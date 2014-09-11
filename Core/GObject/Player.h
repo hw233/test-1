@@ -245,6 +245,10 @@ namespace GObject
 #define GET_BIT_5(X,Y)   ((X >> (Y*5)) & 0x1F)
 #define CLR_BIT_5(X,Y)   (X & ~(0x1F<<(Y*5)))
 
+#define CLR_BIT_4(X,Y)   (X & ~(0x0F<<(Y*4)))
+#define SET_BIT_4(X,Y,V) (CLR_BIT_4(X,Y) | V<<(Y*4))
+#define GET_BIT_4(X,Y)   ((X >> (Y*4)) & 0x0F)
+
 //飞剑(坐骑)系统
 #define MOUNT_COSTID 9500
 #define MOUNT_CANGJIANID 9600
@@ -303,6 +307,7 @@ namespace GObject
         TAIYI       = 22,   //太乙神雷
         SANGBA       = 23,   //桑巴荣耀
         PUDU        = 24,   //普渡众生
+        QTDS        = 25,   //齐天大圣
 
         DRAGONKING_MAX,
     };
@@ -910,6 +915,12 @@ namespace GObject
         UInt32 date;
         UInt32 count;
         UInt8 beantype;
+    };
+
+    struct ShakeMoneyBagLog
+    {
+        UInt32 date;
+        UInt32 count;
     };
 
 	struct PlayerData
@@ -2802,6 +2813,7 @@ namespace GObject
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromIncense(Fighter * fFgt, Fighter * tFgt);
         void sendXinMoInfo(); 
             
     private:
@@ -3258,6 +3270,7 @@ namespace GObject
         void send3366GiftInfo();
         void sendQQGameGift1218();
         void sendFeastLoginAct();
+        void sendFeastGiftLoginAct();
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
@@ -3488,6 +3501,7 @@ namespace GObject
         void sendJiqirenInfo();
         void sevensoul_fixed();
         void BuyLeftPower();
+        UInt32 UseIncenseGood(UInt32 oldExp , UInt8 type , UInt8 num = 0);
 
         //友好度
         void AddFriendlyCount(Player * friender , UInt32 value) ; //增加友好度
@@ -3587,6 +3601,8 @@ namespace GObject
         void do_fighter_xingchen(Fighter* fgt, UInt32 oldId);
         void do_fighter_xinmo(Fighter* fgt, UInt32 oldId);
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
+        void do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId);
+        void do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId);
 
     public:
         void makeClanTitleInfo(Stream & st);
@@ -3616,10 +3632,14 @@ namespace GObject
         void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
+        void getShakeMoneyBagLog();
         void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, UInt8 &, bool);
+        void SetShakeMoneyBagLog(UInt32 , UInt32 , bool);
         void getSeekingHerCharmAward();
+        void CarnivalConsumeAct(UInt32);
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
+        std::vector<ShakeMoneyBagLog *> _shakeMoneyBagLog;
 
         inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
         inline void setMyAnnouncement(std::string & an, bool toDB)
@@ -3632,11 +3652,20 @@ namespace GObject
         void firstPotOfGold(UInt32);
         void firstPotOfGoldReturn(UInt8);
 
+        void giveCarnivalDailyAward(UInt32);
+        void shakeMoneyBag();
+
+        void getGratitudeAward(UInt8);
+        void gratitudeReturnInfo();
+
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
         void ExchangeXG(UInt8 type);
         void ExchangeFlyRoadBox(UInt8 type);
+        void getLuckyBagExtraAward();
+        UInt32 getClanJoinTime();
+        void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
 
     private:
         //玩家位置（包括层数、当层位置）

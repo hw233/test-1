@@ -427,6 +427,7 @@ namespace Script
         Table getShuShanWeiWei_MSYJ_Award(Player * player);
         bool getRedBeanAward(Player * player, UInt8 index, UInt32 count);
         bool getFeiShengDan(Player * player, UInt8 index);
+        bool getFeiShengAward(Player * player, UInt8 index);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

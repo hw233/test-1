@@ -82,6 +82,7 @@
 #include "GData/SevenSoul.h"
 #include "GObject/ClanBigBoss.h"
 #include "GObject/Evolution.h"
+#include "GObject/ClanRankBattle.h"
 
 namespace GObject
 {
@@ -1010,8 +1011,8 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading copy:");
-		DBCopyData dbcd;
         lc.reset(2000);
+		DBCopyData dbcd;
 		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot`, `lootlvl` FROM `player_copy` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
@@ -1028,8 +1029,8 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading frontmap:");
-		DBFrontMapData dbcd;
         lc.reset(2000);
+		DBFrontMapData dbcd;
 		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status`, `lootlvl` FROM `player_frontmap` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
@@ -1046,8 +1047,8 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading xjfrontmap:");
-		DBFrontMapData dbcd;
         lc.reset(2000);
+		DBFrontMapData dbcd;
 		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status`, `lootlvl` FROM `player_xjfrontmap` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
@@ -1064,12 +1065,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading fighter templates:");
+		lc.reset(20);
 		DBFighter dbfgt;
 		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `talent`, `hitrate`, `evade`, `critical`, `criticaldmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -1146,12 +1147,12 @@ namespace GObject
 		globalFighters.buildSummonSet();
 
 		lc.prepare("Loading NPC groups:");
+		lc.reset(20);
 		GData::DBNpcGroup dbng;
 		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `type`, `experience`, `lootId`, `lootId1`, `lootId2`, `lootId3` FROM `npc_group`", dbng) != DB::DB_OK)
 			return false;
 		std::string path = cfg.scriptPath + "formula/main.lua";
 		Script::BattleFormula bform(path.c_str());
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -1197,10 +1198,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading boss template:");
+		lc.reset(20);
 		DBBoss dbboss;
 		if(execu->Prepare("SELECT `id`, `location`, `spawnTime`, `fleeTime`, `appearLevel` FROM `boss`", dbboss) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -1813,12 +1814,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading players:");
+		lc.reset(200);
 		// load players
 		DBPlayerData dbpd;
 		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate`, `clancontrishop`,`announcement` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
-		lc.reset(200);
 		UInt32 tlimit = TimeUtil::SharpDay(-1);
 		UInt32 nextDay = TimeUtil::SharpDay(1);
 		while(execu->Next() == DB::DB_OK)
@@ -2192,11 +2193,11 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading Player HoneyFall:");
+		lc.reset(20);
         pl = NULL;
 		DBHoneyFall hfData;
 		if(execu->Prepare("SELECT `playerId`, `type`, `value` FROM `player_honeyfall`", hfData) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2210,10 +2211,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading prepaid id list:");
+		lc.reset(20);
 		DBPrepaid prepaidData;
 		if(execu->Prepare("SELECT `id`, `gold` FROM `prepaid`", prepaidData) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2222,12 +2223,12 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading player buffs:");
+		lc.reset(100);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBPlayerBuffData buffData;
 		if(execu->Prepare("SELECT `id`, `buffId`, `data` FROM `player_buff` ORDER BY `id`", buffData) != DB::DB_OK)
 			return false;
-		lc.reset(100);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2243,12 +2244,12 @@ namespace GObject
 		lc.finalize();
 
         lc.prepare("Loading player vars:");
+        lc.reset(100);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
         pl = NULL;
         DBPlayerVar playerVar;
         if(execu->Prepare("SELECT `playerId`, `id`, `data`, `over` FROM `var` ORDER BY `playerId`", playerVar) != DB::DB_OK)
             return false;
-        lc.reset(100);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -2263,12 +2264,12 @@ namespace GObject
         lc.finalize();
 
 		lc.prepare("Loading friendliness:");
+		lc.reset(2000);
 		DBFightersFriendliness ffdata;
 		if(execu->Prepare("SELECT `playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay` FROM `friendliness` ORDER BY `playerId`", ffdata) != DB::DB_OK)
 			return false;
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
-		lc.reset(2000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2284,10 +2285,10 @@ namespace GObject
 
         // ???ɼ???
         lc.prepare("Loading clan skill:");
+		lc.reset(1000);
         DBClanSkill cs;
 		if(execu->Prepare("SELECT `playerId`, `skillId`, `level` FROM `clan_skill` ORDER BY `skillId`, `playerId`", cs) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2299,14 +2300,14 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading fighters:");
+		lc.reset(1000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`incense`,`hideFashion`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2422,6 +2423,7 @@ namespace GObject
             fgt2->setAcupointsGold(specfgtobj.acupointsgold, false);
 			fgt2->setHalo(fetchHalo(specfgtobj.halo), false);
 			fgt2->setInnateTrump(fetchInnateTrump(specfgtobj.innateTrump), false);
+			fgt2->setSummoned(specfgtobj.summoned);
 			fgt2->setFashion(fetchFashion(specfgtobj.fashion), false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
@@ -2449,6 +2451,7 @@ namespace GObject
             fgt2->setAttrType3(specfgtobj.attrType3);
             fgt2->setAttrValue3(specfgtobj.attrValue3);
             fgt2->setHideFashion(specfgtobj.hideFashion,false);
+            fgt2->setIncense(specfgtobj.incense);
             if(fgt2->isPet())
                 pl->addFairyPet(static_cast<FairyPet *>(fgt2), false);
             else
@@ -2463,12 +2466,12 @@ namespace GObject
         worldBoss.setLevel(lvl_max);
 
 		lc.prepare("Loading fighter buffs:");
+		lc.reset(200);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFighterBuffData fbuff;
 		if(execu->Prepare("SELECT `playerId`, `id`, `buffId`, `data` FROM `fighter_buff` ORDER BY `playerId`", fbuff) != DB::DB_OK)
 			return false;
-		lc.reset(200);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2486,12 +2489,12 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading password:");
+		lc.reset(100);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBSecondPWD spd;
 		if(execu->Prepare("SELECT `playerId`, `password`, `questionForPWD`, `answerForPWD` FROM `pass_word`", spd) != DB::DB_OK)
 			return false;
-		lc.reset(100);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2507,12 +2510,12 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading fairyPet data:");
+		lc.reset(200);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFairyPetData fpetdb;
 		if(execu->Prepare("SELECT `id`, `playerId`, `onBattle`, `petLev`, `petBone`, `pinjieBless`, `genguBless`, `chong`, `overTime`, `xiaozhou`, `dazhou`, `evolve`, `equip1`, `equip2`, `equip3` FROM `fairyPet` ORDER BY `playerId`", fpetdb) != DB::DB_OK)
 			return false;
-		lc.reset(200);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2534,13 +2537,13 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading fairyPet_sanhun data:");
+		lc.reset(20);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBSanHun shdata;
 		if(execu->Prepare("SELECT `fairyPetId`, `playerId`, sanhunId, `curLvl`  FROM `fairyPet_sanhun` ORDER BY `playerId`", shdata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2562,6 +2565,7 @@ namespace GObject
 
 		//load all items
 		lc.prepare("Loading items:");
+		lc.reset(2000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		ItemData idata;
@@ -2571,7 +2575,6 @@ namespace GObject
 		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bindType` FROM `item` ORDER BY `ownerId`, `bindType` DESC", idata) != DB::DB_OK)
 #endif
 			return false;
-		lc.reset(2000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2624,12 +2627,12 @@ namespace GObject
 
 		//load all trades
 		lc.prepare("Loading trades:");
+		lc.reset(100);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBTradeData tdata;
 		if(execu->Prepare("SELECT `tradeId`, `ownerId`, `tradeSide`, `tradeStatus`, `tradeTo`, `tradeTitle`, `tradeTime`,  `coin`, `gold`, `items` FROM `trade` ORDER BY `ownerId`", tdata) != DB::DB_OK)
 			return false;
-		lc.reset(100);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2680,10 +2683,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading boss data:");
+		lc.reset(20);
 		DBBossHP bosshp;
 		if(execu->Prepare("SELECT `id`, `level`, `pos`, `hp` FROM `boss`", bosshp) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2705,10 +2708,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading boss damage data:");
+		lc.reset(20);
 		DBBossDamage bossdam;
 		if(execu->Prepare("SELECT `id`, `playerId`, `damage`, `exp` FROM `boss_damage`", bossdam) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2723,11 +2726,11 @@ namespace GObject
 		lc.finalize();
 
         lc.prepare("Loading team copy player:");
+        lc.reset(500);
         last_id = 0xFFFFFFFFFFFFFFFFull;
         DBTeamCopyPlayer dbtcp;
         if(execu->Prepare("SELECT `playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime` FROM `teamcopy_player` ORDER BY `playerId`, `copyId`, `type`", dbtcp) != DB::DB_OK)
             return false;
-        lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2744,11 +2747,11 @@ namespace GObject
 		lc.finalize();
 
         lc.prepare("Loading team copy player award:");
+        lc.reset(500);
         last_id = 0xFFFFFFFFFFFFFFFFull;
         DBTeamCopyPlayerAward dbtcpa;
         if(execu->Prepare("SELECT `playerId`, `rollId`, `roll`, `awardId`, `awardCnt` FROM `teamcopy_player_award` ORDER BY `playerId`", dbtcpa) != DB::DB_OK)
             return false;
-        lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2765,12 +2768,12 @@ namespace GObject
 
         
 		lc.prepare("Loading player pending tasks:");
+		lc.reset(2000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBTaskData dtdata;
 		if(execu->Prepare("SELECT `ownerId`, `taskId`, `acceptTime`, `step`, `timeBegin`, `timeEnd`, `completed`, `submit` FROM `task_instance` WHERE `submit` = 0 ORDER BY `ownerId`", dtdata) != DB::DB_OK)
 			return false;
-		lc.reset(2000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2807,12 +2810,12 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading player completed tasks:");
+		lc.reset(4000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBTaskCompleteData dtdata2;
 		if(execu->Prepare("SELECT `ownerId`, `taskId`, `timeEnd` FROM `task_instance` WHERE `submit` = 1 ORDER BY `ownerId`", dtdata2) != DB::DB_OK)
 			return false;
-		lc.reset(4000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2834,12 +2837,12 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading player day tasks:");
+		lc.reset(1000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBDayTaskData dtddata;
 		if(execu->Prepare("SELECT `loopTask`, `ownerId`, `count`, `maxCount`, `maxFlushQualityCount`, `preTaskId`, `preFlushTime`, `preTaskQuality`, `autoCompletedTaskId`, `autoCompletedTaskAcceptTime`, `currDay`, `flushCount` FROM `day_task_instance` ORDER BY `ownerId`", dtddata) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2869,13 +2872,13 @@ namespace GObject
 
 		//load all sales put last
 		lc.prepare("Loading sales:");
+		lc.reset(100);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		UInt32 now = TimeUtil::Now();
 		DBSaleData dbsdata;
 		if(execu->Prepare("SELECT `saleId`, `ownerId`, `status`, `saleTime`, `priceType`, `price`, `itemId`, `itemNum` FROM `sale` WHERE `status` < 4 ORDER BY `ownerId`", dbsdata) != DB::DB_OK)
 			return false;
-		lc.reset(100);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2933,13 +2936,13 @@ namespace GObject
 
 		//load all athletics record
 		lc.prepare("Loading athletics records:");
+		lc.reset(2000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * atker, *defer;
 		atker = defer = NULL;
 		DBAthleticsRecordData drd;
 		if(execu->Prepare("SELECT `id`, `atker`, `defer`, `repid`, `time`, `winSide` FROM `athletics_record` ORDER BY `time` desc", drd) != DB::DB_OK)
 			return false;
-		lc.reset(2000);
 		bool ret1, ret2;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -2959,10 +2962,10 @@ namespace GObject
 
 		//use for new year activity fix???????????????????
 		lc.prepare("Loading exchange plane ticket:");
+		lc.reset(100);
 		DBExchangeTicket det;
 		if(execu->Prepare("SELECT `playerId`, `exchange_num` FROM `exchange_ticket`", det) != DB::DB_OK)
 			return false;
-		lc.reset(100);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -2975,12 +2978,12 @@ namespace GObject
 
         // Load player attainment
 		lc.prepare("Loading player attainment:");
+		lc.reset(1000);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBAttainData dadata;
 		if(execu->Prepare("SELECT `ownerId`, `attainId`, `status`, `updatetime` FROM `attainment` ORDER BY `ownerId`, `attainId`", dadata) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3002,13 +3005,13 @@ namespace GObject
 
         // Load player activity
         lc.prepare("Loading player activityData:");
+		lc.reset(1000);
     	last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBActivityData atydata;
 		//if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags`, `scores`, `propsID`, `signRecord` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
 		if(execu->Prepare("SELECT `playerId`, `overTime`, `scores`, `propsID`, `signRecord` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3025,12 +3028,12 @@ namespace GObject
 
         // Load player Strengthen souls
         lc.prepare("Loading player StrengthenData:");
+		lc.reset(1000);
     	last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBStrengthenData sthdata;
 		if(execu->Prepare("SELECT `playerId`, `overTime`, `souls`, `soulId`, `flags`, `greenBox`, `blueBox`, `purpleBox`, `orangeBox` FROM `strengthenData` ORDER BY  `playerId`", sthdata) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3048,12 +3051,12 @@ namespace GObject
         // Load player airbook
         {
             lc.prepare("Loading player AribookData:");
+            lc.reset(1000);
             last_id = 0xFFFFFFFFFFFFFFFFull;
             pl = NULL;
             DBAirBookData sthdata;
             if(execu->Prepare("SELECT `playerId`, `overTime`, `grade`, `recharge`,`consume`, `flags` FROM `AirBookData` ORDER BY  `playerId`", sthdata) != DB::DB_OK)
                 return false;
-            lc.reset(1000);
             while(execu->Next() == DB::DB_OK)
             {
                 lc.advance();
@@ -3072,12 +3075,12 @@ namespace GObject
         // Load player SeekingHer sendBeans_log
         {
             lc.prepare("Loading player SeekingHer sendBeans_log:");
+            lc.reset(1000);
             last_id = 0xFFFFFFFFFFFFFFFFull;
             pl = NULL;
             DBSeekingHerSendBeanLog sthdata;
             if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY  `senderId`", sthdata) != DB::DB_OK)
                 return false;
-            lc.reset(1000);
             while(execu->Next() == DB::DB_OK)
             {
                 lc.advance();
@@ -3094,12 +3097,37 @@ namespace GObject
 
         lc.finalize();
 
+        // Load player SeekingHer shake_moneybag_log
+        {
+            lc.prepare("Loading player CarnivalConsume shake_moneybag_log:");
+            lc.reset(1000);
+            last_id = 0xFFFFFFFFFFFFFFFFull;
+            pl = NULL;
+            DBShakeMoneyBagLog sthdata;
+            if(execu->Prepare("SELECT `playerId`, `data`, `count` FROM `shake_moneybag_log` ORDER BY  `playerId`", sthdata) != DB::DB_OK)
+                return false;
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                if(sthdata.playerId != last_id)
+                {
+                    last_id = sthdata.playerId;
+                    pl = globalPlayers[last_id];
+                }
+                if(pl == NULL)
+                    continue;
+                pl->SetShakeMoneyBagLog(sthdata.date, sthdata.count, 0);
+            }
+        }
+
+        lc.finalize();
+
 		/*lc.prepare("Loading mail package:");
+		lc.reset(50);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;
 		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
 			return false;
-		lc.reset(50);
 		UInt32 last_pid = 0xFFFFFFFF;
 		MailPackage * mp = NULL;
 		while(execu->Next() == DB::DB_OK)
@@ -3115,11 +3143,11 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading mails:");
+		lc.reset(500);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailData mdata;
 		if(execu->Prepare("SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` ORDER BY `playerId`, `mailId`", mdata) != DB::DB_OK)
 			return false;
-		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3152,11 +3180,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading athletics_rank:");
+		lc.reset(1000);
 		DBAthleticsData dbd;
         UInt32 rank[2] = {0,0};
 		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum`, `eChallengeTime`, `ePhysical`, `eSelectIndex`, `eCombine1`, `eCombine2`, `eCombine3`, `eCombine4`, `eCombine5`, `eRival1`, `eRival2`, `eRival3`, `eRival4`, `eRival5`, `eCanAttack1`, `eCanAttack2`, `eCanAttack3`, `eCanAttack4`, `eCanAttack5`, `eRivalType1`, `eRivalType2`, `eRivalType3`, `eRivalType4`, `eRivalType5` FROM `athletics_rank` ORDER BY `rank`, `maxRank`", dbd) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3224,10 +3252,10 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading athletics_event:");
+		lc.reset(1000);
 		DBAthleticsEventData dbed;
         if(execu->Prepare("SELECT `id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time` FROM `athletics_event` ORDER BY `time` desc", dbed) != DB::DB_OK)
             return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3251,10 +3279,10 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading auto battle data:");
+		lc.reset(20);
 		DBAutoBattle dab;
 		if(execu->Prepare("SELECT `playerId`, `npcId`, `count`, `interval` FROM `auto_battle`", dab) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3266,10 +3294,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading auto copy challenge data:");
+		lc.reset(20);
 		DBAutoCopy dac;
 		if(execu->Prepare("SELECT `playerId`, `id` FROM `autocopy`", dac) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3281,10 +3309,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading auto frontmat challenge data:");
+		lc.reset(20);
 		DBAutoFrontMap afm;
 		if(execu->Prepare("SELECT `playerId`, `id` FROM `auto_frontmap`", afm) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3296,10 +3324,10 @@ namespace GObject
 		lc.finalize();
 
         lc.prepare("Loading auto xjfrontmat challenge data:");
+		lc.reset(20);
 		DBAutoFrontMap axjfm;
 		if(execu->Prepare("SELECT `playerId`, `id` FROM `auto_xjfrontmap`", axjfm) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3311,10 +3339,10 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading auto dungeon challenge data:");
+		lc.reset(20);
 		DBDungeonAuto dda;
 		if(execu->Prepare("SELECT `playerId`, `dungeonId`, `totalExp`, `won` FROM `dungeon_auto`", dda) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3327,12 +3355,12 @@ namespace GObject
 
 		//load training fighters
 		lc.prepare("Loading fighter train table:");
+		lc.reset(100);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFighterTrain dbft;
 		if(execu->Prepare("SELECT `fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `trainRemain`, `checkTime`, `accExp` FROM `fighter_train` ORDER BY `ownerId`", dbft) != DB::DB_OK)
 			return false;
-		lc.reset(100);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3376,12 +3404,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading friends:");
+		lc.reset(500);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriend dbfr;
 		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` ORDER BY `id`", dbfr) != DB::DB_OK)
 			return false;
-		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3420,12 +3448,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading friends:");
+		lc.reset(500);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		PrayRelation dbfr;
 		if(execu->Prepare("SELECT `id`,`friendId`,`pray`,`time`,`praynum` FROM `pray_relation` ORDER BY `id`", dbfr) != DB::DB_OK)
 			return false;
-		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3454,12 +3482,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading presentbox:");
+		lc.reset(500);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		PresentBox dbfr;
 		if(execu->Prepare("SELECT `id`,`awardId`,`playerId2`,`sendtime`,`get`  FROM `player_presentbox` ", dbfr) != DB::DB_OK)
 			return false;
-		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3513,10 +3541,10 @@ namespace GObject
 
         // ͨ??????????
 		LoadingCounter lc("Loading dungeon monster templates:");
+		lc.reset(20);
 		GData::DBDungeonMonster dmon;
 		if(execu->Prepare("SELECT `id`, `formated`, `monsters`, `experience` FROM `dungeon_monster`", dmon) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3574,10 +3602,10 @@ namespace GObject
 
         // ͨ????????
 		lc.prepare("Loading dungeon templates:");
+		lc.reset(20);
 		GData::DBDungeon dd;
 		if(execu->Prepare("SELECT `id`, `name`, `location`, `type`, `lvlReq` FROM `dungeon`", dd) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3592,10 +3620,10 @@ namespace GObject
 
         // ͨ??????????
 		lc.prepare("Loading dungeon level templates:");
+		lc.reset(20);
 		GData::DBDungeonLevel dlvl;
 		if(execu->Prepare("SELECT `id`, `level`, `monsterSet`, `lootSet`,`difficulty` FROM `dungeon_level`", dlvl) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3622,13 +3650,13 @@ namespace GObject
 
         // ͨ?????û?????
 		lc.prepare("Loading dungeon player data:");
+		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 		DBDungeonPlayer dp;
 		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`, `justice`, `justice_roar`, `difficulty` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3655,10 +3683,10 @@ namespace GObject
 
         // ???Ӹ???????
 		LoadingCounter lc("Loading team copy templates:");
+		lc.reset(20);
 		GData::DBTeamCopy dbtc;
 		if(execu->Prepare("SELECT `id`, `type`, `location`, `npcgroups` FROM `team_copy`", dbtc) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3678,10 +3706,10 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading petteamcopy templates:");
+		lc.reset(20);
 		GData::DBPetTeamCopy dbptc;
 		if(execu->Prepare("SELECT `copyIdx`, `type`, `npcgroupId`, `quality` FROM `petteamcopy`", dbptc) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3697,10 +3725,10 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading player_petteamcopy");
+        lc.reset(1000);
         DBPetTeamCopyPlayer dbptcp;
         if(execu->Prepare("SELECT `playerId`, `copyId`, `type`, `npcGroup1Id`, `npcGroup2Id`, `npcGroup3Id` FROM `player_petteamcopy` ORDER BY `playerId`, `copyId`, `type`", dbptcp) != DB::DB_OK)
             return false;
-        lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3722,10 +3750,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading petteamcopylog");
+		lc.reset(1000);
 		DBPetTeamCopyLog t;
 		if(execu->Prepare("SELECT `playerName`, `monsterName`, `items` FROM `petteamcopylog` ORDER BY `id` DESC LIMIT 10", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -3740,11 +3768,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading mobao");
+		lc.reset(1000);
 		DBMoBao mb;
 		if(execu->Prepare("SELECT `playerId`, `buyNum`, `status`, `item`, `itemACnt`, `itemBCnt`, `itemCCnt`,`itemDCnt`,`itemECnt`,`itemFCnt` FROM `mobao` ORDER BY `playerId`", mb)!= DB::DB_OK)
 			return false;
 
-		lc.reset(1000);
         Player* pl = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -3876,10 +3904,10 @@ namespace GObject
 
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
-		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll`,`clanFireValue`,`clanAutoApply`  FROM `clan`", cl) != DB::DB_OK)
-			return false;
 		lc.reset(1000);
+		DBClan cl;
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore`, `battleRanking`,`qqOpenid`,`xianyun`,`gongxian`,`urge`, `duobaoAward`, `tyssSum`, `clantitleAll`,`clanFireValue`,`clanAutoApply`, `serverId`  FROM `clan`", cl) != DB::DB_OK)
+			return false;
 		Clan * clan = NULL;
 		ClanBattle * clanBattle = NULL;
 		while(execu->Next() == DB::DB_OK)
@@ -3898,9 +3926,13 @@ namespace GObject
 				clan->addEnemyClanFromDB(cl.enemyClan2);
 				//clan->patchMergedName();
                 clan->setClanFunds(cl.funds);
+                if(cl.founder == 0 && cl.leader != 0)
+                {
+                    cl.founder = cl.leader;
+                    DB5().PushUpdateData("UPDATE `clan` SET `founder` = %u WHERE `id` = %u", cl.founder, cl.id);
+                }
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
-                clan->patchMergedName();
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
                 clan->LoadBattleScore(cl.battleScore);
@@ -3938,6 +3970,14 @@ namespace GObject
                 clan->SetClanTitle(cl.clantitleAll);
                 clan->SetClanFireValue(cl.clanFireValue);
                 clan->SetClanAutoApply(cl.clanAutoApply);
+                if(cfg.merged && cl.serverId == 0)
+                {
+                    cl.serverId = cl.founder >> 48;
+                    if(cl.serverId != 0)
+                        DB5().PushUpdateData("UPDATE `clan` SET `serverId` = %u WHERE `id` = %u", cl.serverId, cl.id);
+                }
+                clan->SetClanServerId(cl.serverId);
+                clan->patchMergedName();
             }
 			else
 			{
@@ -3965,11 +4005,11 @@ namespace GObject
 
         // ??????Ա
 		lc.prepare("Loading clan players:");
+		lc.reset(1000);
 		DBClanPlayer cp;
 		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `activepoint`, `last_actpt`, `actpt_endtime`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField`,`inQQGroup` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
-		lc.reset(1000);
 		UInt32 rank = 0;
 		bool hasLeader = false;
         clan = NULL;
@@ -4056,14 +4096,21 @@ namespace GObject
 		globalClans.enumerate(cacheClan, 0);
         if(GVAR.GetVar(GVAR_REPAIRTYSSBUG) == 0)
             GVAR.SetVar(GVAR_REPAIRTYSSBUG,1);
-
+#if 0
+        if(GVAR.GetVar(GVAR_CLAN_LOCAL_RANK) == 0)
+        {
+            GVAR.SetVar(GVAR_CLAN_LOCAL_RANK, 1);
+            ClanRankBattleMgr::Instance().clanLocalRankInit();
+            ClanRankBattleMgr::Instance().clanLocalRank();
+        }
+#endif
         lc.prepare("Loading clan item:");
+        lc.reset(1000);
         DBClanItem ci;
         if(execu->Prepare("SELECT `clanid`, `playerid`, `itemid`, `itemnum` FROM `clan_item` ORDER BY `clanid`", ci) != DB::DB_OK)
             return false;
         lastId = 0xFFFFFFFF;
         clan = NULL;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -4079,12 +4126,12 @@ namespace GObject
         lc.finalize();
 
         lc.prepare("Loading clan item history:");
+        lc.reset(1000);
         DBClanItemHistory cih;
         if(execu->Prepare("SELECT `id`, `clanid`, `type`, `time`, `playerid`, `itemstr` FROM `clan_item_history` ORDER BY `clanid`,`time`", cih) != DB::DB_OK)
             return false;
         lastId = 0xFFFFFFFF;
         clan = NULL;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -4101,12 +4148,12 @@ namespace GObject
 
         //???ɿƼ?
 		lc.prepare("Loading clan tech:");
+		lc.reset(1000);
 		DBClanTech ct;
 		if(execu->Prepare("SELECT `clanId`, `techId`, `level`, `extra` FROM `clan_tech` ORDER BY `clanId`", ct) != DB::DB_OK)
 			return false;
 		lastId = 0xFFFFFFFF;
 		clan = NULL;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4120,12 +4167,12 @@ namespace GObject
 
         //????????????
 		lc.prepare("Loading clan pending players:");
+		lc.reset(1000);
 		DBClanPendingPlayer cpp;
 		if(execu->Prepare("SELECT `id`, `playerId`, `class`, `opTime` FROM `clan_pending_player` ORDER BY `id`", cpp) != DB::DB_OK)
 			return false;
 		lastId = 0xFFFFFFFF;
 		clan = NULL;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4147,12 +4194,12 @@ namespace GObject
 
         //????????
 		lc.prepare("Loading clan donate record:");
+		lc.reset(200);
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		DBClanDonateRecord ddr;
 		if (execu->Prepare("SELECT `clanId`, `donateName`, `donateTo`, `donateType`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
 			return false;
-		lc.reset(200);
 		while (execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4168,12 +4215,12 @@ namespace GObject
 		lc.finalize();
 
         lc.prepare("Loading duobaolog:");
+		lc.reset(200);
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		DBDuoBaoLog dbl;
 		if (execu->Prepare("SELECT `clanId`, `name`, `score`, `itemId`, `cnt`, `time` FROM `duobaolog` ORDER BY `clanId`, `time` DESC", dbl) != DB::DB_OK)
 			return false;
-		lc.reset(200);
 		while (execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4194,13 +4241,13 @@ namespace GObject
 
         // ????ս??
 		lc.prepare("Loading clan battle result record:");
+		lc.reset(200);
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		clanBattle = NULL;
 		DBClanBattleResult dbr;
 		if (execu->Prepare("SELECT `id`, `battleTime`, `result` FROM `clan_battle_result` ORDER BY `id`, `battleTime`", dbr) != DB::DB_OK)
 			return false;
-		lc.reset(200);
 		while (execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4223,12 +4270,12 @@ namespace GObject
 
 		//???ذ???ս??????????
 		lc.prepare("Loading clan battler:");
+		lc.reset(1000);
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		DBClanBattler cb;
 		if (execu->Prepare("SELECT `id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `battleStatus`, `reliveNum`, `wins`, `serialWins`, `maxSerialWins`, `southEdurance`, `northEdurance`, `grabAchieve`, `hasEnter`, `hasAttack` FROM `clan_battler` ORDER BY `battleClanId`", cb) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4289,12 +4336,12 @@ namespace GObject
 		clanManager.resumeRobClanBattleScore();
 
 		lc.prepare("Loading clan repositories:");
+		lc.reset(20);
 		DBClanRepo crepo;
 		if(execu->Prepare("SELECT `id`, `itemId`, `itemNum` FROM `clan_repo` ORDER BY `id`", crepo) != DB::DB_OK)
 			return false;
 		UInt32 last_cid = 0xFFFFFFFF;
 		clan = NULL;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4311,13 +4358,13 @@ namespace GObject
 
         //???ά??
 		lc.prepare("Loading clan pending rewards:");
+		lc.reset(20);
 		DBClanPendingReward cpr;
 		if(execu->Prepare("SELECT `id`, `timeAlloc`, `playerId`, `itemId`, `itemNum` FROM `clan_pending_reward` ORDER BY `id`", cpr) != DB::DB_OK)
 			return false;
 
 		last_cid = 0xFFFFFFFF;
 		clan = NULL;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4335,13 +4382,13 @@ namespace GObject
 		lc.finalize();
 
 		lc.prepare("Loading clan reward allocation records:");
+		lc.reset(50);
 		DBClanRewardRecord crr;
 		if(execu->Prepare("SELECT `id`, `type`, `timeAlloc`, `playerName`, `items` FROM `clan_reward_record` ORDER BY `id`", crr) != DB::DB_OK)
 			return false;
 
 		last_cid = 0xFFFFFFFF;
 		clan = NULL;
-		lc.reset(50);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -4372,12 +4419,12 @@ namespace GObject
 
         // 读取帮派神像
         lc.prepare("Loading clan statue:");
+        lc.reset(1000);
         DBClanStatue cs;
         if (execu->Prepare("SELECT `clanid`, `level`, `exp`, `expUpdateTime` FROM `clan_statue` ORDER BY `clanid`", cs) != DB::DB_OK)
             return false;
         clan = NULL;
         lastId = 0xFFFFFFFF;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -4393,12 +4440,12 @@ namespace GObject
 
         // 读取帮派副本
         lc.prepare("Loading clan copy:");
+        lc.reset(1000);
         DBClanCopy cc;
         if (execu->Prepare("SELECT `clanid`, `level`, `levelUpdateTime`, `maxCopyLevel`, `maxCopyTime` FROM `clan_copy` ORDER BY `clanid`", cc) != DB::DB_OK)
             return false;
         clan = NULL;
         lastId = 0xFFFFFFFF;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -4416,11 +4463,11 @@ namespace GObject
         
         // 读取帮派副本历史日志
         lc.prepare("Loading clan copy log:");
+        lc.reset(1000);
         DBClanCopyLog ccl;
         if (execu->Prepare("SELECT `clanid`, `logTime`, `logType`, `playerName`, `logVal` FROM `clan_copy_log` ORDER BY `clanid` ASC, `logTime` ASC", ccl) != DB::DB_OK)
             return false;
         clan = NULL;
-        lc.reset(1000);
         lastId = 0xFFFFFFFF;
         while(execu->Next() == DB::DB_OK)
         {
@@ -4437,11 +4484,11 @@ namespace GObject
 
         // 读取帮派神魔之树
         lc.prepare("Loading clan spirit tree:");
+        lc.reset(1000);
         DBClanSptr csptr;
         if (execu->Prepare("SELECT `clanId`, `exp`, `level`, `refreshTimes`, `color`, `endTime` FROM `clan_sptr` ORDER BY `clanId` ASC", csptr) != DB::DB_OK)
             return false;
         clan = NULL;
-        lc.reset(1000);
         lastId = 0xFFFFFFFF;
         while(execu->Next() == DB::DB_OK)
         {
@@ -4458,13 +4505,13 @@ namespace GObject
 
         // 读取帮派建筑
         lc.prepare("Loading clan buildings:");
+        lc.reset(1000);
         DBClanBuildings clanBuildings;
 		if(execu->Prepare("SELECT `clanId`, `fairylandEnergy`, "
                     "`phyAtkLevel`, `magAtkLevel`, `actionLevel`, `hpLevel`,`oracleLevel` "
                     " `updateTime` FROM `clan_buildings`", clanBuildings) != DB::DB_OK)
 			return false;
         clan = NULL;
-        lc.reset(1000);
         lastId = 0xFFFFFFFF;
         while(execu->Next() == DB::DB_OK)
         {
@@ -4483,11 +4530,11 @@ namespace GObject
 
         // 读取帮派Boss
         lc.prepare("Loading clanbigboss:");
+        lc.reset(1000);
         DBClanBigBoss dcbb;
         if (execu->Prepare("SELECT `clanid`, `status`, `app_time`, `last`, `hp`, `atk`, `matk` FROM `clanbigboss` ", dcbb) != DB::DB_OK)
             return false;
         clan = NULL;
-        lc.reset(1000);
         lastId = 0xFFFFFFFF;
         while(execu->Next() == DB::DB_OK)
         {
@@ -5166,11 +5213,11 @@ namespace GObject
             if (execu.get() == NULL || !execu->isConnected()) return false;
 
             LoadingCounter lc("Loading zhenyuan_extraAttr:");
+            lc.reset(20);
             GData::DBZHYExtraAttr zeadb;
             if(execu->Prepare("SELECT `id`, `lvLimit`, `type1`, `type2`, `maxVal` FROM `zhenyuan_extraAttr` ORDER BY `lvLimit`, `id`", zeadb) != DB::DB_OK)
                 return false;
 
-            lc.reset(20);
             while(execu->Next() == DB::DB_OK)
             {
                 lc.advance();
@@ -5204,11 +5251,11 @@ namespace GObject
             if (execu.get() == NULL || !execu->isConnected()) return false;
 
             LoadingCounter lc("Loading equipments:");
+            lc.reset(2000);
             DBEquipment dbe;
             if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `tRank`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
                 return false;
 
-            lc.reset(2000);
             while(execu->Next() == DB::DB_OK)
             {
                 lc.advance();
@@ -5403,11 +5450,11 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading equipments spirit:");
+        lc.reset(2000);
         DBEquipmentSpirit dbes;
         if(execu->Prepare("SELECT `equipment`.`id`, `splev1`, `splev2`, `splev3`, `splev4`, `spform1`, `spform2`, `spform3` FROM `equipment` LEFT JOIN `equipment_spirit` ON `equipment`.`id` = `equipment_spirit`.`id`", dbes) != DB::DB_OK)
             return false;
 
-        lc.reset(2000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -5463,11 +5510,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading SpecialAward:");
+		lc.reset(20);
 		DBSpecialAward sa;
 		if(execu->Prepare("SELECT `rank`, `type`, `playerId` FROM SpecialAward ORDER BY `rank`", sa) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -5486,10 +5533,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Arena Bets");
+		lc.reset(1000);
 		DBArenaBet ab;
 		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_bet` ORDER BY `id`", ab)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		while(execu->Next() == DB::DB_OK)
@@ -5514,16 +5561,16 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Place");
-		DBPracticePlace pp;
-		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount`, `slotincoming`, `protincoming` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
-			return false;
 		lc.reset(1000);
-        UInt8 i = 0;
+		DBPracticePlace pp;
+		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount`, `slotincoming`, `protincoming`, `serverId` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
+			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
             if (!pp.id)
                 continue;
             GObject::PPlace place;
+            place.id = pp.id;
             place.ownerid = pp.ownerid;
             place.protid = pp.protid;
             place.maxslot = pp.maxslot;
@@ -5535,7 +5582,8 @@ namespace GObject
             place.winCount = pp.winCount;
             place.slotincoming = pp.slotincoming;
             place.protincoming = pp.protincoming;
-            practicePlace.addPlace(place, i++);
+            place.serverId = pp.serverId;
+            practicePlace.addPlace(place, pp.id);
         }
 		lc.finalize();
         return true;
@@ -5593,11 +5641,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Hero Memo Data");
+		lc.reset(1000);
         Player* pl = 0;
 		DBHeroMemo hm;
 		if(execu->Prepare("SELECT `playerId`, `awards`, `memos` FROM `heromemo`", hm)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -5618,11 +5666,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Shuo Shuo Data");
+		lc.reset(1000);
         Player* pl = 0;
 		DBShuoShuo ss;
 		if(execu->Prepare("SELECT `playerId`, `updateTime`, `shuoshuo` FROM `shuoshuo`", ss)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -5643,11 +5691,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading CFriend Awards Data");
+		lc.reset(1000);
         Player* pl = 0;
 		DBCFriendAwards cfa;
 		if(execu->Prepare("SELECT `playerId`, `invitedId`, `awards` FROM `cfriend_awards`", cfa)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -5762,10 +5810,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Tripod Data");
+		lc.reset(1000);
 		DBTripod t;
 		if(execu->Prepare("SELECT `id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num` FROM `tripod`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -5791,10 +5839,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading WorldBoss Data");
+		lc.reset(1000);
 		DBWorldBoss t;
 		if(execu->Prepare("SELECT `npcId`, `level`, `location`, `count` FROM `worldboss`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
             //worldBoss.add(t.loc, t.npcId, t.level, t.count);
@@ -5808,11 +5856,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Data");
+		lc.reset(1000);
         Player* pl = 0;
 		DBPracticeData pd;
 		if(execu->Prepare("SELECT `id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters` FROM `practice_data`", pd)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -5859,6 +5907,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("reRecharge");
+		lc.reset(1000);
 		DBReRecharge rrdb;
         char buf[1024] = {0};
         snprintf(buf, sizeof(buf), "SELECT `playerId`, `id`, `num`, `status` FROM `recharge` WHERE `no` = '%s'", no.c_str());
@@ -5867,7 +5916,6 @@ namespace GObject
             err += "db error.";
 			return 1;
         }
-		lc.reset(1000);
 
         bool found = false;
 		while(execu->Next() == DB::DB_OK)
@@ -6002,10 +6050,10 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading TownDeamon Monsters:");
+		lc.reset(20);
 		GData::DBTownDeamonMonster dbtdm;
 		if(execu->Prepare("SELECT `level`, `npcId`, `itemId`, `itemNum` FROM `towndeamon_monster` order by level asc", dbtdm) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6016,11 +6064,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu2(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu2.get() == NULL || !execu2->isConnected()) return false;
 		lc.prepare("Loading TownDeamon Player:");
+		lc.reset(20);
 		DBTownDeamonPlayer dbtdp;
         Player* pl = NULL;
 		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		while(execu2->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6062,10 +6110,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading WorldBoss Data");
+		lc.reset(1000);
 		DBWBoss t;
 		if(execu->Prepare("SELECT `idx`, `last`, `hp`, `atk`, `matk` FROM `wboss`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6085,10 +6133,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Discount Data");
+		lc.reset(1000);
 		DBDiscount t;
 		if(execu->Prepare("SELECT `itemid`, `exType`, `exValue`, `timeBegin`, `timeEnd`, `priceOriginal`, `priceDiscount`, `type`, `count` FROM `discount`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6104,11 +6152,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Fighter Second Soul:");
+		lc.reset(20);
 		DBSecondSoul dbss;
         Player* pl = NULL;
 		if(execu->Prepare("SELECT `fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul`", dbss) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6148,11 +6196,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Fighter xingchen:");
+		lc.reset(20);
 		DBXingchen dbxc;
         Player* pl = NULL;
 		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6183,13 +6231,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading TempItem:");
+		lc.reset(20);
 		TempItemData idata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bind`, `sellTime` FROM `tempItem` ORDER BY `ownerId`", idata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6222,13 +6270,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Jiguanshu:");
+		lc.reset(20);
 		DBJiguanshu idata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, `curLvl`, `curExp`  FROM `player_jiguanshu` ORDER BY `playerId`", idata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6254,13 +6302,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Jiguanyu:");
+		lc.reset(20);
 		DBJiguanyu idata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, `jiguanId`, `pos`, `scheme`  FROM `player_jiguanyu` ORDER BY `playerId`", idata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6286,13 +6334,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Tuzhi:");
+		lc.reset(20);
 		DBTuzhi idata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, `tuzhiId`, `curProficient`  FROM `player_tuzhi` ORDER BY `playerId`", idata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6318,13 +6366,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Keyin:");
+		lc.reset(20);
 		DBKeyin idata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, keyinId, `curLvl`, `curValue`  FROM `player_keyin` ORDER BY `playerId`", idata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6350,13 +6398,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading zhenwei:");
+		lc.reset(20);
 		DBZhenwei zwdata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, `keyId`, `mark`  FROM `player_zhenwei` ORDER BY `playerId`", zwdata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6382,13 +6430,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading gear:");
+		lc.reset(20);
 		DBGear gdata;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, `gearId`, `mark`  FROM `player_gear` ORDER BY `playerId`", gdata) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6414,13 +6462,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading goback:");
+		lc.reset(20);
 		DBGoback data;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `inviteeId`, `playerId`  FROM `invitegoback` ORDER BY `inviteeId`", data) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6446,13 +6494,13 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading applylist:");
+		lc.reset(20);
 		DBApplyList data;
         Player* pl = NULL;
 
 		if(execu->Prepare("SELECT `playerId`, `applicantId`  FROM `applylist` ORDER BY `playerId`", data) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -6478,6 +6526,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading teammember:");
+		lc.reset(20);
 		DBTeamMember data;
         Player* p1 = NULL;
         Player* p2 = NULL;
@@ -6486,7 +6535,6 @@ namespace GObject
 		if(execu->Prepare("SELECT `teamId`, `member1`, `member2`, `member3`  FROM `teammember` ORDER BY `teamId`", data) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6509,12 +6557,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading inactivemember:");
+		lc.reset(20);
 		DBInactiveMember data;
 
 		if(execu->Prepare("SELECT `playerId` FROM `inactivemember` ORDER BY `playerId`", data) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6532,12 +6580,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading questions:");
+		lc.reset(20);
 		DBQuestions data;
 
 		if(execu->Prepare("SELECT `answerId`, `questionsId` FROM `questions` ORDER BY `answerId`", data) != DB::DB_OK)
 			return false;
 
-		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6585,10 +6633,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Lucky Log");
+		lc.reset(1000);
 		DBLuckyLog t;
 		if(execu->Prepare("SELECT `name`, `items` FROM `luckylog` ORDER BY `id` DESC LIMIT 10", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6603,10 +6651,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Real Item Award");
+		lc.reset(1000);
 		DBRealItemAward t;
 		if(execu->Prepare("SELECT `id`, `cd`, `card_no`, `card_psw` FROM `real_item_award` ORDER BY `id`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6621,10 +6669,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading New Relation");
+		lc.reset(1000);
 		DBNewRelation t;
 		if(execu->Prepare("SELECT `playerId`, `mood`, `sign` FROM `new_relation` ORDER BY `playerId`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6642,10 +6690,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading RNR");
+		lc.reset(1000);
 		DBRNR t;
 		if(execu->Prepare("SELECT `id`, `record` FROM `rechargenextret` ORDER BY `id`", t)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -6663,10 +6711,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading RNR");
+		lc.reset(1000);
         DBGVar gvar;
         if(execu->Prepare("SELECT `id`, `data`, `over` FROM `gvar` ORDER BY `id`", gvar) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
         {
 			lc.advance();
@@ -6681,10 +6729,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading skill strengthen");
+		lc.reset(1000);
         DBSS ss;
         if(execu->Prepare("SELECT `id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl` FROM `skill_strengthen` ORDER BY `playerId`", ss) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -6720,10 +6768,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading GuangGun");
+		lc.reset(1000);
         DBGuangGun guanggun;
         if(execu->Prepare("SELECT `playerId`,`status`,`playerId1`,`playerId2`, `pos`, `score`, `task`, `tasknum`, `taskCom`,`counts`  FROM `guanggun` ORDER BY `playerId`", guanggun) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
         Player* player1 = NULL;
         Player* player2 = NULL;
@@ -6752,10 +6800,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Qixi");
+		lc.reset(1000);
         DBQixi qixi;
         if(execu->Prepare("SELECT `playerId`, `lover`, `bind`, `pos`, `event`, `score` FROM `qixi` ORDER BY `playerId`", qixi) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
         Player* lover = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -6784,10 +6832,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Snow");
+		lc.reset(1000);
         DBSnow snow;
         if(execu->Prepare("SELECT `playerId`, `lover`, `bind`, `score` FROM `snow` ORDER BY `playerId`", snow) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
         Player* lover = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -6815,10 +6863,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading QiShiBan");
+		lc.reset(1000);
         DBQiShiBan qishiban;
         if(execu->Prepare("SELECT `playerId`, `guankaId`, `score`, `beginTime`, `endTime`, `awardMark` FROM `player_qishiban` ORDER BY `score`", qishiban) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -6844,10 +6892,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading ExJob");
+		lc.reset(1000);
         DBJobHunter dbjh;
         if(execu->Prepare("SELECT `playerId`, `fighterList`, `mapInfo`, `progress`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `stepCount`, `slotVal1`, `slotVal2`, `slotVal3` FROM `job_hunter` ORDER BY `playerId`", dbjh) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player * player = NULL;
 		while(execu->Next() == DB::DB_OK)
         {
@@ -6867,10 +6915,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading copy_front_win");
+		lc.reset(1000);
         DBCopyFrontWin dbcf;
         if(execu->Prepare("SELECT `playerId`, `posOrig`, `posPut`, `itemId`, `ratio` FROM `copy_front_win` ORDER BY `playerId`, `posOrig`", dbcf) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -6958,10 +7006,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading arena_extra_board");
+		lc.reset(1000);
         DBArenaExtraBoard extraboard;
         if(execu->Prepare("SELECT `week`, `name1`, `name2`, `name3`, `name4`, `name5`, `heroId1`, `heroId2`, `heroId3`, `heroId4`, `heroId5`, `sufferTotal`, `sufferCnt1`, `sufferCnt2`, `sufferCnt3`, `sufferCnt4`, `sufferCnt5`, `lasttime1`, `lasttime2`, `lasttime3`, `lasttime4`, `lasttime5` FROM `arena_extra_board` ORDER BY `week`", extraboard) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
         {
 			lc.advance();
@@ -7149,11 +7197,11 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading lingbao attr:");
+        lc.reset(2000);
         DBLingbaoAttr dblba;
         if(execu->Prepare("SELECT `equipment`.`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`,`itemId` FROM `lingbaoattr` LEFT JOIN `equipment` ON `equipment`.`id` = `lingbaoattr`.`id`", dblba) != DB::DB_OK)
             return false;
 
-        lc.reset(2000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7241,11 +7289,11 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading lingbao smelt:");
+        lc.reset(2000);
         DBLingbaoSmelt dblbs;
         if(execu->Prepare("SELECT `playerId`, `gujiId`, `itemId`, `bind`, `value`, `maxValue`, `counts`, `purpleAdjVal`, `orangeAdjVal` FROM `lingbaosmelt`", dblbs) != DB::DB_OK)
             return false;
 
-        lc.reset(2000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7277,10 +7325,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading dreamer");
+		lc.reset(1000);
         DBDreamer dbd;
         if(execu->Prepare("SELECT `playerId`, `progress`, `level`, `maxX`, `maxY`, `maxGrid`, `mapInfo`, `posX`, `posY`, `earlyPosX`, `earlyPosY`, `timeConsume`, `remainTime`, `keys`, `eyes`, `eyeTime`, `eyeX`, `eyeY` FROM `dreamer` ORDER BY `playerId`", dbd) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player * player = NULL;
 		while(execu->Next() == DB::DB_OK)
         {
@@ -7301,11 +7349,11 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading petEquip attr:");
+        lc.reset(2000);
         DBPetEquipAttr dbeqa;
         if(execu->Prepare("SELECT `equipment`.`id`, `level`, `exp`, `skillId`, p.`socket1`, p.`socket2`, p.`socket3`, p.`socket4` FROM `petEquipattr` p LEFT JOIN `equipment` ON `equipment`.`id` = p.`id`", dbeqa) != DB::DB_OK)
             return false;
 
-        lc.reset(2000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7339,11 +7387,11 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading zhenyuan attr:");
+        lc.reset(2000);
         DBZhenyuanAttr dbzhya;
         if(execu->Prepare("SELECT `zhenyuanAttr`.`id`, `itemId`, `zycolor`, `types`, `values`, `bindType` FROM `zhenyuanAttr` LEFT JOIN `item` ON `zhenyuanAttr`.`id` = `item`.`id` OR `item`.`id` = NULL", dbzhya) != DB::DB_OK)
             return false;
 
-        lc.reset(2000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7385,11 +7433,11 @@ namespace GObject
         if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading lingshi attr:");
+        lc.reset(2000);
         DBLingshiAttr dblsa;
         if(execu->Prepare("SELECT `lingshiAttr`.`id`, `itemId`, `level`, `exp`, `bindType` FROM `lingshiAttr` LEFT JOIN `item` ON `lingshiAttr`.`id` = `item`.`id` OR `item`.`id` = NULL", dblsa) != DB::DB_OK)
             return false;
 
-        lc.reset(2000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7423,10 +7471,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gLogDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("fixItem9383Leader");
+		lc.reset(1000);
         DBItemSum dbis;
         if(execu->Prepare("select distinct `player_id`, `item_id`, sum(item_num) as item_nums from `item_histories_2013_4` group by `player_id`, `item_id` having `item_id`=9383", dbis) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player * player = NULL;
 		while(execu->Next() == DB::DB_OK)
         {
@@ -7448,10 +7496,10 @@ namespace GObject
         if(execu.get() == NULL || !execu->isConnected())
             return false;
         LoadingCounter lc("Loading Fairy Spar");
+        lc.reset(1000);
         DBFairySpar t;
         if(execu->Prepare("SELECT `playerId`, `atk`, `magAtk`, `phy`, `element1`, `element2`, `element3`, `element4`, `element5`, `complexPercent`, `curMark`, `breakoutCnt` FROM `fairy_spar` ORDER BY `playerId`", t)!= DB::DB_OK)
             return false;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7470,10 +7518,10 @@ namespace GObject
         if(execu.get() == NULL || !execu->isConnected())
             return false;
         LoadingCounter lc("Loading Collect Card");
+        lc.reset(1000);
         DBCollectCard t;
         if(execu->Prepare("SELECT `playerId`, `id`, `partCnt1`, `partCnt2`, `partCnt3`, `partCnt4`, `partCnt5`, `partCnt6`, `partCnt7`, `partCnt8`, `partCnt9`, `alreadyCnt` FROM `collect_card` ORDER BY `playerId`", t)!= DB::DB_OK)
             return false;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7493,10 +7541,10 @@ namespace GObject
         if(execu.get() == NULL || !execu->isConnected())
             return false;
         LoadingCounter lc("Loading TeamArena data");
+        lc.reset(1000);
         DBTeamArenaData dbtad;
         if(execu->Prepare("SELECT `id`, `name`, `leader`, `score`, `members`, `stamps`, `memScore`, `maxRank`, `inspireLvl`, `overTime` FROM `arena_team` ORDER BY `id`", dbtad)!= DB::DB_OK)
             return false;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7513,10 +7561,10 @@ namespace GObject
         if(execu.get() == NULL || !execu->isConnected())
             return false;
         LoadingCounter lc("Loading TeamArena skill");
+        lc.reset(1000);
         DBTeamArenaSkill dbtas;
         if(execu->Prepare("SELECT `teamId`, `skillId`, `level`, `extra` FROM `arena_team_skill` ORDER BY `teamId`", dbtas)!= DB::DB_OK)
             return false;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7535,10 +7583,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Team Arena Bets");
+		lc.reset(1000);
 		DBArenaBet ab;
 		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_team_bet` ORDER BY `id`", ab)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		while(execu->Next() == DB::DB_OK)
@@ -7563,12 +7611,12 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading team pending players:");
+		lc.reset(1000);
 		DBTeamPendingPlayer dbtpp;
 		if(execu->Prepare("SELECT `teamId`, `playerId`, `opTime` FROM `team_pending_player` ORDER BY `teamId`", dbtpp) != DB::DB_OK)
 			return false;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
         TeamArenaData * tad = NULL;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7591,10 +7639,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading serverWar players:");
+		lc.reset(1000);
 		DBArenaServerWar dbasw;
 		if(execu->Prepare("SELECT `playerId`, `type`, `pos`, `battlePoint` FROM `arena_serverWar` ORDER BY `playerId`", dbasw) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7609,10 +7657,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading server war Bets");
+		lc.reset(1000);
 		DBArenaBet ab;
 		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_serverWar_bet` ORDER BY `id`", ab)!= DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		while(execu->Next() == DB::DB_OK)
@@ -7637,10 +7685,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading player_named:");
+		lc.reset(1000);
 		DBPlayerNamed dbpn;
 		if(execu->Prepare("SELECT `serverNo`, `playerid`, `name` FROM `player_named` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7656,10 +7704,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading pet_sevensoul:");
+		lc.reset(1000);
 		DBSevenSoul dbvalue;
 		if(execu->Prepare("SELECT `playerId`, `petId`, `soulId`, `soulLevel`, `skillIndex` FROM `pet_sevensoul` ", dbvalue) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		while(execu->Next() == DB::DB_OK)
@@ -7690,10 +7738,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading player ModifyMount:");
+		lc.reset(1000);
 		DBModifyMount dbmm;
 		if(execu->Prepare("SELECT `id`, `playerId`, `chips`, `curfloor`, `curfloor1`, `failtimes` FROM `modify_mount`", dbmm) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7722,10 +7770,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading skill grade");
+		lc.reset(1000);
         DBSG sg;
         if(execu->Prepare("SELECT `playerId`, `fighterId`, `skillId`, `level` FROM `skill_grade` ORDER BY `playerId`", sg) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
         Player* pl = NULL;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -7755,10 +7803,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading marriage:");
+		lc.reset(1000);
 		DBMarriage dbpn;
 		if(execu->Prepare("SELECT `playerid`, `marriage_time`, `prouncement`, `lover_item`, `status` FROM `marriage` ORDER BY `status`", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7777,10 +7825,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading reply_marriage:");
+		lc.reset(1000);
 		DBReplyMarriage dbpn;
 		if(execu->Prepare("SELECT `reply_marriage`.`man_playerid`, `reply_marriage`.`woman_playerid`, `reply_marriage`.`jy_time`, `reply_marriage`.`jh_time`, `reply_marriage`.`wedding_type`, `reply_marriage`.`wedding_buyer`, `marry_log`.`marriage_buyer`, `marry_log`.`prouncement`, `marry_log`.`lover_item` from `reply_marriage`  left join `marry_log` on `reply_marriage`.`man_playerid` = `marry_log`.`man_playerid` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7801,10 +7849,10 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading married_log:");
+		lc.reset(1000);
 		DBMarriedLog dbpn;
 		if(execu->Prepare("SELECT `jh_time` ,`man_playerid`, `woman_playerid`, `prouncement`, `lover_item`, `marriage_time`, `replymarriage_time`, `jy_time`, `wedding_type` FROM `married_log` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7823,10 +7871,10 @@ namespace GObject
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading married_couple:");
+		lc.reset(1000);
 		DBMarriedCouple dbpn;
 		if(execu->Prepare("SELECT `jh_time` ,`man_playerid`, `woman_playerid`, `lover_item`, `pet_name`, `pet_level`, `pet_levelExp`, `pet_friendliness` FROM `married_couple` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7846,11 +7894,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Fighter xinmo:");
+		lc.reset(20);
 		DBXinmo dbxc;
         Player* pl = NULL;
 		if(execu->Prepare("SELECT `fighterId`, `playerId`, `xinmolev`, `curVal` FROM `fighter_xinmo`", dbxc) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -7881,10 +7929,10 @@ namespace GObject
         if(execu.get() == NULL || !execu->isConnected())
             return false;
         LoadingCounter lc("Loading Collect Card");
+        lc.reset(1000);
         DBCollectCnt t;
         if(execu->Prepare("SELECT `playerId`, `lev`, `bluecnt`, `purlecnt`, `orangecnt` FROM `collect_cnt` ORDER BY `playerId`", t)!= DB::DB_OK)
             return false;
-        lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
@@ -7904,10 +7952,10 @@ namespace GObject
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading card:");
+		lc.reset(1000);
 		DBCard dbpn;
 		if(execu->Prepare("SELECT `playerid` ,`id`,`cid`,`level`, `exp`, `pos` FROM `card` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7925,10 +7973,10 @@ namespace GObject
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading cardsuit:");
+		lc.reset(1000);
 		DBCardSuit dbpn;
 		if(execu->Prepare("SELECT `playerid` ,`id`, `suit_mark`, `active`, `spe_mark`, `collect_degree` FROM `cardsuit` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7948,12 +7996,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading friendlyCount:");
+		lc.reset(500);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriendlyCount dbfr;
 		if(execu->Prepare("SELECT `playerId`, `friendId`, `value` ,`isBrother` ,`time`,`cost`,`wait`,`ybTime`,`ybCount`,`clearTime`,`task1`,`task2`,`task3`,`task4`,`task5`,`task6` FROM `friendlyCount` ORDER BY `playerId`", dbfr) != DB::DB_OK)
 			return false;
-		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -7991,12 +8039,12 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
 		LoadingCounter lc("Loading PictureInfo:");
+		lc.reset(500);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBPictureInfo dbfr;
 		if(execu->Prepare("SELECT `playerId`, `floor`,`cubeHave`, `cubeCover`  FROM `pictureAttr` ORDER BY `playerId`", dbfr) != DB::DB_OK)
 			return false;
-		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
 		{
             lc.advance();
@@ -8044,10 +8092,10 @@ namespace GObject
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading WorldCup:");
+		lc.reset(1000);
 		DBWorldCup dbpn;
 		if(execu->Prepare("SELECT `playerId` ,`num`, `count1`, `count2`, `count3`, `result` FROM `worldCup` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -8070,11 +8118,11 @@ namespace GObject
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading WorldCup:");
+		LoadingCounter lc("Loading happyXXL:");
+		lc.reset(1000);
 		DBHappyXXL dbpn;
 		if(execu->Prepare("SELECT `playerId` ,`num`, `map` FROM `happyXXL` ", dbpn) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -8092,11 +8140,11 @@ namespace GObject
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading WorldCup:");
+		LoadingCounter lc("Loading kettle:");
+		lc.reset(1000);
 		DBKettle dbk;
 		if(execu->Prepare("SELECT `playerId` ,`num`, `history`,`occupy` FROM `kettle` ", dbk) != DB::DB_OK)
 			return false;
-		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
@@ -8117,11 +8165,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Fighter lingbaoLevel:");
+		lc.reset(20);
 		DBLingbaoLevel dbxc;
         Player* pl = NULL;
 		if(execu->Prepare("SELECT `fighterId`, `playerId`, `lingbaoType`, `enLevel` FROM `fighter_lingbaoLevel`", dbxc) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -8152,11 +8200,11 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
         LoadingCounter lc("Loading Fighter lingbaoFall:");
+		lc.reset(20);
 		DBLingbaoFall dbxc;
         Player* pl = NULL;
 		if(execu->Prepare("SELECT `fighterId`, `playerId`, `type`, `fall` FROM `fighter_lingbaoFall`", dbxc) != DB::DB_OK)
 			return false;
-		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
 		{

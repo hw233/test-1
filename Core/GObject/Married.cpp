@@ -229,7 +229,7 @@ namespace GObject
         num = man_player->GetVar(VAR_COUPLE_ONLINE_TIME) / (15*60); 
         if(num < 1)
             return; 
-        if(num > 2 && num <= 7)
+        if(num > 3 && num <= 7)
             num = 3;
         if(num >= 8)
             num = 4;

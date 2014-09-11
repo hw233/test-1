@@ -386,10 +386,10 @@ public:
     { _dropact = v; }
     inline static bool getDropAct()
     { return _dropact; }
-    inline static void setAnswerAct(bool v)
+    /*inline static void setAnswerAct(bool v)
     { _answeract = v; }
     inline static bool getAnswerAct()
-    { return _answeract; }
+    { return _answeract; }*/
     inline static void setWansheng(bool v)
     { _wansheng= v; }
     inline static bool getWansheng()
@@ -446,6 +446,14 @@ public:
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
     { return _feastloginAct; }
+    inline static void setFeastGiftLoginAct(bool v)
+    { _feastgiftloginAct= v; }
+    inline static bool getFeastGiftLoginAct()
+    { return _feastgiftloginAct; }
+    inline static void setPrivateRechargeAct(bool v)
+    { _privateAct= v; }
+    inline static bool getPrivateRechargeAct()
+    { return _privateAct; }
     inline static void setNewYearGiveGiftAct(bool v)
     { _newYearGiveGiftAct= v; }
     inline static bool getNewYearGiveGiftAct()
@@ -653,14 +661,35 @@ public:
     } 
     inline static bool getCoolSummer(UInt32 time = 0)
     {
-        UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
-        UInt32 end = TimeUtil::MkTime(2014, 7, 7);
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 21);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 26);
         UInt32 now = TimeUtil::Now() + time;
         if((now >= begin && now <= end))
             return true;
         else
             return false;
     }
+    inline static bool getGratitudeGiving(UInt32 time = 0, UInt32 time1 = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 11);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 17) + time1;
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+    inline static bool getCarnivalConsume(UInt32 time = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 11);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 16);
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
     inline static bool  getMonsterAndPetTime()  // 妖王，珍兽消费减半
     {
         UInt32 begin = GVAR.GetVar(GVAR_MOSTER_PET_BEGIN);
@@ -1102,25 +1131,36 @@ public:
             return false;
     }
 
-    inline static bool getPrepareTime(UInt32 time = 0)
+    // 一战成名活动时间
+    inline static bool getAnswerTime_Act(UInt32 time = 0)
     {
-        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_PREPARE_DAY);
-        UInt32 end = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
+        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_ANSWER_END);
         UInt32 now = TimeUtil::Now();
 
-        if(now >= begin && now < end)
+        if(now >= begin && now <= end)
             return true;
         else
             return false;
     }
 
-    inline static bool getAnswerTime(UInt32 time = 0)
+    // 一战成名每天准备时间
+    inline static bool getPrepareTime_Day(UInt32 time = 0)
     {
-        UInt32 begin = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY);
-        UInt32 end = GVAR.GetVar(GVAR_ANSWER_END_DAY);
         UInt32 now = TimeUtil::Now();
 
-        if(now >= begin && now <= end)
+        if(now >= _gAnswerPrepareTime && now <= _gAnswerBeginTime)
+            return true;
+        else
+            return false;
+    }
+
+    // 一战成名每天答题时间
+    inline static bool getAnswerTime_Day(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if(now >= _gAnswerBeginTime && now <= _gAllAnswerEndTime_Day)
             return true;
         else
             return false;
@@ -1232,13 +1272,23 @@ public:
         return true;
     }
 
+    inline static bool getCelebrateCardActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        
+        if(now < time20140916 || now > time20140916 + 5 * 86400)
+            return false;
+        return true;
+    }
+
     inline static bool getFlyRoadActivity(UInt32 time = 0)
     {
         UInt32 now = TimeUtil::Now() + time;
         UInt32 time20140802 = TimeUtil::MkTime(2014, 8, 2);
-        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        UInt32 time20140921 = TimeUtil::MkTime(2014, 9, 21);
         
-        if(now < time20140802 || now > time20140916)
+        if(now < time20140802 || now > time20140921)
             return false;
         return true;
     }
@@ -1403,6 +1453,8 @@ public:
     static bool _dragonKingAct;
     static bool _saveGoldAct;
     static bool _feastloginAct;
+    static bool _feastgiftloginAct;
+    static bool _privateAct;
     static bool _newYearGiveGiftAct;
     static bool _newYearQQGameAct;
     static bool _QZoneQQGameAct;
@@ -1478,10 +1530,22 @@ public:
     static bool _duobaoOpen;
     static bool _answerOpenA;
     static bool _answerOpenB;
+    static bool _answerOpenC;
     static UInt32 _rbTimeRank;
     static UInt64 _worldCupAward;
+    static UInt32 _gAnswerPrepareTime;
+    static UInt32 _gAnswerBeginTime;
+    static UInt32 _gAnswerEndTime;
+    static UInt32 _gAnswerFinalTime;
+    static UInt32 _gAllAnswerEndTime_Day;
 #define MAX_WC_COUNT 63
     static UInt32 _worldCup[MAX_WC_COUNT][4];   //支持度  1-胜 2-负 3-平 4-结果 (注意标号需要-1)
+#define ANSWER_PREPARE_TIME    19*60*60 + 15*60 
+#define ANSWER_BROADCASTA_TIME 19*60*60 + 20*60 
+#define ANSWER_BROADCASTB_TIME 19*60*60 + 25*60 
+#define ANSWER_BEGIN_TIME      19*60*60 + 30*60
+#define ANSWER_ALLEND_TIME     19*60*60 + 45*60
+
 public:
     static RCSortType answerScoreSort;     //一战成名排名
     static RCSortType qishibanScoreSort;     //七石板积分排名
@@ -1501,6 +1565,7 @@ public:
     static RCSortType seekingHerNiuLangSort;     //众里寻她牛郎榜排名
     static RCSortType seekingHerZhiNvSort;     //众里寻她织女榜排名
     static RCSortType seekingHerCharmSort;     //众里寻她魅力值排名
+    static RCSortType carnivalConsumeSort;     //狂欢购物排名
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1639,6 +1704,7 @@ public:
     void SendSeekingHerNiuLangAward();
     void SendSeekingHerZhiNvAward();
     void SendSeekingHerCharmAward();
+    void SendCarnivalConsumeAward();
 
 private:
 	void testUpdate();

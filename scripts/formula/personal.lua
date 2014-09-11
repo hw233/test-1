@@ -618,10 +618,14 @@ function calcBattlePoint(fgt)
     bp = bp + fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmgimm 
 
     bp = bp + fgt:getExtraFairyAtk() * bp_factor_atk
-    bp = bp + fgt:getExtraFairyAtk() * bp_factor_def
-    --print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
-    --print("getExtraFairyDef:"..fgt:getExtraFairyDef())
-    --printBattlePoint(fgt)
+    bp = bp + fgt:getExtraFairyDef() * bp_factor_def
+    if fgt:getExtraFairyAtk() ~= 0 then
+        print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
+        print("攻系数："..bp_factor_atk)
+        print("getExtraFairyDef:"..fgt:getExtraFairyDef())
+        print("攻系数："..bp_factor_def)
+    end
+   -- printBattlePoint(fgt)
     return bp;
 end
 

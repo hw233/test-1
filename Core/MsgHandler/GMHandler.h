@@ -268,6 +268,7 @@ private:
     void OnAttackKettle(GObject::Player *player, std::vector<std::string>& args);
     void OnSayToWorld(GObject::Player *player, std::vector<std::string>& args);
     void OnComEvolution(GObject::Player *player, std::vector<std::string>& args);
+    void OnAttackDarkDargon(GObject::Player *player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

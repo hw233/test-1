@@ -144,7 +144,7 @@ void WorldScript::init()
     def("setQixi", GObject::World::setQixi);
     def("getQixi", GObject::World::getQixi);
     def("setDropAct", GObject::World::setDropAct);
-    def("setAnswerAct", GObject::World::setAnswerAct);
+    //def("setAnswerAct", GObject::World::setAnswerAct);
     def("setWansheng", GObject::World::setWansheng);
     def("getWansheng", GObject::World::getWansheng);
     def("setQingren", GObject::World::setQingren);
@@ -155,6 +155,8 @@ void WorldScript::init()
     def("get11Act", GObject::World::get11Act);
     def("setSSToolbarAct", GObject::World::setSSToolbarAct);
     def("setFeastLoginAct", GObject::World::setFeastLoginAct);
+    def("setFeastGiftLoginAct", GObject::World::setFeastGiftLoginAct);
+    def("setPrivateRechargeAct", GObject::World::setPrivateRechargeAct);
     def("setMayDayLoginAct", GObject::World::setMayDayLoginAct);
     def("setNewYearGiveGiftAct", GObject::World::setNewYearGiveGiftAct);
     def("setNewYearQQGameAct", GObject::World::setNewYearQQGameAct);
@@ -266,6 +268,7 @@ void WorldScript::init()
     def("getTYSSTime",GObject::World::getTYSSTime);
     def("get61CardActivity",GObject::World::get61CardActivity);
     def("getSummerCardActivity",GObject::World::getSummerCardActivity);
+    def("getCelebrateCardActivity",GObject::World::getCelebrateCardActivity);
     def("setQZoneRechargeTime",GObject::World::setQZoneRechargeTime);
 
     def("setSurnameLegend",GObject::World::setSurnameLegend);

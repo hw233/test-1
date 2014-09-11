@@ -78,6 +78,7 @@
 #include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
 #include "GObject/Evolution.h"
+#include "GObject/DarkDargon.h"
 
 struct NullReq
 {
@@ -1476,6 +1477,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->firstPotOfGoldReturn(0);
 
     {
+        GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
+    {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
@@ -1488,6 +1494,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     //结拜邀请信息
     pl->sendFriendlyTimeAndCost();
     GObject::raceBattle.sendRBStatus(pl);
+    DarkDargon::Instance().RetAwaitInfo(pl);
 
     }
 
@@ -2191,7 +2198,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             if(!player->hasChecked())
                 return;
             UInt8 type;
-            if(!World::getFeastLoginAct())
+            if(false/*!World::getFeastLoginAct()*/)
                 return;
             br >> type;
             player->getFeastGiftAward(type);
@@ -2420,6 +2427,43 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             player->firstPotOfGoldReturn(type);
         }
         break;
+
+        case 0x14:
+        {
+            if(!World::getGratitudeGiving(0, 5 * 24 * 3600))
+                return;
+            UInt8 type = 0;
+            br >> type;
+            if(type)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                player->getGratitudeAward(flag);
+            }
+            else
+                player->gratitudeReturnInfo();
+        }
+        break;
+
+        case 0x15:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(2 == type)
+                player->shakeMoneyBag();
+            else if(0 == type)
+            {
+                GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(1 == type)
+            {
+                GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(3 == type)
+                player->getShakeMoneyBagLog();
+        }
 
         default:
         break;
@@ -2773,6 +2817,8 @@ void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 	GObject::Dungeon * dg = GObject::dungeonManager[dir.type];
 	if(dg == NULL)
 		return;
+    if(pl->getLocation() != dg->getLocation())
+        return;
     UInt8 result = 0;
     Stream st(REP::COPY_DATA_UPDATE);
 	switch(dir.op)
@@ -2852,6 +2898,8 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	GObject::Dungeon * dg = GObject::dungeonManager[dar.type];
 	if(dg == NULL)
 		return;
+    if(pl->getLocation() != dg->getLocation())
+        return;
 	dg->autoChallenge(pl, dar.mtype, dar.difficulty);
     pl->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
 }
@@ -5905,14 +5953,18 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 npcGroupId = 0;
             UInt32 monsterId = 0;
             br >> npcGroupId >> monsterId;
-            petTeamCopyManager->createTeam(player, npcGroupId, monsterId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->createTeam(player, npcGroupId, monsterId, pwd);
         }
         break;
     case 0x07:
         {
             UInt32 teamId = 0;
             br >> teamId;
-            petTeamCopyManager->joinTeam(player, teamId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->joinTeam(player, teamId, pwd);
         }
         break;
     case 0x08:
@@ -10448,24 +10500,23 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                         } 
                         break;
                     case 4:
-                        { 
+                        {
                             UInt16 fighterId = 0;
                             br >> fighterId;
+                            UInt8 taskId = 0;
+                            br >> taskId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
                             if(!fgt || fgt->getLevel() < limitLev)
                                 return ;
                             if(!fgt->getEvolution())
                                 return ;
-                            UInt8 index = 0;
-                            br >> index;
-                            if(index)
-                            {
-                                fgt->getEvolution()->GetTaskAward(index - 1);
-                                fgt->getEvolution()->SendProcess();
-                            }
-                        } 
+                            UInt8 res = fgt->getEvolution()->GetTaskAward(taskId-1);
+                            if(!res&&(taskId == 3 ||taskId == 7))
+                                GameAction()->getFeiShengAward(player, taskId == 3?1:2 );
+                        }
                         break;
                     case 5:
+                        {
                             UInt16 fighterId = 0;
                             br >> fighterId;
                             GObject::Fighter * fgt = player->findFighter(fighterId);
@@ -10481,9 +10532,180 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                             st << static_cast<UInt8>(res);
                             st << Stream::eos;
                             player->send(st);
+                        }
+                }
+            }
+            break;
+        case 2://黯龙王之怒
+            {
+                if (player->getLocation() != 6152)//雪浪峰
+                    return ;
+                if (player->getThreadId() != WORKER_THREAD_NEUTRAL)
+                    return ;
+                UInt8 opt1 = 0;
+                br >> opt1; 
+                switch(opt1)
+                {
+                    case 1:
+                        {
+                            UInt8 t_opt= 0;
+                            br >> t_opt;
+                            if(t_opt == 1)
+                                DarkDargon::Instance().EnterDarkDargon(player);
+                            if(t_opt == 2)
+                                DarkDargon::Instance().QuitDarkDargon(player);
+                            break;
+                        }
+                    case 2://四方之塔请求
+                        {
+                            UInt8 t_opt = 0;
+                            UInt8 t_idx = 0;
+                            UInt8 t_pos = 0;
+                            br >> t_opt >> t_idx >> t_pos;
+                            switch(t_opt)
+                            {
+                                case 1:
+                                    DarkDargon::Instance().ReturnRoundTowerInfo(player,t_idx,t_pos);
+                                    break;
+                                case 2:
+                                    DarkDargon::Instance().DefRoundTower(player,t_idx,t_pos);
+                                    break;
+                                case 4:
+                                    DarkDargon::Instance().QuitRoundTower(player);
+                                    break;
+                                case 5:
+                                    {
+                                        UInt64 playerId = 0;
+                                        br >> playerId;
+                                        DarkDargon::Instance().PKRoundTower(player,t_idx,t_pos,playerId);
+                                        break;
+                                    }
+                                default:
+                                    break;
+                            }
+
+                            break;
+                        }
+                    case 3://三星阵请求
+                        {
+                            UInt8 t_opt = 0;
+                            br >> t_opt;                        
+                            switch(t_opt)
+                            {
+                                case 1:
+                                    DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
+                                    break;
+                                case 2:
+                                    {
+                                        UInt8 t_type = 0;
+                                        br >> t_type;
+                                        DarkDargon::Instance().SetBufferFlag(player,t_type - 1);
+                                        DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        UInt8 t_idx = 0;
+                                        br >> t_idx;
+                                        DarkDargon::Instance().AttackStarMap(player,t_idx,0);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        UInt8 t_idx = 0;
+                                        br >> t_idx;
+                                        DarkDargon::Instance().AttackStarMap(player,t_idx,1);
+                                        break;
+                                    }
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    case 4:
+                        {
+                            UInt8 t_opt = 0;
+                            br >> t_opt;
+                            switch(t_opt)
+                            {
+                                case 1:
+                                    DarkDargon::Instance().OptBoss(player,t_opt);
+                                    break;
+                                case 2:
+                                    DarkDargon::Instance().OptBoss(player,t_opt);
+                                    break;
+                                case 3:
+                                    DarkDargon::Instance().OptBoss(player,t_opt);
+                                    break;
+                                case 4:
+                                    DarkDargon::Instance().AttackBoss(player);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            break;
+                        }
+                    default :
                         break;
                 }
-            } 
+            }
+            break;
+        case 4:
+            {
+                UInt8 type = 0;
+                br >> type;
+                switch(type)
+                { 
+                    case 1:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt) 
+                                return ;
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x04);
+                            st << static_cast<UInt8>(0x01);
+                            st << static_cast<UInt16>(fgt->getId());
+                            st << fgt->getIncense();
+                            st << Stream::eos;
+                            player->send(st);
+                        } 
+                    case 2:
+                        {
+                            UInt16 fighterId = 0; 
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt) 
+                                return ;
+                            UInt8 flag = 0;
+                            br >>flag;
+                            UInt8 count = 0;
+                            br >> count ;
+                            UInt32 exp = player->UseIncenseGood(fgt->getIncense(),flag,count);
+                            if(exp)
+                            {
+                                fgt->addIncense(exp);
+                                fgt->UpdateIncenseToDB();
+                                player->setFightersDirty(true);
+                            }
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x04);
+                            st << static_cast<UInt8>(0x02);
+                            st << static_cast<UInt16>(fgt->getId());
+                            if(type && exp > 40*count)
+                                st << static_cast<UInt8>(2);
+                            else
+                                st << static_cast<UInt8>(!exp);
+                            st << fgt->getIncense();
+                            st << static_cast<UInt8>(flag);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                } 
+            }
+            break;
     }
 }
 

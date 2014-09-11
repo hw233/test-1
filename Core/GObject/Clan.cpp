@@ -266,7 +266,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
     _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0),_tyssSum(0), _clanFireValue(0),_clanAutoApply(0),
-    _buildingOwner(NULL)
+    _buildingOwner(NULL), _serverId(0)
 {
     _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
 
@@ -733,6 +733,7 @@ bool Clan::kick(Player * player, UInt64 pid)
         GLOBAL().PushMsg(hdr, &tc);
         _buildingOwner->LeaveTeam(NULL,kicker,kicker,1);
     }
+    practicePlace.stop(kicker);
 
 	return true;
 }
@@ -887,6 +888,7 @@ bool Clan::leave(Player * player)
         player->setBuffData(PLAYER_BUFF_NEW_CLAN3, 0);
         player->rebuildBattleName();
     }
+    practicePlace.stop(player);
 
 	return true;
 }
@@ -2321,6 +2323,42 @@ bool Clan::setWatchmanId(UInt64 watchman, bool writedb)
     return true;
 }
 
+bool Clan::impeachLeader(Player* player, UInt8 state)
+{
+#define IMPEACH_ITEM_ID 17017
+    if(!player)
+        return false;
+    ClanMember* mem = getClanMember(player);
+    if(!mem)
+        return false;
+    UInt32 joinTime = mem->joinTime;
+    UInt32 now = TimeUtil::Now();
+    if(now < joinTime + 86400 * 7)
+    {
+        player->sendMsgCode(0, 1377);
+        return false;
+    }
+
+    Player* leader = getLeader();
+    if(!leader)
+        return false;
+    if(now < leader->getLastOnline() + 86400 * 7)
+    {
+        player->sendMsgCode(0, 1378);
+        return false;
+    }
+
+    if(state == 0)
+        return true;
+
+    if(player->GetPackage()->GetItemAnyNum(IMPEACH_ITEM_ID) < 1)
+        return false;
+    player->GetPackage()->DelItemAny(IMPEACH_ITEM_ID, 1);
+    handoverLeader(leader, player->getId());
+    sendImpeachMail(player, leader);
+    return true;
+}
+
 void Clan::setConstruction(UInt64 cons, bool writedb)
 {
     if (cons == _construction)
@@ -2868,10 +2906,10 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 }
 
 #else
-void Clan::patchMergedName( UInt64 id, std::string& name )
+void Clan::patchMergedName( UInt16 serverId, std::string& name )
 {
-    if(cfg.merged)
-        Player::patchMergedName(id, name);
+    if(cfg.merged && serverId > 0)
+        Player::patchMergedName(static_cast<UInt64>(serverId) << 48, name);
 }
 #endif
 float Clan::getClanTechAddon()
@@ -5660,10 +5698,10 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8 a
     };
     static MailPackage::MailItem s_item1[][5] = {
         {{500,3},{503,3},{501,3},{0,0},{0,0}},
-        {{9418,3},{513,3},{9424,3},{0,0},{0,0}},
-        {{9600,3},{551,3},{1325,3},{0,0},{0,0}},
-        {{134,7},{9338,7},{9498,7},{9457,7},{0,0}},
-        {{5136,1},{5005,1},{5055,1},{5105,1},{0,0}},
+        {{516,3},{547,3},{9424,3},{0,0},{0,0}},
+        {{9600,3},{554,3},{1325,3},{0,0},{0,0}},
+        {{556,5},{9338,5},{9498,5},{9457,5},{0,0}},
+        {{5066,1},{5025,1},{5055,1},{5145,1},{0,0}},
     };
     MailPackage::MailItem *items;
     if(actType == 1)
@@ -5792,7 +5830,7 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
         if(actType == 1)
             addClanTitle(1, 0);
         else
-            addClanTitle(5, 0);
+            addClanTitle(6, 0);
     }
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
@@ -6307,6 +6345,19 @@ void Clan::clanFireSacrificeOp(Player * pl, UInt8 type)
         default:
             break;
     }
+}
+
+void Clan::sendImpeachMail(Player* player, Player* leader)
+{
+    if(!player || !leader)
+        return;
+	Mutex::ScopedLock lk(_mutex);
+	SYSMSG(title, 365);
+	SYSMSGV(content, 366, player->getName().c_str(), leader->getName().c_str(), getName().c_str());
+	for (Members::iterator offset = _members.begin(); offset != _members.end(); ++offset)
+	{
+		(*offset)->player->GetMailBox()->newMail(NULL, 0x01, title, content);
+	}
 }
 
 }

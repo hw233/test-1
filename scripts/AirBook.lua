@@ -58,9 +58,10 @@ function getTheResultInSnow2()
         print(x,y,a,b,c,d,e,f,g)
         if result[b] == nil then
             result[b] = 0;
-        end
+        else
         result[b]= result[b] + tonumber(f)    --结果增量设置为0
         print(result[b])
+        end
     end
     file:close()
 end
@@ -104,21 +105,21 @@ for key,value in pairs(result) do
     fileOpen:write(strs);
     fileOpen:write("\n")
 
-    pl = _GameActionLua:GetPlayerPtr(tonumber(key))
-    if pl == nil then
-        return 
-    end
-    local value = pl:GetVar(846)
-    print("value:" .. value)
-    print("cha"..result[key])
-    if value < result[key] then 
-       -- return 
-    end
-    if pl == nil then
-        print("XXXX")
-    else  
-        print("!!!!")
-        pl:SetVar(846,100);
-    end
+    --pl = _GameActionLua:GetPlayerPtr(tonumber(key))
+    --if pl == nil then
+    --    return 
+    --end
+    --local value = pl:GetVar(846)
+    --print("value:" .. value)
+    --print("cha"..result[key])
+    --if value < result[key] then 
+    --   -- return 
+    --end
+    --if pl == nil then
+    --    print("XXXX")
+    --else  
+    --    print("!!!!")
+    --    pl:SetVar(846,value - result[key]);
+    --end
 end
 fileOpen:close()

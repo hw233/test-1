@@ -176,7 +176,9 @@ enum PurchaseType
     MOFUMIZHEN2                 = 1037, //墨符迷阵购买次数
     MakeGear                    = 1038, //打造机关库
     WeiWeiShop                  = 1039, //购买微信商店物品
-    KETTLE                    = 1040, //炼妖壶
+    KETTLE                      = 1040, //炼妖壶
+    DARKDARGON                  = 1041, //黯龙王
+    UNKNOWN                     = 1042, //不明确消费类型
     //繁体私有占150～200
 };
 
@@ -207,6 +209,7 @@ enum IncomingType
     XianpoFromUseItem           = 150, //使用物品仙魄丹
     XTYLFromUseItem             = 151, //使用物品凝露宝瓶、凝露玉盅
     XTYLFromDismiss             = 152, //散去技能升阶
+    CarnivalRebate              = 153, //狂欢购物返利
 };
 
 enum MoneyType
@@ -258,6 +261,7 @@ enum MailItemType
 	DismissXinMo,
 	RandBattleAward,
     LingShiEatBack,
+    DarkDargonAward,
 };
 enum ItemFrom
 {

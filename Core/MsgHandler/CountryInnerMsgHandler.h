@@ -189,6 +189,8 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
         player->SetVar(VAR_RECHARGE_TOTAL, 0);
     if (player->GetVar(VAR_RECHARGE_SCORE))
         player->SetVar(VAR_RECHARGE_SCORE, 0);
+    if (player->GetVar(VAR_PRIVATE_RECHARGE))
+        player->SetVar(VAR_PRIVATE_RECHARGE, 0);
     player->sendRechargeInfo();
 }
 
@@ -1116,7 +1118,7 @@ void OnDirectPurchase( GameMsgHdr& hdr, const void * data )
     }
 
     pkg->AddItem(pur->id, pur->num, true, false, FromDirectPurchase);
-    if(pur->id == 9427 || pur->id == 5135 || pur->id == 9141)
+    if(pur->id == 503 || pur->id == 549 || pur->id == 5135)
         player->AddVar(VAR_DIRECTPURCNT, 1);
     else
         player->AddVar(VAR_DIRECTPURCNT2, 1);
@@ -2483,6 +2485,7 @@ void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
+        rep.viplvl = (player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
 		pl->send(rep);
 	}
 }

@@ -64,7 +64,7 @@ namespace GObject
             bool IsComplete();
             ItemEquip * getEquip(UInt8 cnt){if(cnt >=e_xq_max)return NULL ; return _evolution[cnt]; }
 
-            void GetTaskAward(UInt8 index);
+            UInt8 GetTaskAward(UInt8 index);
 
 
             // TODO

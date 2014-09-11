@@ -267,7 +267,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 }
                 bool ret = m_atkinfo.insert(info).second;
                 TRACE_LOG("WBOSS INSERT ret: %u (pid: %" I64_FMT "u, dmg: %u)", ret, pl->getId(), damage);
-                if(damage > 20000000)
+                if(damage > 2000000)
                     TRACE_LOG("WBOSS reportid: %u (pid: %" I64_FMT "u, dmg: %u)", bsim.getId(), pl->getId(), damage);
 
                 UInt8 newPercent = ((float)newHP / nflist[0].fighter->getMaxHP()) * 100;
@@ -1873,6 +1873,12 @@ bool WBossMgr::checkLocRight(Player* player,UInt16 loc)
     return true;
 }
 
+void WBossMgr::calInitDarkDargon(UInt32& lastHp,Int32& lastAtk,Int32& lastMAtk)
+{
+    lastHp = getLastHP(m_idx) * 1.0;
+    lastAtk = getLastAtk(m_idx) * 1.0;
+    lastMAtk = getLastMAtk(m_idx) * 1.0;
+}
 
 WBossMgr worldBoss;
 

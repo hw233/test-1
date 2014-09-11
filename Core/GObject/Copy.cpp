@@ -28,7 +28,7 @@ namespace GObject
 
 UInt8 PlayerCopy::_activeCount = 0;
 static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
-static UInt16 spots2[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};  //仙界副本
+static UInt16 spots2[] = {16386, 16388, 16390, 16391, 16392, 16400};    //仙界装备
 
 static UInt8 GetCopyIdBySpots(UInt16 currentSpot)
 {
@@ -90,10 +90,13 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
     return 0; // TODO:
 }
 
-UInt32 PlayerCopy::getEnterGold(Player* pl)
+UInt32 PlayerCopy::getEnterGold(Player* pl,UInt8 flag)
 {
     UInt8 vipl = pl->getVipLevel();
     UInt32 VipType =pl-> GetVar(VAR_VIP_PRIVILEGE_DATA_TYPE);
+    UInt8 goldCnt = PLAYER_DATA(pl, copyGoldCnt);
+    if(flag)
+        goldCnt = pl->GetVar(VAR_FAIRYCOPY_GOLD);
     if(pl->in7DayFromCreated() && VipType >4)
          VipType -= 2;
     if(vipl > 3 ||(pl->inVipPrivilegeTime() && !( (VipType==0||VipType ==1 ||VipType ==3 ) ) ))
@@ -105,7 +108,7 @@ UInt32 PlayerCopy::getEnterGold(Player* pl)
         { 0,  0,  0},
     };
 
-    return (GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold + extraVipGold[vipl][PLAYER_DATA(pl, copyGoldCnt)]);
+    return (GData::moneyNeed[GData::COPY_ENTER1+goldCnt].gold + extraVipGold[vipl][goldCnt]);
 }
 
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)
@@ -121,9 +124,18 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << id;
     st << cd.floor;
     st << cd.spot;
+    
     UInt8 count = PLAYER_DATA(pl, copyGoldCnt);
+    UInt8 goldCnt = PLAYER_DATA(pl, copyGoldCnt);
+    UInt8 freeCnt = PLAYER_DATA(pl, copyFreeCnt);
+    if( id >= 100 )
+    {
+        goldCnt = pl->GetVar(VAR_FAIRYCOPY_GOLD);
+        freeCnt = pl->GetVar(VAR_FAIRYCOPY_FREE);
+    }
+    count = goldCnt;
     count <<= 4;
-    count |= PLAYER_DATA(pl, copyFreeCnt);
+    count |= freeCnt;
     st << count;
     count = getGoldCount(pl->getVipLevel());
     count <<=4;
@@ -201,7 +213,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
         return false;
 
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110, 120, 130, 140};
-    //static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
+    //static UInt16 spots[] = {16386, 16388, 16390, 16391, 16392, 16400};
 
     if (id < 100 && id > sizeof(lvls)/sizeof(UInt8))
         return false;
@@ -217,7 +229,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     else if(pl->getLocation() != spots2[id-100])
     {
         SYSMSG_SENDV(2243, pl);
-        //return false;   //XXX
+        return false;   //XXX
     }
 
     if (id < 100 && pl->GetLev() < lvls[id-1]) {
@@ -291,7 +303,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         pl->copyUdpLog(id, 1);
         return 0;
     } else if (/*PLAYER_DATA(pl, copyGoldCnt)*/ copyGoldCnt < getGoldCount(pl->getVipLevel())) {
-        UInt32 gold = getEnterGold(pl);
+        UInt32 gold = getEnterGold(pl,id>=100);
         if (pl->getGold() < gold) {
             pl->sendMsgCode(0, 1104);
             return 1;
@@ -424,6 +436,9 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         return 0;
 
 	FastMutex::ScopedLock lk(_mutex); // XXX:
+
+    if (!copyCheckLevel(pl, id))
+        return 0;
 
     if (pl->hasFlag(Player::AutoCopy) && !ato) {
         pl->sendMsgCode(0, 1414);

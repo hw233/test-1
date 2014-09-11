@@ -323,7 +323,7 @@ bool ClanBigBoss::attackBossFinal(Player* player)
     //player->pendExp(exp);
 
     TRACE_LOG("Clan_BOSS INSERT ret: %u (pid: %" I64_FMT "u, dmg: %u)", ret, player->getId(), damage);
-    if(damage > 20000000)
+    if(damage > 2000000)
         TRACE_LOG("Clan_BOSS reportid: %u (pid: %" I64_FMT "u, dmg: %u)", bsim.getId(), player->getId(), damage);
 
     UInt8 newPercent = ((float)m_BossHP / nflist[0].fighter->getMaxHP()) * 100;
@@ -344,6 +344,7 @@ bool ClanBigBoss::attackBossFinal(Player* player)
         _lastTime = now - appointment_time; 
         //TODO DB
         DB4().PushUpdateData("UPDATE `clanbigboss` SET `last` = %u WHERE `clanid` = %u ",_lastTime,_clan->getId());
+        res = true;
 
     }else if(_percent > 75 && newPercent <= 75)
     {

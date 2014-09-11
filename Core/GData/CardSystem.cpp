@@ -161,7 +161,7 @@ CardUpgradeTable* CardSystem::getCardUpgradeTable(UInt8 level)
 
 bool CardSystem::checkUpgrade(GObject::CardInfo* ci)
 {
-    if(ci->level == 150)
+    if(ci->level == 170)
         return false;
     if(_cardUpgrade.find(ci->level) == _cardUpgrade.end())
         return false;

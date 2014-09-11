@@ -43,7 +43,7 @@ namespace GObject
 
     bool SuitCardInfo::checkExistSetBit(UInt16 cid,UInt8 color)
     {
-        if(id != 20 && id != 30 && id != 500)
+        if(id != 20 && id != 30 && id != 500 && id != 600)
         {
             UInt8 card_index = cid % 10;
             if(GET_BIT(suit_mark,(card_index-1)))
@@ -62,7 +62,7 @@ namespace GObject
             
 
         }
-        else if(id == 30 || id == 500)
+        else if(id == 30 || id == 500 || id == 600)
         {
             UInt8 card_index = cid % 10;
             if(GET_BIT(suit_mark,(card_index-1)))
@@ -354,7 +354,7 @@ namespace GObject
         if(flag == 0 )
             count = 1;
         UInt16 mCount = 0;
-        if(level != 30 && level != 500)
+        if(level != 30 && level != 500 && level != 600)
         {
             iid = 9457;//天界牌
             mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
@@ -366,14 +366,21 @@ namespace GObject
             iid = 9895;//童心令
             mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;
         }
-        else
+        else if(level == 500)
         {
             if(!World::getSummerCardActivity())
                 return;
             iid = 17011;//清凉令
             mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;      
         }
-        if(mCount < count) //天界牌,童心令,清凉令不足
+        else
+        {
+            if(!World::getCelebrateCardActivity())
+                return;
+            iid = 17026;//庆典令
+            mCount = m_owner->GetPackage()->GetItemAnyNum(iid) ;      
+        }
+        if(mCount < count) //天界牌,童心令,清凉令,庆典令不足
             return ;   
 
         ItemBase * item = m_owner->GetPackage()->FindItem(iid, true);
@@ -382,7 +389,7 @@ namespace GObject
         if(item ==NULL)
             return ;
 
-        if((level < 30 || level > 130) && level != 400 && level != 500)
+        if((level < 30 || level > 140) && level != 400 && level != 500 && level != 600)
             return ;
         static UInt8 PCardChance[]= {5,5,4,3,3,4,2,2};
         static UInt8 PCardChance61[]= {2,3,4,5};
@@ -391,7 +398,7 @@ namespace GObject
         while(index < count)
         {
             UInt8 CNum = 0; 
-            if(level != 30 && level != 500)
+            if(level != 30 && level != 500 && level != 600)
                 CNum = GameAction()->GetCardByChance(m_owner,MapCntBlue[level],MapCntPurple[level],MapCntOrg[level]);    
             else
                 CNum = GameAction()->GetCardByChance61(m_owner,MapCntBlue[level],MapCntPurple[level],MapCntOrg[level]);    
@@ -402,7 +409,7 @@ namespace GObject
             MapCntBlue[level] ++ ;
             MapCntPurple[level] ++ ;
             MapCntOrg[level] ++ ;
-            if(level != 30 && level != 500)
+            if(level != 30 && level != 500 && level != 600)
             {
                 if(PCardChance[CNum-1] > 2)
                 {
@@ -495,7 +502,7 @@ namespace GObject
             UInt8 org_active = sci->active;
             if(sci->checkActive(active_set))
                 sci->active = active_set;
-            if(suit_lvl == 30 || suit_lvl == 500)
+            if(suit_lvl == 30 || suit_lvl == 500 || suit_lvl == 600)
             {
                 if(sci->active <= org_active)
                     return;
@@ -748,7 +755,7 @@ namespace GObject
         }
         SuitCardInfo* tmp = MapCardStamp.find(cid/100*10)->second;
         UInt8 org_degree = 0;//初始收集度
-        if(tmp->id == 30 || tmp->id == 500)//童趣套组或凉夏套组
+        if(tmp->id == 30 || tmp->id == 500 || tmp->id == 600)//童趣套组或凉夏套组或庆典套组
             org_degree = tmp->collect_degree;
         if(tmp->checkExistSetBit(ci->cid,ci->color))
             RebuildCardAttr();
@@ -758,7 +765,7 @@ namespace GObject
         if(ci->color == 5)
             SYSMSG_BROADCASTV(953, m_owner->getCountry(),m_owner->getName().c_str(),3,citmp->name.c_str());
 
-        if(tmp->id == 30 || tmp->id == 500)//童趣套组或凉夏套组
+        if(tmp->id == 30 || tmp->id == 500 || tmp->id == 600)//童趣套组或凉夏套组或庆典套组
         {
             if(tmp->collect_degree >= 30 && org_degree != 100 && tmp->collect_degree > org_degree)
             {
@@ -1025,6 +1032,51 @@ namespace GObject
         return;
     }
 
+    void CollectCard::AddCelebrationCard(UInt16 cid)
+    {
+        if(MapCardStamp.find(cid/100*10) == MapCardStamp.end())
+        {
+            UInt8 card_index1 = cid % 10;
+            if(card_index1 < 5)
+                return;
+            CardInfo* citmp = AddCard(cid);
+            if(!citmp)
+                return;
+            Stream st(REP::COLLECTCARD);  
+            st << static_cast<UInt8>(2) ;//0x02套牌信息
+            ReturnSuitInfo(st,600,true);
+            st << citmp->id << citmp->cid << citmp->level << citmp->exp << citmp->pos;
+            st << Stream::eos; 
+            m_owner->send(st);
+            return;
+        }
+        
+        SuitCardInfo* tmp = MapCardStamp.find(cid/100*10)->second;
+        if(tmp == NULL)
+            return;
+        if(tmp->id != 600)
+            return;
+
+        UInt8 card_index = cid % 10;
+        if(card_index < 5)
+            return;
+        if(!GET_BIT(tmp->suit_mark,(card_index-1)))
+        {
+            CardInfo* citmp = AddCard(cid);
+            if(!citmp)
+                return;
+            Stream st(REP::COLLECTCARD);  
+            st << static_cast<UInt8>(2) ;//0x02套牌信息
+            ReturnSuitInfo(st,600,true);
+            st << citmp->id << citmp->cid << citmp->level << citmp->exp << citmp->pos;
+            st << Stream::eos; 
+            m_owner->send(st);
+        }
+        if(GET_BIT(tmp->suit_mark,4) && GET_BIT(tmp->suit_mark,5) && GET_BIT(tmp->suit_mark,6) && GET_BIT(tmp->suit_mark,7))
+            m_owner->udpLog("kapaixitong", "F_140506_25", "", "", "", "", "act");
+        
+        return;
+    }
 
 
 }

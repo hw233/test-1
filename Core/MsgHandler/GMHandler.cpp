@@ -63,6 +63,7 @@
 #include "GObject/RaceBattle.h"
 #include "GObject/ClanBigBoss.h"
 #include "GObject/Evolution.h"
+#include "GObject/DarkDargon.h"
 
 GMHandler gmHandler;
 
@@ -334,6 +335,7 @@ GMHandler::GMHandler()
     Reg(2, "atkcb", &GMHandler::OnAttackBoss);
     Reg(2, "kettleA", &GMHandler::OnAttackKettle);
     Reg(2, "feisheng", &GMHandler::OnComEvolution);
+    Reg(2, "atkdd", &GMHandler::OnAttackDarkDargon);
 
     //  帮派建筑相关指令
     Reg(1, "cbinfo", &GMHandler::OnClanBuildingInfo);
@@ -3362,7 +3364,8 @@ void GMHandler::OnClearCFT(GObject::Player* player, std::vector<std::string>& ar
     PLAYER_DATA(player, xjfrontFreeCnt) = 0;
     PLAYER_DATA(player, xjfrontGoldCnt) = 0;
     PLAYER_DATA(player, xjfrontUpdate) = TimeUtil::Now();
-    
+    player->SetVar(VAR_FAIRYCOPY_FREE,0) ;
+    player->SetVar(VAR_FAIRYCOPY_GOLD,0) ;
     DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
     DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %" I64_FMT "u", TimeUtil::Now(), player->getId());
 	DB1().PushUpdateData("UPDATE `player` SET `dungeonCnt` = 0 where `id` = %" I64_FMT "u", player->getId());
@@ -4826,6 +4829,12 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GVAR_MOSTER_PET_BEGIN, 0);
             GVAR.SetVar(GVAR_MOSTER_PET_END, 0);
             break;
+        case 36:
+            GVAR.SetVar(GObject::GVAR_ANSWER_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GObject::GVAR_ANSWER_END, TimeUtil::SharpDayT(2));
+		    GLOBAL().PushMsg(hdr4, &reloadFlag);
+            GLOBAL().PushMsg(hdr1, &_msg);
+            break;
     }
 }
 
@@ -5765,7 +5774,8 @@ void GMHandler::OnAdd61Card(GObject::Player *player, std::vector<std::string>& a
         return ;
     UInt16 cid = atoi(args[0].c_str());
     
-    player->GetCollectCard()->AddSummerCard(cid);   
+    player->GetCollectCard()->AddCelebrationCard(cid);   
+    //player->GetCollectCard()->AddSummerCard(cid);   
 }
 
 void GMHandler::OnAddCardExp(GObject::Player *player, std::vector<std::string>& args)
@@ -5859,4 +5869,10 @@ void GMHandler::OnComEvolution(GObject::Player *player, std::vector<std::string>
     if(!fgt)
         return ;
     fgt->getEvolution()->SetProcess(0x5FF);
+}
+void GMHandler::OnAttackDarkDargon(GObject::Player *player, std::vector<std::string>& args)
+{
+    /*if (args.size() < 1)
+        return ;*/
+    DarkDargon::Instance().GMDestroyStarMap();
 }

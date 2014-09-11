@@ -300,6 +300,10 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
         return 0;
 
     FastMutex::ScopedLock lk(_mutex);
+
+    if (!checkLevel(pl, id))
+        return 0;
+
     // 是否在次数范围内
     if (PLAYER_DATA(pl, frontFreeCnt) > getFreeCount() &&
             PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))

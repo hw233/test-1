@@ -179,6 +179,8 @@ bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
+bool World::_feastgiftloginAct= false;
+bool World::_privateAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
 bool World::_QZoneQQGameAct= false;
@@ -224,6 +226,7 @@ RCSortType World::coolSummerSort;
 RCSortType World::seekingHerNiuLangSort;
 RCSortType World::seekingHerZhiNvSort;
 RCSortType World::seekingHerCharmSort;
+RCSortType World::carnivalConsumeSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -267,6 +270,13 @@ bool World::_buyfund = false;
 bool World::_duobaoOpen = false;
 bool World::_answerOpenA = false;
 bool World::_answerOpenB = false;
+bool World::_answerOpenC = false;
+UInt32 World::_gAnswerPrepareTime = 0;
+UInt32 World::_gAnswerBeginTime = 0;
+UInt32 World::_gAnswerEndTime = 0;
+UInt32 World::_gAnswerFinalTime = 0;
+UInt32 World::_gAllAnswerEndTime_Day = 0;
+
 UInt32 World::_rbTimeRank = 0;
 UInt64 World::_worldCupAward;
 UInt32 World::_worldCup[MAX_WC_COUNT][4];
@@ -361,7 +371,9 @@ bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
+bool bGratirudeTimeEnd = false;
 bool bWCTimeEnd2 = false;
+bool bCarnivalTimeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -447,251 +459,7 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)
         pl->sendRNR(nextday);
 
-    if (pl->GetVar(VAR_RECHARGE_TOTAL) && (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 31)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
-         
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 31)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
-         
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 7)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 14)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 21)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
-         
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
-
+    if ((pl->GetVar(VAR_RECHARGE_TOTAL) || pl->GetVar(VAR_PRIVATE_RECHARGE))&& (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 12)
@@ -699,6 +467,54 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
 
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
@@ -714,44 +530,20 @@ bool enum_midnight(void * ptr, void* next)
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
             if (pl->GetVar(VAR_RECHARGE_SCORE))
                 pl->SetVar(VAR_RECHARGE_SCORE, 0);
+            if (pl->GetVar(VAR_PRIVATE_RECHARGE))
+                pl->SetVar(VAR_PRIVATE_RECHARGE, 0);
         }
         GObject::RechargeTmpl::instance().clear();
     }
 
     if (pl->GetVar(VAR_RECHARGE_CONDCNT) &&
         (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 5, 25)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 12)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 7)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 14)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 21)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
-        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
         ))
     {
 #if 0
@@ -1362,14 +1154,14 @@ void World::SendSurnameLegendAward()
     if(bSurnameLegendEnd)
     {
         World::initRCRank();
-        static MailPackage::MailItem s_item[][3] = {
-            {{5068,1},{5138,1},{5108,1}},
-            {{5068,1},{5138,1},{5107,1}},
-            {{5068,1},{5137,1},{5107,1}},
-            {{5067,1},{5137,1},{5107,1}},
-            {{5067,1},{5137,1},{5106,1}},
-            {{5067,1},{5136,1},{5106,1}},
-            {{5066,1},{5136,1},{5106,1}},
+        static MailPackage::MailItem s_item[][5] = {
+            {{9498,30},{134,30},{16001,30},{9338,30},{17800,1}},
+            {{9498,25},{134,25},{16001,25},{9338,25},{0,0}},
+            {{9498,20},{134,20},{16001,20},{9338,20},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
         };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
@@ -1382,14 +1174,14 @@ void World::SendSurnameLegendAward()
             if(pos > 7)
                 break;
             //UInt32 score = i->total;
-            if(pos > 0 && pos <= 7)     //奖励前10名
+            if(pos > 0 && pos <= 7)     //奖励前7名
             {
                 SYSMSGV(content, 4174, pos);
-                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 5);
                 Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
                 {
-                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                    mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
                 }
             }
         }
@@ -1472,6 +1264,44 @@ inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
     return true;
 }
 
+inline void SetCarnivalConsumeRebate(Player * pl, UInt32 rank, UInt32 total)
+{
+    UInt32 rebate = 0;
+    if(rank == 1)
+        rebate = total * 15 / 100;
+    else if(rank == 2)
+        rebate = total * 12 / 100;
+    else if(rank == 3)
+        rebate = total * 10 / 100;
+    else if(rank == 4)
+        rebate = total * 8 / 100;
+    else if(rank == 5)
+        rebate = total * 5 / 100;
+    else if(rank >= 6 && rank < 10)
+        rebate = 1000;
+    else if(rank >= 11 && rank < 20)
+        rebate = 800;
+    else if(rank >= 21 && rank < 50)
+        rebate = 500;
+    else if(rank >= 51 && rank < 100)
+        rebate = 300;
+
+    pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
+
+    if(rank >= 1 && rank <= 5)
+        pl->SetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG, 1);
+}
+
+inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        pl->SetVar(VAR_GRATITUDE_GIVING_LEVEL, pl->GetLev());
+        pl->SetVar(VAR_GRATITUDE_GIVING_RECHARGE, pl->getTotalRecharge());
+    }
+    return true;
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -1490,6 +1320,8 @@ void World::World_Midnight_Check( World * world )
     bool bWCtime = getWorldCupTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
+    bool bbCarnivalTime = getCarnivalConsume();
+    bool bGratitudeTime = getGratitudeGiving();
     bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1550,6 +1382,8 @@ void World::World_Midnight_Check( World * world )
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
     //众里寻他活动结束
     bSeekingHerTimeEnd = bSeekingHerTime && !getSeekingHer();
+    bCarnivalTimeEnd = bbCarnivalTime && !getCarnivalConsume(300);
+    bGratirudeTimeEnd = bGratitudeTime && !getGratitudeGiving(300);
     UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
@@ -1571,250 +1405,6 @@ void World::World_Midnight_Check( World * world )
     UInt32 nextday = curtime + 30;
     //充值奖励结束判断
     if (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 11)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 25)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 1, 31)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 2, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 8)
-         
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 15)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 22)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 29)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 3, 31)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 19)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 26)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 4, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 3)
-         
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 10)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 17)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 24)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 5, 31)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 7)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 12)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 14)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 19)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 21)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 26)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 28)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 6, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 2)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 5)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 9)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 10)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 11)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 12)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 13)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 14)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 15)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 16)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 17)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 18)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 19)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 20)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 21)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 22)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 23)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 24)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 25)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 26)
-         
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 27)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 28)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 29)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 30)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 7, 31)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 1)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 2)
-
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 3)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 4)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 5)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 6)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 7)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 8)
-         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
-
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 12)
@@ -1822,6 +1412,46 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 14)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 15)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 20)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 27)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
 
          )
         bRechargeEnd = true;
@@ -1929,6 +1559,14 @@ void World::World_Midnight_Check( World * world )
     }
     if(bWCTimeEnd2)
         world->SendWorldCupAward2();
+    if(bCarnivalTimeEnd)
+    {
+        world->SendCarnivalConsumeAward();
+    }
+    if(bGratirudeTimeEnd)
+    {
+        GObject::globalPlayers.enumerate(player_enum_SetGratitudeInfo, 0);
+    }
 
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
@@ -2067,6 +1705,8 @@ void World::World_Fire_Sacrifice_Check( World * world )
 
 void World::World_Seeking_Her_Check(void *)
 {
+    if(!getSeekingHer())
+        return;
     if(World::seekingHerCharmSort.size() && World::seekingHerZhiNvSort.size() && World::seekingHerNiuLangSort.size())
     {
         RCSortType::iterator i = World::seekingHerCharmSort.begin();
@@ -2133,7 +1773,8 @@ void World::World_OldMan_Refresh(void *)
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4246};
+        //4246 萌萌妹
+        MapNpc mapNpc = {_oldMan._spot, 4245};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -2141,7 +1782,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4246;
+        mo.m_ID = 4245;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
@@ -2592,15 +2233,6 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
         case 5:
             {
                 status = 3;
-                player->SetVar(VAR_ANSWER_QUESTIONS_SUCCORFAIL, 0);
-                player->SetVar(VAR_ANSWER_SUCCESSION_NUM, 0);
-                player->SetVar(VAR_ANSWER_ATTACK_NUM, 0);
-                player->SetVar(VAR_ANSWER_SKILL_USE_NUM, 0);
-                player->SetVar(VAR_ANSWER_QUESTIONS_STATUS, 0);
-                player->SetVar(VAR_ANSWER_SKILL_STATUS, 0);
-                player->SetVar(VAR_ANSWER_LITERARY_VALUE, 0);
-                player->SetVar(VAR_ANSWER_SKILL_MARK, 0);
-                player->SetVar(VAR_ANSWER_QUESTIONS_OPTION, 0);
             }
             break;
         case 6:
@@ -2628,7 +2260,7 @@ inline bool enum_answer_send(GObject::Player* player, UInt8 mark)
     return true;
 }
 
-void World::AnswerCheck(void *)
+/*void World::AnswerCheck(void *)
 {
     if(!World::getAnswerAct())
         return;
@@ -2741,8 +2373,138 @@ void World::AnswerCheck(void *)
             }
         }
     }
-}
+}*/
 
+void World::AnswerCheck(void *)
+{
+    if(!World::getAnswerTime_Act())
+        return;
+
+    UInt32 nowTime = TimeUtil::Now();
+    UInt32 time = TimeUtil::SharpDayT(0, nowTime);
+
+    // 世界频道定时广播
+    if(nowTime == time + ANSWER_PREPARE_TIME)
+    {
+        SYSMSG_BROADCASTV(5170);
+    }
+    else if(nowTime == time + ANSWER_BROADCASTA_TIME)
+    {
+        SYSMSG_BROADCASTV(5171);
+    }
+    else if(nowTime == time + ANSWER_BROADCASTB_TIME)
+    {
+        SYSMSG_BROADCASTV(5172);
+    }
+    else if(nowTime == time + ANSWER_BEGIN_TIME)
+    {
+        SYSMSG_BROADCASTV(5173);
+    }
+
+    if(0 == GVAR.GetVar(GVAR_RAND_QUESTIONS_MARK))
+    {
+        // 每天重置题目
+        answerManager->RandQuestions();
+                
+        // 每天清楚缓存日志
+        answerManager->AnswerLogClear();
+
+        // 每天重置状态
+        if(_answerOpenA)
+            _answerOpenA = false;
+        if(_answerOpenB)
+            _answerOpenB = false;
+        if(_answerOpenC)
+            _answerOpenC = false;
+
+        GVAR.SetVar(GVAR_RAND_QUESTIONS_MARK, 1);
+    }
+
+    // 每天重置时间
+    if(!_answerOpenC)
+    {
+        if(nowTime < time + ANSWER_ALLEND_TIME)
+        {
+            _gAnswerPrepareTime = time + ANSWER_PREPARE_TIME;
+            _gAnswerBeginTime = time + ANSWER_BEGIN_TIME;
+            _gAllAnswerEndTime_Day = time + ANSWER_ALLEND_TIME;
+
+            if(nowTime < _gAnswerBeginTime)
+            {
+                _gAnswerEndTime = _gAnswerBeginTime + 25;
+                _gAnswerFinalTime = _gAnswerBeginTime + 30;
+            }
+            else
+            {
+                _gAnswerEndTime = nowTime / 30 * 30 + 25;
+                _gAnswerFinalTime = nowTime / 30 * 30 + 30;
+            }
+        }
+        _answerOpenC = true;
+    }
+
+    if(World::getPrepareTime_Day())
+    {
+        if(!_answerOpenA)
+        {
+            GObject::globalPlayers.enumerate(enum_answer_send, 1);
+            _answerOpenA = true;
+        }
+    }
+    else if(World::getAnswerTime_Day())
+    {
+        if(!_answerOpenB)
+        {
+            UInt8 answerId = 0;
+            UInt32 temp = _gAllAnswerEndTime_Day - nowTime;
+            if(0 == temp % 30)
+                answerId = 30 - temp / 30 + 1;
+            else
+                answerId = 30 - temp / 30;
+
+            if(answerId > 30)
+                answerId = 30;
+
+            answerManager->InitAnswerId(answerId);
+
+            GObject::globalPlayers.enumerate(enum_answer_send, 2);
+            _answerOpenB = true;
+        }
+    
+        if(nowTime < _gAllAnswerEndTime_Day)
+        {
+            GObject::globalPlayers.enumerate(enum_answer_send, 6);
+        }
+
+        if(nowTime >= _gAnswerEndTime)
+        {
+            if(nowTime+5 >= _gAnswerFinalTime)
+            {
+                //本题结束，时间设置到下一题的答题结束时间
+                _gAnswerEndTime = _gAnswerFinalTime + 25;
+                GObject::globalPlayers.enumerate(enum_answer_send, 3);
+            }
+        }
+        else if(nowTime >= _gAnswerFinalTime)
+        {
+            if(nowTime >= _gAllAnswerEndTime_Day)
+            {
+                World::SendAnswerAward();
+                World::SendAllAnswerEnd();
+
+                GObject::globalPlayers.enumerate(enum_answer_send, 5);
+            }
+            else
+            {
+                 //本题结束，时间设置到下一题的答题结算时间
+                _gAnswerFinalTime = nowTime / 30 * 30 + 30;
+                answerManager->AwardEndClear();
+
+                GObject::globalPlayers.enumerate(enum_answer_send, 4);
+            }
+        }
+    }
+}
 
 inline static bool enum_spread_send(Player* player, void* data)
 {
@@ -2943,37 +2705,7 @@ bool World::Init()
     }
 
     AddTimer(5 * 1000, ClanDuoBaoCheck, static_cast<void*>(NULL));
-
-    /**一战成名**/
-    UInt32 nowTimeA = TimeUtil::Now();
-    UInt32 timeA = TimeUtil::SharpDayT(0,nowTimeA);
-    UInt32 prepareA = timeA + 19*60*60 + 15*60;
-    UInt32 startA = timeA + 19*60*60 + 30*60;
-    UInt32 endA = timeA + 19*60*60 + 45*60;
-    UInt32 valueTimeA = 0;
-    UInt32 valueTimeB = 0;
-
-    if(nowTimeA < endA)
-    {
-        GVAR.SetVar(GVAR_ANSWER_PREPARE_DAY, prepareA);
-        GVAR.SetVar(GVAR_ANSWER_BEGIN_DAY, startA);
-        GVAR.SetVar(GVAR_ANSWER_END_DAY, endA);
-
-        if(nowTimeA < GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY))
-        {
-            valueTimeA = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY) + 25;
-            valueTimeB = GVAR.GetVar(GVAR_ANSWER_BEGIN_DAY) + 30;
-        }
-        else
-        {
-            valueTimeA = nowTimeA / 30 * 30 + 25;
-            valueTimeB = nowTimeA / 30 * 30 + 30;
-        }
-
-        GVAR.SetVar(GVAR_ANSWER_ENDTIME, valueTimeA);
-        GVAR.SetVar(GVAR_ANSWER_AWARDTIME, valueTimeB);
-    }
-
+    
     AddTimer(1000, AnswerCheck, static_cast<void*>(NULL));
 
     return true;
@@ -3878,7 +3610,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::qishibanScoreSort.insert(s);
         }
     }
-    if (World::getAnswerTime())
+    if (World::getAnswerTime_Day())
     {
         UInt32 score = p->GetVar(VAR_ANSWER_LITERARY_VALUE);
         if (score)
@@ -3969,6 +3701,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             st.player = p;
             st.total = charmPoint;
             World::seekingHerCharmSort.insert(st);
+        }
+    }
+    //if(World::getCarnivalConsume())
+    {
+        UInt32 total = p->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+        if(total)
+        {
+            RCSort s;
+            s.player  = p;
+            s.total = total;
+            World::carnivalConsumeSort.insert(s);
         }
     }
 
@@ -4535,11 +4278,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{9600,30},{9457,40},{9068,30},{0,0}},
-        {{9498,35},{9600,25},{9457,35},{9068,20},{0,0}},
-        {{9498,30},{9600,20},{9457,30},{9068,15},{0,0}},
+        {{9498,40},{554,30},{9457,40},{9075,30},{0,0}},
+        {{9498,35},{554,25},{9457,35},{9075,20},{0,0}},
+        {{9498,30},{554,20},{9457,30},{9075,15},{0,0}},
     };
-    static MailPackage::MailItem card = {9987,1};
+    static MailPackage::MailItem card = {9998,1};
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -5449,15 +5192,15 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{1733,1},{9338,25},{9498,30}},
-        {{16001,25},{515,20},{9338,20},{9498,25}},
-        {{16001,20},{515,15},{9338,15},{9498,20}},
-        {{16001,15},{515,10},{9338,10},{9498,15}},
+        {{16001,30},{9600,25},{556,25},{9498,30}},
+        {{16001,25},{9600,20},{556,20},{9498,25}},
+        {{16001,20},{9600,15},{556,15},{9498,20}},
+        {{16001,15},{9600,10},{556,10},{9498,15}},
     };
     static MailPackage::MailItem s_item2[][4] = {
-        {{9995,1}},
-        {{9996,1}},
-        {{9997,1}},
+        {{17805,1}},
+        {{0,0}},
+        {{0,0}},
         {{0,0}},
     };
     SYSMSG(title, 946);
@@ -5487,7 +5230,7 @@ void World::SendTYSSPlayerAward(UInt8 actType)
             int type = pos > 3 ? 4 : pos;
             SYSMSGV(content, 951, pos);
 	        MailPackage::MailItem *items;
-	        MailPackage::MailItem *tmp_items;
+	        MailPackage::MailItem *tmp_items = NULL;
             if(actType == 1)
                 items = s_item[type-1]; 
             else
@@ -5646,10 +5389,10 @@ void World::SendCoolSummerAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9498, 40}, {16001, 40}, {9022, 30}, {503, 50}, {9981, 1}},
-        {{9498, 30}, {16001, 30}, {9022, 25}, {503, 40}, {0 ,0}},
-        {{9498, 20}, {16001, 20}, {9022, 20}, {503, 30}, {0, 0}},
-        {{9498, 10}, {16001, 10}, {9022, 10}, {503, 15}, {0, 0}}
+        {{554, 40}, {9600, 40}, {9022, 25}, {9075, 25}, {9999, 1}},
+        {{554, 30}, {9600, 30}, {9022, 18}, {9075, 18}, {0 ,0}},
+        {{554, 20}, {9600, 20}, {9022, 12}, {9075, 12}, {0, 0}},
+        {{554,  8}, {9600,  8}, {9022,  5}, {9075,  5}, {0, 0}}
     };
 
     SYSMSG(title, 5163);
@@ -5849,6 +5592,64 @@ Player * World::getSeekingHerTopRank(UInt8 flag)
             target = i->player;
     }
     return target;
+}
+
+void rankFixedFunction(UInt32 & rank, UInt32 total)
+{
+    static UInt32 totalLvl[] = {30000, 20000, 15000, 10000, 8000, 3000, 2000, 1000};
+    static UInt32 rankLvl[] = {1, 2, 3, 4, 5, 10, 20, 50};
+    for(size_t i = 0; i < 8; i++)
+    {
+        if(rank <= rankLvl[i] && total < totalLvl[i])
+            rank = rankLvl[i] + 1;
+        if(rank <= rankLvl[i] && total >= totalLvl[i])
+            break;
+    }
+}
+
+void World::SendCarnivalConsumeAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][4] = {
+        {{554, 60}, {9600, 60}, {134, 60}, {17802,  1} },
+        {{554, 40}, {9600, 40}, {134, 40}, {17803,  1} },
+        {{554, 30}, {9600, 30}, {134, 30}, {17804,  1} },
+        {{554, 20}, {9600, 20}, {134, 20}, {16001, 20} },
+        {{554, 10}, {9600, 10}, {134, 10}, {16001, 10} },
+        {{554,  7}, {9600,  7}, {134,  7}, {16001,  7} },
+        {{554,  5}, {9600,  5}, {134,  5}, {16001,  5} },
+        {{554,  3}, {9600,  3}, {134,  3}, {0,  0} },
+    };
+
+    SYSMSG(title, 5232);
+    UInt32 pos = 1;
+    UInt32 index = 0;
+    for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
+    {
+        rankFixedFunction(pos, i->total);
+        SetCarnivalConsumeRebate(i->player, pos, i->total);
+        if(pos <= 50)
+        {
+            SYSMSGV(content, 5233, i->total, pos);
+            if(pos >= 1 && pos <= 5)
+                index = pos - 1;
+            else if(pos >= 6 && pos <= 10)
+                index = 5;
+            else if(pos >= 11 && pos <= 20)
+                index = 6;
+            else if(pos >= 21 && pos <= 50)
+                index = 7;
+
+            MailItemsInfo itemsInfo(s_item[index], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, s_item[index], 4, true);
+        }
+        pos++;
+        if(pos > 100)
+            break;
+    }
+    return;
 }
 
 }

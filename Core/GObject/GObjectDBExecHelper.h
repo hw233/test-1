@@ -441,6 +441,7 @@ struct DBPracticePlace
     UInt16 winCount;    // 赢的次数
     UInt32 slotincoming; // 一周洞府总收入
     UInt32 protincoming; // 一周保护费总收入
+    UInt16 serverId;     //服务器ID
 };
 
 struct DBPracticeData
@@ -527,7 +528,7 @@ struct DBFighter2
     UInt16 talent;          // 天赋
     std::string trump;      // 法宝
     std::string lingbao;    // 灵宝
-    std::string evolution;    // 灵宝
+    std::string evolution;    // 仙器
     std::string acupoints;  // 穴道,打通次数
     std::string acupointsgold;  // 本命金丹,打通次数
     std::string skill;      // 装备的技能
@@ -563,7 +564,9 @@ struct DBFighter2
     Int32 tough;
     Int32 action;
     UInt8 hideFashion;
+    UInt32 incense;
     UInt32 innateTrump;     //先天法宝
+    UInt32 summoned;
 };
 
 
@@ -728,6 +731,7 @@ struct DBClan
     std::string clantitleAll;
     UInt32 clanFireValue;
     UInt8 clanAutoApply;
+    UInt16 serverId;
 };
 
 struct DBClanRepo
@@ -1321,6 +1325,13 @@ struct DBSeekingHerSendBeanLog
     UInt32 date;
     UInt32 count;
     UInt8 beantype;
+};
+
+struct DBShakeMoneyBagLog
+{
+    UInt64 playerId;
+    UInt32 date;
+    UInt32 count;
 };
 
 struct DBAirBookData
@@ -2184,7 +2195,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(12)
+SPECIALDEF(13)
 	(
         UInt8, id,
         UInt64, ownerid,
@@ -2197,7 +2208,8 @@ SPECIALDEF(12)
         UInt16, enemyCount,
         UInt16, winCount,
         UInt32, slotincoming,
-        UInt32, protincoming
+        UInt32, protincoming,
+        UInt16, serverId
     )
 SPECIALEND()
 
@@ -2273,7 +2285,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(60)
+SPECIALDEF(62)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2334,7 +2346,9 @@ SPECIALDEF(60)
     Int32, tough,
     Int32, action,
     UInt8, hideFashion,
-    UInt32, innateTrump
+    UInt32, incense,
+    UInt32, innateTrump,
+    UInt32, summoned
 	)
 SPECIALEND()
 
@@ -2508,7 +2522,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(38)
+SPECIALDEF(39)
 (
 	UInt32, id,
 	std::string, name,
@@ -2547,7 +2561,8 @@ SPECIALDEF(38)
     UInt32,tyssSum, 
     std::string, clantitleAll,
     UInt32, clanFireValue,
-    UInt8, clanAutoApply
+    UInt8, clanAutoApply,
+    UInt16, serverId
 )
 SPECIALEND()
 
@@ -3370,6 +3385,15 @@ SPECIALDEF(5)
     UInt32, date,
     UInt32, count,
     UInt8, beantype
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBShakeMoneyBagLog)
+SPECIALDEF(3)
+(
+    UInt64, playerId,
+    UInt32, date,
+    UInt32, count
 )
 SPECIALEND()
 

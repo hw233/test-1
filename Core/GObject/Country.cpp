@@ -23,6 +23,7 @@
 #include "ClanCityBattle.h"
 #include "ClanBigBoss.h"
 #include "RaceBattle.h"
+#include "DarkDargon.h"
 
 namespace GObject
 {
@@ -64,6 +65,14 @@ void Country::ClanBigBoss_Refesh(void *)
     //UInt32 time = TimeUtil::SharpDayT(0,nowTime);
 
     ClanBigBossMgr::Instance().process(nowTime);
+}
+
+void Country::DarkDargon_Refesh(void *)
+{
+    UInt32 nowTime = TimeUtil::Now();
+    nowTime -= (nowTime % 10);//保证10秒
+
+    DarkDargon::Instance().process(nowTime);
 }
 
 void Country::ClanRankBattleCheck(void *)
@@ -173,6 +182,7 @@ bool Country::Init()
         GObject::ClanBoss::instance().init();
 	    AddTimer(1000, ClanBoss_Refresh, static_cast<void*>(NULL));
 		AddTimer(5 * 60 * 1000, ClanBigBoss_Refesh, static_cast<void *>(NULL), (5 * 60  - (now % (5 * 60))) * 1000);
+		AddTimer(10 * 1000, DarkDargon_Refesh, static_cast<void *>(NULL), (10  - (now % (10))) * 1000);
         //AddTimer(1000, raceBattleCheck);
 
 	}

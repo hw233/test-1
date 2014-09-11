@@ -4,6 +4,7 @@
 #include "Package.h"
 #include "Common/URandom.h"
 #include "MsgID.h"
+#include "Script/GameActionLua.h"
 #include "Common/StringTokenizer.h"
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
@@ -91,7 +92,7 @@ namespace GObject
             return 1;
         Battle::BattleSimulator bsim(0x7000, _fighter->getOwner(), ng->getName(), ng->getLevel(), false);
 
-        if(type == 4)
+        if(type == 5)
             _fighter->getOwner()->PutFighters( bsim, 0);
         else
             _fighter->getOwner()->PutFighters( bsim, 0 ,false, _fighter->getId());
@@ -116,7 +117,7 @@ namespace GObject
     { 
         if(!getOwner())
             return 1;
-        UInt32 expNeed = 100000;
+        UInt32 expNeed = 50000;
         if(_fighter->getPExp() < expNeed)
             return 1;
         _fighter->addPExp(-static_cast<Int32>(expNeed), true);
@@ -285,6 +286,7 @@ namespace GObject
     { 
         UInt32 now = TimeUtil::Now();
         st << static_cast<UInt32>((randomTime + 60*30) > now ?(randomTime + 60*30 -now): 0);
+        std::cout<<"leftTime:" << ((randomTime + 60*30) > now ?(randomTime + 60*30 -now): 0) << std::endl;;
         st << static_cast<UInt8>(TASK9_COUNT);
         for(UInt8 i = 0 ;i < TASK9_COUNT; ++i)
         { 
@@ -413,11 +415,13 @@ namespace GObject
         switch(taskId)
         { 
             case 1:
-            case 4: 
             case 5:
             case 6:
             case 8:
                 st << npcIds[taskId-1];
+                break;
+            case 4: 
+                st << static_cast<UInt32>(npcIds[taskId-1]+(_fighter->getClass()*2 + _fighter->getSex()));
                 break;
             case 2:
                 break;
@@ -484,7 +488,7 @@ namespace GObject
             _task9[j].npcId = static_cast<UInt8>(atoi(tokenizer2[2].c_str())); 
         }
     } 
-    void Evolution::GetTaskAward(UInt8 index)
+    UInt8 Evolution::GetTaskAward(UInt8 index)
     { 
         static UInt32 AwardExp[EVOLUTION_TASKMAX] = {100,200,300,400,500,600,700,800,900} ;
         static UInt32 Exp = 72320; 
@@ -493,16 +497,18 @@ namespace GObject
         if(index < EVOLUTION_TASKMAX-1 )
         {
             if(!cnt)
-                return ;
+                return 1;
         }
         else if(cnt < 5)
-            return ;
+            return 1;
         if(_award& (1 << index))
-            return ;
+            return 1;
         _fighter->addExp(Exp);
         getOwner()->getTael(tael);
         _award|= (1 << index);
         UpdateEvolutionToDB();
+        SendProcess();
+        return 0;
     } 
     UInt8 Evolution::FeiSheng()
     {

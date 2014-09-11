@@ -345,6 +345,7 @@ namespace GObject
 
         typedef std::vector<ClanBattleReward> RewardVec;
         typedef std::map<UInt32, RewardVec> RewardsMap;
+        typedef std::multimap<UInt32, Player *> LocalRankMap;
 
         /**
          *@brief 战斗状态
@@ -435,6 +436,8 @@ namespace GObject
 
         const ClanVec& getClanRanking() const { return m_ClanRanking; }
         void removeClanRank(Clan* clan);
+        void clanLocalRank();
+        void clanLocalRankInit();
 
         void sendDaily(Player* player);
 
@@ -522,6 +525,7 @@ namespace GObject
         RewardsMap  m_WeeklyClanSortRewards;
         //帮派战状态
         UInt8 m_Status;
+        LocalRankMap m_LocalRank;
     };
 }
 

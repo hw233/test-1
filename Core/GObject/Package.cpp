@@ -5555,7 +5555,7 @@ namespace GObject
     {
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
-        if ((fromEquip->getClass() >= Item_Weapon && fromEquip->getClass() <= Item_Ring)) 
+        if ((fromEquip->getClass() >= Item_Weapon && fromEquip->getClass() <= Item_Ring) || (fromEquip->getClass() >= Item_Evolution1 && fromEquip->getClass() <= Item_Evolution2 ))
         {
             if(0 == mark) //活动装备转换
             {
@@ -5668,7 +5668,7 @@ namespace GObject
     UInt8 Package::moveEquipFashion(Fighter* fFgt,Fighter* tFgt, ItemEquip* fromEquip,UInt8 fPos, ItemEquip* toEquip,UInt8 tPos)
     {
         ItemClass fcl = fromEquip->getClass();
-        if(fcl != Item_Trump && fcl != Item_Fashion && fcl != Item_Halo && fcl != Item_InnateTrump)
+        if(fcl != Item_Trump && fcl != Item_Fashion && fcl != Item_Halo && fcl != Item_InnateTrump && fcl != Item_Evolution3)
             return 0;
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
@@ -5740,7 +5740,7 @@ namespace GObject
 
     UInt8 Package::moveEquipSpirit(Fighter* fFgt, Fighter* tFgt, ItemEquip* fromEquip, UInt8 fPos, ItemEquip* toEquip, UInt8 tPos, UInt8 mark)
     {
-        if ((fromEquip->getClass() < Item_Weapon || fromEquip->getClass() > Item_Ring))
+        if ((fromEquip->getClass() < Item_Weapon || (fromEquip->getClass() > Item_Ring && fromEquip->getClass() < Item_Evolution1)|| fromEquip->getClass() > Item_Evolution2))
             return 0;
         ItemEquipData& fIed = fromEquip->getItemEquipData();
         ItemEquipData& tIed = toEquip->getItemEquipData();
@@ -5785,11 +5785,11 @@ namespace GObject
         return 0;
     }
 
-	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect )
+	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect ,UInt8 flag)
 	{
 		// if (t > 2) return 2;
 		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
-		if(m_Owner->getTael() < amount)
+		if(!flag&&m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 1100);
 			return 1;
@@ -5822,7 +5822,7 @@ namespace GObject
 		case 3:
 		case 4:
 		case 5:
-			if(!DelItemAny(itemUse, 1, &isBound))
+			if(!flag && !DelItemAny(itemUse, 1, &isBound))
 				return 2;
 			break;
 		default:
@@ -5862,14 +5862,17 @@ namespace GObject
 		types[2] = ied.extraAttr2.type3;
 		values[2] = ied.extraAttr2.value3;
 		ConsumeInfo ci(ForgeEquipment,0,0);
-		m_Owner->useTael(amount,&ci);
+        if(!flag)
+            m_Owner->useTael(amount,&ci);
         UInt8 crr = equip->GetCareer();
 
         UInt8 equip_t = EQUIPTYPE_EQUIP;
         if(equip->GetItemType().subClass == Item_Trump ||
                 equip->GetItemType().subClass == Item_Fashion ||
                 equip->GetItemType().subClass == Item_Halo ||
-                equip->GetItemType().subClass == Item_InnateTrump)
+                equip->GetItemType().subClass == Item_InnateTrump ||
+                equip->GetItemType().subClass == Item_Evolution3 
+                )
         {
             equip_t = EQUIPTYPE_TRUMP;
             lv = ied.tRank;
@@ -6339,6 +6342,7 @@ namespace GObject
                 Int16 v[3] = {0, 0, 0};
                 getRandomAttr2(lv, crr, q1, 0, 0, t, v, EQUIPTYPE_TRUMP);
                 ApplyAttr2(trump, t, v);
+	            //Forge( fighterId, trumpId,t, v, 0,1);
             }
         }
 
@@ -8867,6 +8871,8 @@ namespace GObject
                 fgt->setLingbaoFall(type ,0);
                 enLevel ++;
                 success ++;
+                if(bless != 0)
+                    wfall = true;
                 bless = 0;
                 wlevel = true;
                 res = 1;

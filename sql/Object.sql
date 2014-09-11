@@ -647,6 +647,7 @@ CREATE TABLE `fighter` (
   `lingshi` varchar(255) NOT NULL,
   `summoned` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `hideFashion` tinyint(4) DEFAULT '0',
+  `incense` int(10) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
   KEY `playerId` (`playerId`),
   KEY `id` (`id`)
@@ -705,7 +706,8 @@ CREATE TABLE `practice_place` (
   `winCount` smallint(5) unsigned NOT NULL DEFAULT '0',
   `slotincoming` int(11) NOT NULL,
   `protincoming` int(11) NOT NULL,
-   PRIMARY KEY (`id`)
+  `serverId` smallint(5) unsigned NOT NULL DEFAULT '0',
+   PRIMARY KEY (`id`, `serverId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `practice_data`;
@@ -1125,6 +1127,7 @@ CREATE TABLE `clan` (
   `clantitleAll` varchar(1024) NOT NULL DEFAULT '',
   `clanFireValue` int(10) unsigned NOT NULL DEFAULT '0',
   `clanAutoApply` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `serverId` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2702,5 +2705,12 @@ CREATE TABLE IF NOT EXISTS `fighter_evolution` (
     `rTime` int(10) unsigned NOT NULL DEFAULT 0,
     `success`  tinyint(3) unsigned NOT NULL DEFAULT '0',  
     PRIMARY KEY(`fighterId`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `shake_moneybag_log`;
+CREATE TABLE IF NOT EXISTS `shake_moneybag_log` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `data` int(10) unsigned NOT NULL,
+    `count` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

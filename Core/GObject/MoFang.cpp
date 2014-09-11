@@ -728,6 +728,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
         return;
 
     UInt8 scheme = m_owner->GetVar(VAR_JIGUAN_SCHEME);
+    TRACE_LOG("equipJG  jgId: %u, pos: %u, scheme:%u, mark:%u", jgId, pos, scheme, mark);
 
     if(EQUIP_JG == mark || DISMANT_JG == mark)
     {
@@ -1608,7 +1609,7 @@ void MoFang::upgradeKY(UInt8 keyinId, UInt8 opt)
     else
         keyinLvl = iter->second;
 
-    if(keyinLvl >= 20)
+    if(keyinLvl >= KEYIN_LVL_MAX)
         return;
     
     GData::JiguanData::keyinInfo * kyInfo = GData::jiguanData.getKeyinInfo(keyinId, keyinLvl+1);
@@ -1707,7 +1708,7 @@ void MoFang::quickUpgradeKY(UInt8 keyinId, UInt8 opt)
     else
         keyinLvl = iter->second;
 
-    if(keyinLvl >= 20)
+    if(keyinLvl >= KEYIN_LVL_MAX)
         return;
     
     GData::JiguanData::keyinInfo * kyInfo = GData::jiguanData.getKeyinInfo(keyinId, keyinLvl+1);
@@ -1888,7 +1889,7 @@ void MoFang::addKYAttr(GData::AttrExtra& ae)
         if(!kyInfo)
             continue;
 
-        if(kyInfo->keyinLvl > 0 && kyInfo->keyinLvl <= 20)
+        if(kyInfo->keyinLvl > 0 && kyInfo->keyinLvl <= KEYIN_LVL_MAX)
         {
             switch(kyInfo->attrType)
             {
