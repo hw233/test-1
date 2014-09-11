@@ -13,6 +13,7 @@
 #include "GData/AcuPraTable.h"
 #include "GData/XingchenData.h"
 #include "GData/DrinkAttr.h"
+#include "GData/IncenseTable.h"
 #include "GData/lingbaoLevel.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
@@ -69,7 +70,7 @@ bool existGreatFighter(UInt32 id)
 
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
-    _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _halo(NULL), _fashion(NULL), _weapon(NULL),
+    _capacity(1.0f), _color(2), _summoned(0), _hp(0), _cittaslot(CITTA_INIT), _halo(NULL), _fashion(NULL), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _skillBPDirty(false),
     _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _skillBP(0.0f), _praadd(0),_powerUp(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
@@ -111,6 +112,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _wbplextmagatk = 0;
     _cbbplextatk = 0;
     _cbbplextmagatk = 0;
+    _incense = 0;
     _ddplextatk = 0;
     _ddplextmagatk = 0;
     _ddplextdef = 0;
@@ -1473,7 +1475,8 @@ void Fighter::addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
 {
 	if(ce == NULL)
 		return;
-	ae += *ce;
+    float up = GData::incenseData.getIncenseAttr(getIncense());
+	ae += ce->getIncenseUp(1+up/100);
 }
 
 void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
@@ -8224,6 +8227,10 @@ void Fighter::updateLingbaoFallToDB(UInt8 type)
     DB1().PushUpdateData("REPLACE INTO `fighter_lingbaoFall` (`playerId`, `fighterId`, `type`, `fall`) VALUES(%" I64_FMT "u, %u, %u, %u)", _owner->getId(), getId(),type,lingbaoFall[type]);
 
 } 
+void Fighter::UpdateIncenseToDB()
+{
+    DB2().PushUpdateData("UPDATE `fighter` SET `incense` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _incense, _id, _owner->getId());
+}
 
 /*
  *end分别计算散仙的战斗力

@@ -2797,6 +2797,7 @@ namespace GObject
         UInt8 transfromXingchen(Fighter * fFgt, Fighter * tFgt);
         void transformElixir(Fighter * fFgt, Fighter * tFgt);
         UInt8 transfromLingbaoLevel(Fighter * fFgt, Fighter * tFgt);
+        UInt8 transfromIncense(Fighter * fFgt, Fighter * tFgt);
         void sendXinMoInfo(); 
             
     private:
@@ -3253,6 +3254,7 @@ namespace GObject
         void send3366GiftInfo();
         void sendQQGameGift1218();
         void sendFeastLoginAct();
+        void sendFeastGiftLoginAct();
         void sendTowerLoginAct();
         void getFeastGiftAward(UInt8 type);
         void sendFeastGiftAct();
@@ -3483,6 +3485,7 @@ namespace GObject
         void sendJiqirenInfo();
         void sevensoul_fixed();
         void BuyLeftPower();
+        UInt32 UseIncenseGood(UInt32 oldExp , UInt8 type , UInt8 num = 0);
 
         //友好度
         void AddFriendlyCount(Player * friender , UInt32 value) ; //增加友好度
@@ -3632,11 +3635,17 @@ namespace GObject
         void giveCarnivalDailyAward(UInt32);
         void shakeMoneyBag();
 
+        void getGratitudeAward(UInt8);
+        void gratitudeReturnInfo();
+
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
         void ExchangeXG(UInt8 type);
         void ExchangeFlyRoadBox(UInt8 type);
+        void getLuckyBagExtraAward();
+        UInt32 getClanJoinTime();
+        void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
 
     private:
         //玩家位置（包括层数、当层位置）

@@ -179,6 +179,7 @@ bool World::_heroIslandAct= false;
 bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
+bool World::_feastgiftloginAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
 bool World::_QZoneQQGameAct= false;
@@ -369,6 +370,7 @@ bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
+bool bGratirudeTimeEnd = false;
 bool bWCTimeEnd2 = false;
 bool bCarnivalTimeEnd = false;
 
@@ -481,6 +483,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 29)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -504,6 +514,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 9)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
         ))
     {
 #if 0
@@ -1114,14 +1125,14 @@ void World::SendSurnameLegendAward()
     if(bSurnameLegendEnd)
     {
         World::initRCRank();
-        static MailPackage::MailItem s_item[][3] = {
-            {{5068,1},{5138,1},{5108,1}},
-            {{5068,1},{5138,1},{5107,1}},
-            {{5068,1},{5137,1},{5107,1}},
-            {{5067,1},{5137,1},{5107,1}},
-            {{5067,1},{5137,1},{5106,1}},
-            {{5067,1},{5136,1},{5106,1}},
-            {{5066,1},{5136,1},{5106,1}},
+        static MailPackage::MailItem s_item[][5] = {
+            {{9498,30},{134,30},{16001,30},{9338,30},{17800,1}},
+            {{9498,25},{134,25},{16001,25},{9338,25},{0,0}},
+            {{9498,20},{134,20},{16001,20},{9338,20},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
+            {{9498,10},{134,10},{16001,10},{9338,10},{0,0}},
         };
         int pos = 0;
         for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
@@ -1134,14 +1145,14 @@ void World::SendSurnameLegendAward()
             if(pos > 7)
                 break;
             //UInt32 score = i->total;
-            if(pos > 0 && pos <= 7)     //奖励前10名
+            if(pos > 0 && pos <= 7)     //奖励前7名
             {
                 SYSMSGV(content, 4174, pos);
-                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 5);
                 Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(mail)
                 {
-                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                    mailPackageManager.push(mail->id, s_item[pos-1], 5, true);
                 }
             }
         }
@@ -1250,6 +1261,15 @@ inline bool player_enum_CarnivalConsume(GObject::Player * pl, int)
             rebate = 300;
         pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
     }
+}
+
+inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        pl->SetVar(VAR_GRATITUDE_GIVING_LEVEL, pl->GetLev());
+        pl->SetVar(VAR_GRATITUDE_GIVING_RECHARGE, pl->getTotalRecharge());
+    }
     return true;
 }
 
@@ -1272,6 +1292,7 @@ void World::World_Midnight_Check( World * world )
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
     bool bbCarnivalTime = getCarnivalConsume();
+    bool bGratitudeTime = getGratitudeGiving();
     bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1333,6 +1354,7 @@ void World::World_Midnight_Check( World * world )
     //众里寻他活动结束
     bSeekingHerTimeEnd = bSeekingHerTime && !getSeekingHer();
     bCarnivalTimeEnd = bbCarnivalTime && !getCarnivalConsume(300);
+    bGratirudeTimeEnd = bGratitudeTime && !getGratitudeGiving(300);
     UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
@@ -1377,6 +1399,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 28)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 29)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 31)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  4)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
 
          )
         bRechargeEnd = true;
@@ -1488,6 +1518,10 @@ void World::World_Midnight_Check( World * world )
     {
         world->SendCarnivalConsumeAward();
         GObject::globalPlayers.enumerate(player_enum_CarnivalConsume, 0);
+    }
+    if(bGratirudeTimeEnd)
+    {
+        GObject::globalPlayers.enumerate(player_enum_SetGratitudeInfo, 0);
     }
 
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
@@ -5310,10 +5344,10 @@ void World::SendCoolSummerAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9498, 40}, {16001, 40}, {9022, 30}, {503, 50}, {9981, 1}},
-        {{9498, 30}, {16001, 30}, {9022, 25}, {503, 40}, {0 ,0}},
-        {{9498, 20}, {16001, 20}, {9022, 20}, {503, 30}, {0, 0}},
-        {{9498, 10}, {16001, 10}, {9022, 10}, {503, 15}, {0, 0}}
+        {{554, 40}, {9600, 40}, {9022, 25}, {9075, 25}, {9999, 1}},
+        {{554, 30}, {9600, 30}, {9022, 18}, {9075, 18}, {0 ,0}},
+        {{554, 20}, {9600, 20}, {9022, 12}, {9075, 12}, {0, 0}},
+        {{554,  8}, {9600,  8}, {9022,  5}, {9075,  5}, {0, 0}}
     };
 
     SYSMSG(title, 5163);

@@ -446,6 +446,10 @@ public:
     { _feastloginAct= v; }
     inline static bool getFeastLoginAct()
     { return _feastloginAct; }
+    inline static void setFeastGiftLoginAct(bool v)
+    { _feastgiftloginAct= v; }
+    inline static bool getFeastGiftLoginAct()
+    { return _feastgiftloginAct; }
     inline static void setNewYearGiveGiftAct(bool v)
     { _newYearGiveGiftAct= v; }
     inline static bool getNewYearGiveGiftAct()
@@ -653,8 +657,18 @@ public:
     } 
     inline static bool getCoolSummer(UInt32 time = 0)
     {
-        UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
-        UInt32 end = TimeUtil::MkTime(2014, 7, 7);
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 21);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 26);
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+    inline static bool getGratitudeGiving(UInt32 time = 0, UInt32 time1 = 0)
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 11);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 17) + time1;
         UInt32 now = TimeUtil::Now() + time;
         if((now >= begin && now <= end))
             return true;
@@ -1254,6 +1268,16 @@ public:
         return true;
     }
 
+    inline static bool getCelebrateCardActivity(UInt32 time = 0)
+    {
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 time20140916 = TimeUtil::MkTime(2014, 9, 16);
+        
+        if(now < time20140916 || now > time20140916 + 5 * 86400)
+            return false;
+        return true;
+    }
+
     inline static bool getFlyRoadActivity(UInt32 time = 0)
     {
         UInt32 now = TimeUtil::Now() + time;
@@ -1425,6 +1449,7 @@ public:
     static bool _dragonKingAct;
     static bool _saveGoldAct;
     static bool _feastloginAct;
+    static bool _feastgiftloginAct;
     static bool _newYearGiveGiftAct;
     static bool _newYearQQGameAct;
     static bool _QZoneQQGameAct;

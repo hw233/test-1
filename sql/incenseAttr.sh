@@ -1,33 +1,34 @@
 
+
 #!/bin/bash
 
-F=soullvlexp.txt
+F=incenseAttr.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function soullvlexp()
+function incenseAttr()
 {
 # 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=soullvlexp
-    sed -i /LVL/d $f
-    sed -i /lvl/d $f
-    sed -i /exp/d $f
-    sed -i /pexp/d $f
+    d=incenseAttr
+    sed -i /ID/d $f
+    sed -i /hp/d $f
     sed -i /^$/d $f
+    sed -i /^[[:space:]]*$/d $f   #lb
+    sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `soul_lvl_exp` VALUES";
+            print "INSERT INTO `incenseAttr` VALUES";
         } {
-            printf("(%d,%d,%d)",$1,$2,$3);
-            if (NR <= ENVIRON["lines"])
+            printf("(%d,%.02f)",$2,$3);
+            if (NR < ENVIRON["lines"])
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
@@ -53,8 +54,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    soullvlexp $F
+    incenseAttr $F
 else
     echo "File $F is not exists"
 fi
-

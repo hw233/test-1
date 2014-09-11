@@ -382,6 +382,9 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
 	FastMutex::ScopedLock lk(_mutex); // XXX:
 
+    if (!copyCheckLevel(pl, id))
+        return 0;
+
     if (pl->hasFlag(Player::AutoCopy) && !ato) {
         pl->sendMsgCode(0, 1414);
         return 0;
