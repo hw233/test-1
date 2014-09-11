@@ -1261,6 +1261,7 @@ inline bool player_enum_CarnivalConsume(GObject::Player * pl, int)
             rebate = 300;
         pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
     }
+    return true;
 }
 
 inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
