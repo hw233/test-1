@@ -21755,15 +21755,7 @@ void Player::postDragonKing(UInt8 count)
     UInt32 XBLing = Dragon_Ling[flag];
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
         return;
-    if(XBLing == 17032)
-    {
-        if(GetPackage()->GetRestPackageSize(2) < count)
-        {
-            sendMsgCode(0, 8050);
-            return;
-        }
-    }
-    else if (GetPackage()->GetRestPackageSize() < count)
+    if (GetPackage()->GetRestPackageSize() < count)
     {
         sendMsgCode(0, 1011);
         return;
