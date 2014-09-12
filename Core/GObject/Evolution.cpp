@@ -78,8 +78,8 @@ namespace GObject
             npcId = npcIdEx;
         if(type == 3)
         {
-            std::cout<<"class :" << static_cast<UInt32>(_fighter->getClass()); 
-            std::cout<< "sex :" << static_cast<UInt32>(_fighter->getSex()) << std::endl;
+            //std::cout<<"class :" << static_cast<UInt32>(_fighter->getClass()); 
+            //std::cout<< "sex :" << static_cast<UInt32>(_fighter->getSex()) << std::endl;
             npcId += (_fighter->getClass()*2 + _fighter->getSex()) ;   //待定
         }
         GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
@@ -286,7 +286,7 @@ namespace GObject
     { 
         UInt32 now = TimeUtil::Now();
         st << static_cast<UInt32>((randomTime + 60*30) > now ?(randomTime + 60*30 -now): 0);
-        std::cout<<"leftTime:" << ((randomTime + 60*30) > now ?(randomTime + 60*30 -now): 0) << std::endl;;
+        //std::cout<<"leftTime:" << ((randomTime + 60*30) > now ?(randomTime + 60*30 -now): 0) << std::endl;;
         st << static_cast<UInt8>(TASK9_COUNT);
         for(UInt8 i = 0 ;i < TASK9_COUNT; ++i)
         { 
@@ -362,22 +362,22 @@ namespace GObject
         UInt32 rand = uRand(size/3);
         for(UInt32 i = 0; i < TASK9_COUNT; ++i)
         {
-            std::cout <<" index: "<< static_cast<UInt32>(i) ;
+            //std::cout <<" index: "<< static_cast<UInt32>(i) ;
             UInt32 pos = rand + i*(size/3);
             if(pos >= size)
             {
                 _task9[i].npcId = 14003;
                 _task9[i].pl =NULL;
                 _task9[i].win = 0;
-                std::cout <<" npcId: "<< static_cast<UInt32>(_task9[i].npcId) ;
+                //std::cout <<" npcId: "<< static_cast<UInt32>(_task9[i].npcId) ;
             }
             else
             {
                 _task9[i].pl = vec.at(pos);
                 _task9[i].win = 0;
-                std::cout <<" playerId : "<< static_cast<UInt32>(_task9[i].pl->getId()) ;
+                //std::cout <<" playerId : "<< static_cast<UInt32>(_task9[i].pl->getId()) ;
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
 
         }
         UpdateEvolutionToDB();

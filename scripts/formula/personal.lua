@@ -619,12 +619,12 @@ function calcBattlePoint(fgt)
 
     bp = bp + fgt:getExtraFairyAtk() * bp_factor_atk
     bp = bp + fgt:getExtraFairyDef() * bp_factor_def
-    if fgt:getExtraFairyAtk() ~= 0 then
-        print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
-        print("攻系数："..bp_factor_atk)
-        print("getExtraFairyDef:"..fgt:getExtraFairyDef())
-        print("攻系数："..bp_factor_def)
-    end
+    --if fgt:getExtraFairyAtk() ~= 0 then
+    --    print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
+    --    print("攻系数："..bp_factor_atk)
+    --    print("getExtraFairyDef:"..fgt:getExtraFairyDef())
+    --    print("攻系数："..bp_factor_def)
+    --end
     --printBattlePoint(fgt)
     return bp;
 end
