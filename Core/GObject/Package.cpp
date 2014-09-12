@@ -6143,6 +6143,7 @@ namespace GObject
     bool Package::DelItemAny2(UInt32 id,UInt16 num )
     {
         DelItemAny(id,num,NULL,0);
+        return 1;
     }
 
 	ItemEquip * Package::FindEquip( Fighter *& fgt, UInt8& pos, UInt16 fgtId, UInt32 id )
