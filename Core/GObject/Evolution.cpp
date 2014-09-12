@@ -254,6 +254,8 @@ namespace GObject
             if(r == NULL)
                 return !res;
             getOwner()->send(&(*r)[0], r->size());
+            if(!res)
+                getOwner()->sendCompareBP(pl);
         }
         if(res)
         {

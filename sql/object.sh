@@ -162,6 +162,8 @@ function update_object()
     ##mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140812_cEvolution.sql #飞升
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140818_addXianEq.sql     
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_serverwar_clearstate.sql     #服战押注没结算
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_0911.sql     #911bug清理积分
 }
 
 #sh player_jiguan.sh
