@@ -1506,6 +1506,21 @@ void Fighter::addAttrExtraGem( GData::AttrExtra& ae, GData::ItemGemType * igt )
         case Item_Gem14:
 	        ae += *(igt->attrExtra) * (1.0 + (stxc ? stxc->rate3 : 0));
             break;
+        case Item_EvolutionGem:
+        case Item_EvolutionGem1:
+        case Item_EvolutionGem2:
+        case Item_EvolutionGem3:
+        case Item_EvolutionGem4:
+        case Item_EvolutionGem5:
+            ae.getFairyEquipInfo(*(igt->attrExtra) * (1.0 + (stxc ? stxc->rate1 : 0)));
+            break;
+        case Item_EvolutionGem6:
+        case Item_EvolutionGem8:
+            ae.getFairyEquipInfo(*(igt->attrExtra) * (1.0 + (stxc ? stxc->rate2 : 0)));
+            break;
+        case Item_EvolutionGem14:
+            ae.getFairyEquipInfo(*(igt->attrExtra) * (1.0 + (stxc ? stxc->rate3 : 0)));
+            break;
         default:
 	        ae += *(igt->attrExtra);
             break;
@@ -1770,12 +1785,11 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
         break;
     //XXX LIBO 
     case Item_Evolution1:
-    case Item_Evolution2:
-    case Item_Evolution3:
         if(lev0 > 0)
         {
             ae.fairyAck += GData::spiritAttrTable[lev0-1].attack;
-            ae.fairyDef += GData::spiritAttrTable[lev0-1].defend;
+            ae.attack += GData::spiritAttrTable[lev0-1].attack * 0.3;
+            ae.magatk += GData::spiritAttrTable[lev0-1].attack * 0.3;
             //ae.fairyDef += GData::spiritAttrTable[lev0-1].attack;
         }
         if(lev1 > 0)
@@ -1784,6 +1798,21 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
             ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
         if(lev3 > 0)
             ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/100.f);
+        break;
+    case Item_Evolution2:
+        if(lev0 > 0)
+        {
+            ae.fairyDef += GData::spiritAttrTable[lev0-1].defend;
+            ae.defend += GData::spiritAttrTable[lev0-1].defend * 0.3;
+            ae.magdef += GData::spiritAttrTable[lev0-1].defend * 0.3;
+            //ae.fairyDef += GData::spiritAttrTable[lev0-1].attack;
+        }
+        if(lev1 > 0)
+            ae.action += GData::spiritAttrTable[lev1-1].action;
+        if(lev2 > 0)
+            ae.pirlvl += GData::spiritAttrTable[lev2-1].pierce_lvl;
+        if(lev3 > 0)
+            ae.hp += GData::spiritAttrTable[lev3-1].hp;
         break;
     default:
         return;
@@ -2266,6 +2295,19 @@ void Fighter::rebuildEquipAttr()
             if(equip)
             {
                 addAttr(equip,1);
+                const GData::AttrExtra * ext = equip->getAttrExtra();
+                if(i == 0)
+                {
+                    _attrExtraEquip.fairyAck += ext->magatk * enc_factor[equip->getItemEquipData().enchant];
+                    _attrExtraEquip.magatk += ext->magatk * enc_factor[equip->getItemEquipData().enchant] * 0.3;
+                    _attrExtraEquip.attack += ext->magatk * enc_factor[equip->getItemEquipData().enchant] * 0.3;
+                }
+                else if( i ==1 )
+                {
+                    _attrExtraEquip.fairyDef += ext->magdef * enc_factor[equip->getItemEquipData().enchant];
+                    _attrExtraEquip.defend += ext->magdef * enc_factor[equip->getItemEquipData().enchant] * 0.3;
+                    _attrExtraEquip.magdef += ext->magdef * enc_factor[equip->getItemEquipData().enchant] * 0.3;
+                }
                 /*
                    if(i != 2)
                    {

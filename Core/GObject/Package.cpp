@@ -3444,8 +3444,13 @@ namespace GObject
 		if(!equip->GetBindStatus() && isBound)
 			equip->DoEquipBind();
 		if(fgt != NULL)
-			fgt->sendModification(0x20 + pos, equip, false);
-		else
+        {
+            if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution3)
+                fgt->sendModification(0x66 + pos, equip, false);
+            else
+                fgt->sendModification(0x20 + pos, equip, false);
+        }
+        else
 			SendSingleEquipData(equip);
 
         if (ied.sockets >= 3)
@@ -3680,7 +3685,7 @@ namespace GObject
             if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution2)
                 fgt->sendModification(0x66 + pos, equip, false);
             else
-			fgt->sendModification(0x20 + pos, equip, false);
+                fgt->sendModification(0x20 + pos, equip, false);
 		}
 		else
 			SendSingleEquipData(equip);
@@ -4802,6 +4807,8 @@ namespace GObject
                     fgt->sendModification(0x1f, equip, false);
                 else if(equip->getClass() == Item_InnateTrump)
                     fgt->sendModification(0x70, equip, false);
+                else if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution3)
+                    fgt->sendModification(0x66+pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -5548,7 +5555,10 @@ namespace GObject
         if(fFgt != NULL)
         {
             fFgt->setDirty();
-            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+            if(fromEquip->getClass() >= Item_Evolution1 && fromEquip->getClass() <= Item_Evolution3)
+                fFgt->sendModification(0x66 + fPos, fromEquip, false);
+            else
+                fFgt->sendModification(0x20 + fPos, fromEquip, false);
         }
         else
             SendSingleEquipData(fromEquip);
@@ -5556,7 +5566,10 @@ namespace GObject
         if(tFgt != NULL)
         {
             tFgt->setDirty();
-            tFgt->sendModification(0x20 + tPos, toEquip, false);
+            if(toEquip->getClass() >= Item_Evolution1 && toEquip->getClass() <= Item_Evolution3)
+                tFgt->sendModification(0x66 + tPos, toEquip, false);
+            else
+                tFgt->sendModification(0x20 + tPos, toEquip, false);
         }
         else
             SendSingleEquipData(toEquip);
@@ -5603,7 +5616,10 @@ namespace GObject
         if(fFgt != NULL)
         {
             fFgt->setDirty();
-            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+            if(fromEquip->getClass() >= Item_Evolution1 && fromEquip->getClass() <= Item_Evolution3)
+                fFgt->sendModification(0x66 + fPos, fromEquip, false);
+            else
+                fFgt->sendModification(0x20 + fPos, fromEquip, false);
         }
         else
             SendSingleEquipData(fromEquip);
@@ -5611,7 +5627,10 @@ namespace GObject
         if(tFgt != NULL)
         {
             tFgt->setDirty();
-            tFgt->sendModification(0x20 + tPos, toEquip, false);
+            if(toEquip->getClass() >= Item_Evolution1 && toEquip->getClass() <= Item_Evolution3)
+                tFgt->sendModification(0x66 + tPos, toEquip, false);
+            else
+                tFgt->sendModification(0x20 + tPos, toEquip, false);
         }
         else
             SendSingleEquipData(toEquip);
@@ -5663,7 +5682,10 @@ namespace GObject
         if(fFgt != NULL)
         {
             fFgt->setDirty();
-            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+            if(fromEquip->getClass() >= Item_Evolution1 && fromEquip->getClass() <= Item_Evolution3)
+                fFgt->sendModification(0x66 + fPos, fromEquip, false);
+            else
+                fFgt->sendModification(0x20 + fPos, fromEquip, false);
         }
         else
             SendSingleEquipData(fromEquip);
@@ -5671,7 +5693,10 @@ namespace GObject
         if(tFgt != NULL)
         {
             tFgt->setDirty();
-            tFgt->sendModification(0x20 + tPos, toEquip, false);
+            if(toEquip->getClass() >= Item_Evolution1 && toEquip->getClass() <= Item_Evolution3)
+                tFgt->sendModification(0x66 + tPos, toEquip, false);
+            else
+                tFgt->sendModification(0x20 + tPos, toEquip, false);
         }
         else
             SendSingleEquipData(toEquip);
@@ -5784,7 +5809,10 @@ namespace GObject
         if(fFgt != NULL)
         {
             fFgt->setDirty();
-            fFgt->sendModification(0x20 + fPos, fromEquip, false);
+            if(fromEquip->getClass() >= Item_Evolution1 && fromEquip->getClass() <= Item_Evolution3)
+                fFgt->sendModification(0x66 + fPos, fromEquip, false);
+            else
+                fFgt->sendModification(0x20 + fPos, fromEquip, false);
         }
         else
             SendSingleEquipData(fromEquip);
@@ -5792,7 +5820,10 @@ namespace GObject
         if(tFgt != NULL)
         {
             tFgt->setDirty();
-            tFgt->sendModification(0x20 + tPos, toEquip, false);
+            if(toEquip->getClass() >= Item_Evolution1 && toEquip->getClass() <= Item_Evolution3)
+                tFgt->sendModification(0x66 + tPos, toEquip, false);
+            else
+                tFgt->sendModification(0x20 + tPos, toEquip, false);
         }
         else
             SendSingleEquipData(toEquip);
@@ -5981,6 +6012,8 @@ namespace GObject
                 fgt->sendModification(0x1f, equip, false);
             else if(equip->GetItemType().subClass == Item_InnateTrump)
                 fgt->sendModification(0x70, equip, false);
+            else if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution3)
+                fgt->sendModification(0x66+pos, equip, false);
             else
                 fgt->sendModification(0x20 + pos, equip, false);
 		}
@@ -6512,6 +6545,8 @@ namespace GObject
                 fgt->sendModification(0x70, trump, false);
             else if (trump->getClass() == Item_Fashion)
                 fgt->sendModification(0x20, trump, false);
+            else if (trump->getClass() == Item_Evolution3)
+                fgt->sendModification(0x68, trump, false);
             else
                 fgt->sendModification(0x0a + pos, trump, false);
         }
@@ -6625,9 +6660,12 @@ namespace GObject
 		if(fgt != NULL)
         {
             fgt->setDirty();
-			fgt->sendModification(0x20 + pos, equip, false);
+            if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution3)
+                fgt->sendModification(0x66 + pos, equip, false);
+            else
+                fgt->sendModification(0x20 + pos, equip, false);
         }
-		else
+        else
 			SendSingleEquipData(equip);
 
 		Stream st(REP::EQ_SPIRIT);
