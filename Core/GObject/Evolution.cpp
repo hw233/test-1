@@ -318,8 +318,8 @@ namespace GObject
         if(!getOwner())
             return ;
         UInt8 level = _fighter->getOwner()->GetLev(); 
-        if( level < 120)
-            return ;
+        //if( level < 120)
+        //    return ;
 
         if(!flag )
         { 
@@ -512,8 +512,8 @@ namespace GObject
     } 
     UInt8 Evolution::FeiSheng()
     {
-        if(_fighter->getLevel()<120)
-            return 0;
+        //if(_fighter->getLevel()<120)
+        //    return 0;
         if(!success && _process == 0x5FF)
         {
             setSuccessValue(1);

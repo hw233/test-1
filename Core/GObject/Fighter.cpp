@@ -2020,42 +2020,6 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
     
-    { 
-        for(UInt8 i = 0 ; i < 3 ; ++i)
-        { 
-            equip = getEvolution()->getEquip(i);
-            if(equip)
-            {
-                addAttr(equip,1);
-                /*
-                if(i != 2)
-                {
-                    if(!equipType)
-                    {
-                        equipType = equip->GetTypeId();
-                    }
-                    else
-                    {
-                        UInt32 setId = 0;
-                        if(equip->GetTypeId() == (equipType+1) && equipType > 2000)
-                             setId = (equipType-2000)/8;
-                        const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId];
-                        if(iest != NULL)
-                        {
-                            for(UInt8 i =0; i < 4; ++i)
-                            {
-                                if(iest->attrExtra[i])
-                                {
-                                    _attrExtraEquip += *iest->attrExtra[i];
-                                }
-                            }
-                        }
-                    }
-                }
-                */
-            }
-        } 
-    } 
 
     isCanStrengthenSuit(setId, setNum, this);
 
@@ -2295,6 +2259,42 @@ void Fighter::rebuildEquipAttr()
         //凝结金丹  增加暴击伤害减免
         _attrExtraEquip.criticaldmgimmune += getAcupointsGoldAttr(1);
     }
+    { 
+        for(UInt8 i = 0 ; i < 3 ; ++i)
+        { 
+            equip = getEvolution()->getEquip(i);
+            if(equip)
+            {
+                addAttr(equip,1);
+                /*
+                   if(i != 2)
+                   {
+                   if(!equipType)
+                   {
+                   equipType = equip->GetTypeId();
+                   }
+                   else
+                   {
+                   UInt32 setId = 0;
+                   if(equip->GetTypeId() == (equipType+1) && equipType > 2000)
+                   setId = (equipType-2000)/8;
+                   const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId];
+                   if(iest != NULL)
+                   {
+                   for(UInt8 i =0; i < 4; ++i)
+                   {
+                   if(iest->attrExtra[i])
+                   {
+                   _attrExtraEquip += *iest->attrExtra[i];
+                   }
+                   }
+                   }
+                   }
+                   }
+                   */
+            }
+        } 
+    } 
 
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }

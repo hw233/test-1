@@ -625,7 +625,7 @@ function calcBattlePoint(fgt)
         print("getExtraFairyDef:"..fgt:getExtraFairyDef())
         print("攻系数："..bp_factor_def)
     end
-   -- printBattlePoint(fgt)
+    --printBattlePoint(fgt)
     return bp;
 end
 
