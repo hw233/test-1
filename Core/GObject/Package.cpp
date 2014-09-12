@@ -2408,6 +2408,10 @@ namespace GObject
             if(Mnum > GetRestPackageSize())
                 return 2;
         }
+        else if( IsLingShiItem(itemId) ){ //合成的是灵侍
+            if(Mnum > GetRestPackageSize(2))
+                return 2;
+        }
         else{
             UInt16 grids = item->Size(item->Count() + Mnum) - item->Size() + 1;
             if(GetItemSubClass(itemId) == Item_Soul && grids > GetRestPackageSize(1))
