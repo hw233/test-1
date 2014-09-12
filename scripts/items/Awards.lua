@@ -2214,7 +2214,7 @@ function getFeiShengDan(player,opt)
 
     print("XXXX")
     for i = 1,#FeiShengDanNeed[opt*2-1] do
-        package:DelItem(FeiShengDanNeed[opt*2-1][i][1],FeiShengDanNeed[opt*2-1][i][2])
+        package:DelItemAny2(FeiShengDanNeed[opt*2-1][i][1],FeiShengDanNeed[opt*2-1][i][2])
     end
     package:AddItem(FeiShengDanGoods[opt], 1, true, 0, 39);
 end

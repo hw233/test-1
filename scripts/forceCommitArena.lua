@@ -1,5 +1,5 @@
 --commitArenaForceOnce();
-require("AirBook")
+--require("AirBook")
 
 --pl = _GameActionLua:GetPlayerPtr(2)
 --if pl == nil then

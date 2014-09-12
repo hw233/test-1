@@ -6140,6 +6140,10 @@ namespace GObject
 
 		return false;
 	}
+    bool Package::DelItemAny2(UInt32 id,UInt16 num )
+    {
+        DelItemAny(id,num,NULL,0);
+    }
 
 	ItemEquip * Package::FindEquip( Fighter *& fgt, UInt8& pos, UInt16 fgtId, UInt32 id )
 	{
@@ -8894,5 +8898,5 @@ namespace GObject
             fgt->updateLingbaoFallToDB(type);
         return res;
     } 
-
+    
 }

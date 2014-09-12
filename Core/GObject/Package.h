@@ -142,6 +142,7 @@ namespace GObject
 		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt16 toWhere = 0);
 		bool   DelItem2(ItemBase* item, UInt16 num, UInt16 toWhere = 0);
 		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt16 toWhere = 0);
+		bool   DelItemAny2(UInt32 id, UInt16 num);
         bool   eraseEquip(UInt32 id);     //删除背包道具容器
 		bool   DelEquip(UInt32 id, UInt16 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt16 toWhere = 0);

@@ -56,12 +56,9 @@ function getTheResultInSnow2()
     for i in file:lines() do 
         x,y,a,b,c,d,e,f,g = string.find(i,reg)
         print(x,y,a,b,c,d,e,f,g)
-<<<<<<< HEAD
         if c != 27 then
             return ;
         end
-=======
->>>>>>> 5dd39e5de39fc105e07345ada10245b70bb46446
         if result[b] == nil then
             result[b] = 0;
         else

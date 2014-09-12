@@ -474,6 +474,7 @@ namespace Script
 		CLASS_DEF(Package, DelItemAll);
 		CLASS_DEF(Package, DelItem);
 		CLASS_DEF(Package, DelItemAny);
+		CLASS_DEF(Package, DelItemAny2);
 		CLASS_DEF(Package, DelEquip);
 		CLASS_DEF(Package, SellItem);
 		CLASS_DEF(Package, SellEquip);
