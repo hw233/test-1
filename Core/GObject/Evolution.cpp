@@ -490,7 +490,7 @@ namespace GObject
     } 
     UInt8 Evolution::GetTaskAward(UInt8 index)
     { 
-        static UInt32 AwardExp[EVOLUTION_TASKMAX] = {100,200,300,400,500,600,700,800,900} ;
+        //static UInt32 AwardExp[EVOLUTION_TASKMAX] = {100,200,300,400,500,600,700,800,900} ;
         static UInt32 Exp = 72320; 
         static UInt32 tael = 1244;
         UInt8  cnt = GetProcess(index);
