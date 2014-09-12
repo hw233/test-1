@@ -3329,6 +3329,8 @@ namespace GObject
                     fgt->sendModification(0x1f, equip, false);
                 else if(equip->getClass() == Item_InnateTrump)
                     fgt->sendModification(0x70, equip, false);
+                else if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution3)
+                    fgt->sendModification(0x66 + pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 			}
@@ -3675,6 +3677,9 @@ namespace GObject
 		if(fgt != NULL)
 		{
 			fgt->setDirty();
+            if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution2)
+                fgt->sendModification(0x66 + pos, equip, false);
+            else
 			fgt->sendModification(0x20 + pos, equip, false);
 		}
 		else
@@ -3752,9 +3757,12 @@ namespace GObject
 		if(fgt != NULL)
 		{
 			fgt->setDirty();
-			fgt->sendModification(0x20 + pos2, equip, false);
-		}
-		else
+            if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution2)
+                fgt->sendModification(0x66 + pos2, equip, false);
+            else
+                fgt->sendModification(0x20 + pos2, equip, false);
+        }
+        else
 			SendSingleEquipData(equip);
 
         m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 1, 1);
