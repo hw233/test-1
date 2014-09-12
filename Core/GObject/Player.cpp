@@ -35480,40 +35480,38 @@ void Player::shakeMoneyBag()
 {
     if(10 <= GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES))
         return;
-    if(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS))
-        return;
     UInt32 total = GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
-    if(!total)
-        return;
-
-    UInt32 now = TimeUtil::Now();
-    if(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES) == 9)
+    if(!total && GetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS) == 0)
     {
-        UInt32 tmp = 0;
-        tmp = total/10;
-        if(!GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG))
-            getCoupon(total - tmp * 9);
+        UInt32 now = TimeUtil::Now();
+        if(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES) == 9)
+        {
+            UInt32 tmp = 0;
+            tmp = total/10;
+            if(!GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG))
+                getCoupon(total - tmp * 9);
+            else
+            {
+                IncommingInfo ii(CarnivalRebate, 0, 0);
+                getGold(total - tmp * 9, &ii);
+            }
+            SetShakeMoneyBagLog(now, total - tmp * 9, 1);
+        }
         else
         {
-            IncommingInfo ii(CarnivalRebate, 0, 0);
-            getGold(total - tmp * 9, &ii);
+            if(!GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG))
+                getCoupon(total/10);
+            else
+            {
+                IncommingInfo ii(CarnivalRebate, 0, 0);
+                getGold(total/10, &ii);
+            }
+            SetShakeMoneyBagLog(now, total/10, 1);
         }
-        SetShakeMoneyBagLog(now, total - tmp * 9, 1);
-    }
-    else
-    {
-        if(!GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG))
-            getCoupon(total/10);
-        else
-        {
-            IncommingInfo ii(CarnivalRebate, 0, 0);
-            getGold(total/10, &ii);
-        }
-        SetShakeMoneyBagLog(now, total/10, 1);
+        SetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS, 1);
+        AddVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES, 1);
     }
 
-    AddVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES, 1);
-    SetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS, 1);
     GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, this, 0);
     GLOBAL().PushMsg(hdr, NULL);
 }
