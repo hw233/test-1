@@ -152,12 +152,12 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140820_clearGvar95_99.sql     #清除一战成名时间控制
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140422_1.sql     #周年好礼送不停
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_shakemoneybag.sql     #创建狂欢大购物摇钱袋记录表
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar606.sql        #清除掉落活动
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar844.sql        #众里寻他掉落状态
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearCoolSummer.sql     #清除酷爽一夏
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_serverwar_clearstate.sql     #服战押注没结算
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_0911.sql     #911bug清理积分
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar606.sql        #清除掉落活动
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar844.sql        #众里寻他掉落状态
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearCoolSummer.sql     #清除酷爽一夏
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_serverwar_clearstate.sql     #服战押注没结算
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_0911.sql     #911bug清理积分
 }
 
 #sh player_jiguan.sh
