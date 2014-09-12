@@ -342,7 +342,7 @@ namespace GObject
 
         std::vector<Player * > vec;
         vec.clear();
-        for(UInt8 i = level - 3 ; i <= level + 3 ; ++i)
+        for(UInt8 i = level - 10; i <= level + 3 ; ++i)
         {
             GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(i);
             if(it != GObject::globalLevelsPlayers.end())

@@ -3240,6 +3240,8 @@ namespace GObject
                     fgt->sendModification(0x70, equip, false);
                 else if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x0a+ pos, equip, false);
+                else if(equip->getClass() >= Item_Evolution1 && equip->getClass() <= Item_Evolution3)
+                    fgt->sendModification(0x66 + pos, equip, false);
                 else
                     fgt->sendModification(0x20 + pos, equip, false);
 
