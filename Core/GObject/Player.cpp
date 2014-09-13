@@ -35714,5 +35714,42 @@ void Player::CarnivalConsumeAct(UInt32 c)
     GLOBAL().PushMsg(hdr1, NULL);
 }
 
+void Player::SendFlyRoadGiftInfo()
+{
+    if(GetLev() < 80)
+        return;
+    Stream st(REP::ACT);
+    st << static_cast<UInt8>(0x37);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(GetVar(VAR_FLY_ROAD_GIFT_GOT_NUM));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::GetFlyRoadGift(UInt8 IsDouble)
+{
+    UInt32 currentPos = 0;
+    currentPos = GetVar(VAR_FLY_ROAD_GIFT_GOT_NUM);
+    if(currentPos >= 10 || GetVar(VAR_FLY_ROAD_GIFT_TODAY_STATUS) || GetLev() < 80)
+        return;
+
+    if(IsDouble)
+    {
+        ConsumeInfo ci(FLYROADGETAWARD,0,0);
+        if (getGold() < 100)
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        useGold(100, &ci);
+        GameAction()->getFlyRoadAward(this, currentPos + 1, true);
+    }
+    else
+        GameAction()->getFlyRoadAward(this, currentPos + 1, false);
+
+    SetVar(VAR_FLY_ROAD_GIFT_TODAY_STATUS, 1);
+    AddVar(VAR_FLY_ROAD_GIFT_GOT_NUM, 1);
+}
+
 } // namespace GObject
 

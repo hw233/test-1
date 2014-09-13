@@ -1996,5 +1996,10 @@ namespace Script
 		assert(player != NULL);
         return Call<bool>("getRedBeanAward", player, index, count);
     }
+    void GameActionLua::getFlyRoadAward(Player * player, UInt8 index, bool isdouble)
+    {
+		assert(player != NULL);
+        return Call<void>("getFlyRoadAward", player, index, isdouble);
+    }
 }
 
