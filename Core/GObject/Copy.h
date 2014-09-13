@@ -38,7 +38,7 @@ public:
 
     static UInt8 getFreeCount();
     static UInt8 getGoldCount(UInt8 vipl);
-    static UInt32 getEnterGold(Player*);
+    static UInt32 getEnterGold(Player*,UInt8 flag = 0);
 
 public:
     void getCount(Player* pl, UInt8* free, UInt8* gold, bool = false);

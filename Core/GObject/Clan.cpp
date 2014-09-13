@@ -5036,7 +5036,7 @@ void Clan::checkSpiritTree()
         m_spiritTree.m_exp = m_spiritTree.m_exp * 8 / 25;
         m_spiritTree.m_exp -= m_spiritTree.m_exp % 100;
         m_spiritTree.m_level = 0;
-        while(m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level] && m_spiritTree.m_level < MAX_CLANSPTR_LEVEL)
+        while(m_spiritTree.m_level < MAX_CLANSPTR_LEVEL && m_spiritTree.m_exp >= clansptr_exptable[m_spiritTree.m_level])
             ++ m_spiritTree.m_level;
         m_spiritTree.m_refreshTimes = 0;
         m_spiritTree.m_color = 0;

@@ -419,6 +419,20 @@ function calcMagAttack( fgt )
   return ((magatk + pot * magatk_factor[cls] * lvl + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
 end
 
+--function calcFairyAtk(fgt)   --XXX  LIBO
+--    if fgt == nil then
+--        return 0
+--    end
+--    return fgt::getExtraFairyAtk()
+--end
+--
+--function calcFairyDef(fgt)   --XXX  LIBO
+--    if fgt == nil then
+--        return 0
+--    end
+--    return fgt::getExtraFairyDef()
+--end
+
 function calcDefend( fgt )
   if fgt == nil then
     return 0
@@ -603,6 +617,14 @@ function calcBattlePoint(fgt)
     bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
     bp = bp + fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmgimm 
 
+    bp = bp + fgt:getExtraFairyAtk() * bp_factor_atk
+    bp = bp + fgt:getExtraFairyDef() * bp_factor_def
+    --if fgt:getExtraFairyAtk() ~= 0 then
+    --    print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
+    --    print("攻系数："..bp_factor_atk)
+    --    print("getExtraFairyDef:"..fgt:getExtraFairyDef())
+    --    print("攻系数："..bp_factor_def)
+    --end
     --printBattlePoint(fgt)
     return bp;
 end
@@ -636,6 +658,8 @@ function printBattlePoint(fgt)
     print("Counter:"..((fgt:getBaseCounter() + fgt:getExtraCounter())/100).."__"..((fgt:getBaseCounter() + fgt:getExtraCounter())/100 * bp_factor_counter))
     print("MagRes:"..((fgt:getBaseMagRes() + fgt:getExtraMagRes())/100).."__"..((fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres))
     print("CriticalDmgImmune:"..fgt:getExtraCriticalDmgImmune().."__"..fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmgimm)
+    print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
+    print("getExtraFairyDef:"..fgt:getExtraFairyDef())
     print("+++++++++++++++++++++End")
 end
 

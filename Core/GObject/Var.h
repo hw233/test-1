@@ -814,6 +814,9 @@ namespace GObject
         VAR_KETTLE_4CNT = 820,  //4星刷新次数
         VAR_KETTLE_5CNT = 821, //5星刷新次数
         VAR_KETTLE_LOCK = 822,  //是否锁定
+
+        VAR_FAIRYCOPY_FREE = 823, //仙界副本免费次数
+        VAR_FAIRYCOPY_GOLD = 824, //仙界副本付费次数
             
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
@@ -1592,6 +1595,8 @@ namespace GObject
             REGISTER_VAR(VAR_KETTLE_4CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_KETTLE_5CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_KETTLE_LOCK, CYCLE_NONE);
+            REGISTER_VAR(VAR_FAIRYCOPY_FREE, CYCLE_DAY);
+            REGISTER_VAR(VAR_FAIRYCOPY_GOLD, CYCLE_DAY);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

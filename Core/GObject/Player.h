@@ -1380,6 +1380,15 @@ namespace GObject
 			}
             return c;
         }
+        inline UInt8 getLineupNum(UInt32 fighterId)
+        { 
+            UInt8 c = 0;
+            for(int i = 0 ; i < 5;++i)
+            {
+                if(_playerData.lineup[i].fighter && _playerData.lineup[i].fighter->getId() == fighterId) 
+                    return c;
+            }
+        } 
 
 		inline void SetSessionID(int session) { _session = session; }
 		inline int GetSessionID() const { return _session; }
@@ -2084,7 +2093,7 @@ namespace GObject
         void SendOtherInfoForPray(Player *other,UInt32 op=0);
         void bePrayed(UInt64 id);
         
-		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
+		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false ,UInt16 fighterId = 0 );
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
         void PutSpecialPets (Battle::BattleSimulator&, int side, int pos, bool init = true);
 
@@ -3594,6 +3603,7 @@ namespace GObject
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId);
+        void do_fighter_evolution(Fighter* fgt, UInt32 oldId);
 
     public:
         void makeClanTitleInfo(Stream & st);

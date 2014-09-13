@@ -65,6 +65,7 @@ namespace GData
 	std::vector<ItemGemType *> petGemTypes(1000);
 	std::vector<ItemGemType *> mountTypes(400);
 	std::vector<ItemGemType *> lingshiTypes(1000);
+	std::vector<ItemGemType *> evolutionTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -99,6 +100,7 @@ namespace GData
     std::vector<UInt16>     GDataManager::m_petGems[20];
     std::vector<UInt16>     GDataManager::m_petEqSkills;
     std::vector<UInt16>     GDataManager::m_zhenyuanItem[20];
+    std::vector<UInt16>     GDataManager::m_evolutionGems[20];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -866,6 +868,8 @@ namespace GData
 			case Item_Armor5:
 			case Item_Ring:
 			case Item_Amulet:
+            case Item_Evolution1:
+            case Item_Evolution2:
 				{
 					wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
 				}
@@ -874,6 +878,7 @@ namespace GData
             case Item_InnateTrump:
 			case Item_Fashion: // XXX:
 			case Item_Trump:
+            case Item_Evolution3:
 				{
 					wt = new ItemTrumpType(idt.typeId, idt.name, idt.attrExtra);
                     if (((ItemTrumpType*)wt)->attrExtra)
@@ -923,6 +928,26 @@ namespace GData
 					petGemTypes[wt->getId() - LPETGEM_ID] = igt;
                     if(idt.reqLev > 0 && idt.reqLev <= 20)
                         m_petGems[idt.reqLev - 1].push_back(idt.typeId);
+				}
+				break;
+            case Item_EvolutionGem:
+            case Item_EvolutionGem1:
+            case Item_EvolutionGem2:
+            case Item_EvolutionGem3:
+            case Item_EvolutionGem4:
+            case Item_EvolutionGem5:
+            case Item_EvolutionGem6:
+            //case Item_EvolutionGem7:
+            case Item_EvolutionGem8:
+            case Item_EvolutionGem9:
+            case Item_EvolutionGem10:
+            case Item_EvolutionGem11:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					evolutionTypes[wt->getId() - LXIANGEM_ID] = igt;
+                    if(idt.reqLev > 0 && idt.reqLev <= 20)
+                        m_evolutionGems[idt.reqLev - 1].push_back(idt.typeId);
 				}
 				break;
             case Item_Mount:

@@ -96,6 +96,7 @@
 #include "Battle/BattleReport.h"
 #include "GObject/RaceBattle.h"
 #include "GData/ClanShop.h"
+#include "GObject/Evolution.h"
 #include "GObject/DarkDargon.h"
 #include "GData/IncenseTable.h"
 
@@ -3658,6 +3659,13 @@ namespace GObject
             UInt32 lss[3] = {0};
             fgt->getAllLingshiId(lss);
             st << lss[0] << lss[1] << lss[2];
+            for(UInt8 i = 0 ; i < 3; ++i)
+            {
+                if(fgt->getEvolution()->getEquip(i))
+                    st << static_cast<UInt32>(fgt->getEvolution()->getEquip(i)->getId());
+                else
+                    st << static_cast<UInt32>(0);
+            }
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -3690,6 +3698,7 @@ namespace GObject
             fgt->getAllAcupointsGoldBits(st);
             fgt->getAllLingbaoLevelAndFall(st);
             st << static_cast<UInt32>(fgt->getIncense()); 
+            st << static_cast<UInt8>(fgt->getEvolution()->IsComplete());
 		}
 	}
 
@@ -4396,12 +4405,14 @@ namespace GObject
 		evab->notify();
 	}
 
-	void Player::PutFighters( Battle::BattleSimulator& bsim, int side, bool fullhp )
+	void Player::PutFighters( Battle::BattleSimulator& bsim, int side, bool fullhp ,UInt16 fighterId )
 	{
 		bsim.setFormation(side, getFormation());
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& lup = getLineup(i);
+            if(fighterId != 0 && lup.fid != fighterId)
+                continue ;
 			if(lup.fid != 0 && lup.fighter == NULL)
 			{
 				std::map<UInt32, Fighter *>::iterator it = _fighters.find(lup.fid);
@@ -4435,10 +4446,11 @@ namespace GObject
 			}
 		}
 		bsim.setPortrait(side, _fighters.empty() ? 0 : _fighters.begin()->second->getId());
-        PutPets(bsim, side);
-	}
+        if(!fighterId)
+            PutPets(bsim, side);
+    }
 
-	void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
+    void Player::PutPets( Battle::BattleSimulator& bsim, int side, bool init /* = true */)
     {
         // 战斗模拟器中加载宠物
         if (_onBattlePet)
@@ -4458,16 +4470,16 @@ namespace GObject
         }
     }
 
-	Fighter * Player::takeFighter( UInt32 id, bool writedb )
-	{
-		if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))
-			return NULL;
-		if(hasFighter(id))
-			return NULL;
-		Fighter * fgt = globalFighters[id];
-		if(fgt == NULL)
-			return NULL;
-		Fighter * fgt2 = fgt->clone(this);
+    Fighter * Player::takeFighter( UInt32 id, bool writedb )
+    {
+        if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))
+            return NULL;
+        if(hasFighter(id))
+            return NULL;
+        Fighter * fgt = globalFighters[id];
+        if(fgt == NULL)
+            return NULL;
+        Fighter * fgt2 = fgt->clone(this);
 		addFighter(fgt2, writedb);
 		if (_clan != NULL)
 		{
@@ -5392,7 +5404,7 @@ namespace GObject
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
-        if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3)
+        if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3 && ci->purchaseType != ZhengHun && ci->purchaseType != JieHun && ci->purchaseType != LiHun && ci->purchaseType != TrainFighter && ci->purchaseType != DINGQINGXINWU)
             CarnivalConsumeAct(c);
         return _playerData.gold;
 	}
@@ -9730,6 +9742,7 @@ namespace GObject
         {
             playerCopy.buildInfo(this, st);
         }
+        UInt8 cnt_xianjie = cnt;
 
         checkDungeonTimeout(TimeUtil::Now());
         /*
@@ -9766,6 +9779,11 @@ namespace GObject
             xjfrontMap.buildInfo(this, st);
         }
 
+        st << cnt_xianjie << static_cast<UInt8>(GetVar(VAR_FAIRYCOPY_FREE) + GetVar(VAR_FAIRYCOPY_GOLD) + currentDiamondCnt + currentCnt2) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt) << static_cast<UInt8>(totalCnt2);
+        if(cnt_xianjie)
+        {
+            playerCopy.buildInfo(this, st);
+        }
 #if 0
 		size_t sz;
 		UInt16 * prices = Dungeon::getPrice(sz);
@@ -17408,7 +17426,7 @@ namespace GObject
         UInt32 now = TimeUtil::Now();
         UInt32 rf =GVAR.GetVar(GVAR_SUMMER_MEET_BEGIN);
         UInt32 rf2 = GVAR.GetVar(GVAR_SUMMER_MEET_END);
-        if (!rf || now < rf ||rf > rf2)
+        if (!rf || now < rf ||now > rf2)
             return;
         AddVar(VAR_SUMMER_MEET_RECHARGE, r);
         getSummerMeetScore(10,r);
@@ -20841,12 +20859,18 @@ void Player::sendCopyFrontAllAward()
 UInt8 Player::getCopyId()
 {
     static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512, 0x1411, 0x2707, 0x290a, 4871, 4628};
+    static UInt16 spots2[] = {16386, 16388, 16390, 16391, 16392, 16400};    //仙界装备
 
     UInt16 currentSpot = PLAYER_DATA(this, location);
     for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
     {
         if(spots[i] == currentSpot)
             return (i+1);
+    }
+    for(UInt8 i = 0; i < sizeof(spots2)/sizeof(spots2[0]); i++)
+    {
+        if(spots2[i] == currentSpot)
+            return (i+100);
     }
     return 0;
 }
@@ -21755,15 +21779,7 @@ void Player::postDragonKing(UInt8 count)
     UInt32 XBLing = Dragon_Ling[flag];
     if (GetPackage()->GetItemAnyNum(XBLing) < count)
         return;
-    if(XBLing == 17032)
-    {
-        if(GetPackage()->GetRestPackageSize(2) < count)
-        {
-            sendMsgCode(0, 8050);
-            return;
-        }
-    }
-    else if (GetPackage()->GetRestPackageSize() < count)
+    if (GetPackage()->GetRestPackageSize() < count)
     {
         sendMsgCode(0, 1011);
         return;
@@ -31093,6 +31109,7 @@ UInt8 Player::useChangeSexCard()
     do_skill_grade(fgt, oldId);
     do_fighter_lingbaoLevel(fgt, oldId);
     do_fighter_lingbaoFall(fgt, oldId);
+    do_fighter_evolution(fgt, oldId);
 
     struct _stTable
     {
@@ -31317,6 +31334,11 @@ void Player::do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId)
 void Player::do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_lingbaoFall` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_evolution(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_evolution` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
 void Player::BuyLeftPower()
@@ -35450,7 +35472,7 @@ void Player::giveCarnivalDailyAward(UInt32 addTotal)
             {{513, 3}, {547, 3}, {517, 3}, {0, 0}, {0, 0}},
             {{9418, 3}, {9414, 3}, {551, 3}, {513, 3}, {0, 0}},
             {{134, 5}, {9338, 5}, {9604, 5}, {9498, 6}, {0, 0}},
-            {{9498, 6}, {16001, 6}, {1126, 6}, {501, 6}, {1325, 5}},
+            {{9438, 6}, {16001, 6}, {1126, 6}, {501, 6}, {1325, 5}},
             {{9600, 10}, {9457, 10}, {9498, 10}, {0, 0}, {0, 0}},
             {{1734, 1}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
         },

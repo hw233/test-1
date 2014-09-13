@@ -26,8 +26,17 @@ namespace GObject
     UInt32 getRandGem(UInt8 lev);
 #define ITEM_ENCHANT_L1 502   //Ì«ÒÒÕæ½ð
 #define ITEM_ENCHANT_L2 503   //Ì«ÒÒ¾«½ð
+#define ITEM_ENCHANT_L3 17102  //仙兵仙衣专用强化材料
+#define ITEM_ENCHANT_L4 17103  //仙兵仙衣专用强化材料
+
 #define TRUMP_ENCHANT_L1 514   //ÎåÐÐ¾«Ó¢
 #define TRUMP_ENCHANT_L2 515  //ÎåÐÐ¾«»ª
+
+#define TRUMP_ENCHANT_L3 17104  //仙兵仙衣专用强化材料
+#define TRUMP_ENCHANT_L4 17105  //仙兵仙衣专用强化材料
+
+#define TRUMP_RONGLIAN_XIAN_GEGIN 17106
+#define TRUMP_RONGLIAN_XIAN_END 17108
 
 #define ARENA_BET_ITEM1    9081
 #define ARENA_BET_ITEM2    9082
@@ -133,6 +142,7 @@ namespace GObject
 		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt16 toWhere = 0);
 		bool   DelItem2(ItemBase* item, UInt16 num, UInt16 toWhere = 0);
 		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt16 toWhere = 0);
+		bool   DelItemAny2(UInt32 id, UInt16 num);
         bool   eraseEquip(UInt32 id);     //删除背包道具容器
 		bool   DelEquip(UInt32 id, UInt16 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt16 toWhere = 0);
@@ -201,7 +211,7 @@ namespace GObject
 		UInt8 Split(UInt32 itemId, std::vector<SplitItemOut>& splitOut, /*bool protect,*/ bool silence = false);
 		UInt8 SplitItem(UInt32 itemId, std::vector<SplitItemOut>& splitOut, /*bool protect,*/ bool silence = false);
 		UInt8 Exchange(UInt32 * itemId, UInt32& resultId);
-		UInt8 Forge(UInt16 fighterId, UInt32 itemId, /*UInt8 t,8*/ UInt8 * types, Int16 * values, UInt8 protect);
+		UInt8 Forge(UInt16 fighterId, UInt32 itemId, /*UInt8 t,8*/ UInt8 * types, Int16 * values, UInt8 protect,UInt8 flag = 0);
 		UInt8 ExchangeSet(UInt32 * itemId, UInt8 type, UInt32& resultId);
 		// UInt8 BatchMergeGem(std::map<UInt16, UInt32, _GemCompare >& gems, std::vector<UInt32>& gemsOut);
 		UInt8 BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes);
@@ -209,7 +219,7 @@ namespace GObject
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId);
         UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId, UInt8 bind);
 		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId ,UInt8 opt = 0);
-        UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp);
+        UInt8 SmeltItemTrumpExp(Fighter * fgt, UInt32 itemId, bool& bind, UInt32& exp, UInt8 flag = 0);
 
 		void AutoRegen(Fighter *);
 

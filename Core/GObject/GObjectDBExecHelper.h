@@ -528,6 +528,7 @@ struct DBFighter2
     UInt16 talent;          // 天赋
     std::string trump;      // 法宝
     std::string lingbao;    // 灵宝
+    std::string evolution;    // 仙器
     std::string acupoints;  // 穴道,打通次数
     std::string acupointsgold;  // 本命金丹,打通次数
     std::string skill;      // 装备的技能
@@ -1467,6 +1468,17 @@ struct DBLingbaoFall
 	UInt32  fall;
 };
 
+struct DBEvolution
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt32 process;
+	UInt32 award;
+    std::string task9;
+	UInt32 rTime;
+    UInt8 success;
+};
+
 struct DBJiguanshu
 {
     UInt64 playerId;
@@ -2273,7 +2285,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(61)
+SPECIALDEF(62)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2298,6 +2310,7 @@ SPECIALDEF(61)
     UInt16, talent,
     std::string, trump,
     std::string, lingbao,
+    std::string, evolution,
     std::string, acupoints,
     std::string, acupointsgold,
     std::string, skill,
@@ -3945,6 +3958,19 @@ SPECIALDEF(4)
 	UInt64, playerId,
 	UInt8,  type,
 	UInt32, fall
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBEvolution)
+SPECIALDEF(7)
+(
+	UInt32, fighterId,
+	UInt64, playerId,
+	UInt32, process,
+	UInt32, award,
+    std::string, task9,
+	UInt32, rTime,
+    UInt8 , success
 )
 SPECIALEND()
 }
