@@ -3603,6 +3603,7 @@ namespace GObject
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId);
+        void do_fighter_evolution(Fighter* fgt, UInt32 oldId);
 
     public:
         void makeClanTitleInfo(Stream & st);
