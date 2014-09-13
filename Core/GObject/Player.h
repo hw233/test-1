@@ -1386,8 +1386,9 @@ namespace GObject
             for(int i = 0 ; i < 5;++i)
             {
                 if(_playerData.lineup[i].fighter && _playerData.lineup[i].fighter->getId() == fighterId) 
-                    return c;
+                    return c+1;
             }
+            return c;
         } 
 
 		inline void SetSessionID(int session) { _session = session; }
