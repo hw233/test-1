@@ -83,6 +83,7 @@
 #include "GObject/ClanBigBoss.h"
 #include "GObject/Evolution.h"
 #include "GObject/ClanRankBattle.h"
+#include "GObject/QuestionPaper.h"
 
 namespace GObject
 {
@@ -807,6 +808,12 @@ namespace GObject
         if(!loadCardSuit())
         {
             fprintf(stderr, "loadCardSuit error!\n");
+            std::abort();
+        }
+		
+        if(!loadQuestionPaper())
+        {
+            fprintf(stderr, "loadQuestionPaper error!\n");
             std::abort();
         }
 
@@ -8239,6 +8246,25 @@ namespace GObject
 
         return true;
     }
+
+    bool GObjectManager::loadQuestionPaper()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading questionpaper:");
+		lc.reset(1000);
+		DBQuestionPaper dbqp;
+		if(execu->Prepare("SELECT `playerid` ,`begtime`,`cur_idx`,`answer`,`award`,`totaltime`  FROM `questionpaper` ", dbqp) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            GObject::QuestionPaper::Instance().loadQuestionPaper(dbqp); 
+        }
+		lc.finalize();
+		return true;
+    }
+
     bool GObjectManager::loadFighterEvolution()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());

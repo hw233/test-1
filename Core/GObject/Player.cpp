@@ -20807,8 +20807,6 @@ void Player::sendCopyFrontAllAward()
 
     if(flag == 1)
     {
-        if(getCopyId() >= 100)
-            return ;
         if(GetVar(VAR_CF_INDEX) == 0)
             SetVar(VAR_CF_INDEX, getCopyId());
         st << static_cast<UInt8>(GetVar(VAR_CF_INDEX));

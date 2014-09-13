@@ -7215,7 +7215,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
-    UInt8 Evolution = bf->getEvolutionCnt() ;
+    //UInt8 Evolution = bf->getEvolutionCnt() ;
     if(bf->getHP() > 0 && _winner == 0 && bf->getEvolutionCnt() >= 2)  //LIBO
     {
         const GData::SkillBase* passiveSkill = bf->getSkillEvolution();
@@ -16038,7 +16038,7 @@ void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::S
 
     const std::vector<float>& efv = skill->effect->efv;
     const std::vector<UInt16>& eft = skill->effect->eft;
-    const std::vector<UInt8>& efl = skill->effect->efl;
+    //const std::vector<UInt8>& efl = skill->effect->efl;
 
     //size_t cnt = eft.size();
     //if(cnt != efl.size() || efv.size() != cnt)

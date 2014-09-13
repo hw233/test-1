@@ -3460,7 +3460,10 @@ namespace GObject
 		if(ied.sockets >= 6)
 			return 2;
         if(equip->GetItemType().subClass >= Item_Evolution1 && equip->GetItemType().subClass <= Item_Evolution3 && ied.sockets >=4)
+        {
+			m_Owner->sendMsgCode(0, 1390);
             return 2;
+        }
 		else if(ied.sockets >= 4)
 		{
 			if(!DelItemAny(ITEM_SOCKET_L3, 1, &isBound))

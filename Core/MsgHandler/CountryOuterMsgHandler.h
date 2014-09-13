@@ -79,6 +79,7 @@
 #include "GObject/CollectCard.h"
 #include "GObject/Evolution.h"
 #include "GObject/DarkDargon.h"
+#include "GObject/QuestionPaper.h"
 
 struct NullReq
 {
@@ -10386,6 +10387,7 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
      
     BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt32 bodyLen = hdr.msgHdr.bodyLen;
     UInt8 opt = 0;
     br >> opt ; 
     switch(opt)
@@ -10705,6 +10707,14 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                         }
                 } 
             }
+            break;
+        case 5:
+        {
+            if(player->getMainFighter()->getLevel() < 50)
+                return;
+            GameMsgHdr hdr(0x411, WORKER_THREAD_NEUTRAL, player, bodyLen);
+            GLOBAL().PushMsg(hdr, (void*)data);
+        }
             break;
     }
 }
