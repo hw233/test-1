@@ -54,6 +54,7 @@
 #include "ClanShop.h"
 #include "KettleNpc.h"
 #include "lingbaoLevel.h"
+#include "GObject/QuestionPaper.h"
 
 namespace GData
 {
@@ -557,6 +558,12 @@ namespace GData
         if (!LoadIncenseAttrConfig())
         {
             fprintf (stderr, "Load LoadIncenseAttrConfig Error !\n");
+            std::abort();
+        }
+        
+        if (!LoadTitlePaper())
+        {
+            fprintf (stderr, "Load LoadTitlePaper Error !\n");
             std::abort();
         }
 
@@ -3405,6 +3412,18 @@ namespace GData
         {
             lingbaoLevelData.SetLingbaoLevelData( dblbl.id/100-1 , dblbl.id%100-1,dblbl.itemNum ,dblbl.itemCount , dblbl.percent , dblbl.probability , dblbl.honeyFall , dblbl.honeyFallP);
         }
+		return true;
+    }
+
+    bool GDataManager::LoadTitlePaper()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBTitlePaper dbpn;
+		if(execu->Prepare("SELECT `titleid`, `award`, `type`, `option_num` FROM `titlepaper` ", dbpn) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+            GObject::QuestionPaper::Instance().loadTitlePaper(dbpn); 
 		return true;
     }
 }
