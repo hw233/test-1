@@ -166,6 +166,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140818_addXianEq.sql     
     #增加的表中如果有fighterId，记得在useChangeSexCard函数中添加修改主将ID的函数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_questiopaper.sql   #调查问卷
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140915_clearCopyGold.sql   #清除当日付费次数
 }
 
 #sh player_jiguan.sh
