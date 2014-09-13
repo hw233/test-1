@@ -40,6 +40,17 @@ bool TitleInfo::checkAnswerCorrect(UInt16 answer,string str)
         if(!str.empty())
             return false;
     }
+    if(eAnswerType == ANSWER_MULTIPLE)
+    {
+        UInt8 bit_num = 0;
+        while(answer != 0)
+        {
+            answer = answer >> 1;
+            bit_num ++;
+        }
+        if(bit_num > answer_num)
+            return false;
+    }
 
     return true;
 }

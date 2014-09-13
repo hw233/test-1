@@ -23,9 +23,9 @@ function titlepaper()
             print "INSERT INTO `titlepaper` VALUES";
         } {
             printf("(%d,\x27%s\x27,%d,%d)",$1,$3,$4,$5);
-            if (NR < ENVIRON["lines"])
+            if (NR <= ENVIRON["lines"])
                 printf(",");
-            else if (NR >= ENVIRON["lines"])
+            else if (NR > ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
