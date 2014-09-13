@@ -573,7 +573,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             pl->SetVar(VAR_COPY_AUTO_FIGHT_USE_MONEY_MARK, mark);
 
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
-            pl->copyFrontWinAward(1, tcd.lootlvl > 0);
+            if(id < 100)
+                pl->copyFrontWinAward(1, tcd.lootlvl > 0);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
