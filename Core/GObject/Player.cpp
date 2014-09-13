@@ -31111,6 +31111,7 @@ UInt8 Player::useChangeSexCard()
     do_skill_grade(fgt, oldId);
     do_fighter_lingbaoLevel(fgt, oldId);
     do_fighter_lingbaoFall(fgt, oldId);
+    do_fighter_evolution(fgt, oldId);
 
     struct _stTable
     {
@@ -31335,6 +31336,11 @@ void Player::do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId)
 void Player::do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_lingbaoFall` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+
+void Player::do_fighter_evolution(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_evolution` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
 void Player::BuyLeftPower()

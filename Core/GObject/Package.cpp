@@ -2582,7 +2582,7 @@ namespace GObject
 
 	void Package::AppendEquipData( Stream& st, ItemEquip * equip, bool hascount )
 	{
-        UInt32 itemId = equip->getId();
+        //UInt32 itemId = equip->getId();
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
 		if(hascount)
 			st << equip->Count();
