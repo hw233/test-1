@@ -2582,7 +2582,7 @@ namespace GObject
 
 	void Package::AppendEquipData( Stream& st, ItemEquip * equip, bool hascount )
 	{
-        UInt32 itemId = equip->getId();
+        //UInt32 itemId = equip->getId();
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
 		if(hascount)
 			st << equip->Count();
@@ -3410,7 +3410,10 @@ namespace GObject
 		if(ied.sockets >= 6)
 			return 2;
         if(equip->GetItemType().subClass >= Item_Evolution1 && equip->GetItemType().subClass <= Item_Evolution3 && ied.sockets >=4)
+        {
+			m_Owner->sendMsgCode(0, 1390);
             return 2;
+        }
 		else if(ied.sockets >= 4)
 		{
 			if(!DelItemAny(ITEM_SOCKET_L3, 1, &isBound))
