@@ -1817,7 +1817,7 @@ namespace GObject
 		lc.reset(200);
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate`, `clancontrishop`,`announcement` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `titleAll`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `packSizeSoul`, `packSizeGem`, `packSizeFormula`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `zhenyuans`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime`, `openid`, `canHirePet`, `dungeonCnt1`,`xjfrontFreeCnt`, `xjfrontGoldCnt`, `xjfrontUpdate`, `clancontrishop`,`announcement` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		UInt32 tlimit = TimeUtil::SharpDay(-1);
@@ -1881,6 +1881,16 @@ namespace GObject
             {
                 dbpd.pdata.packSizeSoul = PlayerData::INIT_PACK_SIZE + 50;
 				DB1().PushUpdateData("UPDATE `player` SET `packSizeSoul` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSizeSoul, id);
+            }
+            if (dbpd.pdata.packSizeGem < PlayerData::INIT_PACK_SIZE+50)
+            {
+                dbpd.pdata.packSizeGem = PlayerData::INIT_PACK_SIZE + 50;
+				DB1().PushUpdateData("UPDATE `player` SET `packSizeGem` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSizeGem, id);
+            }
+            if (dbpd.pdata.packSizeFormula < PlayerData::INIT_PACK_SIZE+50)
+            {
+                dbpd.pdata.packSizeFormula = PlayerData::INIT_PACK_SIZE + 50;
+				DB1().PushUpdateData("UPDATE `player` SET `packSizeFormula` = %u WHERE `id` = %" I64_FMT "u", dbpd.pdata.packSizeFormula, id);
             }
 
 			{

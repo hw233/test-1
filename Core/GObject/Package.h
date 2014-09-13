@@ -187,6 +187,10 @@ namespace GObject
                 return m_SizeSoul;
             else if(type == 2)
                 return m_SizeLS;
+            else if(type == 3)
+                return m_SizeGem;
+            else if(type == 4)
+                return m_SizeFormula;
             return 0;
         }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
@@ -277,6 +281,18 @@ namespace GObject
                 if(iter == m_ItemsSoul.end())
                     return NULL;
             }
+            else if(GetItemSubClass(id) == Item_Gem)
+            {
+			    iter = m_ItemsGem.find(ItemKey(id, bind));
+                if(iter == m_ItemsGem.end())
+                    return NULL;
+            }
+            else if(GetItemSubClass(id) == Item_Formula)
+            {
+			    iter = m_ItemsFormula.find(ItemKey(id, bind));
+                if(iter == m_ItemsFormula.end())
+                    return NULL;
+            }
             else
             {
 			    iter = m_Items.find(ItemKey(id, bind));
@@ -323,6 +339,8 @@ namespace GObject
         bool TryAddTempItem(ItemBase * item, UInt32 num);
         bool TryDelTempItem(ItemBase * item, UInt32 num);
         bool TryBuySoulItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        bool TryBuyGemItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        bool TryBuyFormulaItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
         void SendTempItemInfo();
         void SendSingleTempEquipData(ItemEquip * equip);
         void SendTempItemData(ItemBase * item);
@@ -365,10 +383,14 @@ namespace GObject
 		ItemCont m_Items;
 		ItemCont m_ItemsSoul;
 		ItemCont m_ItemsLS;     //灵侍背包
+		ItemCont m_ItemsGem; //宝石背包
+		ItemCont m_ItemsFormula; //阵法背包
         ItemCont m_ItemsTemporary; //临时物品
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
 		UInt16 m_SizeLS;    //already used lingshi grids
+		UInt16 m_SizeGem;  //already used gem grids
+		UInt16 m_SizeFormula;  //already used formula grids
         UInt16 m_TempItemSize;
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;

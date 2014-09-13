@@ -534,7 +534,7 @@ namespace GObject
         }
     }
 
-	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), m_SizeLS(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
+	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), m_SizeLS(0), m_SizeGem(0), m_SizeFormula(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
 	}
 
@@ -762,6 +762,10 @@ namespace GObject
 			{
                 if(GetItemSubClass(typeId) == Item_Soul)
 				    m_ItemsSoul[ItemKey(typeId, bind)] = item;
+                else if(GetItemSubClass(typeId) == Item_Gem)
+				    m_ItemsGem[ItemKey(typeId, bind)] = item;
+                else if(GetItemSubClass(typeId) == Item_Formula)
+				    m_ItemsFormula[ItemKey(typeId, bind)] = item;
                 else
 				    m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %" I64_FMT "u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
@@ -937,6 +941,20 @@ namespace GObject
                 m_ItemsSoul[ItemKey(typeId, bind)] = item;
                 ++ m_SizeSoul;
             }
+            else if(GetItemSubClass(typeId) == Item_Gem)
+            {
+                if(item->Size() + m_SizeGem > m_Owner->getPacksize(3))
+                    return item;
+                m_ItemsGem[ItemKey(typeId, bind)] = item;
+                ++ m_SizeGem;
+            }
+            else if(GetItemSubClass(typeId) == Item_Formula)
+            {
+                if(item->Size() + m_SizeFormula > m_Owner->getPacksize(4))
+                    return item;
+                m_ItemsFormula[ItemKey(typeId, bind)] = item;
+                ++ m_SizeFormula;
+            }
             else
             {
                 if(item->Size() + m_Size > m_Owner->getPacksize(0) + 50)
@@ -1032,6 +1050,16 @@ namespace GObject
         {
             m_SizeSoul = m_SizeSoul + newq - oldq;
             m_ItemsSoul[ItemKey(id, bind)] = item;
+        }
+        else if(GetItemSubClass(id) == Item_Gem)
+        {
+            m_SizeGem = m_SizeGem + newq - oldq;
+            m_ItemsGem[ItemKey(id, bind)] = item;
+        }
+        else if(GetItemSubClass(id) == Item_Formula)
+        {
+            m_SizeFormula = m_SizeFormula + newq - oldq;
+            m_ItemsFormula[ItemKey(id, bind)] = item;
         }
         else
         {
@@ -1569,6 +1597,10 @@ namespace GObject
 				SAFE_DELETE(item);
                 if(GetItemSubClass(id) == Item_Soul)
 				    m_ItemsSoul.erase(ItemKey(id, bind));
+                else if(GetItemSubClass(id) == Item_Gem)
+				    m_ItemsGem.erase(ItemKey(id, bind));
+                else if(GetItemSubClass(id) == Item_Formula)
+				    m_ItemsFormula.erase(ItemKey(id, bind));
                 else
 				    m_Items.erase(ItemKey(id, bind));
 				DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %" I64_FMT "u", id, bind, m_Owner->getId());
@@ -1637,6 +1669,10 @@ namespace GObject
 				SAFE_DELETE(item);
                 if(GetItemSubClass(id) == Item_Soul)
 				    m_ItemsSoul.erase(ItemKey(id, bind));
+                else if(GetItemSubClass(id) == Item_Gem)
+				    m_ItemsGem.erase(ItemKey(id, bind));
+                else if(GetItemSubClass(id) == Item_Formula)
+				    m_ItemsFormula.erase(ItemKey(id, bind));
                 else
 				    m_Items.erase(ItemKey(id, bind));
 				DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %" I64_FMT "u", id, bind, m_Owner->getId());
@@ -2067,13 +2103,19 @@ namespace GObject
             }
             else if (GetItemSubClass(id) == Item_Normal ||
                     GetItemSubClass(id) == Item_Soul ||
-                    GetItemSubClass(id) == Item_SL)
+                    GetItemSubClass(id) == Item_SL
+                 || GetItemSubClass(id) == Item_Gem
+                 || GetItemSubClass(id) == Item_Formula
+                 )
             {
                 if (item && (item->getClass() == Item_Normal29 ||
                             item->getClass() == Item_Normal28 ||
                             (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9) ||
                             item->getClass() == Item_SL1 ||
-                            item->getClass() == Item_SL2))
+                            item->getClass() == Item_SL2
+                         || (item->getClass() >= Item_Gem1 && item->getClass() <= Item_Gem19)
+                         || (item->getClass() >= Item_Formula1 && item->getClass() <= Item_Formula9)
+                        ))
                 {
                     ret2 = TrumpMerge(id, bind, num, toId);
                     if (1 == ret2){
@@ -2099,7 +2141,11 @@ namespace GObject
                  GetItemSubClass(id) != Item_Formula &&
                  GetItemSubClass(id) != Item_Enhance &&
                 GetItemSubClass(id) != Item_Citta &&
-                GetItemSubClass(id) != Item_Soul)){
+                GetItemSubClass(id) != Item_Soul
+             && GetItemSubClass(id) != Item_Gem
+             && GetItemSubClass(id) != Item_Formula
+                ))
+        {
             ret = false;}
 		else
 		{
@@ -2416,7 +2462,11 @@ namespace GObject
             UInt16 grids = item->Size(item->Count() + Mnum) - item->Size() + 1;
             if(GetItemSubClass(itemId) == Item_Soul && grids > GetRestPackageSize(1))
                 return 2;
-            if(GetItemSubClass(itemId) != Item_Soul && grids > GetRestPackageSize(0))
+            if(GetItemSubClass(itemId) == Item_Gem && grids > GetRestPackageSize(3))
+                return 2;
+            if(GetItemSubClass(itemId) == Item_Formula && grids > GetRestPackageSize(4))
+                return 2;
+            if(GetItemSubClass(itemId) != Item_Soul && GetItemSubClass(itemId) != Item_Gem && GetItemSubClass(itemId) != Item_Formula && grids > GetRestPackageSize(0))
                 return 2;
         }
 
@@ -6028,17 +6078,35 @@ namespace GObject
         if(item == NULL)
             return false;
         bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
-		UInt16 cur = isSoul ? m_SizeSoul : m_Size;
+        bool isGem = GetItemSubClass(item->GetTypeId()) == Item_Gem;
+        bool isFormula = GetItemSubClass(item->GetTypeId()) == Item_Formula;
+		UInt16 cur;
+        if(isSoul)
+            cur = m_SizeSoul;
+        else if(isGem)
+            cur = m_SizeGem;
+        else if(isFormula)
+            cur = m_SizeFormula;
+        else
+            cur = m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
 		cur = cur - oldq + newq;
         if(isSoul && cur > m_Owner->getPacksize(1))
 			return false;
-		if(!isSoul && cur > m_Owner->getPacksize(0) + 50)
+        if(isGem && cur > m_Owner->getPacksize(3))
+			return false;
+        if(isFormula && cur > m_Owner->getPacksize(4))
+			return false;
+		if(!isSoul && !isGem && !isGem && cur > m_Owner->getPacksize(0) + 50)
 			return false;
 		if(!item->IncItem(num))
 			return false;
         if(isSoul)
 		    m_SizeSoul = cur;
+        else if(isGem)
+		    m_SizeGem = cur;
+        else if(isFormula)
+		    m_SizeFormula = cur;
         else
 		    m_Size = cur;
 		return true;
@@ -6090,13 +6158,27 @@ namespace GObject
 		if(item->Count() < num)
 			return false;
         bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
-		UInt16 cur = isSoul ? m_SizeSoul : m_Size;
+        bool isGem = GetItemSubClass(item->GetTypeId()) == Item_Gem;
+        bool isFormula = GetItemSubClass(item->GetTypeId()) == Item_Formula;
+		UInt16 cur;
+        if(isSoul)
+            cur = m_SizeSoul;
+        else if(isGem)
+            cur = m_SizeGem;
+        else if(isFormula)
+            cur = m_SizeFormula;
+        else
+            cur = m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() - num);
 		cur = cur - oldq + newq;
 		if(!item->DecItem(num))
 			return false;
         if(isSoul)
 		    m_SizeSoul = cur;
+        else if(isGem)
+		    m_SizeGem = cur;
+        else if(isFormula)
+		    m_SizeFormula = cur;
         else
 		    m_Size = cur;
 
@@ -7714,6 +7796,14 @@ namespace GObject
             {
                 m_ItemsSoul.erase(ItemKey(itemId, bind));
             }
+            else if(GetItemSubClass(itemId) == Item_Gem)
+            {
+                m_ItemsGem.erase(ItemKey(itemId, bind));
+            }
+            else if(GetItemSubClass(itemId) == Item_Formula)
+            {
+                m_ItemsFormula.erase(ItemKey(itemId, bind));
+            }
             else
             {
                 m_Items.erase(ItemKey(itemId, bind));
@@ -8131,6 +8221,22 @@ namespace GObject
                     return NULL;
                 }
             }
+            else if(GetItemSubClass(typeId) == Item_Gem)
+            {
+                if(!(TryBuyGemItem(typeId, num, bind)))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
+            else if(GetItemSubClass(typeId) == Item_Formula)
+            {
+                if(!(TryBuyFormulaItem(typeId, num, bind)))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
             else
             {
                 if(!(TryBuyItem(typeId, num, bind)))
@@ -8166,6 +8272,66 @@ namespace GObject
                 return false;
         }
         else if(itemType->Size(num) > GetRestPackageSize(1))
+        {
+            return false;
+        }
+
+		return true;
+    }
+
+    bool Package::TryBuyGemItem(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {      
+        if(0 == typeId || 0 == num) 
+            return false;
+
+		if(IsEquipTypeId(typeId)) 
+            return false;
+
+		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+		if(itemType == NULL) 
+            return false;
+
+		ITEM_BIND_CHECK(itemType->bindType,bind);
+		ItemBase * item = FindItem(typeId, bind);
+        if(item)
+        {
+            UInt16 cur = m_SizeGem;
+            UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+            cur = cur - oldq + newq;
+            if(cur > m_Owner->getPacksize(3))
+                return false;
+        }
+        else if(itemType->Size(num) > GetRestPackageSize(3))
+        {
+            return false;
+        }
+
+		return true;
+    }
+
+    bool Package::TryBuyFormulaItem(UInt32 typeId, UInt32 num, bool bind /*= false */)
+    {      
+        if(0 == typeId || 0 == num) 
+            return false;
+
+		if(IsEquipTypeId(typeId)) 
+            return false;
+
+		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+		if(itemType == NULL) 
+            return false;
+
+		ITEM_BIND_CHECK(itemType->bindType,bind);
+		ItemBase * item = FindItem(typeId, bind);
+        if(item)
+        {
+            UInt16 cur = m_SizeFormula;
+            UInt16 oldq = item->Size(), newq = item->Size(item->Count() + num);
+            cur = cur - oldq + newq;
+            if(cur > m_Owner->getPacksize(4))
+                return false;
+        }
+        else if(itemType->Size(num) > GetRestPackageSize(4))
         {
             return false;
         }
