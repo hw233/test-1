@@ -958,6 +958,13 @@ struct DBLingbaoLevel
     UInt32 honeyFall;
     UInt32 honeyFallP;
 };
+struct DBTitlePaper
+{
+    UInt8 id;
+    std::string award;
+    UInt8 type;
+    UInt8 option_num; 
+};
 
 }
 
@@ -2085,6 +2092,14 @@ SPECIALDEF(7)
     UInt32, honeyFallP 
 	)
 SPECIALEND()
-}
+SPECIALBEGIN(GData::DBTitlePaper)
+SPECIALDEF(4)
+	(
+    UInt8, id         ,
+    std::string, award,
+    UInt8, type,
+    UInt8, option_num
+	)
+SPECIALEND()}
 
 #endif // _GDATADBEXECHELPER_H_
