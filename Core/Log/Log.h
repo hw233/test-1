@@ -179,6 +179,7 @@ enum PurchaseType
     KETTLE                      = 1040, //炼妖壶
     DARKDARGON                  = 1041, //黯龙王
     UNKNOWN                     = 1042, //不明确消费类型
+    FLYROADGETAWARD             = 1043, //飞升之路礼包双倍
     //繁体私有占150～200
 };
 

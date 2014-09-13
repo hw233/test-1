@@ -3437,6 +3437,20 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             GLOBAL().PushMsg(hdr, (void*)data);
             break;
        }
+       case 0x37:
+       {
+            UInt8 op = 0;
+            brd >> op;
+            if(1 == op)
+                player->SendFlyRoadGiftInfo();
+            else
+            {
+                UInt8 IsDouble = 0;
+                brd >> IsDouble;
+                GameMsgHdr hdr(0x388, player->getThreadId(), player, sizeof(IsDouble));
+                GLOBAL().PushMsg(hdr, &IsDouble);
+            }
+       }
        case 0x45:
        {
            UInt8 logType = 0;

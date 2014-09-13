@@ -3660,6 +3660,11 @@ namespace GObject
         void getGratitudeAward(UInt8);
         void gratitudeReturnInfo();
 
+        void GetFlyRoadGift(UInt8);
+        void SendFlyRoadGiftInfo();
+        void GetMemoirAward(UInt8);
+        void sendMemoirAwardInfo();
+
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();
         void SacrificeFlyRoad(UInt8 type, UInt16 num);

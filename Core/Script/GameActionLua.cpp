@@ -2007,5 +2007,10 @@ namespace Script
 		assert(player != NULL);
         return Call<bool>("getFeiShengDanAward", player, index);
     }
+    bool GameActionLua::getFlyRoadAward(Player * player, UInt8 index, UInt8 isdouble)
+    {
+		assert(player != NULL);
+        return Call<bool>("getFlyRoadAward", player, index, isdouble);
+    }
 }
 
