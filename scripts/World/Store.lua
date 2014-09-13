@@ -447,7 +447,6 @@ function loadStore()
         store:add(3,20045,100)
         store:add(3,20055,100)
         store:add(3,20065,200)
-        store:add(3,20135,150)
 
         store:add(3,5003,10)
         store:add(3,5013,10)
@@ -472,7 +471,6 @@ function loadStore()
         store:add(3,20043,10)
         store:add(3,20053,10)
         store:add(3,20063,20)
-        store:add(3,20133,15)
         -- 礼券
         store:add(4,16007,10)
         store:add(4,57,10)
@@ -504,7 +502,6 @@ function loadStore()
         store:add(4,20043,10)
         store:add(4,20053,10)
         store:add(4,20063,20)
-        store:add(4,20133,15)
         if is0926_0927() then
             store:add(5,492,1000)
         end
@@ -547,7 +544,6 @@ function loadStore()
         store:add(5,20041,300)
         store:add(5,20051,300)
         store:add(5,20061,500)
-        store:add(5,20131,400)
 
         -- 荣誉
         store:add(6,9457,1500)
