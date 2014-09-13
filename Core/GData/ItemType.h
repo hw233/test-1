@@ -17,6 +17,9 @@
 #define LARM_ID         1500
 #define RARM_ID         4999
 #define LGEM_ID         5000
+#define XIAN_ID         18000
+#define LXIANGEM_ID     20000
+#define LXIANGEM_ID_END     21000
 #define RGEM_ID         5999
 #define LCITTA1_ID      6000
 #define RCITTA1_ID      7000
@@ -130,6 +133,15 @@ enum ItemClass
     Item_Guji_Xin_Hitrate = 125, // 信·命中古籍
     Item_Guji_Dossier = 126, // 通用卷宗
 
+    Item_Evolution = 170,   //仙界装备
+    Item_Evolution1 ,Item_Evolution2,Item_Evolution3,  //仙兵，仙衣，仙器
+	Item_EvolutionGem = 174,		//宝石 60~79                       力量宝石
+    Item_EvolutionGem1, Item_EvolutionGem2, Item_EvolutionGem3,Item_EvolutionGem4,// 敏捷宝石， 智力宝石， 耐力宝石， 意志宝石
+    Item_EvolutionGem5, Item_EvolutionGem6, Item_EvolutionGem8,Item_EvolutionGem9,// 生命宝石， 攻击宝石， 防御宝石， 命中宝石
+    Item_EvolutionGem10,Item_EvolutionGem11,Item_EvolutionGem12,Item_EvolutionGem13,// 反击宝石,闪避宝石， 暴击宝石， 破击宝石
+    Item_EvolutionGem14, Item_EvolutionGem15,Item_EvolutionGem16,Item_EvolutionGem17,// 身法宝石， 坚韧宝石， 法抗宝石
+    Item_EvolutionGem18, Item_EvolutionGem19,
+
     Item_PetEquip = 200,    //仙宠装备 200~219                          //生命
     Item_PetEquip1, Item_PetEquip2, Item_PetEquip3, Item_PetEquip4,     //物攻，法功，物防，法防
     Item_PetEquip5, Item_PetEquip6, Item_PetEquip7, Item_PetEquip8,     //暴击，破击，命中，躲避
@@ -150,7 +162,7 @@ inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
 
 inline bool IsEquipTypeId(UInt32 id)
 {
-	return (id >= LARM_ID && id <= RARM_ID) || (id >=LBMIN_ID && id <= LBMAX_ID);
+	return (id >= LARM_ID && id <= RARM_ID) || (id >=LBMIN_ID && id <= LBMAX_ID) || (id > XIAN_ID && id < LXIANGEM_ID);
 }
 
 inline bool IsLingbaoTypeId(UInt32 id)
@@ -199,6 +211,24 @@ inline bool IsGemId2(UInt32 id)
         return true;
     else if(id >= 5631 && id <= 5632)
         return true;
+    else if(id >= 20161 && id <= 20162)
+        return true;
+    else if(id >= 20166 && id <= 20167)
+        return true;
+    else if(id >= 20171 && id <= 20172)
+        return true;
+    else if(id >= 20176 && id <= 20177)
+        return true;
+    else if(id >= 20181 && id <= 20182)
+        return true;
+    else if(id >= 20186 && id <= 20187)
+        return true;
+    else if(id >= 20191 && id <= 20192)
+        return true;
+    else if(id >= 20196 && id <= 20197)
+        return true;
+    else if(id >= 20201 && id <= 20202)
+        return true;
     else
         return false;
 }
@@ -210,7 +240,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump);
+	return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3) );
 }
 
 inline bool IsZhenYuan(UInt8 subClass)
@@ -276,6 +306,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_PetGem;
     if (id >= LLINGSHI_ID && id <= RLINGSHI_ID)
         return Item_LingShi;
+    if (id >= LXIANGEM_ID && id <= LXIANGEM_ID_END)
+        return Item_EvolutionGem;
 	return Item_Other;
 }
 
@@ -397,6 +429,7 @@ namespace GData
 	extern std::vector<ItemGemType *> lingshiTypes;
 	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
 	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
+	extern std::vector<ItemGemType *> evolutionTypes;
 
 #define ITEM_BIND_CHECK(bindType, bind)	\
 	if(!bind && bindType == 1) bind = true;

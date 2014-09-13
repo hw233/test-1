@@ -81,6 +81,7 @@
 #include "GObject/Married.h"
 #include "GData/SevenSoul.h"
 #include "GObject/ClanBigBoss.h"
+#include "GObject/Evolution.h"
 #include "GObject/ClanRankBattle.h"
 
 namespace GObject
@@ -335,11 +336,6 @@ namespace GObject
             fprintf(stderr, "loadEquipmentsSpirit error!\n");
             std::abort();
         }
-		if(!loadLingbaoAttr())
-        {
-            fprintf(stderr, "loadLingbaoAttr error!\n");
-            std::abort();
-        }
         if(!loadFightersPCChance())
         {
             fprintf(stderr, "loadFightersPCChance error!\n");
@@ -353,6 +349,11 @@ namespace GObject
 		if(!loadFighters())
         {
             fprintf(stderr, "loadFighters error!\n");
+            std::abort();
+        }
+		if(!loadLingbaoAttr())
+        {
+            fprintf(stderr, "loadLingbaoAttr error!\n");
             std::abort();
         }
 		if(!loadClanAssist())
@@ -373,6 +374,11 @@ namespace GObject
 		if(!loadAllPlayers())
         {
             fprintf(stderr, "loadAllPlayers error!\n");
+            std::abort();
+        }
+		if(!loadFighterEvolution())
+        {
+            fprintf(stderr, "loadFighterEvolution error!\n");
             std::abort();
         }
 		if(!loadLingbaoSmelt())
@@ -2300,7 +2306,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`fighter`.`hideFashion`,`fighter`.`incense`, `innateTrump`, UNIX_TIMESTAMP(`summoned`) FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`hideFashion`,`fighter`.`incense`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -2429,6 +2435,7 @@ namespace GObject
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
             fgt2->loadLingbao(specfgtobj.lingbao);
+            fgt2->loadEvolutionEquip(specfgtobj.evolution);
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
@@ -5283,6 +5290,10 @@ namespace GObject
                 case Item_PetEquip8:
                 case Item_PetEquip9:
                 case Item_PetEquip10:
+                case Item_Evolution:
+                case Item_Evolution1:
+                case Item_Evolution2:
+                case Item_Evolution3:
                 {
                     ItemEquipData ied;
                     ied.enchant = dbe.enchant;
@@ -5308,12 +5319,15 @@ namespace GObject
                     case Item_Armor3:
 					case Item_Armor4:
 					case Item_Armor5:
+                    case Item_Evolution1:
+                    case Item_Evolution2:
 						equip = new ItemArmor(dbe.id, itype, ied);
                         break;
                     case Item_Halo:
                     case Item_InnateTrump:
                     case Item_Fashion:
                     case Item_Trump:
+                    case Item_Evolution3:
                         if (itype->subClass == Item_Halo)
                         {
                             equip = new ItemHalo(dbe.id, itype, ied);
@@ -5461,6 +5475,9 @@ namespace GObject
             case Item_Armor5:
             case Item_Ring:
             case Item_Amulet:
+            case Item_Evolution1:
+            case Item_Evolution2:
+            //case Item_Evolution3:
                 {
                     ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
                     esa.spLev[0] = dbes.splev1;
@@ -8207,6 +8224,43 @@ namespace GObject
 
             fgt->setLingbaoFall(dbxc.type,dbxc.fall);
 
+		}
+		lc.finalize();
+
+        return true;
+    }
+    bool GObjectManager::loadFighterEvolution()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter Evolution:");
+		DBEvolution dbxc;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`,`process`,`award`,`task9`, `rTime`,`success` FROM `fighter_evolution`", dbxc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbxc.playerId != last_id)
+			{
+				last_id = dbxc.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbxc.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+            fgt->getEvolution()->LoadTask9Info(dbxc.task9);
+            fgt->getEvolution()->setRandomTime(dbxc.rTime);
+            fgt->getEvolution()->SetProcess(dbxc.process);
+            fgt->getEvolution()->SetAward(dbxc.award);
+            fgt->getEvolution()->setSuccessValue(dbxc.success);
 		}
 		lc.finalize();
 

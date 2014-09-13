@@ -549,6 +549,7 @@ namespace GObject
         static	bool loadMonsterKettle();
         static	bool loadFighterLingbaoLevel();
         static	bool loadFighterLingbaoFall();
+        static bool loadFighterEvolution();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

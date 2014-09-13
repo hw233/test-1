@@ -474,6 +474,7 @@ namespace Script
 		CLASS_DEF(Package, DelItemAll);
 		CLASS_DEF(Package, DelItem);
 		CLASS_DEF(Package, DelItemAny);
+		CLASS_DEF(Package, DelItemAny2);
 		CLASS_DEF(Package, DelEquip);
 		CLASS_DEF(Package, SellItem);
 		CLASS_DEF(Package, SellEquip);
@@ -2000,6 +2001,16 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<void>("getFlyRoadAward", player, index, isdouble);
+    }
+    bool GameActionLua::getFeiShengDan(Player * player, UInt8 index)
+    {
+		assert(player != NULL);
+        return Call<bool>("getFeiShengDan", player, index);
+    }
+    bool GameActionLua::getFeiShengAward(Player * player, UInt8 index)
+    {
+		assert(player != NULL);
+        return Call<bool>("getFeiShengDanAward", player, index);
     }
 }
 

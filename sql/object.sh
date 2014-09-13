@@ -140,6 +140,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_create_seekingher.sql     #众里寻他送豆记录表,player表增加宣言字段
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140731_clear_var790.sql     #清除文采值
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_drop_packSizeLS.sql #drop column packSizeLS of player
+
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbao.sql #drop column packSizeLS of player
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbaoFall.sql #drop column packSizeLS of player
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbao.sql #create fighter_lingbaoLevel
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140804_aLingbaoFall.sql #create fighter_lingbaoFall
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_modify_clan_founder.sql #modify clan founder
@@ -156,6 +159,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar844.sql        #众里寻他掉落状态
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearvar182_187.sql        #清除仗剑江湖蜀山路
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearCoolSummer.sql     #清除酷爽一夏
+    ##mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140812_cEvolution.sql #飞升
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20140818_addXianEq.sql     
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_serverwar_clearstate.sql     #服战押注没结算
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_0911.sql     #911bug清理积分
 }

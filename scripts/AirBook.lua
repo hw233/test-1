@@ -56,6 +56,9 @@ function getTheResultInSnow2()
     for i in file:lines() do 
         x,y,a,b,c,d,e,f,g = string.find(i,reg)
         print(x,y,a,b,c,d,e,f,g)
+        if c != 27 then
+            return ;
+        end
         if result[b] == nil then
             result[b] = 0;
         else
@@ -109,6 +112,7 @@ for key,value in pairs(result) do
     --if pl == nil then
     --    return 
     --end
+    --local value = pl:GetVar(846)
     --local value = pl:GetVar(84)
     --print("value:" .. value)
     --print("cha"..result[key])
@@ -119,6 +123,7 @@ for key,value in pairs(result) do
     --    print("XXXX")
     --else  
     --    print("!!!!")
+    --    pl:SetVar(846,value - result[key]);
     --    pl:SetVar(845,value - result[key]);
     --end
 end

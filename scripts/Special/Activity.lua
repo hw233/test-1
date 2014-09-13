@@ -1046,6 +1046,9 @@ function onVipLevelAward(player, vipLevel)
 end
 
 function onCopyWin(player, id, floor, spot, lootlvl)
+    if id >= 100 then
+        return 
+    end
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
     ValentineDay(player, lootlvl)
