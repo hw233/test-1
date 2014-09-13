@@ -728,8 +728,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
         return;
 
     UInt8 scheme = m_owner->GetVar(VAR_JIGUAN_SCHEME);
-    TRACE_LOG("equipJG  jgId: %u, pos: %u, scheme:%u, mark:%u", jgId, pos, scheme, mark);
-
+    TRACE_LOG("equipJG  playerId: %" I64_FMT "u, jgId: %u, pos: %u, scheme:%u, mark:%u", m_owner->GetId(), jgId, pos, scheme, mark);
     if(EQUIP_JG == mark || DISMANT_JG == mark)
     {
         std::vector<UInt8> values;
@@ -811,6 +810,7 @@ void MoFang::equipJG(UInt32 jgId, UInt8 pos, UInt8 mark)
             for(UInt8 i=0; i<values.size(); i++)
             {
                 m_grids[scheme-1][values[i]] = occupyMark;
+                TRACE_LOG("equipJG  playerId: %" I64_FMT "u, pos: %u, scheme:%u, occupyMark:%u", m_owner->GetId(), scheme-1, values[i], occupyMark);
             }
 
             if(DISMANT_JG == mark)
