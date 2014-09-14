@@ -16107,6 +16107,7 @@ void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::S
                     // }
                     {
                         atk = skill->effect->magdamP * calcEvolutionAttack(bf, cs2, target, NULL) + skill->effect->addmag;
+                        std::cout <<" damP:" <<skill->effect->magdamP << std::endl;
                         def = getBFEvolutionDefend(target);
                         //reduce = getBFAtkReduce(target);
                         isPhysic = true;
