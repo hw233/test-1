@@ -394,24 +394,24 @@ namespace GObject
                         {
                             if(aidx < GObjectManager::getAttrChance(q, k))
                             {
-                                std::cout <<" index:" << static_cast<UInt32>(i)<<std::endl;
-                                std::cout <<" j:" << static_cast<UInt32>(j) << std::endl;
+                               // std::cout <<" index:" << static_cast<UInt32>(i)<<std::endl;
+                               // std::cout <<" j:" << static_cast<UInt32>(j) << std::endl;
                                 UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
-                                std::cout <<" q:"<<static_cast<UInt32>(q) << " k:" << static_cast<UInt32>(k) << std::endl;
-                                std::cout <<" 最低:"<<static_cast<UInt32>(GObjectManager::getAttrDics(q, k)) << " 最高:" << static_cast<UInt32>(GObjectManager::getAttrDics(q, k+1)) << std::endl;
+                               // std::cout <<" q:"<<static_cast<UInt32>(q) << " k:" << static_cast<UInt32>(k) << std::endl;
+                               // std::cout <<" 最低:"<<static_cast<UInt32>(GObjectManager::getAttrDics(q, k)) << " 最高:" << static_cast<UInt32>(GObjectManager::getAttrDics(q, k+1)) << std::endl;
                                 UInt32 tmp = uRand(100) + 1;
-                                std::cout << " tmp:" << tmp;
+                              //  std::cout << " tmp:" << tmp;
                                 UInt32 factor = GObjectManager::getAttrDics(q, k) + static_cast<float>(dics * tmp) / 100;
-                                std ::cout <<" factor:" << static_cast<UInt32>(factor);
-                                std::cout <<" crr:" << static_cast<UInt32>(crr) <<std::endl;
+                              //  std ::cout <<" factor:" << static_cast<UInt32>(factor);
+                              //  std::cout <<" crr:" << static_cast<UInt32>(crr) <<std::endl;
                                 if(equip_t == EQUIPTYPE_EQUIP)
                                 {
-                                    std::cout <<" MaxAttr:"<<static_cast<UInt32>(GObjectManager::getAttrMax(lv, t[i]-1, q, crr)) << std::endl;
+                             //       std::cout <<" MaxAttr:"<<static_cast<UInt32>(GObjectManager::getAttrMax(lv, t[i]-1, q, crr)) << std::endl;
                                     v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
                                 }
                                 else if(equip_t == EQUIPTYPE_TRUMP)
                                 {
-                                    std::cout <<" MaxAttr:"<<static_cast<UInt32>(GObjectManager::getAttrTrumpMax(lv, t[i]-1, q, crr)) << std::endl;
+                               //     std::cout <<" MaxAttr:"<<static_cast<UInt32>(GObjectManager::getAttrTrumpMax(lv, t[i]-1, q, crr)) << std::endl;
                                     v[i] = GObjectManager::getAttrTrumpMax(lv, t[i]-1, q, crr)*factor;
                                 }
                                 std::cout << static_cast<UInt32>(v[i]) << std::endl;
