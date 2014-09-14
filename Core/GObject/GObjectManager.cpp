@@ -5435,7 +5435,7 @@ namespace GObject
                     }
                     else if(itype->subClass == Item_Evolution3)
                     { 
-                        UInt8 lv = equip->getValueLev();
+                        UInt8 lv = equip->getItemEquipData().tRank;
                         UInt8 q = equip->getQuality() - 3;
                         UInt8 crr = equip->GetCareer();
                         if(dbe.attrType1 > 0)
