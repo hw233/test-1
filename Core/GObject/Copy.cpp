@@ -293,7 +293,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
         if(id < 100)
         {
             DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %" I64_FMT "u",
-                    /*PLAYER_DATA(pl, copyFreeCnt)*/copyFreeCnt, /*PLAYER_DATA(pl, copyGoldCnt)*/ copyFreeCnt, pl->getId());
+                    /*PLAYER_DATA(pl, copyFreeCnt)*/copyFreeCnt, /*PLAYER_DATA(pl, copyGoldCnt)*/ copyGoldCnt, pl->getId());
             PLAYER_DATA(pl, copyFreeCnt) = copyFreeCnt;
         }
         else
