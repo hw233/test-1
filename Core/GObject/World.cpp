@@ -368,6 +368,7 @@ bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
+bool bGratirudeTimeEnd = false;
 bool bWCTimeEnd2 = false;
 
 bool enum_midnight(void * ptr, void* next)
@@ -1488,6 +1489,16 @@ inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
     return true;
 }
 
+inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        pl->SetVar(VAR_GRATITUDE_GIVING_LEVEL, pl->GetLev());
+        pl->SetVar(VAR_GRATITUDE_GIVING_RECHARGE, pl->getTotalRecharge());
+    }
+    return true;
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -1506,6 +1517,7 @@ void World::World_Midnight_Check( World * world )
     bool bWCtime = getWorldCupTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
+    bool bGratitudeTime = getGratitudeGiving();
     bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1566,6 +1578,7 @@ void World::World_Midnight_Check( World * world )
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
     //众里寻他活动结束
     bSeekingHerTimeEnd = bSeekingHerTime && !getSeekingHer();
+    bGratirudeTimeEnd = bGratitudeTime && !getGratitudeGiving(300);
     UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
@@ -1953,6 +1966,10 @@ void World::World_Midnight_Check( World * world )
     }
     if(bWCTimeEnd2)
         world->SendWorldCupAward2();
+    if(bGratirudeTimeEnd)
+    {
+        GObject::globalPlayers.enumerate(player_enum_SetGratitudeInfo, 0);
+    }
 
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;

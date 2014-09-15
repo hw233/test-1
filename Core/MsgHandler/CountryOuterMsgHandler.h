@@ -2419,6 +2419,23 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         }
         break;
 
+        case 0x14:
+        {
+            if(!World::getGratitudeGiving(0, 5 * 24 * 3600))
+                return;
+            UInt8 type = 0;
+            br >> type;
+            if(type)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                player->getGratitudeAward(flag);
+            }
+            else
+                player->gratitudeReturnInfo();
+        }
+        break;
+
         default:
         break;
     }

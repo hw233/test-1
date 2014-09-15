@@ -35317,6 +35317,84 @@ void Player::ExchangeFlyRoadBox(UInt8 type)
     ReturnFlyRoadInfo();
 }
 
+void Player::gratitudeReturnInfo()
+{
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x14);
+        st << static_cast<UInt8>(GetVar(VAR_GRATITUDE_GIVING_AWARD_STATUS));
+        st << getCreated();
+        if(World::getGratitudeGiving())
+        {
+            st << GetLev();
+            st << getTotalRecharge();
+        }
+        else
+        {
+            st << GetVar(VAR_GRATITUDE_GIVING_LEVEL);
+            st << GetVar(VAR_GRATITUDE_GIVING_RECHARGE);
+        }
+        st << Stream::eos;
+        send(st);
+}
+
+void Player::getGratitudeAward(UInt8 flag)
+{
+    if(flag > 3 || flag < 1)
+        return;
+    UInt32 now = TimeUtil::Now();
+    if(getCreated() > now)
+        return;
+    UInt32 status = GetVar(VAR_GRATITUDE_GIVING_AWARD_STATUS);
+    if(GET_BIT(status, (flag - 1)))
+        return;
+    UInt32 endDay = TimeUtil::MkTime(2014, 9, 17);
+    if(getCreated() > endDay)
+        return;
+    if(World::getGratitudeGiving())
+    {
+        if(1 == flag)
+        {
+            UInt32 days = (now - getCreated()) / (24 * 3600);
+            getCoin(days * 1000);
+        }
+        else if(2 == flag)
+        {
+            getCoupon(GetLev() * 10);
+        }
+        else
+        {
+            UInt32 total = (getTotalRecharge() > 100000 ? 100000 : getTotalRecharge());
+            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+            {
+                it->second->addExp(total * 10);
+            }
+        }
+    }
+    else
+    {
+         if(1 == flag)
+        {
+            UInt32 days = (endDay - getCreated()) / (24 * 3600);
+            getCoin(days * 1000);
+        }
+        else if(2 == flag)
+        {
+            getCoupon(GetVar(VAR_GRATITUDE_GIVING_LEVEL) * 10);
+        }
+        else
+        {
+             UInt32 total = (GetVar(VAR_GRATITUDE_GIVING_RECHARGE) > 100000 ? 100000 : GetVar(VAR_GRATITUDE_GIVING_RECHARGE));
+             for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+             {
+                 it->second->addExp(total * 10);
+             }
+        }
+    }
+    status = SET_BIT(status, (flag - 1));
+    SetVar(VAR_GRATITUDE_GIVING_AWARD_STATUS, status);
+    gratitudeReturnInfo();
+}
+
 
 } // namespace GObject
 
