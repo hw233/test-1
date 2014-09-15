@@ -143,8 +143,6 @@ Fighter::~Fighter()
     }
     if(m_2ndSoul)
         SAFE_DELETE(m_2ndSoul);
-    if(_evl)
-        SAFE_DELETE(_evl);
 }
 
 const std::string& Fighter::getName()
