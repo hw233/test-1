@@ -35472,6 +35472,8 @@ void Player::shakeMoneyBag()
 {
     if(10 <= GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES))
         return;
+    if(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS))
+        return;
     UInt32 total = GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
     if(!total)
         return;
@@ -35503,6 +35505,7 @@ void Player::shakeMoneyBag()
     }
 
     AddVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES, 1);
+    SetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS, 1);
     GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, this, 0);
     GLOBAL().PushMsg(hdr, NULL);
 }
