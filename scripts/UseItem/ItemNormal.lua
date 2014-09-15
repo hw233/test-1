@@ -11842,6 +11842,60 @@ function ItemNormal_00016013(id, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016029(id, num, bind, param)
+    print("XXX")
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    package:AddEquip(18809, 1);
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+function ItemNormal_00016030(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    package:AddEquip(18811, 1);
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+function ItemNormal_00016031(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    package:AddEquip(18810, 1);
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+function ItemNormal_00016032(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    package:AddEquip(18812, 1);
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
+
 function ItemNormal_00016014(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -14482,6 +14536,10 @@ local ItemNormal_Table = {
     [16014] = ItemNormal_00016014,
     [16015] = ItemNormal_00016015,
     [16018] = ItemNormal_00016018,
+    [16029] = ItemNormal_00016029,
+    [16030] = ItemNormal_00016030,
+    [16031] = ItemNormal_00016031,
+    [16032] = ItemNormal_00016032,
     [16043] = ItemNormal_00016043,
     [16044] = ItemNormal_00016043,
     [16045] = ItemNormal_00016043,

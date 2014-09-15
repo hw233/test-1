@@ -189,6 +189,8 @@ void OnResetRecharge(GameMsgHdr& hdr, const void * data)
         player->SetVar(VAR_RECHARGE_TOTAL, 0);
     if (player->GetVar(VAR_RECHARGE_SCORE))
         player->SetVar(VAR_RECHARGE_SCORE, 0);
+    if (player->GetVar(VAR_PRIVATE_RECHARGE))
+        player->SetVar(VAR_PRIVATE_RECHARGE, 0);
     player->sendRechargeInfo();
 }
 
@@ -2483,6 +2485,7 @@ void OnSpreadWhisper(GameMsgHdr &hdr, const void* data)
 		rep.office = player->getTitle();
 		rep.guard = player->getPF();
 		rep.level = player->GetLev();
+        rep.viplvl = (player->GetVar(VAR_HIDE_VIP_LEVEL_FLAG) ? 0xFF : player->getVipLevel());
 		pl->send(rep);
 	}
 }

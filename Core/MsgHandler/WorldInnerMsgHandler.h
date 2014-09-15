@@ -3598,5 +3598,90 @@ void OnSeekingHer_FriendInfo( GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void SetCarnivalConsumeRank( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    UInt32 total = player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+    if (!total)
+        return;
+
+    for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            World::carnivalConsumeSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::carnivalConsumeSort.insert(s);
+}
+
+void OnCarnivalRankReturn( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x15);
+    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(player->GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
+    size_t offset = st.size();
+    UInt32 count = 0;
+    st << count;
+
+    for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
+    {
+        st << ++count;
+        st << i->player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+        st << i->player->getCountry();
+        st << i->player->getName();
+        if(count >= 100)
+            break;
+    }
+
+    st.data<UInt8>(offset) = count;
+    st << Stream::eos;
+    player->send(st);
+}
+
+void OnCarnivalMoneyBagReturn( GameMsgHdr& hdr,  const void* data )
+{
+    World::initRCRank();
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x15);
+    st << static_cast<UInt8>(0);
+    st << player->GetVar(VAR_CARNIVAL_CONSUME_TODAY_TOTAL);
+    st << player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+    UInt32 rank = 0;
+    UInt32 pos = 1;
+
+    for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
+    {
+        if (i->player == player)
+        {
+            rank = pos;
+            break;
+        }
+        pos ++;
+    }
+    st << rank;
+    st << player->GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
+    st << static_cast<UInt8>(player->GetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG));
+    st << static_cast<UInt8>(player->GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
+    st << Stream::eos;
+    player->send(st);
+}
+
 
 #endif // _WORLDINNERMSGHANDLER_H_

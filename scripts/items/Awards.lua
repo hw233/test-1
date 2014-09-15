@@ -739,10 +739,10 @@ function RunQZoneRechargeAward(player, cts)
 end
 function RunInterestingAward(player, cts)
     local item = {
-        [0] = {{15,3},{500,3},{133,3}},
-        [1] = {{503,5},{501,5},{511,5}},
-        [2] = {{9457,5},{9603,5},{513,5},{134,5}},
-        [3] = {{1325,5},{9338,5},{515,5},{1126,5}},
+        [0] = {{501,3},{500,3},{511,3}},
+        [1] = {{505,3},{503,3},{517,3},{15,3}},
+        [2] = {{33,3},{9414,3},{9457,3},{9600,3}},
+        [3] = {{9498,3},{9338,3},{1325,3},{16001,3}},
     };
     local package = player:GetPackage();
 --    package:DelItemSendMsg(9371, player)
@@ -768,7 +768,7 @@ function RunInterestingBag(player, cts)
         [0] = {{33,1},{9371,1},{500,1}},
     };
     local package = player:GetPackage();
-    package:DelItemSendMsg(16041, player)   --需要修改
+    package:DelItemSendMsg(16011, player)   --需要修改
     if cts > 1  then
         return false
     end
@@ -2160,4 +2160,71 @@ function getLingbaoLevelChance( level , fall)
         fall = #EnchantlingbaoLevel[level]
     end
     return EnchantlingbaoLevel[level][fall];
+end
+
+local FeiShengDanNeed = {
+    {
+        { 5005,2},
+        { 5015,2},
+        { 5025,2},
+        { 5035,2},
+        { 5045,2},
+        { 5055,2},
+    },{
+        { 20005,1},
+        { 20015,1},
+        { 20025,1},
+        { 20035,1},
+        { 20045,1},
+        { 20055,1},
+    },
+    {
+        {502,20} , 
+        {503,10}, 
+        {514,25}, 
+        {515,10}, 
+        --{133,20}, 
+        {134,10}, 
+    },{
+        {17102,10},
+        {17103,5},
+        {17104,10},
+        {17105,5},
+        {17108,10},
+        {17107,5},
+    },
+}
+local FeiShengDanGoods = { 17100,17101}
+function getFeiShengDan(player,opt)
+    print("XXX ")
+    if opt > 2 then 
+        return
+    end
+
+    local package = player:GetPackage();
+    for i = 1,#FeiShengDanNeed[opt*2-1] do
+        local count = package:GetItemAnyNum(FeiShengDanNeed[opt*2-1][i][1])
+        if count < FeiShengDanNeed[opt*2-1][i][2] then
+            print("id: "..FeiShengDanNeed[opt*2-1][i][1])
+            print("count: "..count)
+            print("need: "..FeiShengDanNeed[opt*2-1][i][2])
+            return 0;
+        end
+    end
+
+    print("XXXX")
+    for i = 1,#FeiShengDanNeed[opt*2-1] do
+        package:DelItemAny2(FeiShengDanNeed[opt*2-1][i][1],FeiShengDanNeed[opt*2-1][i][2])
+    end
+    package:AddItem(FeiShengDanGoods[opt], 1, true, 0, 39);
+end
+function getFeiShengDanAward(player,opt)
+    if opt > 2 then 
+        return
+    end
+    local package = player:GetPackage();
+    print("opt:"..opt)
+    for i = 1,#FeiShengDanNeed[opt*2] do
+        package:AddItem(FeiShengDanNeed[opt*2][i][1], FeiShengDanNeed[opt*2][i][2], true, 0, 39);
+    end
 end

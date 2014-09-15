@@ -960,6 +960,11 @@ int BattleSimulator::findFirstAttacker()
     if(_fgtlist[_cur_fgtlist_idx].size() == 0)
     {
         _cur_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
+        //_attackRound ++ ;
+        //appendAttackRoundChange();
+    }
+    else if(_fgtlist[_cur_fgtlist_idx].size() == 1)
+    {
         _attackRound ++ ;
         appendAttackRoundChange();
     }
@@ -1447,6 +1452,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 aura_factor = 1;
             if(bf->isHide() || area_target->isMarkMo())
                 aura_factor += 0.1f;
+            //doEvolution(bf);
+            //std::cout << "无双技能:" << static_cast<UInt32>(skill->getId()) << std::endl;
         }
 
         if(!colorStock && !defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(area_target, skill) && !area_target->getMoEvade100())))
@@ -4864,6 +4871,20 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         if(last > 0 && bf->getBlind() < 0.001f)
             initBuddhaLight(bf, true, false);
     }
+    //仙界技能 
+    //if(skill && skill->cond == GData::SKILL_EVOLUTION)
+    //{ 
+    //    UInt8 curCnt = bf->getEvolutionCnt();
+    //    if(curCnt >= 2)
+    //        curCnt = curCnt - 2;
+    //    else
+    //        curCnt = 0;
+    //    bf->setEvolutionCnt(curCnt);
+    //    if(curCnt > 0)
+    //        appendDefStatus(e_evolution, curCnt, bf);
+    //    else
+    //        appendDefStatus(e_unEvolution, curCnt, bf);
+    //} 
 
     if(ss && bf->getHP() != 0)
     {
@@ -5879,6 +5900,18 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf, const GData::Sk
             break;
         }
 
+        if(SKILL_ID(skill->getId()) == 650)
+        {
+            if(skill->effect->hp > 0 || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
+            {
+                if (doSkillAttack(bf, skill, target_side, target_pos, cnt))
+                {
+                    ++ rcnt;
+                }
+            }
+            break;
+        }
+
         for(int pos = 0; pos < cnt; pos++)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
@@ -6165,6 +6198,8 @@ UInt32 BattleSimulator::doAttack( int pos )
 #endif
                     UInt8 disableLast = bf->getPeerLessDisableLast();
                     skill = bf->getActiveSkill(therapy_bf!= NULL, noPossibleTarget);
+                    if(skill && skill->cond == GData::SKILL_PEERLESS)
+                        doEvolution(bf);
                     if(disableLast > 0 && bf->getPeerLessDisableLast() == 0)
                         appendDefStatus(e_unBenevolent, 0, bf);
                     if(bf->getBuddhaLightLast() == 0xFF)
@@ -6842,6 +6877,23 @@ UInt32 BattleSimulator::doAttack( int pos )
             {
                 int cnt = 0;
                 getSkillTarget(bf, skill, otherside, target_pos, cnt);
+
+                if(SKILL_ID(skill->getId()) == 651)
+                {
+                    std::vector<AttackAct> atkAct;
+                    if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                        ++ rcnt;
+
+                    size_t actCnt = atkAct.size();
+                    for(size_t idx = 0; idx < actCnt; idx++)
+                    {
+                        if(atkAct[idx].bf->getHP() == 0)
+                            continue;
+                        if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                            ++ rcnt;
+                    }
+                }
+
                 GData::SkillStrengthenBase* ss = bf->getSkillStrengthen(SKILL_ID(skill->getId()));
                 if(ss)
                 {
@@ -7086,28 +7138,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         for(UInt8 i = 0; i < 25; i++)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
-                continue;
-            _activeFgt = bo;
-            UInt32 skillId = 0;
-            rcnt += doLingshiModelAttack(bo, 0, skillId);
-            if(skillId > 0)
-            {
-                if(_defList.size() > 0 || _scList.size() > 0)
-                {
-                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
-                    ++ rcnt;
-                }
-            }
-            _activeFgt = NULL;
-        }
-    }
-
-    for(UInt8 side = 0; side < 2; side++)
-    {
-        for(UInt8 i = 0; i < 25; i++)
-        {
-            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
             if(bo == NULL || bo->getHP() == 0)
                 continue;
             if(bo->getTyslSSFactor() < 0.001f)
@@ -7160,6 +7190,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             _activeFgt = NULL;
         }
     }
+
     for(UInt8 side = 0; side < 2; side++)
     {
         for(UInt8 i = 0; i < 25; i++)
@@ -7181,6 +7212,53 @@ UInt32 BattleSimulator::doAttack( int pos )
         {
             appendToPacket(0, -1, -1, 0, 0, false, false);
             ++ rcnt;
+        }
+    }
+
+    UInt8 Evolution = bf->getEvolutionCnt() ;
+    if(bf->getHP() > 0 && _winner == 0 && bf->getEvolutionCnt() >= 2)  //LIBO
+    {
+        const GData::SkillBase* passiveSkill = bf->getSkillEvolution();
+        if(passiveSkill)
+        {
+            _activeFgt = bf;
+            UInt8 curCnt = bf->getEvolutionCnt() - 2;  //LIBO
+            if(curCnt > 0)
+                appendDefStatus(e_evolution, curCnt, bf);
+            else
+                appendDefStatus(e_unEvolution, curCnt, bf);
+            bf->setEvolutionCnt(curCnt);
+            //std::cout << "Evolution: Skill:" << static_cast<UInt32>(curCnt) << std::endl;
+            doSkillAttackByEvolution(bf, passiveSkill);
+            //++ rcnt;
+            //if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
+                ++ rcnt;
+            }
+        }
+    }
+
+    //必须放在doAttack函数的最后面，牵涉到回合数的计算
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0 || !bo->isChar() || bo->isSoulOut())
+                continue;
+            _activeFgt = bo;
+            UInt32 skillId = 0;
+            rcnt += doLingshiModelAttack(bo, 0, skillId);
+            if(skillId > 0)
+            {
+                if(_defList.size() > 0 || _scList.size() > 0)
+                {
+                    appendToPacket(bo->getSide(), bo->getPos(), 0, 2, skillId, false, false);
+                    ++ rcnt;
+                }
+            }
+            _activeFgt = NULL;
         }
     }
 
@@ -7236,6 +7314,15 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
     // attack mode
     _packet << static_cast<UInt8>(atk_type | (cs ? 0x80 : 0) | (pr ? 0x40 : 0)) << add_id;
 
+    if(pr)
+    {
+        BattleFighter* bf = static_cast<BattleFighter*>(getObject(from_side, from_pos));
+        if(bf)
+        {
+            //doEvolution(bf);
+            //std::cout << "name:" << bf->getFighter()->getName() << std::endl;
+        }
+    }
     //攻击成就判断
     if(from_side < 2 && _player[from_side])
     {
@@ -12465,7 +12552,10 @@ void BattleSimulator::appendDefStatus(StateType type, UInt32 value, BattleFighte
     }
 
     if(type == e_damEvade)
+    {
         addSelfSideEvadeCnt(bf);
+        //doEvolution(bf);
+    }
 
     DefStatus defList;
     defList.damType = type;
@@ -15035,7 +15125,7 @@ float BattleSimulator::calcMagAttack(BattleFighter* bf, bool& isCritical, Battle
     return magatk;
 }
 
-float BattleSimulator::calcTherapy(BattleFighter* bf, bool& isCritical, bool& first, const GData::SkillBase* skill)
+float BattleSimulator::calcTherapy(BattleFighter* bf, bool& isCritical, bool& first, const GData::SkillBase* skill , UInt8 flag)
 {
     if(!skill)
         return 0;
@@ -15069,7 +15159,8 @@ float BattleSimulator::calcTherapy(BattleFighter* bf, bool& isCritical, bool& fi
     GData::LBSkillItem* item = bf->getSkillCondItem(SKILL_ID(skill->getId()));
     if(NULL != item)
         return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + item->ef_value + sg_v);
-
+    if(flag)
+        return aura_factor * ( bf->getExtraFairyAtk() * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + sg_v);
     return aura_factor * (getBFMagAtk(bf) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp + sg_v);
 }
 
@@ -15912,6 +16003,7 @@ void BattleSimulator::doControlBall(BattleFighter* bf)
 {
     if(!bf)
         return;
+    //doEvolution(bf);
     for(UInt8 i = 0; i < 25; i++)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(bf->getSide(), i));
@@ -15920,6 +16012,262 @@ void BattleSimulator::doControlBall(BattleFighter* bf)
         if(bo->getSkillControlBall())
             bo->setControlBallCnt(bo->getControlBallCnt() + 1);
     }
+}
+void BattleSimulator::doEvolution(BattleFighter* bf)
+{
+    if(!bf)
+        return;
+
+    if(bf->getSkillEvolution())
+        bf->setEvolutionCnt(bf->getEvolutionCnt() + 1);
+
+    UInt8 curCnt = bf->getEvolutionCnt();
+    if(curCnt > 0)
+        appendDefStatus(e_evolution, curCnt, bf);
+    else
+        appendDefStatus(e_unEvolution, curCnt, bf);
+    //std::cout << "Evolution: " << static_cast<UInt32>(curCnt) << std::endl;
+}
+
+void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::SkillBase *skill)
+{
+    if(!skill)
+        return;
+    if(!skill->effect)
+        return;
+
+    const std::vector<float>& efv = skill->effect->efv;
+    const std::vector<UInt16>& eft = skill->effect->eft;
+    const std::vector<UInt8>& efl = skill->effect->efl;
+
+    //size_t cnt = eft.size();
+    //if(cnt != efl.size() || efv.size() != cnt)
+    //    return;
+    size_t cnt = 1;
+    if(efv.size() != eft.size())
+        return ;
+    appendDefStatus(e_skill, skill->getId(), bf);
+    bool first = true;
+    for(size_t i = 0; i < cnt; ++ i)
+    {
+        AtkList atklist;
+        getAtkList(bf, skill, atklist);
+        UInt8 cnt2 = atklist.size();
+        for(size_t j = 0; j < cnt2; ++ j)
+        {
+            BattleFighter* target = static_cast<BattleFighter *>(atklist[j].bf);
+            UInt8 target_stun = target->getStunRound();
+            bool enterEvade = target->getEvad100();
+            bool defend100 = target->getDefend100();
+
+            if(!defend100 && (target_stun > 0 || (!enterEvade && bf->calcHit(target, NULL))))
+            {
+                float dmg;
+                UInt32 curDmg;
+                bool isPhysic;
+                bool cs2 = false;
+                if(target->hasFlag(BattleFighter::IsMirror))
+                {
+                    curDmg = target->getHP();
+                    dmg = curDmg;
+                    if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                        isPhysic = true;
+                    else
+                        isPhysic = false;
+                }
+                else
+                {
+                    bool pr2 = bf->calcPierce(target);
+                    float cf = 0.0f;
+                    if(cs2)
+                    {
+                        UInt8 s = bf->getSide();
+                        if(s < 2)
+                            _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+                    }
+                    if(first)
+                        first = false;
+
+                    float atk = 0;
+                    float def = 0;
+                    float reduce = 0;
+                    // if(bf->getClass() == GObject::e_cls_dao || bf->getClass() == GObject::e_cls_mo)
+                    // {
+                    //     atk = skill->effect->crrdamP * calcAttack(bf, cs2, target, NULL);
+                    //     def = getBFDefend(target);
+                    //     reduce = getBFAtkReduce(target);
+                    //     isPhysic = true;
+                    // }
+                    // else
+                    // {
+                    //     atk = skill->effect->crrdamP * calcMagAttack(bf, cs2, target, NULL);
+                    //     def = getBFMagDefend(target);
+                    //     reduce = getBFMagAtkReduce(target);
+                    //     isPhysic = false;
+                    // }
+                    {
+                        atk = skill->effect->magdamP * calcEvolutionAttack(bf, cs2, target, NULL) + skill->effect->addmag;
+                        def = getBFEvolutionDefend(target);
+                        //reduce = getBFAtkReduce(target);
+                        isPhysic = true;
+                    }
+                    if(cs2)
+                        doControlBall(bf);
+
+                    float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
+                    float factor = atklist[j].factor;
+                    dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, reduce);
+                    dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                    dmg = dmg > 0 ? dmg : 1;
+
+                    curDmg = dmg;
+                    //    doShieldHPAttack(target, curDmg);
+                }
+                if(curDmg > 0)
+                {
+                    makeDamage(target, curDmg, e_damNormal, isPhysic ? e_damagePhysic : e_damageMagic);
+                }
+                //XXX LIBO
+            }
+            else if(!defend100 && !enterEvade)
+            {
+                appendDefStatus(e_damEvade, 0, target);
+                if(target->getSneakStatus() == e_sneak_on)
+                {
+                    _sneak_atker.push_back(target);
+                    target->nextSneakStatus();
+                }
+            }
+            else
+            {
+                if(!defend100)
+                {
+                    appendDefStatus(e_damEvade, 0, target);
+                    target->setEvad100(false);
+                    if(target->getSneakStatus() == e_sneak_on)
+                    {
+                        _sneak_atker.push_back(target);
+                        target->nextSneakStatus();
+                    }
+                }
+                else
+                {
+                    appendDefStatus(e_damOut, 0, target);
+                    target->setDefend100(false);
+                }
+            }
+        }
+
+        UInt16 skillEffect = 0;
+        if(skill->effect->eft.size() && skill->effect->efv.size())
+        {
+            skillEffect = skill->effect->eft[0];
+        }
+        switch(skillEffect)
+        {
+            case GData::e_eft_evolution2:
+            case GData::e_eft_evolution3:
+                {
+                    bool cs = false;
+                    bool first = true;
+                    //float skillEffectPrb = skill->effect->efv[0];
+                    UInt32 rhp = calcTherapy(bf, cs, first, skill,1);
+                    BattleFighter* bmin = NULL;
+                    if(skillEffect == GData::e_eft_evolution2)
+                        bmin= getMinHpFighter(bf->getSide(),NULL,0);
+                    else
+                        bmin = bf;
+                    UInt32 hpr = bmin->regenHP(rhp);
+                    if(hpr != 0)
+                    {
+                        appendDefStatus(e_damHpAdd, hpr, bmin);
+                        onHPChanged(bmin);
+                    }
+                }
+            case GData::e_eft_evolution1:
+            case GData::e_eft_evolution4:
+                {
+                    BattleFighter * bo = NULL;
+                    UInt8 cnt = 1;
+                    float rnd1 = 0;
+                    float rnd2 = 0;
+                    if(skill->effect->efv.size() != 2)
+                        return ;
+                    rnd1 = skill->effect->efv[0];
+                    rnd2 = skill->effect->efv[1];
+                    if( skillEffect == GData::e_eft_evolution4 )
+                    {
+                        bo = getMinHpFighter(!bf->getSide(),NULL,0);
+                        cnt = 3;
+                        rnd2 = rnd1 + (rnd2-rnd1)*_rnd(100)/100 ;
+                    }
+                    else
+                    {
+                        if(_rnd(100) < rnd1*100)
+                            bo = getRandomFighter(!bf->getSide(),NULL,0);
+                    }
+                    //reduce = getBFAtkReduce(target);
+                    if(!bo)
+                        return ;
+                    bool isPhysic = false;
+                    bool pr2 = bf->calcPierce(bo);
+                    for(UInt8 i = 0; i < cnt ; ++i)
+                    {
+
+                        bool cs2 = false;
+                        float atk = rnd2 * calcEvolutionAttack(bf, cs2, bo, NULL) + skill->effect->addmag;
+                        float def = getBFEvolutionDefend(bo);
+                        if(cs2)
+                            doControlBall(bf);
+
+                        float toughFactor = pr2 ? bo->getTough(bf) : 1.0f;
+                        float factor = 1;
+                        float dmg = _formula->calcDamage(atk * factor, def, bf->getLevel(), toughFactor, 0);
+                        dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
+                        dmg = dmg > 0 ? dmg : 1;
+
+                        UInt32 curDmg = dmg;
+                        //    doShieldHPAttack(target, curDmg);
+                        if(curDmg > 0)
+                        {
+                            makeDamage(bo, curDmg, e_damNormal, isPhysic ? e_damagePhysic : e_damageMagic);
+                        }
+                    }
+                }
+        }
+        return;
+    }
+}
+float BattleSimulator::calcEvolutionAttack(BattleFighter* bf, bool& isCritical, BattleFighter* defender, float* pCf)
+{
+    float rate = bf->getCritical(defender);
+    isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
+
+    float atk = bf->getExtraFairyAtk();
+    float factor = bf->getCriticalDmg() - defender->getCriticalDmgImmune() - defender->getTough(bf);
+    if(factor < 1.25)
+        factor = 1.25;
+
+    if(isCritical)
+    {
+        atk = atk * factor;
+    }
+
+    if(pCf)
+        *pCf = factor;
+    return atk;
+}
+float BattleSimulator::getBFEvolutionDefend(BattleFighter* bf)
+{
+    float def = bf->getExtraFairyDef();
+    /*
+       int side = bf->getSide();
+       BattleFighter* pet = static_cast<BattleFighter*>(getObject(side, _backupTargetPos[side]));
+       if(pet && pet->getHP() != 0 && bf != pet)
+       def *= (1 + pet->getLingYouDef());
+       */
+
+    return def;
 }
 
 } // namespace Battle

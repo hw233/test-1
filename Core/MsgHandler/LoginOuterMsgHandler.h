@@ -1403,6 +1403,7 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
     };
 
     Msg* _msg = (Msg*)msg;
+   //UInt16 serverNo = _msg->serverNo;
     UInt16 serverNo = _msg->serverNo;
     UInt32 var = _msg->var;
     UInt32 value = _msg->value;

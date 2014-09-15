@@ -180,6 +180,7 @@ bool World::_dragonKingAct= false;
 bool World::_saveGoldAct= false;
 bool World::_feastloginAct= false;
 bool World::_feastgiftloginAct= false;
+bool World::_privateAct= false;
 bool World::_newYearGiveGiftAct= false;
 bool World::_newYearQQGameAct= false;
 bool World::_QZoneQQGameAct= false;
@@ -225,6 +226,7 @@ RCSortType World::coolSummerSort;
 RCSortType World::seekingHerNiuLangSort;
 RCSortType World::seekingHerZhiNvSort;
 RCSortType World::seekingHerCharmSort;
+RCSortType World::carnivalConsumeSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -369,7 +371,9 @@ bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
+bool bGratirudeTimeEnd = false;
 bool bWCTimeEnd2 = false;
+bool bCarnivalTimeEnd = false;
 
 bool enum_midnight(void * ptr, void* next)
 {
@@ -455,7 +459,7 @@ bool enum_midnight(void * ptr, void* next)
             TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)
         pl->sendRNR(nextday);
 
-    if (pl->GetVar(VAR_RECHARGE_TOTAL) && (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
+    if ((pl->GetVar(VAR_RECHARGE_TOTAL) || pl->GetVar(VAR_PRIVATE_RECHARGE))&& (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2013, 10, 5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 11)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 12)
@@ -488,6 +492,30 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -502,6 +530,8 @@ bool enum_midnight(void * ptr, void* next)
                 pl->SetVar(VAR_RECHARGE_TOTAL, 0);
             if (pl->GetVar(VAR_RECHARGE_SCORE))
                 pl->SetVar(VAR_RECHARGE_SCORE, 0);
+            if (pl->GetVar(VAR_PRIVATE_RECHARGE))
+                pl->SetVar(VAR_PRIVATE_RECHARGE, 0);
         }
         GObject::RechargeTmpl::instance().clear();
     }
@@ -512,6 +542,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 16)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 23)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
         ))
     {
 #if 0
@@ -1232,6 +1264,44 @@ inline bool player_enum_LeftAddrPower(GObject::Player* pl, int)
     return true;
 }
 
+inline void SetCarnivalConsumeRebate(Player * pl, UInt32 rank, UInt32 total)
+{
+    UInt32 rebate = 0;
+    if(rank == 1)
+        rebate = total * 15 / 100;
+    else if(rank == 2)
+        rebate = total * 12 / 100;
+    else if(rank == 3)
+        rebate = total * 10 / 100;
+    else if(rank == 4)
+        rebate = total * 8 / 100;
+    else if(rank == 5)
+        rebate = total * 5 / 100;
+    else if(rank >= 6 && rank < 10)
+        rebate = 1000;
+    else if(rank >= 11 && rank < 20)
+        rebate = 800;
+    else if(rank >= 21 && rank < 50)
+        rebate = 500;
+    else if(rank >= 51 && rank < 100)
+        rebate = 300;
+
+    pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);
+
+    if(rank >= 1 && rank <= 5)
+        pl->SetVar(VAR_CARNIVAL_CONSUME_REBATE_FLAG, 1);
+}
+
+inline bool player_enum_SetGratitudeInfo(GObject::Player * pl, int)
+{
+    if(pl)
+    {
+        pl->SetVar(VAR_GRATITUDE_GIVING_LEVEL, pl->GetLev());
+        pl->SetVar(VAR_GRATITUDE_GIVING_RECHARGE, pl->getTotalRecharge());
+    }
+    return true;
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -1250,6 +1320,8 @@ void World::World_Midnight_Check( World * world )
     bool bWCtime = getWorldCupTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
+    bool bbCarnivalTime = getCarnivalConsume();
+    bool bGratitudeTime = getGratitudeGiving();
     bool bWCtime2 = getWorldCupTime2();
     bool bGGtime = getGGTime();
     bool bhalfgold = getHalfGold();
@@ -1310,6 +1382,8 @@ void World::World_Midnight_Check( World * world )
     bCoolSummerTimeEnd = bCoolSummerTime && !getCoolSummer(300);
     //众里寻他活动结束
     bSeekingHerTimeEnd = bSeekingHerTime && !getSeekingHer();
+    bCarnivalTimeEnd = bbCarnivalTime && !getCarnivalConsume(300);
+    bGratirudeTimeEnd = bGratitudeTime && !getGratitudeGiving(300);
     UInt8 TYSSType = getTYSSTime();
     UInt8 actType = getTYSSTime(300);
     bTYSSEnd = bTYSSTime && !actType;
@@ -1362,6 +1436,22 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  4)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  5)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  11)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  18)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
 
          )
         bRechargeEnd = true;
@@ -1469,6 +1559,14 @@ void World::World_Midnight_Check( World * world )
     }
     if(bWCTimeEnd2)
         world->SendWorldCupAward2();
+    if(bCarnivalTimeEnd)
+    {
+        world->SendCarnivalConsumeAward();
+    }
+    if(bGratirudeTimeEnd)
+    {
+        GObject::globalPlayers.enumerate(player_enum_SetGratitudeInfo, 0);
+    }
 
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
@@ -1675,7 +1773,8 @@ void World::World_OldMan_Refresh(void *)
             UInt16 loc;
             UInt32 npcId;
         };
-        MapNpc mapNpc = {_oldMan._spot, 4246};
+        //4246 萌萌妹
+        MapNpc mapNpc = {_oldMan._spot, 4245};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1683,7 +1782,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4246;
+        mo.m_ID = 4245;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
@@ -3604,6 +3703,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::seekingHerCharmSort.insert(st);
         }
     }
+    //if(World::getCarnivalConsume())
+    {
+        UInt32 total = p->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
+        if(total)
+        {
+            RCSort s;
+            s.player  = p;
+            s.total = total;
+            World::carnivalConsumeSort.insert(s);
+        }
+    }
 
     return true;
 }
@@ -5082,15 +5192,15 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{1733,1},{9338,25},{9498,30}},
-        {{16001,25},{515,20},{9338,20},{9498,25}},
-        {{16001,20},{515,15},{9338,15},{9498,20}},
-        {{16001,15},{515,10},{9338,10},{9498,15}},
+        {{16001,30},{9600,25},{556,25},{9498,30}},
+        {{16001,25},{9600,20},{556,20},{9498,25}},
+        {{16001,20},{9600,15},{556,15},{9498,20}},
+        {{16001,15},{9600,10},{556,10},{9498,15}},
     };
     static MailPackage::MailItem s_item2[][4] = {
-        {{9995,1}},
-        {{9996,1}},
-        {{9997,1}},
+        {{17805,1}},
+        {{0,0}},
+        {{0,0}},
         {{0,0}},
     };
     SYSMSG(title, 946);
@@ -5279,10 +5389,10 @@ void World::SendCoolSummerAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9498, 40}, {16001, 40}, {9022, 30}, {503, 50}, {9981, 1}},
-        {{9498, 30}, {16001, 30}, {9022, 25}, {503, 40}, {0 ,0}},
-        {{9498, 20}, {16001, 20}, {9022, 20}, {503, 30}, {0, 0}},
-        {{9498, 10}, {16001, 10}, {9022, 10}, {503, 15}, {0, 0}}
+        {{554, 40}, {9600, 40}, {9022, 25}, {9075, 25}, {9999, 1}},
+        {{554, 30}, {9600, 30}, {9022, 18}, {9075, 18}, {0 ,0}},
+        {{554, 20}, {9600, 20}, {9022, 12}, {9075, 12}, {0, 0}},
+        {{554,  8}, {9600,  8}, {9022,  5}, {9075,  5}, {0, 0}}
     };
 
     SYSMSG(title, 5163);
@@ -5482,6 +5592,64 @@ Player * World::getSeekingHerTopRank(UInt8 flag)
             target = i->player;
     }
     return target;
+}
+
+void rankFixedFunction(UInt32 & rank, UInt32 total)
+{
+    static UInt32 totalLvl[] = {30000, 20000, 15000, 10000, 8000, 3000, 2000, 1000};
+    static UInt32 rankLvl[] = {1, 2, 3, 4, 5, 10, 20, 50};
+    for(size_t i = 0; i < 8; i++)
+    {
+        if(rank <= rankLvl[i] && total < totalLvl[i])
+            rank = rankLvl[i] + 1;
+        if(rank <= rankLvl[i] && total >= totalLvl[i])
+            break;
+    }
+}
+
+void World::SendCarnivalConsumeAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][4] = {
+        {{554, 60}, {9600, 60}, {134, 60}, {17802,  1} },
+        {{554, 40}, {9600, 40}, {134, 40}, {17803,  1} },
+        {{554, 30}, {9600, 30}, {134, 30}, {17804,  1} },
+        {{554, 20}, {9600, 20}, {134, 20}, {16001, 20} },
+        {{554, 10}, {9600, 10}, {134, 10}, {16001, 10} },
+        {{554,  7}, {9600,  7}, {134,  7}, {16001,  7} },
+        {{554,  5}, {9600,  5}, {134,  5}, {16001,  5} },
+        {{554,  3}, {9600,  3}, {134,  3}, {0,  0} },
+    };
+
+    SYSMSG(title, 5232);
+    UInt32 pos = 1;
+    UInt32 index = 0;
+    for (RCSortType::iterator i = World::carnivalConsumeSort.begin(), e = World::carnivalConsumeSort.end(); i != e; ++i)
+    {
+        rankFixedFunction(pos, i->total);
+        SetCarnivalConsumeRebate(i->player, pos, i->total);
+        if(pos <= 50)
+        {
+            SYSMSGV(content, 5233, i->total, pos);
+            if(pos >= 1 && pos <= 5)
+                index = pos - 1;
+            else if(pos >= 6 && pos <= 10)
+                index = 5;
+            else if(pos >= 11 && pos <= 20)
+                index = 6;
+            else if(pos >= 21 && pos <= 50)
+                index = 7;
+
+            MailItemsInfo itemsInfo(s_item[index], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+                mailPackageManager.push(mail->id, s_item[index], 4, true);
+        }
+        pos++;
+        if(pos > 100)
+            break;
+    }
+    return;
 }
 
 }

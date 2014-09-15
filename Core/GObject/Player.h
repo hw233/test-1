@@ -307,6 +307,7 @@ namespace GObject
         TAIYI       = 22,   //太乙神雷
         SANGBA       = 23,   //桑巴荣耀
         PUDU        = 24,   //普渡众生
+        QTDS        = 25,   //齐天大圣
 
         DRAGONKING_MAX,
     };
@@ -916,6 +917,12 @@ namespace GObject
         UInt8 beantype;
     };
 
+    struct ShakeMoneyBagLog
+    {
+        UInt32 date;
+        UInt32 count;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -1373,6 +1380,15 @@ namespace GObject
 			}
             return c;
         }
+        inline UInt8 getLineupNum(UInt32 fighterId)
+        { 
+            UInt8 c = 0;
+            for(int i = 0 ; i < 5;++i)
+            {
+                if(_playerData.lineup[i].fighter && _playerData.lineup[i].fighter->getId() == fighterId) 
+                    return c;
+            }
+        } 
 
 		inline void SetSessionID(int session) { _session = session; }
 		inline int GetSessionID() const { return _session; }
@@ -2077,7 +2093,7 @@ namespace GObject
         void SendOtherInfoForPray(Player *other,UInt32 op=0);
         void bePrayed(UInt64 id);
         
-		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
+		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false ,UInt16 fighterId = 0 );
         void PutPets (Battle::BattleSimulator&, int side, bool init = true);
         void PutSpecialPets (Battle::BattleSimulator&, int side, int pos, bool init = true);
 
@@ -3587,6 +3603,7 @@ namespace GObject
         void do_skill_grade(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId);
+        void do_fighter_evolution(Fighter* fgt, UInt32 oldId);
 
     public:
         void makeClanTitleInfo(Stream & st);
@@ -3616,10 +3633,14 @@ namespace GObject
         void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
+        void getShakeMoneyBagLog();
         void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, UInt8 &, bool);
+        void SetShakeMoneyBagLog(UInt32 , UInt32 , bool);
         void getSeekingHerCharmAward();
+        void CarnivalConsumeAct(UInt32);
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
+        std::vector<ShakeMoneyBagLog *> _shakeMoneyBagLog;
 
         inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
         inline void setMyAnnouncement(std::string & an, bool toDB)
@@ -3631,6 +3652,12 @@ namespace GObject
 
         void firstPotOfGold(UInt32);
         void firstPotOfGoldReturn(UInt8);
+
+        void giveCarnivalDailyAward(UInt32);
+        void shakeMoneyBag();
+
+        void getGratitudeAward(UInt8);
+        void gratitudeReturnInfo();
 
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();

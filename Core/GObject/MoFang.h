@@ -70,10 +70,11 @@ namespace GObject
 
     #define NORMAL_TUZHI        100000
     #define SPECIAL_TUZHI       200000
-    #define JGS_MAXEXP          1525500
-    #define JGS_MAXLVL          60
+    #define JGS_MAXEXP          2077250
+    #define JGS_MAXLVL          70
     #define EQUIP_SCHEME_MAX    3
     #define EQUIP_GRID_MAX      49
+    #define KEYIN_LVL_MAX       25
 
     class Player;
 	class Fighter;

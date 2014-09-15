@@ -77,6 +77,7 @@
 #include "GObject/ClanBuilding.h"
 #include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
+#include "GObject/Evolution.h"
 #include "GObject/DarkDargon.h"
 #include "GObject/QuestionPaper.h"
 
@@ -1477,6 +1478,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->firstPotOfGoldReturn(0);
 
     {
+        GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, pl, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+    }
+
+    {
         GameMsgHdr hdr(0x1AF, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
     }
@@ -1781,14 +1787,15 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[20] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65};
-		ItemEquip * e[20] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[23] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65,0x66,0x67,0x68};
+		ItemEquip * e[23] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
             fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump(),
-            fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2)
+            fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2),
+            fgt->getEvolution()->getEquip(0),fgt->getEvolution()->getEquip(1),fgt->getEvolution()->getEquip(2)
         };
-		fgt->sendModification(20, p, e, false);
+		fgt->sendModification(23, p, e, false);
 		return;
 	}
 
@@ -2421,6 +2428,43 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             player->firstPotOfGoldReturn(type);
         }
         break;
+
+        case 0x14:
+        {
+            if(!World::getGratitudeGiving(0, 5 * 24 * 3600))
+                return;
+            UInt8 type = 0;
+            br >> type;
+            if(type)
+            {
+                UInt8 flag = 0;
+                br >> flag;
+                player->getGratitudeAward(flag);
+            }
+            else
+                player->gratitudeReturnInfo();
+        }
+        break;
+
+        case 0x15:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(2 == type)
+                player->shakeMoneyBag();
+            else if(0 == type)
+            {
+                GameMsgHdr hdr(0x189, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(1 == type)
+            {
+                GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, player, 0);
+                GLOBAL().PushMsg(hdr, NULL);
+            }
+            else if(3 == type)
+                player->getShakeMoneyBagLog();
+        }
 
         default:
         break;
@@ -5910,14 +5954,18 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 npcGroupId = 0;
             UInt32 monsterId = 0;
             br >> npcGroupId >> monsterId;
-            petTeamCopyManager->createTeam(player, npcGroupId, monsterId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->createTeam(player, npcGroupId, monsterId, pwd);
         }
         break;
     case 0x07:
         {
             UInt32 teamId = 0;
             br >> teamId;
-            petTeamCopyManager->joinTeam(player, teamId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->joinTeam(player, teamId, pwd);
         }
         break;
     case 0x08:
@@ -10381,6 +10429,114 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                 //GameAction()->RunOperationTaskAction1(player, 1, 2);
                 break;
             }
+        case 3:
+            { 
+                UInt8 index = 0;
+                br >> index;
+                const UInt8 limitLev = 80;
+                switch(index)
+                {
+                    case 1:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < limitLev)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            {
+                                fgt->getEvolution()->SendProcess();
+                            }
+                        } 
+                        break;
+                    case 2:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            UInt8 taskId = 0;
+                            br >> taskId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < limitLev)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            { 
+                                fgt->getEvolution()->SendTaskInfo(taskId);
+                            } 
+                        } 
+                        break;
+                    case 3:
+                        { 
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            UInt8 taskId = 0;
+                            UInt8 flag = 1;
+                            UInt8 pos = 0; 
+                            br >> taskId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < limitLev)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            if(taskId == 9)
+                            {
+                                br >> flag ;
+                                br >> pos;
+                                if(!flag)
+                                    fgt->getEvolution()->RandomTask9Player(pos);
+                            }
+                            if(taskId == 3 || taskId == 7)
+                            {
+                                br >> flag ; 
+                                if(!flag)
+                                    GameAction()->getFeiShengDan(player, taskId==3?1:2 );
+                            }
+                            if(flag && taskId)
+                            { 
+                                fgt->getEvolution()->CompleteTask(taskId-1,pos);
+                            } 
+                            fgt->getEvolution()->SendProcess();
+                            fgt->getEvolution()->SendTaskInfo(taskId);
+                        } 
+                        break;
+                    case 4:
+                        {
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            UInt8 taskId = 0;
+                            br >> taskId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < limitLev)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            UInt8 res = fgt->getEvolution()->GetTaskAward(taskId-1);
+                            if(!res&&(taskId == 3 ||taskId == 7))
+                                GameAction()->getFeiShengAward(player, taskId == 3?1:2 );
+                        }
+                        break;
+                    case 5:
+                        {
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < limitLev)
+                                return ;
+                            if(!fgt->getEvolution())
+                                return ;
+                            UInt8 res = fgt->getEvolution()->FeiSheng();
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x03);
+                            st << static_cast<UInt8>(0x05);
+                            st << static_cast<UInt16>(fighterId);
+                            st << static_cast<UInt8>(res);
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                }
+            }
+            break;
         case 2://黯龙王之怒
             {
                 if (player->getLocation() != 6152)//雪浪峰
@@ -10392,105 +10548,105 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                 switch(opt1)
                 {
                     case 1:
-                    {
-                        UInt8 t_opt= 0;
-                        br >> t_opt;
-                        if(t_opt == 1)
-                            DarkDargon::Instance().EnterDarkDargon(player);
-                        if(t_opt == 2)
-                            DarkDargon::Instance().QuitDarkDargon(player);
-                        break;
-                    }
+                        {
+                            UInt8 t_opt= 0;
+                            br >> t_opt;
+                            if(t_opt == 1)
+                                DarkDargon::Instance().EnterDarkDargon(player);
+                            if(t_opt == 2)
+                                DarkDargon::Instance().QuitDarkDargon(player);
+                            break;
+                        }
                     case 2://四方之塔请求
-                    {
-                        UInt8 t_opt = 0;
-                        UInt8 t_idx = 0;
-                        UInt8 t_pos = 0;
-                        br >> t_opt >> t_idx >> t_pos;
-                        switch(t_opt)
                         {
-                            case 1:
-                                DarkDargon::Instance().ReturnRoundTowerInfo(player,t_idx,t_pos);
-                                break;
-                            case 2:
-                                DarkDargon::Instance().DefRoundTower(player,t_idx,t_pos);
-                                break;
-                            case 4:
-                                DarkDargon::Instance().QuitRoundTower(player);
-                                break;
-                            case 5:
-                                {
-                                    UInt64 playerId = 0;
-                                    br >> playerId;
-                                    DarkDargon::Instance().PKRoundTower(player,t_idx,t_pos,playerId);
+                            UInt8 t_opt = 0;
+                            UInt8 t_idx = 0;
+                            UInt8 t_pos = 0;
+                            br >> t_opt >> t_idx >> t_pos;
+                            switch(t_opt)
+                            {
+                                case 1:
+                                    DarkDargon::Instance().ReturnRoundTowerInfo(player,t_idx,t_pos);
                                     break;
-                                }
-                            default:
-                                break;
-                        }
+                                case 2:
+                                    DarkDargon::Instance().DefRoundTower(player,t_idx,t_pos);
+                                    break;
+                                case 4:
+                                    DarkDargon::Instance().QuitRoundTower(player);
+                                    break;
+                                case 5:
+                                    {
+                                        UInt64 playerId = 0;
+                                        br >> playerId;
+                                        DarkDargon::Instance().PKRoundTower(player,t_idx,t_pos,playerId);
+                                        break;
+                                    }
+                                default:
+                                    break;
+                            }
 
-                        break;
-                    }
+                            break;
+                        }
                     case 3://三星阵请求
-                    {
-                        UInt8 t_opt = 0;
-                        br >> t_opt;                        
-                        switch(t_opt)
                         {
-                            case 1:
-                                DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
-                                break;
-                            case 2:
+                            UInt8 t_opt = 0;
+                            br >> t_opt;                        
+                            switch(t_opt)
                             {
-                                UInt8 t_type = 0;
-                                br >> t_type;
-                                DarkDargon::Instance().SetBufferFlag(player,t_type - 1);
-                                DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
-                                break;
+                                case 1:
+                                    DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
+                                    break;
+                                case 2:
+                                    {
+                                        UInt8 t_type = 0;
+                                        br >> t_type;
+                                        DarkDargon::Instance().SetBufferFlag(player,t_type - 1);
+                                        DarkDargon::Instance().ReturnStarMapInfo(player,t_opt);
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        UInt8 t_idx = 0;
+                                        br >> t_idx;
+                                        DarkDargon::Instance().AttackStarMap(player,t_idx,0);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        UInt8 t_idx = 0;
+                                        br >> t_idx;
+                                        DarkDargon::Instance().AttackStarMap(player,t_idx,1);
+                                        break;
+                                    }
+                                default:
+                                    break;
                             }
-                            case 3:
-                            {
-                                UInt8 t_idx = 0;
-                                br >> t_idx;
-                                DarkDargon::Instance().AttackStarMap(player,t_idx,0);
-                                break;
-                            }
-                            case 4:
-                            {
-                                UInt8 t_idx = 0;
-                                br >> t_idx;
-                                DarkDargon::Instance().AttackStarMap(player,t_idx,1);
-                                break;
-                            }
-                            default:
-                                break;
+                            break;
                         }
-                        break;
-                    }
                     case 4:
-                    {
-                        UInt8 t_opt = 0;
-                        br >> t_opt;
-                        switch(t_opt)
                         {
-                            case 1:
-                                DarkDargon::Instance().OptBoss(player,t_opt);
-                                break;
-                            case 2:
-                                DarkDargon::Instance().OptBoss(player,t_opt);
-                                break;
-                            case 3:
-                                DarkDargon::Instance().OptBoss(player,t_opt);
-                                break;
-                            case 4:
-                                DarkDargon::Instance().AttackBoss(player);
-                                break;
-                            default:
-                                break;
-                        }
+                            UInt8 t_opt = 0;
+                            br >> t_opt;
+                            switch(t_opt)
+                            {
+                                case 1:
+                                    DarkDargon::Instance().OptBoss(player,t_opt);
+                                    break;
+                                case 2:
+                                    DarkDargon::Instance().OptBoss(player,t_opt);
+                                    break;
+                                case 3:
+                                    DarkDargon::Instance().OptBoss(player,t_opt);
+                                    break;
+                                case 4:
+                                    DarkDargon::Instance().AttackBoss(player);
+                                    break;
+                                default:
+                                    break;
+                            }
 
-                        break;
-                    }
+                            break;
+                        }
                     default :
                         break;
                 }
