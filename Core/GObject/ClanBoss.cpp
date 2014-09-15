@@ -964,7 +964,7 @@ bool ClanBoss::attack(Player* pl)
         return false;
 
     _ng = it->second;
-    Battle::BattleSimulator bsim(Battle::BS_CLANBOSSBATTLE, pl, _ng->getName(), _ng->getLevel(), false);
+    Battle::BattleSimulator bsim(Battle::BS_CLANBOSSBATTLE, pl, _ng->getName(), _ng->getLevel(), true);
     pl->PutFighters(bsim, 0);
     _ng->putFighters(bsim);
 

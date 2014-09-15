@@ -267,7 +267,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 }
                 bool ret = m_atkinfo.insert(info).second;
                 TRACE_LOG("WBOSS INSERT ret: %u (pid: %" I64_FMT "u, dmg: %u)", ret, pl->getId(), damage);
-                if(damage > 20000000)
+                if(damage > 2000000)
                     TRACE_LOG("WBOSS reportid: %u (pid: %" I64_FMT "u, dmg: %u)", bsim.getId(), pl->getId(), damage);
 
                 UInt8 newPercent = ((float)newHP / nflist[0].fighter->getMaxHP()) * 100;
