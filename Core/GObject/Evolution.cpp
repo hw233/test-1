@@ -346,29 +346,38 @@ namespace GObject
 
         std::vector<Player * > vec;
         vec.clear();
-        for(UInt8 i = level - 10; i <= level + 3 ; ++i)
+        UInt8 count = 0;
+        while(count <= 6 && vec.size() < 6)
         {
-            GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(i);
-            if(it != GObject::globalLevelsPlayers.end())
+            for(UInt8 i = level - 10 * (count); i <= level+10 - count*10 ; ++i)
             {
-                GObject::LevelPlayers* lvPlayer = it->second;
-                UInt8 size = lvPlayer->size();
-                for(UInt8 j = 0; j < size; j++)
+                if(i > level +3)
+                    break;
+                GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(i);
+                if(it != GObject::globalLevelsPlayers.end())
                 {
-                    if((*lvPlayer)[j])
+                    GObject::LevelPlayers* lvPlayer = it->second;
+                    UInt8 size = lvPlayer->size();
+                    for(UInt8 j = 0; j < size; j++)
                     {
-                        Player *p = globalPlayers[(*lvPlayer)[j]];
-                        if(p && p != getOwner())
-                            vec.push_back(p);
+                        if((*lvPlayer)[j])
+                        {
+                            Player *p = globalPlayers[(*lvPlayer)[j]];
+                            if(p && p != getOwner())
+                                vec.push_back(p);
+                        }
                     }
-                }
-            } 
+                } 
+            }
+            count ++;
         }
         UInt32 size = vec.size();
-        UInt32 rand = uRand(size/3);
+        if(size < 3 )
+            return ;
         for(UInt32 i = 0; i < TASK9_COUNT; ++i)
         {
             //std::cout <<" index: "<< static_cast<UInt32>(i) ;
+            UInt32 rand = uRand(size/3 - 1);
             UInt32 pos = rand + i*(size/3);
             if(pos >= size)
             {
