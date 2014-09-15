@@ -349,9 +349,9 @@ namespace GObject
         UInt8 count = 0;
         while(count <= 6 && vec.size() < 6)
         {
-            for(UInt8 i = level - 10 * (count); i <= level+10 - count*10 ; ++i)
+            for(UInt8 i = level - 10 * (count+1); i <= level - count*10 + (count == 0?3:0) ; ++i)
             {
-                if(i > level +3)
+                if(i > level + 3)
                     break;
                 GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(i);
                 if(it != GObject::globalLevelsPlayers.end())
