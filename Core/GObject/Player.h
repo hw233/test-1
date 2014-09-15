@@ -307,6 +307,7 @@ namespace GObject
         TAIYI       = 22,   //太乙神雷
         SANGBA       = 23,   //桑巴荣耀
         PUDU        = 24,   //普渡众生
+        QTDS        = 25,   //齐天大圣
 
         DRAGONKING_MAX,
     };

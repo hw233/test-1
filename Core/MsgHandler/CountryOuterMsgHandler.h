@@ -5947,14 +5947,18 @@ void OnPetTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 npcGroupId = 0;
             UInt32 monsterId = 0;
             br >> npcGroupId >> monsterId;
-            petTeamCopyManager->createTeam(player, npcGroupId, monsterId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->createTeam(player, npcGroupId, monsterId, pwd);
         }
         break;
     case 0x07:
         {
             UInt32 teamId = 0;
             br >> teamId;
-            petTeamCopyManager->joinTeam(player, teamId);
+            std::string pwd;
+            br >> pwd;
+            petTeamCopyManager->joinTeam(player, teamId, pwd);
         }
         break;
     case 0x08:

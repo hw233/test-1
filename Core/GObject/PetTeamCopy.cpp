@@ -205,6 +205,13 @@ void PetTeamCopy::reqTeamList(Player* pl)
         {
             st << td->members[i]->getId();
         }
+
+        UInt8 isPwd;
+        if(td->pwd.empty())
+            isPwd = 0;
+        else
+            isPwd = 1;
+        st << isPwd;
     }
     st.data<UInt16>(pos) = cnt;
     st << Stream::eos;
@@ -256,6 +263,13 @@ void PetTeamCopy::updateTeamInfo(Player* pl, UInt32 teamId)
     st << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) 
         << static_cast<UInt32>(td->id) << static_cast<UInt8>(td->quality) << static_cast<UInt32>(ng->getId()) 
         << td->leader->getId() << static_cast<UInt32>(pet->getId()) << static_cast<UInt8>(td->count);
+
+    UInt8 isPwd;
+    if(td->pwd.empty())
+        isPwd = 0;
+    else
+        isPwd = 1;
+    st << isPwd;
 
     st << Stream::eos;
     pl->send(st);
@@ -718,7 +732,7 @@ void PetTeamCopy::addMonster(Player* pl, UInt8 copyId, UInt8 type, UInt32 oldNPC
                           pl->getId(), copyId, t, npcGroupId[0], npcGroupId[1], npcGroupId[2]);
 }
 
-UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
+UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId, std::string pwd)
 {
     if(pl == NULL)
         return 0;
@@ -891,6 +905,7 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
     td->members[0] = pl;
     td->formation[0] = pos;
     td->NPCId = NPCId;
+    td->pwd = pwd;
     if(markA)
         td->useMoney = true;
 
@@ -909,7 +924,7 @@ UInt32 PetTeamCopy::createTeam(Player* pl, UInt32 NPCId, UInt32 monsterId)
     return td->id;
 }
 
-UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
+UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 {
     if(pl->hasFlag(GObject::Player::InCopyTeam))
         return 0;
@@ -961,6 +976,12 @@ UInt32 PetTeamCopy::joinTeam(Player* pl, UInt32 teamId)
     if(td->start)
     {
 		pl->sendMsgCode(1, 8001);
+        return 0;
+    }
+
+    if(td->pwd != pwd)
+    {
+        pl->sendMsgCode(1, 2104);
         return 0;
     }
 
@@ -1382,6 +1403,14 @@ void PetTeamCopy::inviteFriend(Player* pl, UInt64 friendId)
     Stream st(REP::PET_TEAM_COPY);
     st << static_cast<UInt8>(0x16);
     st << pl->getId() << pl->getCountry() << pl->getName().c_str() << static_cast<UInt8>(td->index) << static_cast<UInt8>(td->type) << static_cast<UInt32>(td->id) << static_cast<UInt32>(td->NPCId); 
+
+    UInt8 isPwd;
+    if(td->pwd.empty())
+        isPwd = 0;
+    else
+        isPwd = 1;
+    st << isPwd;
+
     st << Stream::eos;
     member->send(st);
 
