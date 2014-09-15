@@ -5441,7 +5441,6 @@ namespace GObject
                         if(dbe.attrType1 > 0)
                         {
                             float maxV1 = GObjectManager::getAttrTrumpMax(lv, dbe.attrType1 - 1, q, crr) * 100;
-                            std::cout <<"max1:"<< maxV1 <<endl;
                             if(ea2.value1 > maxV1)
                             {
                                 ea2.value1 = maxV1;
@@ -5451,7 +5450,6 @@ namespace GObject
                         if(dbe.attrType2 > 0)
                         {
                             float maxV2 = GObjectManager::getAttrTrumpMax(lv, dbe.attrType2 - 1, q, crr) * 100;
-                            std::cout <<"max2:"<< maxV2 <<endl;
                             if(ea2.value2 > maxV2)
                             {
                                 ea2.value2 = maxV2;
@@ -5461,7 +5459,6 @@ namespace GObject
                         if(dbe.attrType3 > 0)
                         {
                             float maxV3 = GObjectManager::getAttrTrumpMax(lv, dbe.attrType3 - 1, q, crr) * 100;
-                            std::cout <<"max3:"<< maxV3 <<endl;
                             if(ea2.value3 > maxV3)
                             {
                                 ea2.value3 = maxV3;
