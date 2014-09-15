@@ -364,7 +364,11 @@ namespace GObject
                         {
                             Player *p = globalPlayers[(*lvPlayer)[j]];
                             if(p && p != getOwner())
+                            {
                                 vec.push_back(p);
+                                //std::cout << "index: "<< static_cast<UInt32>(i);
+                               // std::cout << " level: "<< static_cast<UInt32>(p->GetLev()) << std::endl;
+                            }
                         }
                     }
                 } 
@@ -377,7 +381,7 @@ namespace GObject
         for(UInt32 i = 0; i < TASK9_COUNT; ++i)
         {
             //std::cout <<" index: "<< static_cast<UInt32>(i) ;
-            UInt32 rand = uRand(size/3 - 1);
+            UInt32 rand = uRand(size/3);
             UInt32 pos = rand + i*(size/3);
             if(pos >= size)
             {
