@@ -78,6 +78,7 @@
 #include "GObject/RaceBattle.h"
 #include "GObject/CollectCard.h"
 #include "GObject/DarkDargon.h"
+#include "GObject/QuestionPaper.h"
 
 struct NullReq
 {
@@ -10549,6 +10550,14 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                         }
                 } 
             }
+            break;
+        case 5:
+        {
+            if(player->getMainFighter()->getLevel() < 50)
+                return;
+            GameMsgHdr hdr(0x411, WORKER_THREAD_NEUTRAL, player, sizeof(data));
+            GLOBAL().PushMsg(hdr, (void*)data);
+        }
             break;
     }
 }

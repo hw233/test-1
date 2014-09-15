@@ -1736,6 +1736,15 @@ struct DBKettle
     std::string history;
     std::string occupy;
 };
+struct DBQuestionPaper 
+{
+    UInt64 playerId;
+    UInt32  begtime;
+    UInt8  cur_idx;
+    std::string answer;
+    std::string award;
+    UInt32  totaltime;
+};
 
 }
 
@@ -3929,6 +3938,18 @@ SPECIALDEF(4)
 	UInt64, playerId,
 	UInt8,  type,
 	UInt32, fall
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBQuestionPaper)
+SPECIALDEF(6)
+(
+	UInt64, playerId,
+	UInt32, begtime,
+	UInt8, cur_idx,
+    std::string, answer,
+    std::string, award,
+	UInt32, totaltime 
 )
 SPECIALEND()
 }
