@@ -916,6 +916,12 @@ namespace GObject
         UInt8 beantype;
     };
 
+    struct ShakeMoneyBagLog
+    {
+        UInt32 date;
+        UInt32 count;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -3616,10 +3622,15 @@ namespace GObject
         void seekingHer_SendBeans(UInt64 , UInt8 , UInt32 , std::string );
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
+        void getShakeMoneyBagLog();
+        void sendShakeMoneyBagInfo();
         void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, UInt8 &, bool);
+        void SetShakeMoneyBagLog(UInt32 , UInt32 , bool);
         void getSeekingHerCharmAward();
+        void CarnivalConsumeAct(UInt32);
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
+        std::vector<ShakeMoneyBagLog *> _shakeMoneyBagLog;
 
         inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
         inline void setMyAnnouncement(std::string & an, bool toDB)
