@@ -35526,7 +35526,7 @@ void Player::getGratitudeAward(UInt8 flag)
         else
         {
             UInt32 total = (getTotalRecharge() > 100000 ? 100000 : getTotalRecharge());
-            AddPExp(total * 10);
+            AddPExp(total * 50);
         }
     }
     else
@@ -35543,7 +35543,7 @@ void Player::getGratitudeAward(UInt8 flag)
         else
         {
              UInt32 total = (GetVar(VAR_GRATITUDE_GIVING_RECHARGE) > 100000 ? 100000 : GetVar(VAR_GRATITUDE_GIVING_RECHARGE));
-             AddPExp(total * 10);
+             AddPExp(total * 50);
         }
     }
     status = SET_BIT(status, (flag - 1));
