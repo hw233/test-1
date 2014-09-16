@@ -7231,11 +7231,12 @@ UInt32 BattleSimulator::doAttack( int pos )
             //std::cout << "Evolution: Skill:" << static_cast<UInt32>(curCnt) << std::endl;
             doSkillAttackByEvolution(bf, passiveSkill);
             //++ rcnt;
-            //if(_defList.size() > 0 || _scList.size() > 0)
+            if(_defList.size() > 0 || _scList.size() > 0)
             {
                 appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
                 ++ rcnt;
             }
+            _activeFgt = NULL;
         }
     }
 
@@ -16108,6 +16109,7 @@ void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::S
                     {
                         atk = skill->effect->magdamP * calcEvolutionAttack(bf, cs2, target, NULL) + skill->effect->addmag;
                         def = getBFEvolutionDefend(target);
+                        std::cout <<" damP:" <<skill->effect->magdamP << std::endl;
                         //reduce = getBFAtkReduce(target);
                         isPhysic = true;
                     }

@@ -5398,7 +5398,7 @@ namespace GObject
 					ea2.type3 = dbe.attrType3;
 					ea2.value3 = dbe.attrValue3;
 
-                    if(itype->subClass == Item_Weapon || itype->subClass == Item_Armor1 || itype->subClass == Item_Armor2 || itype->subClass == Item_Armor3 || itype->subClass == Item_Armor4 || itype->subClass == Item_Armor5 || itype->subClass == Item_Ring || itype->subClass == Item_Amulet)
+                    if(itype->subClass == Item_Weapon || itype->subClass == Item_Armor1 || itype->subClass == Item_Armor2 || itype->subClass == Item_Armor3 || itype->subClass == Item_Armor4 || itype->subClass == Item_Armor5 || itype->subClass == Item_Ring || itype->subClass == Item_Amulet || itype->subClass == Item_Evolution1 || itype->subClass == Item_Evolution2)
                     {
                         UInt8 lv = equip->getValueLev();
                         UInt8 q = equip->getQuality() - 3;
@@ -5433,6 +5433,38 @@ namespace GObject
                             }
                         }
                     }
+                    else if(itype->subClass == Item_Evolution3)
+                    { 
+                        UInt8 lv = equip->getItemEquipData().tRank;
+                        UInt8 q = equip->getQuality() - 3;
+                        UInt8 crr = equip->GetCareer();
+                        if(dbe.attrType1 > 0)
+                        {
+                            float maxV1 = GObjectManager::getAttrTrumpMax(lv, dbe.attrType1 - 1, q, crr) * 100;
+                            if(ea2.value1 > maxV1)
+                            {
+                                ea2.value1 = maxV1;
+                            }
+                        }
+
+                        if(dbe.attrType2 > 0)
+                        {
+                            float maxV2 = GObjectManager::getAttrTrumpMax(lv, dbe.attrType2 - 1, q, crr) * 100;
+                            if(ea2.value2 > maxV2)
+                            {
+                                ea2.value2 = maxV2;
+                            }
+                        }
+
+                        if(dbe.attrType3 > 0)
+                        {
+                            float maxV3 = GObjectManager::getAttrTrumpMax(lv, dbe.attrType3 - 1, q, crr) * 100;
+                            if(ea2.value3 > maxV3)
+                            {
+                                ea2.value3 = maxV3;
+                            }
+                        }
+                    } 
 
 					equip->SetBindStatus(dbe.bindType > 0);
 					equips[dbe.id] = equip;

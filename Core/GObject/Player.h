@@ -1385,8 +1385,9 @@ namespace GObject
             for(int i = 0 ; i < 5;++i)
             {
                 if(_playerData.lineup[i].fighter && _playerData.lineup[i].fighter->getId() == fighterId) 
-                    return c;
+                    return c+1;
             }
+            return c;
         } 
 
 		inline void SetSessionID(int session) { _session = session; }
@@ -3661,6 +3662,11 @@ namespace GObject
 
         void getGratitudeAward(UInt8);
         void gratitudeReturnInfo();
+
+        void GetFlyRoadGift(UInt8);
+        void SendFlyRoadGiftInfo();
+        void GetMemoirAward(UInt8);
+        void sendMemoirAwardInfo();
 
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();

@@ -694,7 +694,12 @@ public:
 	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
 	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
 	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
-	inline float getBattlePoint() { checkBPDirty(); return _battlePoint + _skillBP; }
+	inline float getBattlePoint() { 
+        checkBPDirty();
+        //std::cout << "id:" <<static_cast<UInt32>(getId());
+        //std::cout << " battlePoint:" << _battlePoint << " skillPoint:" << _skillBP << std::endl;
+        return _battlePoint + _skillBP; 
+    }
 
 	inline float getBattlePoint_Dirty() { return _battlePoint + _skillBP; }
 

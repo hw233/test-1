@@ -143,8 +143,6 @@ Fighter::~Fighter()
     }
     if(m_2ndSoul)
         SAFE_DELETE(m_2ndSoul);
-    if(!_evl)
-        SAFE_DELETE(_evl);
 }
 
 const std::string& Fighter::getName()
@@ -1793,11 +1791,11 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
             //ae.fairyDef += GData::spiritAttrTable[lev0-1].attack;
         }
         if(lev1 > 0)
-            ae.hp += GData::spiritAttrTable[lev1-1].hp;
+            ae.pirlvl += GData::spiritAttrTable[lev1-1].pierce_lvl;
         if(lev2 > 0)
             ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
         if(lev3 > 0)
-            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/100.f);
+            ae.action += GData::spiritAttrTable[lev3-1].action;
         break;
     case Item_Evolution2:
         if(lev0 > 0)

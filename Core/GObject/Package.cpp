@@ -394,13 +394,27 @@ namespace GObject
                         {
                             if(aidx < GObjectManager::getAttrChance(q, k))
                             {
+                               // std::cout <<" index:" << static_cast<UInt32>(i)<<std::endl;
+                               // std::cout <<" j:" << static_cast<UInt32>(j) << std::endl;
                                 UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
+                               // std::cout <<" q:"<<static_cast<UInt32>(q) << " k:" << static_cast<UInt32>(k) << std::endl;
+                               // std::cout <<" 最低:"<<static_cast<UInt32>(GObjectManager::getAttrDics(q, k)) << " 最高:" << static_cast<UInt32>(GObjectManager::getAttrDics(q, k+1)) << std::endl;
                                 UInt32 tmp = uRand(100) + 1;
+                              //  std::cout << " tmp:" << tmp;
                                 UInt32 factor = GObjectManager::getAttrDics(q, k) + static_cast<float>(dics * tmp) / 100;
+                              //  std ::cout <<" factor:" << static_cast<UInt32>(factor);
+                              //  std::cout <<" crr:" << static_cast<UInt32>(crr) <<std::endl;
                                 if(equip_t == EQUIPTYPE_EQUIP)
+                                {
+                             //       std::cout <<" MaxAttr:"<<static_cast<UInt32>(GObjectManager::getAttrMax(lv, t[i]-1, q, crr)) << std::endl;
                                     v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
+                                }
                                 else if(equip_t == EQUIPTYPE_TRUMP)
+                                {
+                               //     std::cout <<" MaxAttr:"<<static_cast<UInt32>(GObjectManager::getAttrTrumpMax(lv, t[i]-1, q, crr)) << std::endl;
                                     v[i] = GObjectManager::getAttrTrumpMax(lv, t[i]-1, q, crr)*factor;
+                                }
+                                //std::cout << static_cast<UInt32>(v[i]) << std::endl;
                                 break;
                             }
                         }
@@ -3045,7 +3059,7 @@ namespace GObject
         if(!hf)
             return 2;
         HoneyFallType hft;
-        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump ||equip->getClass() == Item_Evolution3)
             hft = e_HFT_Trump_Enchant;
         else
             hft = e_HFT_Equip_Enchant;
@@ -3100,7 +3114,7 @@ namespace GObject
                 ++ ied.enchant;
                 if(ied.enchant>=8)
                     equip->DoEquipBind(true);
-                if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+                if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump || equip->getClass() == Item_Evolution3)
                     && ied.enchant == 1)
             {
                     ((ItemTrump*)equip)->fixSkills();
@@ -3139,7 +3153,7 @@ namespace GObject
                         updateHft = true;
                         hf->setHftValue(hft, 0);
                     }
-                    if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+                    if ((equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump || equip->getClass() == Item_Evolution3)
                         && ied.enchant == 1)
                     {
                         ((ItemTrump*)equip)->fixSkills();
@@ -3178,7 +3192,7 @@ namespace GObject
         if(updateHft)
             hf->updateHftValueToDB(hft);
         bless = hf->getHftValue(hft);
-        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump ||equip->getClass() == Item_Evolution3)
         {
             GameAction()->doStrong(this->m_Owner, SthTrumpEnchant, 0, 0);
             m_Owner->GuangGunCompleteTask(0,2);
@@ -3207,7 +3221,7 @@ namespace GObject
 				equip->DoEquipBind();
 			}
 
-            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump || equip->getClass() == Item_Evolution3)
             {
                 GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
                 if(ied.enchant != 1)
@@ -3362,7 +3376,7 @@ namespace GObject
 			DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%" I64_FMT "u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
 
-            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump ||equip->getClass() == Item_Evolution3)
             {
                 GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
                 ((ItemTrump*)equip)->enchant(ied.enchant, attr);
@@ -3394,7 +3408,7 @@ namespace GObject
     {
         static const int logId[] = {1120, 1121,1122,1123,1124,1125};
         char udpStr[64] = {0};
-        if (equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump) //法宝
+        if (equip->getClass() == Item_Trump || equip->getClass() == Item_Halo || equip->getClass() == Item_InnateTrump || equip->getClass() == Item_Evolution3) //法宝
         {
             const GData::ItemBaseType& itemType =  equip-> GetItemType();
             sprintf(udpStr, "F_1126_%d_%d", itemType.getId(), level);
@@ -4840,7 +4854,9 @@ namespace GObject
             if(equip->GetItemType().subClass == Item_Trump ||
                     equip->GetItemType().subClass == Item_Fashion ||
                     equip->GetItemType().subClass == Item_Halo ||
-                    equip->GetItemType().subClass == Item_InnateTrump)
+                    equip->GetItemType().subClass == Item_InnateTrump ||
+                    equip->GetItemType().subClass == Item_Evolution3 
+                    )
             {
                 equip_t = EQUIPTYPE_TRUMP;
                 lv = ied.tRank;

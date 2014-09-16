@@ -3131,6 +3131,13 @@ void OnPaperQuestion(GameMsgHdr & hdr ,const void *data)
     }
 }
 
+void OnFlyRoadAward(GameMsgHdr & hdr , const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 IsDouble = *reinterpret_cast<const UInt8 *>(data);
+    player->GetFlyRoadGift(IsDouble);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 
