@@ -973,6 +973,8 @@ namespace GObject
         xxlMapInfo[0]="";
         xxlMapInfo[1]="";
         xxlMapInfo[2]="";
+        SetVar(VAR_PACKAGE_SIZE_GEM, 200);
+        SetVar(VAR_PACKAGE_SIZE_FORMULA, 200);
     }
 
 
@@ -4537,15 +4539,9 @@ namespace GObject
             updateDB(32, _playerData.packSize);
         }
         else if(type == 3)
-        {
-            _playerData.packSizeGem += EACH_EXTEND_NUM;
-            updateDB(34, _playerData.packSizeGem);
-        }
+            AddVar(VAR_PACKAGE_SIZE_GEM, EACH_EXTEND_NUM);
         else if(type == 4)
-        {
-            _playerData.packSizeFormula += EACH_EXTEND_NUM;
-            updateDB(35, _playerData.packSizeFormula);
-        }
+            AddVar(VAR_PACKAGE_SIZE_FORMULA, EACH_EXTEND_NUM);
         else
         {
             _playerData.packSizeSoul += EACH_EXTEND_NUM;
@@ -5314,8 +5310,6 @@ namespace GObject
         case 0x0B:field = "attainment"; break;
 		case 0x20: field = "packSize"; break;
 		case 0x21: field = "packSizeSoul"; break;
-		case 0x22: field = "packSizeGem"; break;
-		case 0x23: field = "packSizeFormula"; break;
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %" I64_FMT "u", field, v, _id);
