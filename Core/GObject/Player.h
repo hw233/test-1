@@ -1759,7 +1759,7 @@ namespace GObject
         UInt8 getPIcCount();
         void checkPIcCount();
 
-		inline UInt16 getPacksize(UInt8 type = 0)
+		UInt16 getPacksize(UInt8 type = 0)
         {
             if(type == 0)
                 return _playerData.packSize;
@@ -1768,10 +1768,27 @@ namespace GObject
             else if(type == 2)
                 return _playerData.packSizeLS;
             else if(type == 3)
-                return GetVar(VAR_PACKAGE_SIZE_GEM);
+            {
+                UInt16 size = GetVar(VAR_PACKAGE_SIZE_GEM);
+                if(size == 0)
+                {
+                    size = 200;
+                    SetVar(VAR_PACKAGE_SIZE_GEM, size);
+                }
+                return size;
+            }
             else if(type == 4)
-                return GetVar(VAR_PACKAGE_SIZE_FORMULA);
-            return 0;
+            {
+                UInt16 size = GetVar(VAR_PACKAGE_SIZE_FORMULA);
+                if(size == 0)
+                {
+                    size = 200;
+                    SetVar(VAR_PACKAGE_SIZE_FORMULA, size);
+                }
+                return size;
+            }
+            else
+                return 0;
         }
 
         void setLineupDirty(bool = true);
