@@ -3527,7 +3527,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << getPacksize(3) << getPacksize(4) << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
