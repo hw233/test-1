@@ -1277,13 +1277,13 @@ inline void SetCarnivalConsumeRebate(Player * pl, UInt32 rank, UInt32 total)
         rebate = total * 8 / 100;
     else if(rank == 5)
         rebate = total * 5 / 100;
-    else if(rank >= 6 && rank < 10)
+    else if(rank >= 6 && rank <= 10)
         rebate = 1000;
-    else if(rank >= 11 && rank < 20)
+    else if(rank >= 11 && rank <= 20)
         rebate = 800;
-    else if(rank >= 21 && rank < 50)
+    else if(rank >= 21 && rank <= 50)
         rebate = 500;
-    else if(rank >= 51 && rank < 100)
+    else if(rank >= 51 && rank <= 100)
         rebate = 300;
 
     pl->SetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE, rebate);

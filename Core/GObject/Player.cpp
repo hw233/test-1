@@ -35768,16 +35768,19 @@ void Player::GetFlyRoadGift(UInt8 IsDouble)
 
     if(IsDouble)
     {
-        ConsumeInfo ci(FLYROADGETAWARD,0,0);
         if (getGold() < 20)
         {
             sendMsgCode(0, 1104);
             return;
         }
-        useGold(20, &ci);
     }
     if(!GameAction()->getFlyRoadAward(this, currentPos + 1, IsDouble))
         return;
+    if(IsDouble)
+    {
+        ConsumeInfo ci(FLYROADGETAWARD,0,0);
+        useGold(20, &ci);
+    }
 
     SetVar(VAR_FLY_ROAD_GIFT_TODAY_STATUS, 1);
     AddVar(VAR_FLY_ROAD_GIFT_GOT_NUM, 1);
