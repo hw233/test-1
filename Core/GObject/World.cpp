@@ -1721,7 +1721,7 @@ void World::World_OldMan_Refresh(void *)
 {
     if(!getOldManTime())
         return ;
-    UInt32 oldManId = 4245;
+    const UInt32 oldManId = 4245;
     UInt32 now = TimeUtil::Now();
     UInt32 time = now - TimeUtil::SharpDay(0, now);
     if(_oldMan._time < 8*3600  ) 
@@ -1757,6 +1757,7 @@ void World::World_OldMan_Refresh(void *)
     else if( time > _oldMan._time )
     {
         UInt16 spot = GetRandomSpot();
+        spot = 2056;
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
