@@ -2287,7 +2287,7 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.criticaldmgimmune += getAcupointsGoldAttr(1);
     }
     { 
-        for(UInt8 i = 0 ; i < 3 ; ++i)
+        for(UInt8 i = 0 ; i < 2 ; ++i)
         { 
             equip = getEvolution()->getEquip(i);
             if(equip)
@@ -2334,8 +2334,28 @@ void Fighter::rebuildEquipAttr()
                    */
             }
         } 
+        ItemTrump* trump = static_cast<ItemTrump*>(getEvolution()->getEquip(2));
+        if(trump)
+        { 
+            addTrumpAttr(trump);
+        } 
     } 
-
+    if(_owner)
+    { 
+        const GData::Formation * formation = GData::formationManager[_owner->getFormation()];
+        UInt8 idx = _owner->getFighterPos(getId());
+        if(formation)
+        { 
+            int c = formation->getGridCount();
+            for(int i = 0; i < c; ++ i)
+            {
+                if(idx == (*formation)[i].pos)                                                                             
+                {
+                    addAttrExtra(_attrExtraEquip, (*formation)[i].attrExtra);
+                }
+            }
+        } 
+    } 
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
@@ -2739,7 +2759,10 @@ void Fighter::rebuildSkillBattlePoint()
         {
             if(_passkl[i][j])
             {
-                _skillBP += calcSkillBattlePoint(_passkl[i][j], 3);
+                if( (i + 1) == (GData::SKILL_PASSIVES-GData::SKILL_PASSSTART))
+                    _skillBP += calcSkillBattlePoint(_passkl[i][j], 4);
+                else
+                    _skillBP += calcSkillBattlePoint(_passkl[i][j], 3);
             }
         }
     }

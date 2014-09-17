@@ -453,6 +453,7 @@ public:
     inline std::vector<UInt16>& getPassiveSkillOnAttackBlind() { return _rpasskl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillOnAttackBlind100() { return _passkl[GData::SKILL_ONATKBLIND-GData::SKILL_PASSSTART]; }
     inline std::vector<UInt16>& getPassiveSkillCondition100() { return _passkl[GData::SKILL_CONDITION-GData::SKILL_PASSSTART]; }
+    inline std::vector<UInt16>& getPassiveSkillEvolution100() { return _passkl[GData::SKILL_EVOLUTION-GData::SKILL_PASSSTART]; }
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -627,6 +628,8 @@ public:
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
+	inline void set(bool d = true) { _attrDirty = d; _bPDirty = d; }
+	inline void setSkillBPDirty(bool d = true) { _skillBPDirty= d;}
     bool hasTrumpType(UInt32 trumpid);
     bool canSetTrump(UInt8 idx, UInt32 trumpid);
 

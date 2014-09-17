@@ -62,7 +62,7 @@ enum    // 技能触发方式
     /*36*/ SKILL_ONATKCONFUSEFORGET,// 攻击带混乱沉默的主目标后
     /*37*/ SKILL_ONATKBLIND,        // 攻击带致盲的主目标后
     /*38*/ SKILL_CONDITION,        // 达到条件100%触发
-    ///*39*/ SKILL_EVOLUTION,        // 达到仙气达到
+    /*39*/ SKILL_EVOLUTION,        // 达到仙气达到
     SKILL_PASSIVES
 };
 
