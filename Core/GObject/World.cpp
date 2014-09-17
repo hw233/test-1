@@ -3674,7 +3674,7 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::seekingHerCharmSort.insert(st);
         }
     }
-    if(World::getCarnivalConsume())
+    //if(World::getCarnivalConsume())
     {
         UInt32 total = p->GetVar(VAR_CARNIVAL_CONSUME_TOTAL);
         if(total)
