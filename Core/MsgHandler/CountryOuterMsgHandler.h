@@ -3869,7 +3869,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     ItemClass cur = GetItemSubClass(items[i]);
                     if(cur == Item_Soul)
                         ++c1;
-                    else if(cur == Item_Gem)
+                    else if(cur == Item_Gem || cur == Item_EvolutionGem)
                         ++c3;
                     else if(cur == Item_Formula)
                         ++c4;

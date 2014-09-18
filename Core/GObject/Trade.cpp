@@ -804,7 +804,7 @@ bool Trade::appendTradeItems(ItemBase** items, UInt16 itemNum)
             UInt16 size = package->GetItemUsedGrids(items[i]->getId(), items[i]->Count());
             if(GetItemSubClass(items[i]->getId()) == Item_Soul)
                 grids1 += size;
-            else if(GetItemSubClass(items[i]->getId()) == Item_Gem)
+            else if(GetItemSubClass(items[i]->getId()) == Item_Gem || GetItemSubClass(items[i]->getId()) == Item_EvolutionGem)
                 grids3 += size;
             else if(GetItemSubClass(items[i]->getId()) == Item_Formula)
                 grids4 += size;

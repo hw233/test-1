@@ -424,7 +424,7 @@ bool Sale::addSaleMailItems(UInt32 id)
     UInt8 type;
     if(GetItemSubClass(item->getId()) == Item_Soul)
         type = 1;
-    else if(GetItemSubClass(item->getId()) == Item_Gem)
+    else if(GetItemSubClass(item->getId()) == Item_Gem || GetItemSubClass(item->getId()) == Item_EvolutionGem)
         type = 3;
     else if(GetItemSubClass(item->getId()) == Item_Formula)
         type = 4;

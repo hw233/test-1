@@ -776,7 +776,7 @@ namespace GObject
 			{
                 if(GetItemSubClass(typeId) == Item_Soul)
 				    m_ItemsSoul[ItemKey(typeId, bind)] = item;
-                else if(GetItemSubClass(typeId) == Item_Gem)
+                else if(GetItemSubClass(typeId) == Item_Gem || GetItemSubClass(typeId) == Item_EvolutionGem)
 				    m_ItemsGem[ItemKey(typeId, bind)] = item;
                 else if(GetItemSubClass(typeId) == Item_Formula)
 				    m_ItemsFormula[ItemKey(typeId, bind)] = item;
@@ -955,7 +955,7 @@ namespace GObject
                 m_ItemsSoul[ItemKey(typeId, bind)] = item;
                 ++ m_SizeSoul;
             }
-            else if(GetItemSubClass(typeId) == Item_Gem)
+            else if(GetItemSubClass(typeId) == Item_Gem || GetItemSubClass(typeId) == Item_EvolutionGem)
             {
                 if(item->Size() + m_SizeGem > m_Owner->getPacksize(3))
                     return item;
@@ -1065,7 +1065,7 @@ namespace GObject
             m_SizeSoul = m_SizeSoul + newq - oldq;
             m_ItemsSoul[ItemKey(id, bind)] = item;
         }
-        else if(GetItemSubClass(id) == Item_Gem)
+        else if(GetItemSubClass(id) == Item_Gem || GetItemSubClass(id) == Item_EvolutionGem)
         {
             m_SizeGem = m_SizeGem + newq - oldq;
             m_ItemsGem[ItemKey(id, bind)] = item;
@@ -1611,7 +1611,7 @@ namespace GObject
 				SAFE_DELETE(item);
                 if(GetItemSubClass(id) == Item_Soul)
 				    m_ItemsSoul.erase(ItemKey(id, bind));
-                else if(GetItemSubClass(id) == Item_Gem)
+                else if(GetItemSubClass(id) == Item_Gem || GetItemSubClass(id) == Item_EvolutionGem)
 				    m_ItemsGem.erase(ItemKey(id, bind));
                 else if(GetItemSubClass(id) == Item_Formula)
 				    m_ItemsFormula.erase(ItemKey(id, bind));
@@ -1683,7 +1683,7 @@ namespace GObject
 				SAFE_DELETE(item);
                 if(GetItemSubClass(id) == Item_Soul)
 				    m_ItemsSoul.erase(ItemKey(id, bind));
-                else if(GetItemSubClass(id) == Item_Gem)
+                else if(GetItemSubClass(id) == Item_Gem || GetItemSubClass(id) == Item_EvolutionGem)
 				    m_ItemsGem.erase(ItemKey(id, bind));
                 else if(GetItemSubClass(id) == Item_Formula)
 				    m_ItemsFormula.erase(ItemKey(id, bind));
@@ -2119,6 +2119,7 @@ namespace GObject
                     GetItemSubClass(id) == Item_Soul ||
                     GetItemSubClass(id) == Item_SL
                  || GetItemSubClass(id) == Item_Gem
+                 || GetItemSubClass(id) == Item_EvolutionGem
                  || GetItemSubClass(id) == Item_Formula
                  )
             {
@@ -2128,6 +2129,7 @@ namespace GObject
                             item->getClass() == Item_SL1 ||
                             item->getClass() == Item_SL2
                          || (item->getClass() >= Item_Gem1 && item->getClass() <= Item_Gem19)
+                         || (item->getClass() >= Item_EvolutionGem1 && item->getClass() <= Item_EvolutionGem19)
                          || (item->getClass() >= Item_Formula1 && item->getClass() <= Item_Formula9)
                         ))
                 {
@@ -2157,6 +2159,7 @@ namespace GObject
                 GetItemSubClass(id) != Item_Citta &&
                 GetItemSubClass(id) != Item_Soul
              && GetItemSubClass(id) != Item_Gem
+             && GetItemSubClass(id) != Item_EvolutionGem
              && GetItemSubClass(id) != Item_Formula
                 ))
         {
@@ -2476,11 +2479,11 @@ namespace GObject
             UInt16 grids = item->Size(item->Count() + Mnum) - item->Size() + 1;
             if(GetItemSubClass(itemId) == Item_Soul && grids > GetRestPackageSize(1))
                 return 2;
-            if(GetItemSubClass(itemId) == Item_Gem && grids > GetRestPackageSize(3))
+            if((GetItemSubClass(itemId) == Item_Gem || GetItemSubClass(itemId) == Item_EvolutionGem) && grids > GetRestPackageSize(3))
                 return 2;
             if(GetItemSubClass(itemId) == Item_Formula && grids > GetRestPackageSize(4))
                 return 2;
-            if(GetItemSubClass(itemId) != Item_Soul && GetItemSubClass(itemId) != Item_Gem && GetItemSubClass(itemId) != Item_Formula && grids > GetRestPackageSize(0))
+            if(GetItemSubClass(itemId) != Item_Soul && GetItemSubClass(itemId) != Item_Gem && GetItemSubClass(itemId) != Item_EvolutionGem && GetItemSubClass(itemId) != Item_Formula && grids > GetRestPackageSize(0))
                 return 2;
         }
 
@@ -6153,7 +6156,7 @@ namespace GObject
         if(item == NULL)
             return false;
         bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
-        bool isGem = GetItemSubClass(item->GetTypeId()) == Item_Gem;
+        bool isGem = (GetItemSubClass(item->GetTypeId()) == Item_Gem || GetItemSubClass(item->GetTypeId()) == Item_EvolutionGem);
         bool isFormula = GetItemSubClass(item->GetTypeId()) == Item_Formula;
 		UInt16 cur;
         if(isSoul)
@@ -6233,7 +6236,7 @@ namespace GObject
 		if(item->Count() < num)
 			return false;
         bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
-        bool isGem = GetItemSubClass(item->GetTypeId()) == Item_Gem;
+        bool isGem = (GetItemSubClass(item->GetTypeId()) == Item_Gem || GetItemSubClass(item->GetTypeId()) == Item_EvolutionGem);
         bool isFormula = GetItemSubClass(item->GetTypeId()) == Item_Formula;
 		UInt16 cur;
         if(isSoul)
@@ -7871,7 +7874,7 @@ namespace GObject
             {
                 m_ItemsSoul.erase(ItemKey(itemId, bind));
             }
-            else if(GetItemSubClass(itemId) == Item_Gem)
+            else if(GetItemSubClass(itemId) == Item_Gem || GetItemSubClass(itemId) == Item_EvolutionGem)
             {
                 m_ItemsGem.erase(ItemKey(itemId, bind));
             }
@@ -8296,7 +8299,7 @@ namespace GObject
                     return NULL;
                 }
             }
-            else if(GetItemSubClass(typeId) == Item_Gem)
+            else if(GetItemSubClass(typeId) == Item_Gem || GetItemSubClass(typeId) == Item_EvolutionGem)
             {
                 if(!(TryBuyGemItem(typeId, num, bind)))
                 {

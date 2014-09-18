@@ -78,7 +78,7 @@ bool MailPackage::takeIt( Player * player, bool gm )
         UInt16 size = package->GetItemUsedGrids(it->first, it->second & 0x00FF, bind);
         if(GetItemSubClass(it->first) == Item_Soul)
             required1 += size;
-        else if(GetItemSubClass(it->first) == Item_Gem)
+        else if(GetItemSubClass(it->first) == Item_Gem || GetItemSubClass(it->first) == Item_EvolutionGem)
             required3 += size;
         else if(GetItemSubClass(it->first) == Item_Formula)
             required4 += size;

@@ -282,7 +282,7 @@ namespace GObject
         void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);
         void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt16 fromWhere);
 
-		inline ItemBase * FindItem(UInt32 id, bool bind = false)
+		ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
             item_elem_iter iter;
             if(GetItemSubClass(id) == Item_Soul)
@@ -291,7 +291,7 @@ namespace GObject
                 if(iter == m_ItemsSoul.end())
                     return NULL;
             }
-            else if(GetItemSubClass(id) == Item_Gem)
+            else if(GetItemSubClass(id) == Item_Gem || GetItemSubClass(id) == Item_EvolutionGem)
             {
 			    iter = m_ItemsGem.find(ItemKey(id, bind));
                 if(iter == m_ItemsGem.end())
