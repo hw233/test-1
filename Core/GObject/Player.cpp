@@ -19317,23 +19317,25 @@ void EventTlzAuto::notify(bool isBeginAuto)
     ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
-        static UInt32 muttrumps[][2] = {
-            {1529, 1532},
-            {1530, 1533},
-            {1531, 1534},
-            {1650, 1653},
-            {1651, 1654},
-            {1652, 1655},
+        static UInt32 muttrumps[][4] = {
+            {1529, 1532, 0, 0},
+            {1530, 1533, 0, 0},
+            {1531, 1534, 0, 0},
+            {1650, 1653, 1671, 1672},
+            {1651, 1654, 0, 0},
+            {1652, 1655, 0, 0},
         };
         if ((trumpid >= 1529 && trumpid <= 1534)
-                || (trumpid >= 1650 && trumpid <= 1655))
+                || (trumpid >= 1650 && trumpid <= 1655) || (trumpid >= 1671 && trumpid <= 1672))
         {
             size_t i = 0;
-            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
+            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*4); ++i)
             {
-                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1])
+                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1] || trumpid == muttrumps[i][2] || trumpid == muttrumps[i][3])
                     break;
             }
+            if(i == sizeof(muttrumps)/(sizeof(UInt32)*4))
+                return false;
 
             for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
             {
@@ -19346,7 +19348,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 {
                     if (!trumpids[j])
                         continue;
-                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
+                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1] || trumpids[j] == muttrumps[i][2] || trumpids[j] == muttrumps[i][3])
                     {
                         sendMsgCode(0, 1032);
                         return true;
