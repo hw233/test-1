@@ -8822,7 +8822,7 @@ namespace GObject
             return;
         if(!hasChecked())
             return;
-        if (GetPackage()->GetRestPackageSize() <= 0)
+        if (GetPackage()->GetRestPackageSize(4) <= 0)
         {
             sendMsgCode(0, 1011);
             return;

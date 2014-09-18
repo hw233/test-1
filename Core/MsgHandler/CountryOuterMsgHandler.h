@@ -2674,7 +2674,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
 	if(!player->hasChecked())
 		return;
 
-	if(player->GetPackage()->GetRestPackageSize() < (bmr._unBindNum > 0 ? 1 : 0) + (bmr._bindNum > 0 ? 1 : 0))
+	if(player->GetPackage()->GetRestPackageSize(3) < (bmr._unBindNum > 0 ? 1 : 0) + (bmr._bindNum > 0 ? 1 : 0))
 	{
 		player->sendMsgCode(0, 1011);
 		return;
@@ -2938,7 +2938,7 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 1)
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2979,7 +2979,7 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((pl->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+	if((pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3_4) < 1) && (type != 1))
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -3722,7 +3722,7 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
                 brd >> type;
                 brd >> id;
 
-                if((player->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+                if((player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_4) < 1) && (type != 1))
                 {
                     player->sendMsgCode(1, 1014);
                     return;
@@ -3860,7 +3860,23 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 UInt16 items[4] = {0};
                 UInt8 c = GData::store.getItemsByDiscount(discountType, items);
                 if (!c) return;
-                if (player->GetPackage()->GetRestPackageSize() < c)
+                UInt16 c0 = 0;
+                UInt16 c1 = 0;
+                UInt16 c3 = 0;
+                UInt16 c4 = 0;
+                for(UInt8 i = 0; i < c; i++)
+                {
+                    ItemClass cur = GetItemSubClass(items[i]);
+                    if(cur == Item_Soul)
+                        ++c1;
+                    else if(cur == Item_Gem)
+                        ++c3;
+                    else if(cur == Item_Formula)
+                        ++c4;
+                    else
+                        ++c0;
+                }
+                if(player->GetPackage()->GetRestPackageSize() < c0 || player->GetPackage()->GetRestPackageSize(1) < c1 || player->GetPackage()->GetRestPackageSize(3) < c3 || player->GetPackage()->GetRestPackageSize(4) < c4)
                 {
                     // 背包空间不足
                     player->sendMsgCode(0, 1011);
@@ -6193,7 +6209,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             br >> optType;
             br >> copyIndex;
 
-            if((optType == 0 || optType == 2) && player->GetPackage()->GetRestPackageSize() < 1)
+            if((optType == 0 || optType == 2) && (player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1))
             {
                 player->sendMsgCode(1, 1014);
                 return;

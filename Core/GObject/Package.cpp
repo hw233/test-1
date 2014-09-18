@@ -2606,6 +2606,47 @@ namespace GObject
 		}
 	}
 
+    UInt16 Package::GetRestPackageSizeMin(UInt32 type)
+    {
+        UInt16 min = 0xFFFF;
+        UInt16 size;
+
+        if((type & PACKAGE_0) == PACKAGE_0)
+        {
+            size = GetRestPackageSize(0);
+            if(min > size)
+                min = size;
+        }
+        if((type & PACKAGE_1) == PACKAGE_1)
+        {
+            size = GetRestPackageSize(1);
+            if(min > size)
+                min = size;
+        }
+        if((type & PACKAGE_2) == PACKAGE_2)
+        {
+            size = GetRestPackageSize(2);
+            if(min > size)
+                min = size;
+        }
+        if((type & PACKAGE_3) == PACKAGE_3)
+        {
+            size = GetRestPackageSize(3);
+            if(min > size)
+                min = size;
+        }
+        if((type & PACKAGE_4) == PACKAGE_4)
+        {
+            size = GetRestPackageSize(4);
+            if(min > size)
+                min = size;
+        }
+        if(min == 0xFFFF)
+            min = 0;
+
+        return min;
+    }
+
 	void Package::SendPackageItemInfor()
 	{
 		ItemCont::iterator cit = m_Items.begin();
@@ -2639,6 +2680,21 @@ namespace GObject
             count++;
             AppendItemData(st, cit->second);
 		}
+
+        cit = m_ItemsGem.begin();
+		for (; cit != m_ItemsGem.end(); ++cit)
+		{
+            count++;
+            AppendItemData(st, cit->second);
+		}
+
+        cit = m_ItemsFormula.begin();
+		for (; cit != m_ItemsFormula.end(); ++cit)
+		{
+            count++;
+            AppendItemData(st, cit->second);
+		}
+
 		st.data<UInt16>(4) = count;
 		st << Stream::eos;
 		m_Owner->send(st);

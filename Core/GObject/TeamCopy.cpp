@@ -1629,7 +1629,7 @@ void TeamCopy::autoBattle(Player* pl, UInt32 copyIndex, UInt8 type)
             if(curAutoCnt >= totalAutoCnt)
                 return;
 
-            if(pl->GetPackage()->GetRestPackageSize() < 40)
+            if(pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 40)
             {
                 Stream st(REP::TEAM_COPY_REQ);
                 st << static_cast<UInt8>(0x06) << static_cast<UInt8>(5);
@@ -1703,7 +1703,7 @@ UInt8 TeamCopy::fight(Player* pl, UInt32 copyIndex, bool ato, bool complete)
     }
 
 
-    if(pl->GetPackage()->GetRestPackageSize() < 4)
+    if(pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 4)
     {
         Stream st(REP::TEAM_COPY_REQ);
         st << static_cast<UInt8>(0x06) << static_cast<UInt8>(5);

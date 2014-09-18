@@ -1222,7 +1222,7 @@ function onGetVipPack(player, _type)
         return
     end
 
-    if package:GetRestPackageSize() < needsize then
+    if package:GetRestPackageSize() < needsize or package:GetRestPackageSize(3) < needsize then
         player:sendMsgCode(2, 1011, 0)
         return
     end
@@ -9065,7 +9065,7 @@ end
 function onGetYearActAward(player, type)
     if type ==1 then
         local package = player:GetPackage()
-        if package:GetRestPackageSize() < 9 then
+        if package:GetRestPackageSize() < 9 or package:GetRestPackageSize(3) < 1 then
             return false
         end
         player:getCoupon(50)
@@ -9899,7 +9899,7 @@ function getLuckyStarAward(player, idx)
         player:sendMsgCode(0, 1104)
         return false
     end
-    if player:GetFreePackageSize() < #items[idx] then
+    if player:GetFreePackageSize() < #items[idx] or player:GetFreePackageSize(3) < #items[idx] then
         player:sendMsgCode(2, 1011)
         return false
     end
@@ -10907,7 +10907,7 @@ function onFishUserPackage(player, idx)
     elseif idx == 4 then
         reqGrids = reqGrids + 1
     end
-    if package:GetRestPackageSize() < reqGrids then
+    if package:GetRestPackageSize() < reqGrids or package:GetRestPackageSize(3) < 10 then
         player:sendMsgCode(2, 1011, 0)
         return false
     end

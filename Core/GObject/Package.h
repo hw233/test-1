@@ -44,6 +44,15 @@ namespace GObject
 #define PURPLEADJVAL_TYPE  1
 #define ORANGEADJVAL_TYPE  2
 
+#define PACKAGE_0 1
+#define PACKAGE_1 2
+#define PACKAGE_2 4
+#define PACKAGE_3 8
+#define PACKAGE_4 16
+#define PACKAGE_0_3 (PACKAGE_0 | PACKAGE_3)
+#define PACKAGE_0_4 (PACKAGE_0 | PACKAGE_4)
+#define PACKAGE_0_3_4 (PACKAGE_0 | PACKAGE_3 | PACKAGE_4)
+
 	class Fighter;
 	class Player;
 
@@ -195,6 +204,7 @@ namespace GObject
         }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
 		inline UInt16 GetRestPackageSize(UInt8 type = 0) const { return (m_Owner->getPacksize(type) > GetUsedPackageSize(type)) ? (m_Owner->getPacksize(type) - GetUsedPackageSize(type)) : 0; }
+		UInt16 GetRestPackageSizeMin(UInt32 type = PACKAGE_0);
 		inline bool IsFull() const { return m_Owner->getPacksize() <= m_Size; }
 
 	public:

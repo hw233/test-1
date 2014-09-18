@@ -115,7 +115,7 @@ function onUseTickets(player)
     end
     --]]
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < 1 then
+    if package:GetRestPackageSize() < 1 or package:GetRestPackageSize(3) < 1 then
         player:sendMsgCode(2, 1011, 0)
         return 0
     end
