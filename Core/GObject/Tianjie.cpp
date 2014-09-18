@@ -387,7 +387,7 @@ void Tianjie::OpenTj()
     if(m_currOpenedTjLevel!=999 && m_manualTjLevel != m_currOpenedTjLevel)
     {
         UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
-        if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel) && 129 < static_cast<UInt32>(m_currOpenedTjLevel))
+        if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel) || 129 < static_cast<UInt32>(m_currOpenedTjLevel))
             return ;
     }
 
