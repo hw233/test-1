@@ -382,7 +382,7 @@ bool  Tianjie::isTjRateNpc(UInt32 npcid)
  //开启天劫
 void Tianjie::OpenTj()
 {
-    if (m_currOpenedTjLevel == 0)
+    if (m_currOpenedTjLevel == 0 || m_currOpenedTjLevel == 129)
         return;
     if(m_currOpenedTjLevel!=999 && m_manualTjLevel != m_currOpenedTjLevel)
     {
@@ -390,6 +390,9 @@ void Tianjie::OpenTj()
         if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel) || 129 < static_cast<UInt32>(m_currOpenedTjLevel))
             return ;
     }
+
+    if(m_currOpenedTjLevel == (129 - 10) && GVAR.GetVar(GVAR_MAX_LEVEL) >= 129)
+         m_currOpenedTjLevel = 129;
 
     m_notifyRate = 0;
 	m_isTjOpened = 1;
