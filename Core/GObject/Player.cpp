@@ -35481,7 +35481,7 @@ void Player::shakeMoneyBag()
     if(10 <= GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES))
         return;
     UInt32 total = GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
-    if(!total && GetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS) == 0)
+    if(total && GetVar(VAR_CARNIVAL_CONSUME_SHAKE_STATUS) == 0)
     {
         UInt32 now = TimeUtil::Now();
         if(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES) == 9)
@@ -35718,6 +35718,7 @@ void Player::sendShakeMoneyBagInfo()
     st << static_cast<UInt8>(0x15);
     st << static_cast<UInt8>(4);
     st << static_cast<UInt8>(GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
+    st << GetVar(VAR_CARNIVAL_CONSUME_TOTAL_REBATE);
     st << Stream::eos;
     send(st);
 }
