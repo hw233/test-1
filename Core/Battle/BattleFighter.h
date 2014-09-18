@@ -1776,9 +1776,6 @@ private:
     UInt8 _evolutionCnt;   //ÏÉÆøÀÛ¼Æ
     UInt8 getEvolutionCnt() { return _evolutionCnt; }
     void setEvolutionCnt(UInt8 cnt) { if(cnt > 5) cnt = 5; _evolutionCnt = cnt; }
-    UInt8 _evolutionCnt2; //last time
-    UInt8 getEvolutionCnt2() { return _evolutionCnt2; }
-    void setEvolutionCnt2(UInt8 cnt) { _evolutionCnt2 = cnt; }
     const GData::SkillBase* _skillEvolution;
     const GData::SkillBase* getSkillEvolution() { return _skillEvolution; }
     void setSkillEvolution(const GData::SkillBase* skill) { _skillEvolution = skill; }

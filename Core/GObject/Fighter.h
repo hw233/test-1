@@ -628,8 +628,6 @@ public:
 	void findTrumpByTypeId(std::vector<ItemEquip*>& ret, UInt32 id);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
-	inline void set(bool d = true) { _attrDirty = d; _bPDirty = d; }
-	inline void setSkillBPDirty(bool d = true) { _skillBPDirty= d;}
     bool hasTrumpType(UInt32 trumpid);
     bool canSetTrump(UInt8 idx, UInt32 trumpid);
 

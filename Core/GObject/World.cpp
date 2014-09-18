@@ -1757,7 +1757,6 @@ void World::World_OldMan_Refresh(void *)
     else if( time > _oldMan._time )
     {
         UInt16 spot = GetRandomSpot();
-        spot = 2056;
         if(!spot)
             return ;
         if(_oldMan._spot == 0)
