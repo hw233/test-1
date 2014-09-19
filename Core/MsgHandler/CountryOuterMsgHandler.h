@@ -2421,8 +2421,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 0x14:
         {
-            if(!World::getGratitudeGiving(0, 5 * 24 * 3600))
-                return;
+            //if(!World::getGratitudeGiving(0, 5 * 24 * 3600))
+                //return;
             UInt8 type = 0;
             br >> type;
             if(type)

@@ -137,7 +137,7 @@ function loadStore()
     end
 
     if  getCoolSummer(300) then
-        store:add(2 ,16020 ,20)
+        store:add(2 ,16052 ,20)
     end
 
     store:add(2 ,9457 ,20)

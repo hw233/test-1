@@ -34474,9 +34474,9 @@ void Player::sendCoolSummerActPointGift(UInt8 awardType)
         { {0, 0}, {0 ,0}},
         { {503, 2}, {0, 0} },
         { {500, 5}, {501, 5} },
-        { {9424, 5}, {9418, 5} },
-        { {9498, 5}, {16001, 5} },
-        { {9076, 5}, {0, 0} },
+        { {9424, 5}, {9413, 5} },
+        { {554, 5}, {9600, 5} },
+        { {9022, 3}, {0, 0} },
     };
     //活跃值第一次达到双倍，后面单倍
     if(awardType)
@@ -34538,13 +34538,13 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
     }
 
     //使用冰淇淋，增加活跃值
-    if(GetPackage()->GetItemAnyNum(16020) < useCount[randType - 1][0])
+    if(GetPackage()->GetItemAnyNum(16052) < useCount[randType - 1][0])
     {
         sendMsgCode(0, 8062);
         return;
     }
 
-    GetPackage()->DelItemAny(16020, useCount[randType - 1][0]);
+    GetPackage()->DelItemAny(16052, useCount[randType - 1][0]);
 
     char str[16] = {0};
     sprintf(str, "F_140625_%d", randType);
@@ -34584,7 +34584,7 @@ void Player::useIceCream(UInt8 randType, UInt8 flag)
 
     //为拉把随机奖励
     UInt8 awardType = 0;
-    static UInt32 awardProb[] = {8700, 9200, 9500, 9710, 9860, 9960, 9990, 10000};
+    static UInt32 awardProb[] = {3000, 5300, 7600, 8500, 9270, 9970, 9990, 10000};
     UInt32 rand = uRand(10000);
     for(UInt8 i = 0; i < 8; i++)
     {
@@ -34624,13 +34624,13 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType
     static UInt8 awardCount[4] = {1, 11, 22, 53};
     static UInt32 awardArray[][2] = {
         {16018, 1},
-        {16018, 2},
-        {9600, 2},
-        {9457, 2},
+        {503, 1},
+        {501, 2},
+        {1325, 2},
         {134, 2},
-        {515, 2},
-        {9075, 4},
-        {9022, 8},
+        {515, 3},
+        {1734, 1},
+        {1735, 1},
     };
 
     UInt32 itemCount = awardArray[awardType][1] * awardCount[randType - 1];
@@ -35330,7 +35330,7 @@ void Player::gratitudeReturnInfo()
         }
         else
         {
-            st << GetVar(VAR_GRATITUDE_GIVING_LEVEL);
+            st << static_cast<UInt8>(GetVar(VAR_GRATITUDE_GIVING_LEVEL));
             st << GetVar(VAR_GRATITUDE_GIVING_RECHARGE);
         }
         st << Stream::eos;
@@ -35355,7 +35355,7 @@ void Player::getGratitudeAward(UInt8 flag)
         if(1 == flag)
         {
             UInt32 days = (now - getCreated()) / (24 * 3600);
-            getCoin(days * 1000);
+            getTael(days * 1000);
         }
         else if(2 == flag)
         {
@@ -35364,10 +35364,7 @@ void Player::getGratitudeAward(UInt8 flag)
         else
         {
             UInt32 total = (getTotalRecharge() > 100000 ? 100000 : getTotalRecharge());
-            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-            {
-                it->second->addExp(total * 10);
-            }
+            AddPExp(total * 10);
         }
     }
     else
@@ -35375,7 +35372,7 @@ void Player::getGratitudeAward(UInt8 flag)
          if(1 == flag)
         {
             UInt32 days = (endDay - getCreated()) / (24 * 3600);
-            getCoin(days * 1000);
+            getTael(days * 1000);
         }
         else if(2 == flag)
         {
@@ -35384,10 +35381,7 @@ void Player::getGratitudeAward(UInt8 flag)
         else
         {
              UInt32 total = (GetVar(VAR_GRATITUDE_GIVING_RECHARGE) > 100000 ? 100000 : GetVar(VAR_GRATITUDE_GIVING_RECHARGE));
-             for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-             {
-                 it->second->addExp(total * 10);
-             }
+             AddPExp(total * 10);
         }
     }
     status = SET_BIT(status, (flag - 1));

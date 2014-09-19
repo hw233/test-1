@@ -653,8 +653,8 @@ public:
     } 
     inline static bool getCoolSummer(UInt32 time = 0)
     {
-        UInt32 begin = TimeUtil::MkTime(2014, 7, 1);
-        UInt32 end = TimeUtil::MkTime(2014, 7, 7);
+        UInt32 begin = TimeUtil::MkTime(2014, 9, 21);
+        UInt32 end = TimeUtil::MkTime(2014, 9, 26);
         UInt32 now = TimeUtil::Now() + time;
         if((now >= begin && now <= end))
             return true;
