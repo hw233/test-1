@@ -4561,7 +4561,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
         // 天劫:御雷神针、芭蕉巨扇、盘古神斧, 幽灵碧炎梭
         UInt16 skillId = SKILL_ID(skill->getId());
         if((skillId == 150) || (skillId == 151) || (skillId == 152) || (skillId == 160)
-                || (skillId == 153) || (skillId == 154) || (skillId == 155) || (skillId == 161) )
+                || (skillId == 153) || (skillId == 154) || (skillId == 155) || (skillId == 161) || skillId == 556 || skillId == 557)
         {
             float rate = skill->prob * 100;
             BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
@@ -4573,7 +4573,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     factor = skill->factor[0];
                 if((rate * factor) > _rnd(10000))
                 {
-                    if(skillId == 150 || skillId == 153)
+                    if(skillId == 150 || skillId == 153 || skillId == 556 || skillId == 557)
                     {
                         UInt32 magdef = getBFMagDefend(bo);
                         UInt32 dmg = _formula->calcDamage(factor*getBFMagAtk(bf)*0.35f, magdef, bf->getLevel(), 1, 0);
@@ -4644,7 +4644,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
 
                 if(rate > _rnd(10000))
                 {
-                    if(skillId == 150 || skillId == 153)
+                    if(skillId == 150 || skillId == 153 || skillId == 556 || skillId == 557)
                     {
                         UInt32 magdef = getBFMagDefend(bo);
                         UInt32 dmg = _formula->calcDamage(ap[i].factor*getBFMagAtk(bf)*0.35f, magdef, bf->getLevel(), 1, 0);

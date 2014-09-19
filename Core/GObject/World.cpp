@@ -544,6 +544,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
         ))
     {
 #if 0
