@@ -206,8 +206,7 @@ struct AttrExtra
 
 		return *this;
 	}
-
-	AttrExtra operator *(const float rate) const
+    AttrExtra operator *(const float rate) const
 	{
         AttrExtra aet = *this;
 		aet.strength *= rate;
