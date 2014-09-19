@@ -257,7 +257,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
             if (maxLevel < level && level != 999)    //玩家等级过低,不能手动启动天劫
                 return 2;
         }
-        if (dbexp.level == level) //已经触发了
+        if (dbexp.level == level && dbexp.rate > 0) //已经触发了
         {
             m_isManualOpening = false;
             m_manualTjLevel = 0;
@@ -382,7 +382,7 @@ bool  Tianjie::isTjRateNpc(UInt32 npcid)
  //开启天劫
 void Tianjie::OpenTj()
 {
-    if (m_currOpenedTjLevel == 0 || m_currOpenedTjLevel == 129)
+    if (m_currOpenedTjLevel == 0)
         return;
     if(m_currOpenedTjLevel!=999 && m_manualTjLevel != m_currOpenedTjLevel)
     {
@@ -390,9 +390,6 @@ void Tianjie::OpenTj()
         if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel) || 129 < static_cast<UInt32>(m_currOpenedTjLevel))
             return ;
     }
-
-    if(m_currOpenedTjLevel == (129 - 10) && GVAR.GetVar(GVAR_MAX_LEVEL) >= 129)
-         m_currOpenedTjLevel = 129;
 
     m_notifyRate = 0;
 	m_isTjOpened = 1;
@@ -621,7 +618,7 @@ bool Tianjie::LoadFromDB()
                 {
                    m_currOpenedTjLevel = 0;
                 }
-                else if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
+                else if (s_tjRoleLevel[m_tjTypeId] == 119 && m_currTjRate >= 4)
                 {
                     m_currOpenedTjLevel = 129;
 	   	            DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
