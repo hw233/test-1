@@ -3088,6 +3088,8 @@ namespace GObject
             }
         }
 
+        lc.finalize();
+
         // Load player SeekingHer shake_moneybag_log
         {
             lc.prepare("Loading player CarnivalConsume shake_moneybag_log:");
