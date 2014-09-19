@@ -618,7 +618,7 @@ bool Tianjie::LoadFromDB()
                 {
                    m_currOpenedTjLevel = 0;
                 }
-                else if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
+                else if (s_tjRoleLevel[m_tjTypeId] == 119 && m_currTjRate >= 4)
                 {
                     m_currOpenedTjLevel = 129;
 	   	            DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
