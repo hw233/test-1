@@ -5392,7 +5392,7 @@ namespace GObject
         if(!GetVar(VAR_LUCKYSTAR_IS_CONSUME))
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
-        if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3 && ci->purchaseType != ZhengHun && ci->purchaseType != JieHun && ci->purchaseType != LiHun && ci->purchaseType != TrainFighter)
+        if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3 && ci->purchaseType != ZhengHun && ci->purchaseType != JieHun && ci->purchaseType != LiHun && ci->purchaseType != TrainFighter && ci->purchaseType != DINGQINGXINWU)
             CarnivalConsumeAct(c);
         return _playerData.gold;
 	}
