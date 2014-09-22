@@ -877,6 +877,17 @@ function onActivityCheck(tm)
          set11Time(false)
       end
 
+      --if tm >= actTimeBaiFu and tm < actTimeBaiFu_1 then
+      --   setBaiFuBagTime(true)
+      --else
+      --   setBaiFuBagTime(false)
+      --end
+
+      --if tm >= actTimeXCTJ and tm < actTimeXCTJ_1 then
+      --   setXCTJTime(true)
+      --else
+      --   setXCTJTime(false)
+      --end
 
       if tm >= actTime254 and tm < actTime254_1 then
          setGGTime(true)
@@ -1489,6 +1500,12 @@ function initActTime(y, m, d)
   local  SerStartTm253= { ['year'] = 2014, ['month'] = 6, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm253_1= { ['year'] = 2014, ['month'] = 6, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  --local  SerStartTmBaiFu= { ['year'] = 2014, ['month'] = 9, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTmBaiFu_1= { ['year'] = 2014, ['month'] = 10, ['day'] = 3, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  --local  SerStartTmXCTJ= { ['year'] = 2014, ['month'] = 9, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTmXCTJ_1= { ['year'] = 2014, ['month'] = 10, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   local  SerStartTm254= { ['year'] = 2013, ['month'] =11, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm254_1= { ['year'] = 2013, ['month'] = 11, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1978,6 +1995,12 @@ function initActTime(y, m, d)
   actTime254_1= os.time(SerStartTm254_1);
   actTime255= os.time(SerStartTm255)
   actTime255_1= os.time(SerStartTm255_1);
+
+  --actTimeBaiFu= os.time(SerStartTmBaiFu)
+  --actTimeBaiFu_1= os.time(SerStartTmBaiFu_1);
+
+  --actTimeXCTJ= os.time(SerStartTmXCTJ)
+  --actTimeXCTJ_1= os.time(SerStartXCTJ_1);
 
   actTime256= os.time(SerStartTm256)
   actTime256_1= os.time(SerStartTm256_1);

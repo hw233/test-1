@@ -1350,6 +1350,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GameMsgHdr hdr1(0x1D3, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
     }
+    if(World::getXCTJTime())
+    { 
+        pl->AddXCTJAward(0,0,0);
+        pl->sendXCTJMyAward();
+    } 
 #if 0
     if (World::getHappyFireTime())
     {
@@ -2480,8 +2485,63 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             else
                 player->GetMemoirAward(type);
         }
+        case 0x18:   //百服大礼包
+        {
+            UInt8 type = 0;
+            br >> type ;
+            if(!type)
+                player->sendBaiFuBagInfo();
+            else
+                player->getBaiFuBag();
+        }
         break;
-
+        case 0x19:  //喜从天降
+        { 
+            if(!World::getXCTJTime())
+                return ;
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            { 
+                case 1:
+                    // player->sendXCTJInfo();
+                    {
+                        GameMsgHdr hdr(0x18D, WORKER_THREAD_WORLD ,player , 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                    }
+                    break;
+                case 2:
+                    {
+                        UInt8 opt = 0;
+                        br >> opt;
+                        UInt8 res = player->HitEggInXCTJ(opt);
+                        Stream st(REP::COUNTRY_ACT); 
+                        st << static_cast<UInt8>(0x19);
+                        st << static_cast<UInt8>(0x02);
+                        st << static_cast<UInt8>(res);
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+                    break;
+                case 3:
+                    {
+                        UInt8 opt = 0;
+                        std::string test;
+                        br >> opt >> test;
+                        player->giveOutTheWelfare(opt,test);
+                    }
+                    break;
+                case 4:
+                    {
+                        UInt8 opt = 0;
+                        br >> opt;
+                        player->getXCTJCountAward(opt);
+                    }
+                    break;
+            } 
+            player->sendXCTJInfo();
+        } 
+        break;
         case 0x17:
         {
             if(!World::getTreasureTime())
@@ -2514,7 +2574,6 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         }
         break;
-
         default:
         break;
     }

@@ -3683,5 +3683,172 @@ void OnCarnivalMoneyBagReturn( GameMsgHdr& hdr,  const void* data )
     player->send(st);
 }
 
+void SendXCTJRank(Stream& st)
+{
+    World::initRCRank();
+    using namespace GObject;
+    st.init(REP::COUNTRY_ACT);    //lib待定
+    UInt32 cnt = World::XCTJSort.size();
+    if (cnt > CNT)
+        cnt = CNT;
+    st << static_cast<UInt8>(0x19)<<static_cast<UInt8>(4) << static_cast<UInt8>(0) << static_cast<UInt8>(cnt);
+    UInt32 c = 0;
+    for (RCSortType::iterator i = World::XCTJSort.begin(), e = World::XCTJSort.end(); i != e; ++i)
+    {
+        if(i->player == NULL)
+            continue;
+        st << i->player->getName();
+        st << i->total;
+        st << static_cast<UInt8>(i->player->getCountry()<<4|(i->player->IsMale()?0:1));
+        ++c;
+        if (c >= cnt)
+            break;
+    }
+    st << Stream::eos;
+}
+void OnXCTJRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+ 
+    UInt32 total = *((UInt32*)data);
+    if (!total)
+        return;
+
+    bool inrank = false;
+    UInt32 oldrank = 0;
+    for (RCSortType::iterator i = World::XCTJSort.begin(), e = World::XCTJSort.end(); i != e; ++i)
+    {
+        ++oldrank;
+        if (i->player == player)
+        {
+            if (oldrank <= CNT10)
+                inrank = true;
+            World::XCTJSort.erase(i);
+            break;
+        }
+    }
+
+    RCSort s;
+    s.player = player;
+    s.total = total;
+    World::XCTJSort.insert(s);
+
+    UInt32 rank = 0;
+    UInt32 myrank = 0;
+    bool stop = false;
+    for (RCSortType::iterator i = World::XCTJSort.begin(), e = World::XCTJSort.end(); i != e; ++i)
+    {
+       if (!stop)
+            ++myrank;
+
+        if (i->player == player)
+            stop = true;
+
+        ++rank;
+
+        Stream st(REP::COUNTRY_ACT);  //lib待定
+        st << static_cast<UInt8>(0x19)<< static_cast<UInt8>(0x04)<< static_cast<UInt8>(2);
+        st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+        i->player->send(st);
+    }
+
+    if (oldrank <= CNT || (!inrank && myrank <= CNT))
+    {
+        Stream st;
+        SendXCTJRank(st);
+        NETWORK()->Broadcast(st);
+    }
+}
+void OnSendXCTJRank ( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    World::initRCRank();
+    Stream st;
+    SendXCTJRank(st);
+    player->send(st);
+
+    UInt32 rank = 0;
+    for (RCSortType::iterator i = World::XCTJSort.begin(), e = World::XCTJSort.end(); i != e; ++i)
+    {
+        ++rank;
+        if (i->player == player)
+        {
+            Stream st(REP::COUNTRY_ACT);
+            st << static_cast<UInt8>(0x19)<< static_cast<UInt8>(0x04) << static_cast<UInt8>(2);
+            st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
+            player->send(st);
+            break;
+        }
+    }
+}
+void OnXCTJAwardInsert ( GameMsgHdr& hdr,  const void* data )
+{ 
+	MSG_QUERY_PLAYER(player);
+	struct XCTJAward
+	{
+        Player *pl;
+        UInt8 num;
+		UInt32 itemId;
+        UInt8 count;
+        UInt32 time;
+	};
+	XCTJAward * ar = reinterpret_cast<XCTJAward *>(const_cast<void *>(data));
+    WORLD().AddWorldXCTJAward(ar->pl ,ar->num ,ar->itemId ,ar->count ,ar->time);
+} 
+bool enum_send_xctj_welfare(void * ptr, void * data )
+{
+    //static UInt32 welfare[] = {503,500,509,17103,17109};
+    //static UInt8 welfareNum[] = {4,4,3,3,3};
+    static MailPackage::MailItem mitem[5] = {{503,2}, {500,2},{509,1},{17103,2},{17109,2}};
+    GObject::Player* player = static_cast<GObject::Player*>(ptr);
+    GObject::Player* pl = static_cast<GObject::Player*>(data);
+    UInt32 now = TimeUtil::Now();
+    if(player == NULL || pl == NULL)
+        return true;
+    if(player->getServerNo() != player->getServerNo())
+        return true;
+    if(player->GetLev() < 40 )
+        return true;
+    if(PLAYER_DATA(player,lastOnline) + 90*86400 < now)
+        return true;
+
+    SYSMSGV(title, 5241,pl->getCountry(), pl->getName().c_str());
+    SYSMSGV(content, 5243,pl->getCountry(), pl->getName().c_str());
+    { 
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, mitem, 5, true);
+
+            std::string strItems;
+            for(int i = 0; i < 5; ++ i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    } 
+    return true;
+}
+void OnXCTJWelfare ( GameMsgHdr& hdr,  const void* data )
+{ 
+	MSG_QUERY_PLAYER(player);
+	const UInt8 * type = reinterpret_cast<const UInt8*>(data);
+    if(*type)
+    {
+        if(player->getClan())
+            player->getClan()->sendXCTJWelfare(player);
+    }
+    else
+    { 
+        GObject::globalPlayers.enumerate(enum_send_xctj_welfare,player);
+    } 
+} 
+
 
 #endif // _WORLDINNERMSGHANDLER_H_

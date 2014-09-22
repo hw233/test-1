@@ -271,6 +271,12 @@ void WorldScript::init()
     def("getCelebrateCardActivity",GObject::World::getCelebrateCardActivity);
     def("setQZoneRechargeTime",GObject::World::setQZoneRechargeTime);
 
+    def("setBaiFuBagTime",GObject::World::setBaiFuBagTime);
+    def("getBaiFuBagTime",GObject::World::getBaiFuBagTime);
+
+    def("setXCTJTime",GObject::World::setXCTJTime);
+    def("getXCTJTime",GObject::World::getXCTJTime);
+
     def("setSurnameLegend",GObject::World::setSurnameLegend);
     def("getSurnameLegend",GObject::World::getSurnameLegend);
     def("get11TimeNum",GObject::World::get11TimeAirNum);

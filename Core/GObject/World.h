@@ -66,6 +66,16 @@ struct stArenaExtra
     UInt64 playerId[5];
 };
 
+struct XCTJAward
+{
+    Player *pl;
+    UInt8 num;
+    UInt32 itemId;
+    UInt8 count;
+    UInt32 time;
+    XCTJAward(Player * pl2,UInt8 num2,UInt32 itemId2,UInt8 count2,UInt32 time2):pl(pl2),num(num2),itemId(itemId2),count(count2),time(time2){ } 
+};
+
 typedef std::list<Player*> LuckyDrawList;
 typedef LuckyDrawList::iterator LuckyDrawRank;
 typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
@@ -807,6 +817,33 @@ public:
             return false;
     }
 
+    inline static void setBaiFuBagTime(bool v)
+    { _baifu = v; }
+    inline static bool getBaiFuBagTime()
+    { 
+        UInt32 now = TimeUtil::Now();
+        UInt32 Begin = TimeUtil::MkTime(2014, 10, 1);
+        UInt32 End = TimeUtil::MkTime(2014, 10,3);
+        if(now >= Begin && now <= End)
+            return true;
+        else
+            return false;
+        return _baifu; 
+    }
+
+    inline static void setXCTJTime(bool v)
+    { _xctj = v; }
+    inline static bool getXCTJTime(UInt32 time = 0)
+    { 
+        UInt32 now = TimeUtil::Now() + time;
+        UInt32 Begin = TimeUtil::MkTime(2014, 10, 1);
+        UInt32 End = TimeUtil::MkTime(2014, 10,8);
+        if(now >= Begin && now <= End)
+            return true;
+        else
+            return false;
+        return _xctj; 
+    }
     inline static bool getTreasureTime(UInt32 time = 0 )
     {
         UInt32 now = TimeUtil::Now();
@@ -1539,6 +1576,8 @@ public:
     static bool _speedTime;
     static bool _happyFire;
     static bool _11time;
+    static bool _baifu;
+    static bool _xctj;
     static bool _qishiban;
     static bool _guankaAct;
     static bool _ggtime;
@@ -1572,6 +1611,8 @@ public:
     static UInt32 _gAnswerEndTime;
     static UInt32 _gAnswerFinalTime;
     static UInt32 _gAllAnswerEndTime_Day;
+    static std::deque<struct XCTJAward> xctj_deque;
+
 #define MAX_WC_COUNT 63
     static UInt32 _worldCup[MAX_WC_COUNT][4];   //支持度  1-胜 2-负 3-平 4-结果 (注意标号需要-1)
 #define ANSWER_PREPARE_TIME    19*60*60 + 15*60 
@@ -1600,6 +1641,7 @@ public:
     static RCSortType seekingHerZhiNvSort;     //众里寻她织女榜排名
     static RCSortType seekingHerCharmSort;     //众里寻她魅力值排名
     static RCSortType carnivalConsumeSort;     //狂欢购物排名
+    static RCSortType XCTJSort;               //喜从天降排名
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1719,8 +1761,12 @@ public:
     void SendGuankaActAward();
     void SendTYSSClanAward(UInt8);
     void SendTYSSPlayerAward(UInt8);
+    void AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time);
+    static void SendXCTJAward();
+
     static void SendAllAnswerEnd();
     static void SendAnswerAward();
+
 
     void killMonsterAppend(Stream& st, UInt8 index);
     void killMonsterInit();

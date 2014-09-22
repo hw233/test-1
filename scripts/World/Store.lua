@@ -215,6 +215,10 @@ function loadStore()
         store:add(2, 9425, 80)
         store:add(2, 9438, 30)
 
+        if getXCTJTime() then
+            store:add(2, 16058, 30)
+        end
+
         if getQingren() then    --蜀山之恋
             store:add(2, 9355,10)
         end

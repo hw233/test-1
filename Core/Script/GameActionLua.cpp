@@ -158,6 +158,7 @@ namespace Script
 		lua_tinker::def(_L, "getHappyFireTime", GObject::World::getHappyFireTime);
 		lua_tinker::def(_L, "getWorldCupTime", GObject::World::getWorldCupTime);
 		lua_tinker::def(_L, "getWorldCupTime2", GObject::World::getWorldCupTime2);
+		lua_tinker::def(_L, "getXCTJTime", GObject::World::getXCTJTime);
 		lua_tinker::def(_L, "getOpenTime", GObject::World::getOpenTime);
 		lua_tinker::def(_L, "isRPServer", GObject::World::isRPServer);
 		lua_tinker::def(_L, "getAccRecharge", GObject::World::getAccRecharge);
@@ -246,6 +247,7 @@ namespace Script
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
 		CLASS_DEF(Player, Add11grade);
+		CLASS_DEF(Player, AddXCTJAward);
 		CLASS_DEF(Player, AddHeartSword);
 		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
@@ -2013,6 +2015,21 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<bool>("getFlyRoadAward", player, index, isdouble);
+    }
+    bool GameActionLua::getBaiFuBagAward(Player * player)
+    {
+		assert(player != NULL);
+        return Call<bool>("getBaiFuBagAward", player);
+    }
+    bool GameActionLua::getXCTJCountAward(Player * player, UInt8 opt , UInt8 index)
+    {
+		assert(player != NULL);
+        return Call<bool>("getXCTJCountAward", player,opt,index);
+    }
+    bool GameActionLua::getHitEggAward(Player * player,UInt8 count)
+    {
+		assert(player != NULL);
+        return Call<bool>("getHitEggAward", player,count);
     }
     bool GameActionLua::exchangeTreasure(Player * player, UInt8 index, UInt32 num, UInt32 now)
     {
