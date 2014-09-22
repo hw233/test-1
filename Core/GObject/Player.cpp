@@ -4156,7 +4156,7 @@ namespace GObject
 
             pendExp(exp);
             pexp = exp;
-            ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
+            ng->getLoots(this, _lastLoot, lootlvl, &atoCnt, nationalDayF);
 
             //战胜NPC 成就
             GameAction()->doAttainment(this, 10351, npcId);

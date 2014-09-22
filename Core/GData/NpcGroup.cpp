@@ -107,7 +107,8 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
             if(!player->checkClientIP())
                 bind = true;
 
-            lr[j].count *= factor;
+            if(!IsEquipTypeId(lr[j].id))
+                lr[j].count *= factor;
             if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, true, FromNpc))
             {
                 ++cnt;
