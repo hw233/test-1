@@ -991,7 +991,11 @@ function LuckyDrawBox(player, id)
     end
 
     local package = player:GetPackage()
-    package:Add(item, 1, true)
+    if getNationalDayHigh() then
+        package:Add(item, 2, true)
+    else
+        package:Add(item, 1, true)
+    end
 end
 
 function sendWinReward(player, lootlvl, typeId)
