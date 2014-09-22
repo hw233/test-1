@@ -9389,7 +9389,11 @@ function GetBDSupermanPrice(player, itemId, isUsed)
             function ExJob(player, id)
                 if id >= 4 then
                     local package = player:GetPackage()
-                    package:AddItem(9229, 1, true)
+                    if getNationalDayHigh() then
+                        package:AddItem(9229, 2, true)
+                    else
+                        package:AddItem(9229, 1, true)
+                    end
                 end
             end
 
