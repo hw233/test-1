@@ -876,8 +876,8 @@ public:
     {
         if( now == 1 )
               now = TimeUtil::Now();
-        UInt32 _speedBegin = TimeUtil::MkTime(2014, 1, 18);
-        UInt32 _speedEnd = TimeUtil::MkTime(2014, 2,16);
+        UInt32 _speedBegin = TimeUtil::MkTime(2014, 9, 29);
+        UInt32 _speedEnd = TimeUtil::MkTime(2014, 10,9);
         if(now >_speedBegin && now <= _speedEnd)
             return true;
         else 
