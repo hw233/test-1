@@ -975,6 +975,7 @@ namespace GObject
         xxlMapInfo[2]="";
         SetVar(VAR_PACKAGE_SIZE_GEM, 200);
         SetVar(VAR_PACKAGE_SIZE_FORMULA, 200);
+        SetVar(VAR_PACKAGE_SIZE_SL, 200);
     }
 
 
@@ -3527,7 +3528,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << getPacksize(3) << getPacksize(4) << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << getPacksize(3) << getPacksize(4) << getPacksize(5) << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -4542,6 +4543,8 @@ namespace GObject
             AddVar(VAR_PACKAGE_SIZE_GEM, EACH_EXTEND_NUM);
         else if(type == 4)
             AddVar(VAR_PACKAGE_SIZE_FORMULA, EACH_EXTEND_NUM);
+        else if(type == 5)
+            AddVar(VAR_PACKAGE_SIZE_SL, EACH_EXTEND_NUM);
         else
         {
             _playerData.packSizeSoul += EACH_EXTEND_NUM;

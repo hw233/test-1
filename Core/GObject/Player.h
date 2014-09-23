@@ -1787,6 +1787,16 @@ namespace GObject
                 }
                 return size;
             }
+            else if(type == 5)
+            {
+                UInt16 size = GetVar(VAR_PACKAGE_SIZE_SL);
+                if(size == 0)
+                {
+                    size = 200;
+                    SetVar(VAR_PACKAGE_SIZE_SL, size);
+                }
+                return size;
+            }
             else
                 return 0;
         }

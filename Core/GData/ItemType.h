@@ -152,6 +152,7 @@ enum ItemClass
     Item_PetGem9, Item_PetGem10, Item_PetGem11,                         //躲避，反击，坚韧
     Item_LingShi = 240,
     Item_LingShi1, Item_LingShi2, Item_LingShi3,
+    Item_Zhenyuan = 250,
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -306,6 +307,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_PetGem;
     if (id >= LLINGSHI_ID && id <= RLINGSHI_ID)
         return Item_LingShi;
+    if (id >= LZHENYAUN_ID && id <= RZHENYUAN_ID)
+        return Item_Zhenyuan;
     if (id >= LXIANGEM_ID && id <= LXIANGEM_ID_END)
         return Item_EvolutionGem;
 	return Item_Other;

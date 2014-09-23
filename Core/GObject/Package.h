@@ -49,6 +49,7 @@ namespace GObject
 #define PACKAGE_2 4
 #define PACKAGE_3 8
 #define PACKAGE_4 16
+#define PACKAGE_5 32
 #define PACKAGE_0_3 (PACKAGE_0 | PACKAGE_3)
 #define PACKAGE_0_4 (PACKAGE_0 | PACKAGE_4)
 #define PACKAGE_0_3_4 (PACKAGE_0 | PACKAGE_3 | PACKAGE_4)
@@ -199,7 +200,9 @@ namespace GObject
             else if(type == 3)
                 return m_SizeGem;
             else if(type == 4)
-                return m_SizeFormula;
+                return m_SizeFormula + m_SizeZY;
+            else if(type == 5)
+                return m_SizeSL;
             return 0;
         }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
@@ -351,6 +354,7 @@ namespace GObject
         bool TryBuySoulItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
         bool TryBuyGemItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
         bool TryBuyFormulaItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        bool TryBuySLItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
         void SendTempItemInfo();
         void SendSingleTempEquipData(ItemEquip * equip);
         void SendTempItemData(ItemBase * item);
@@ -395,12 +399,16 @@ namespace GObject
 		ItemCont m_ItemsLS;     //灵侍背包
 		ItemCont m_ItemsGem; //宝石背包
 		ItemCont m_ItemsFormula; //阵法背包
+		ItemCont m_ItemsZY; //阵元背包
+		ItemCont m_ItemsSL; //元神背包
         ItemCont m_ItemsTemporary; //临时物品
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
 		UInt16 m_SizeLS;    //already used lingshi grids
-		UInt16 m_SizeGem;  //already used gem grids
-		UInt16 m_SizeFormula;  //already used formula grids
+		UInt16 m_SizeGem;  //宝石
+		UInt16 m_SizeFormula;  //阵法
+		UInt16 m_SizeZY;  //阵元
+		UInt16 m_SizeSL;  //元神
         UInt16 m_TempItemSize;
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;
