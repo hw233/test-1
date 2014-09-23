@@ -300,6 +300,9 @@ bool Tianjie::isPlayerInTj(int playerLevel)
 }
 bool Tianjie::isOpenTj(Player* pl)
 {
+    if(m_currOpenedTjLevel != 999 && m_currOpenedTjLevel > 129)
+        return false;
+
     int playerLevel = pl->GetLev();
     //在手动开启的天劫运行中,又达到了自动天劫的等级
     UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
@@ -743,6 +746,9 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
 }
 void Tianjie::notifyTianjieStatus(Player* pl)
 {
+    if(m_currOpenedTjLevel != 999 && m_currOpenedTjLevel > 129)
+        return;
+
     Stream st1(REQ::TIANJIE);
     UInt8 type1 = 5; //通知
     UInt8 status1 =  m_isTjOpened;
