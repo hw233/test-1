@@ -35768,7 +35768,6 @@ void Player::GetFlyRoadGift(UInt8 IsDouble)
 
     if(IsDouble)
     {
-        ConsumeInfo ci(FLYROADGETAWARD,0,0);
         if (getGold() < 20)
         {
             sendMsgCode(0, 1104);
@@ -35779,6 +35778,7 @@ void Player::GetFlyRoadGift(UInt8 IsDouble)
         return;
     if(IsDouble)
     {
+        ConsumeInfo ci(FLYROADGETAWARD,0,0);
         useGold(20, &ci);
     }
 
