@@ -245,6 +245,7 @@ namespace Script
 		CLASS_DEF(Player, GetTaskMgr);
 		CLASS_DEF(Player, GetPackage);
 		CLASS_DEF(Player, Add11grade);
+		CLASS_DEF(Player, AddXCTJAward);
 		CLASS_DEF(Player, AddHeartSword);
 		CLASS_DEF(Player, GetPetPackage);
 		CLASS_DEF(Player, GetMailBox);
@@ -2011,6 +2012,22 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<bool>("getFlyRoadAward", player, index, isdouble);
+    }
+
+    bool GameActionLua::getBaiFuBagAward(Player * player)
+    {
+		assert(player != NULL);
+        return Call<bool>("getBaiFuBagAward", player);
+    }
+    bool GameActionLua::getXCTJCountAward(Player * player, UInt8 opt , UInt8 index)
+    {
+		assert(player != NULL);
+        return Call<bool>("getXCTJCountAward", player,opt,index);
+    }
+    bool GameActionLua::getHitEggAward(Player * player,UInt8 count)
+    {
+		assert(player != NULL);
+        return Call<bool>("getHitEggAward", player,count);
     }
 }
 

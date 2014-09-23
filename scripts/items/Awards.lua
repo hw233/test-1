@@ -2228,3 +2228,136 @@ function getFeiShengDanAward(player,opt)
         package:AddItem(FeiShengDanNeed[opt*2][i][1], FeiShengDanNeed[opt*2][i][2], true, 0, 39);
     end
 end
+function getBaiFuBagAward(player)
+    local award = {{9425,5},{515,3},{549,2},{503,5},{134,5},{1325,5},{9388,1},{9360,5}}
+    local package = player:GetPackage();
+    for i = 1,#award do
+        package:AddItem(award[i][1], award[i][2], true, 0, 39);
+    end
+    return true;
+end
+
+function getXCTJCountAward(player,opt,index)
+    local award = {
+        [1] = {{503 ,2},{500 ,2},{56  ,2},{57  ,2}},
+        [2] = {{501 ,3},{9498,3},{516 ,3},{547 ,2}},
+        [3] = {{9600,4},{16001,4},{9414,4},{9424,4}},
+        [4] = {{9457,6},{1126,6},{134,6},{1325,6}},
+        [5] = {{9600,7},{9076,5},{515,6},{517,8}},
+        [6] = {{13017,1},{13137,1},{13117,1},{13157,1},{13197,1}},
+    }
+    if opt > 6 or opt == 0 then
+        return ;
+    end
+
+    local package = player:GetPackage();
+
+    if opt ~= 6 then
+        for i = 1,#award[opt] do
+            package:AddItem(award[opt][i][1], award[opt][i][2], true, 0, 39);
+        end
+    else
+        if index > #award[opt] then
+            return 
+        end
+        package:AddItem(award[opt][index][1],award[opt][index][2], true, 0, 39);
+    end
+    return true
+end
+
+local chance_egg = {1100 ,2080 ,2980 ,3780 ,4580 ,5280 ,5960 ,6560 ,7160 ,7760 ,8360 ,8810 ,9110 ,9410 ,9710 ,9810 ,9910 ,9960 ,9990 ,10000 }
+local awardEgg = {
+    [1] ={{503,1}},
+    [2] ={{500,2}},
+    [3] ={{501,2}},
+    [4] ={{554,1}},
+    [5] ={{16001,1}},
+    [6] ={{9498,1}},
+    [7] ={{9457,1}},
+    [8] ={{9600,1}},
+    [9] ={{509,1}},
+    [10] ={{134,1}},
+    [11] ={{1325,1}},
+    [12] ={{556,1}},
+    [13] ={{7420,5},{7720,5},{7620,5},{7220,5},{7320,5},{7020,5},{7120,5},{7520,5}},
+    [14] ={{515,1}},
+    [15] ={{9076,1}},
+    [16] ={{13132,1},{13112,1},{13012,1},{13032,1},{13052,1},{13072,1},{13092,1},{13172,1},{13152,1},{13192,1}},
+    [17] ={{9022,1}},
+    [18] ={{9075,1}},
+    [20] ={{1733,1},{1732,1},{1734,1},{1735,1}},
+}
+local chance_19 = { 1000 ,2000 ,3000 ,4000 ,5000 ,6000 ,6500 ,7000 ,7500 ,8000 ,8500 ,9100 ,9400 ,9700 ,10000 }
+local award_19 = {5058,5038,5028,5048,5008,5018,5148,5088,5128,5118,5108,5078,5068,5138,5098}
+
+function getHitEggAward(player,num)
+    if player == nil then
+        return false;
+    end
+    local package = player:GetPackage();
+    if package == nil then
+        return 
+    end
+    print("enterNum:"..num)
+    local max = 0;
+    local itemId = 0;
+    local count = 1;
+    for i = 1,num do
+        local g = math.random(1, 10000)
+        print("g = "..g)
+        local index = 0;
+        local item_id = 0;
+        local item_count = 0;
+        for k = 1,#chance_egg do
+            print(chance_egg[k])
+            if g < chance_egg[k] then
+                index = k
+                break;
+            end
+        end
+        print("index"..index)
+
+        if index > max  then
+            max = index;
+        end
+
+        print("awardNum:"..#awardEgg[index])
+        if #awardEgg[index] == 1 then
+            print("item:".. awardEgg[index][1][1])
+            item_id = awardEgg[index][1][1];
+            item_count =  awardEgg[index][1][2];
+        elseif index ~= 19 then
+            local idx = math.random(1, 10000)% (#awardEgg[index]) + 1
+            item_id = awardEgg[index][idx][1];
+            item_count =  awardEgg[index][idx][2];
+        else 
+            local r = math.random(1, 10000)
+            local idx = 0;
+            for k = 1,#chance_19 do
+                if g < chance_egg[k] then
+                    idx = k
+                    break;
+                end
+            end
+            item_id = award_19[idx]
+            item_count = 1;
+        end
+
+        print("XXXXX")
+        if index > 3 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]运气爆棚，砸金蛋竟然砸出个[4:"..item_id.."]x"..item_count.."，简直碉堡了！")
+        end
+        package:AddItem(item_id, item_count, true, 0, 39);
+
+        print("max"..max)
+        print("index"..index)
+        if max == index then
+            itemId = item_id
+            count = item_count
+        end
+    end
+    print("itemId"..itemId)
+    print("count"..count)
+    player:AddXCTJAward(num,itemId,count);
+    return true
+end

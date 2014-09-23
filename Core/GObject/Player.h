@@ -2255,6 +2255,8 @@ namespace GObject
         bool _qixiBinding;
         QiShiBanInfo m_qishiban;
         MoBaoInfo m_mobao;
+        std::deque<struct XCTJAward> my_deque;
+
     public:
 		inline bool isFriend(Player *pl) const { return _hasFriend(0, pl); }
         inline bool isJumpingMap() { return _isJumpingMap; }
@@ -3674,6 +3676,9 @@ namespace GObject
         void GetMemoirAward(UInt8);
         void sendMemoirAwardInfo();
 
+        void sendBaiFuBagInfo();
+        void getBaiFuBag();
+
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();
         void SacrificeFlyRoad(UInt8 type, UInt16 num);
@@ -3682,6 +3687,14 @@ namespace GObject
         void getLuckyBagExtraAward();
         UInt32 getClanJoinTime();
         void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
+
+        void AddXCTJAward(UInt8 num ,UInt32 ItemId , UInt8 count);
+        void HitEggInXCTJ(UInt8 num);
+        void giveOutTheWelfare(UInt8 type,std::string test);
+        void getXCTJCountAward(UInt8 type);
+        void sendXCTJInfo();
+        void AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count);
+        void sendXCTJMyAward();
 
     private:
         //玩家位置（包括层数、当层位置）

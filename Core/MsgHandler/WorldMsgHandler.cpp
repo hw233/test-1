@@ -158,6 +158,12 @@ MSG_REG_2(GameMsgHdr, 0x185, OnSeekingHer_FriendInfo);
 MSG_REG_2(GameMsgHdr, 0x188, OnCarnivalRankReturn);
 MSG_REG_2(GameMsgHdr, 0x189, OnCarnivalMoneyBagReturn);
 
+MSG_REG_2(GameMsgHdr, 0x18A, OnXCTJAwardInsert);   //XCTJ
+MSG_REG_2(GameMsgHdr, 0x18B, OnXCTJWelfare);  
+MSG_REG_2(GameMsgHdr, 0x18C, OnXCTJRank);    // 积分有变化
+MSG_REG_2(GameMsgHdr, 0x18D, OnSendXCTJRank);  //获得积分排名 
+
+
 MSG_REG_2(GameMsgHdr, 0x198, OnPopTimerEvent);
 MSG_REG_2(GameMsgHdr, 0x199, OnPushTimerEvent);
 

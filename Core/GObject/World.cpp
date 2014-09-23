@@ -162,6 +162,8 @@ bool World::_surnamelegend = false;
 bool World::_speedTime = false;
 bool World::_happyFire = false;
 bool World::_11time = false;
+bool World::_baifu = false;
+bool World::_xctj = false;
 bool World::_ggtime = false;
 bool World::_qzoneRechargetime = false;
 bool World::_ryhbActivity = false;
@@ -227,11 +229,13 @@ RCSortType World::seekingHerNiuLangSort;
 RCSortType World::seekingHerZhiNvSort;
 RCSortType World::seekingHerCharmSort;
 RCSortType World::carnivalConsumeSort;
+RCSortType World::XCTJSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
 bool World::_killMonsteract = 0;
 RCSortType World::rechargeRP7Sort;
+std::deque<struct XCTJAward> World::xctj_deque;
 #ifndef _WIN32
 CUserLogger* World::ulog = NULL;
 #endif
@@ -369,6 +373,7 @@ bool bItem9343End = false;
 bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
+bool bXCTJTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
 bool bGratirudeTimeEnd = false;
@@ -1319,6 +1324,7 @@ void World::World_Midnight_Check( World * world )
     bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
     bool bWCtime = getWorldCupTime();
+    bool bXCTJtime = getXCTJTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
     bool bbCarnivalTime = getCarnivalConsume();
@@ -1373,6 +1379,9 @@ void World::World_Midnight_Check( World * world )
     bGuankaEnd = bGuanka && !getGuankaAct(300);
     b11TimeEnd = b11time && !get11Time(300);
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
+
+    bXCTJTimeEnd = bXCTJtime && !getXCTJTime();
+
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
     bQiShiBanEnd = bQiShiBanTime && !getQiShiBanTime(300);
@@ -1576,6 +1585,8 @@ void World::World_Midnight_Check( World * world )
     {
         GObject::globalPlayers.enumerate(player_enum_SetGratitudeInfo, 0);
     }
+    if(bXCTJTimeEnd)
+        world->SendXCTJAward();
 
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
@@ -5661,6 +5672,65 @@ void World::SendCarnivalConsumeAward()
     }
     return;
 }
+void World::AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count)
+{ 
+    XCTJAward bfa(pl,num,itemId,count);
+    if(xctj_deque.size() >=50 )
+        xctj_deque.pop_front();
+    xctj_deque.push_back(bfa);
+
+    //单个获奖信息广播
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(0) << static_cast<UInt8>(1);
+    st << pl->getName() << num << itemId << count;
+    st << Stream::eos;
+    NETWORK()->Broadcast(st);
+} 
+void World::SendXCTJAward()   
+{ 
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][5] = {
+        {{515,30},{9600,40},{503,50},{134,40},{1325,40}},
+        {{515,20},{9600,30},{503,40},{134,30},{1325,30}},
+        {{515,10},{9600,15},{503,25},{134,15},{1325,15}},
+        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
+        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
+        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
+        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
+    };
+    static MailPackage::MailItem card = {9979,1};   //暂无白马王子
+
+    SYSMSG(title, 5244);
+    int pos = 0;
+    for (RCSortType::iterator i = World::XCTJSort.begin(), e = World::XCTJSort.end(); i != e; ++i)
+    {
+        Player* player = i->player;
+        if (!player)
+            continue;
+        ++pos;
+        if(pos > 7) break;   // 1--7名
+        SYSMSGV(content, 5245, pos);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        //player->sendMailItem(4153, 4154, items, sizeof(items)/sizeof(items[0]), false);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, s_item[pos-1], 5, true);  
+            if(pos ==1)
+                mailPackageManager.push(mail->id, &card, 1, true);
+        }
+        std::string strItems;
+        for(int index = 0; index < 4; ++ index)
+        {
+            strItems += Itoa(s_item[pos-1][index].id);
+            strItems += ",";
+            strItems += Itoa(s_item[pos-1][index].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+    }
+    XCTJSort.clear();
+    //GObject::globalPlayers.enumerate(player_enum_clearVar746, 0);
+} 
 
 }
 

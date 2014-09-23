@@ -2479,7 +2479,51 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             else
                 player->GetMemoirAward(type);
         }
-
+        case 0x18:   //百服大礼包
+        {
+            UInt8 type = 0;
+            br >> type ;
+            if(!type)
+                player->sendBaiFuBagInfo();
+            else
+                player->getBaiFuBag();
+        }
+        break;
+        case 0x19:  //喜从天降
+        { 
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            { 
+                case 1:
+                    // player->sendXCTJInfo();
+                    break;
+                case 2:
+                    {
+                        UInt8 opt = 0;
+                        br >> opt;
+                        player->HitEggInXCTJ(opt);
+                    }
+                    break;
+                case 3:
+                    {
+                        UInt8 opt = 0;
+                        std::string test;
+                        br >> opt >> test;
+                        player->giveOutTheWelfare(opt,test);
+                    }
+                    break;
+                case 4:
+                    {
+                        UInt8 opt = 0;
+                        br >> opt;
+                        player->getXCTJCountAward(opt);
+                    }
+                    break;
+            } 
+            player->sendXCTJInfo();
+        } 
+        break;
         default:
         break;
     }
