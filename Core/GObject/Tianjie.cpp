@@ -37,7 +37,7 @@ static const UInt32 s_rate1Npc[][4] = {
 {7031, 7032, 7033, 7034},  //99
 {7037, 7038, 7039, 7040},  //109
 {7069, 7070, 7071, 7072},  //119
-{7069, 7070, 7071, 7072},  //129
+{7077, 7078, 7079, 7080},  //129
 {7069, 7070, 7071, 7072},  //139
 {7069, 7070, 7071, 7072},  //149
 {7109, 7110, 7111, 7112}   //999
@@ -50,7 +50,7 @@ static const UInt32 s_rate1MinNpcIds[][4] = {
 {8064, 8073, 8077, 8079},  //99
 {8080, 8089, 8093, 8095},  //109
 {8112, 8121, 8125, 8127},  //119
-{8112, 8121, 8125, 8127},  //129
+{8128, 8137, 8141, 8143},  //129
 {8112, 8121, 8125, 8127},  //139
 {8112, 8121, 8125, 8127},  //149
 {8096, 8105, 8109, 8111}   //999
@@ -64,7 +64,7 @@ static const UInt32 s_rate1MaxNpcIds[][4] = {
 {8072, 8076, 8078, 8079},  //99
 {8088, 8092, 8094, 8095},  //109
 {8120, 8124, 8126, 8127},  //119
-{8120, 8124, 8126, 8127},  //129
+{8136, 8140, 8142, 8143},  //129
 {8120, 8124, 8126, 8127},  //139
 {8120, 8124, 8126, 8127},  //149
 {8104, 8108, 8110, 8111}   //999
@@ -88,7 +88,7 @@ static const UInt32 s_tlzNpcId[][2] = {
 {7035, 7036},  //99
 {7041, 7042},  //109
 {7073, 7074},  //119
-{7073, 7075},  //129
+{7081, 7082},  //129
 {7073, 7074},  //139
 {7073, 7074},  //149
 {7113, 7114}   //999
@@ -103,7 +103,7 @@ static const float  s_rate3NpcBaseModulus[][6] = {
 {0.009f, 0.009f, 0.01f, 0.01f, 0.09f, 0.001f},  //99
 {0.010f, 0.010f, 0.01f, 0.01f, 0.10f, 0.001f},  //109
 {0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //119
-{0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //129
+{0.012f, 0.012f, 0.01f, 0.01f, 0.12f, 0.001f},  //129
 {0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //139
 {0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f},  //149
 {0.011f, 0.011f, 0.01f, 0.01f, 0.11f, 0.001f}   //999
@@ -134,7 +134,7 @@ static const UInt32 s_tjBoss[][2] = {
 {7051, 7052},  //99
 {7053, 7054},  //109
 {7075, 7076},  //119
-{7075, 7076},  //129
+{7083, 7084},  //129
 {7075, 7076},  //139
 {7075, 7076},  //149
 {7115, 7116}   //999
@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1533,1534,1535,1399};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,9161,9162,9163,17801};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1671,1534,1535,1399};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,17809,9162,9163,17801};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -223,11 +223,11 @@ Tianjie::Tianjie()
 }
 int  Tianjie::manualOpenTj(int level, bool force)
 {
-    if (level != 999 && ((level % 10 != 9) || level < 59 || level > 119))
+    if (level != 999 && ((level % 10 != 9) || level < 59 || level > 129))
         return 1;
     if (m_manualTjLevel > 0)
         return 4;
-    if (m_isTjOpened && m_currOpenedTjLevel == 119 && level == 999)
+    if (m_isTjOpened && m_currOpenedTjLevel == 129 && level == 999)
         return 4;
  	std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return 2;
@@ -249,7 +249,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
 	{
         if (maxLevel < dbexp.level)
             maxLevel = dbexp.level;
-        if(level == 119 && maxLevel == 109)
+        if(level == 129 && maxLevel == 119)
         {
         }
         else
@@ -257,7 +257,7 @@ int  Tianjie::manualOpenTj(int level, bool force)
             if (maxLevel < level && level != 999)    //玩家等级过低,不能手动启动天劫
                 return 2;
         }
-        if (dbexp.level == level) //已经触发了
+        if (dbexp.level == level && dbexp.rate > 0) //已经触发了
         {
             m_isManualOpening = false;
             m_manualTjLevel = 0;
@@ -300,6 +300,9 @@ bool Tianjie::isPlayerInTj(int playerLevel)
 }
 bool Tianjie::isOpenTj(Player* pl)
 {
+    if(m_currOpenedTjLevel != 999 && m_currOpenedTjLevel > 129)
+        return false;
+
     int playerLevel = pl->GetLev();
     //在手动开启的天劫运行中,又达到了自动天劫的等级
     UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
@@ -387,7 +390,7 @@ void Tianjie::OpenTj()
     if(m_currOpenedTjLevel!=999 && m_manualTjLevel != m_currOpenedTjLevel)
     {
         UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
-        if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel))
+        if( maxLevel < static_cast<UInt32>(m_currOpenedTjLevel) || 129 < static_cast<UInt32>(m_currOpenedTjLevel))
             return ;
     }
 
@@ -614,13 +617,13 @@ bool Tianjie::LoadFromDB()
                 clearPlayerTaskScore();
                 //天劫全都跑完了
                 //if (m_tjTypeId == (sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1) && m_currTjRate >= 4)
-                if (s_tjRoleLevel[m_tjTypeId] == 119 && m_currTjRate >= 4)
+                if (s_tjRoleLevel[m_tjTypeId] == 129 && m_currTjRate >= 4)
                 {
                    m_currOpenedTjLevel = 0;
                 }
-                else if (s_tjRoleLevel[m_tjTypeId] == 109 && m_currTjRate >= 4)
+                else if (s_tjRoleLevel[m_tjTypeId] == 119 && m_currTjRate >= 4)
                 {
-                    m_currOpenedTjLevel = 119;
+                    m_currOpenedTjLevel = 129;
 	   	            DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);
                     m_tjTypeId += 1;
                 }
@@ -743,6 +746,9 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
 }
 void Tianjie::notifyTianjieStatus(Player* pl)
 {
+    if(m_currOpenedTjLevel != 999 && m_currOpenedTjLevel > 129)
+        return;
+
     Stream st1(REQ::TIANJIE);
     UInt8 type1 = 5; //通知
     UInt8 status1 =  m_isTjOpened;
@@ -1325,7 +1331,7 @@ void Tianjie::goNext()
            else
            {
                //if ((UInt8)(m_tjTypeId+1) < sizeof(s_tjRoleLevel)/sizeof(s_tjRoleLevel[0])-1)
-               if (s_tjRoleLevel[m_tjTypeId] < 119)
+               if (s_tjRoleLevel[m_tjTypeId] < 129)
                {
                    m_currOpenedTjLevel = s_tjRoleLevel[++m_tjTypeId];
 	   	           DB1().PushUpdateData("INSERT INTO `tianjie`(`level`) VALUES(%d)",m_currOpenedTjLevel);

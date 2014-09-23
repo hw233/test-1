@@ -2470,9 +2470,14 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 0x16:
         {
+            if(!World::getMemoirTime())
+                return;
             UInt8 type = 0;
             br >> type;
-            //player->GetMemoirAward(type);
+            if(type == 2)
+                player->sendMemoirAwardInfo();
+            else
+                player->GetMemoirAward(type);
         }
 
         default:

@@ -209,7 +209,8 @@ SysMsg::~SysMsg()
 {
 	for(std::vector<SysMsgItem *>::iterator it = _msg.begin(); it != _msg.end(); ++ it)
 	{
-		delete *it;
+        if(*it != NULL)
+		    delete *it;
 	}
 	_msg.clear();
 }

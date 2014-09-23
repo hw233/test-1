@@ -472,13 +472,22 @@ namespace GObject
             {
                 const GData::AttrExtra * ae = equip1->getAttrExtra(); 
                 if(ae && ae->skills.size())
-                    fairyskill = ae->skills[0]->getId();
+                {
+                    std::string skills = Itoa(ae->skills[0]->getId());
+                    _fighter->setSkills(skills,false);
+                }
             }
-            else
-                fairyskill = 0;
+            else if(_evolution[pos])
+            {
+                const GData::AttrExtra * ae = _evolution[pos]->getAttrExtra(); 
+                if(ae && ae->skills.size())
+                {
+                    std::string skills = Itoa(ae->skills[0]->getId());
+                    _fighter->delSkills(skills,false);
+                }
+            }
         }
         _evolution[pos] = equip1;
-
         if(!flag)
         {
             if(equip1 != NULL)
@@ -489,6 +498,7 @@ namespace GObject
             _fighter->sendModification(0x66 + pos, equip1 , false);
             UpdateEquipToDB();
         }
+        _fighter->setDirty(true);
         return old;
     } 
     void Evolution::LoadTask9Info(std::string str)

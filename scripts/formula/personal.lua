@@ -99,7 +99,7 @@ bp_factor_crtdmgimm   = 14000     -- 暴击减免
 
 bp_factor_skill_color = {0, 20, 30, 40, 50}    -- 技能颜色
 bp_factor_skill_level = {3.81, 4.58, 5.5, 6.59, 7.85, 9.31, 10.98, 12.87, 15}  -- 技能等级
-bp_factor_skill_type = {15, 25, 20}  -- 技能类型
+bp_factor_skill_type = {15, 25, 20 ,25}  -- 技能类型
 bp_factor_ss_level = {2.49, 3.09, 3.78, 4.57, 5.46, 6.44, 7.53, 8.72, 10}  -- 技能符文等级
 
 
@@ -682,7 +682,7 @@ function calcSkillBattlePoint(c, l, t, s)
     else
         bp = bp_factor_skill_color[c] * bp_factor_skill_type[t] * (bp_factor_skill_level[l] + bp_factor_ss_level[s])
     end
-
+    --print(bp)
     return bp;
 end
 

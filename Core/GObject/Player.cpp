@@ -19326,23 +19326,25 @@ void EventTlzAuto::notify(bool isBeginAuto)
     ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
-        static UInt32 muttrumps[][2] = {
-            {1529, 1532},
-            {1530, 1533},
-            {1531, 1534},
-            {1650, 1653},
-            {1651, 1654},
-            {1652, 1655},
+        static UInt32 muttrumps[][4] = {
+            {1529, 1532, 0, 0},
+            {1530, 1533, 0, 0},
+            {1531, 1534, 0, 0},
+            {1650, 1653, 1671, 1672},
+            {1651, 1654, 0, 0},
+            {1652, 1655, 0, 0},
         };
         if ((trumpid >= 1529 && trumpid <= 1534)
-                || (trumpid >= 1650 && trumpid <= 1655))
+                || (trumpid >= 1650 && trumpid <= 1655) || (trumpid >= 1671 && trumpid <= 1672))
         {
             size_t i = 0;
-            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
+            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*4); ++i)
             {
-                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1])
+                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1] || trumpid == muttrumps[i][2] || trumpid == muttrumps[i][3])
                     break;
             }
+            if(i == sizeof(muttrumps)/(sizeof(UInt32)*4))
+                return false;
 
             for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
             {
@@ -19355,7 +19357,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 {
                     if (!trumpids[j])
                         continue;
-                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
+                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1] || trumpids[j] == muttrumps[i][2] || trumpids[j] == muttrumps[i][3])
                     {
                         sendMsgCode(0, 1032);
                         return true;
@@ -26652,20 +26654,20 @@ void Player::Send11GradeAward(UInt8 type)
         SetVar(VAR_11AIRBOOK_AWARDSCORE,gradeAward[type-1]);
 
     static MailPackage::MailItem s_item[][6] = {
-        {{9418,1}, {503,1}},
-        {{500,2},{57,2},{9371,2}},
-        {{501,3},{9414,2}},
-        {{516,2},{16001,2},{503,2}},
-        {{547,3},{1126,3},{517,3}},
-        {{549,1},{554,3},{551,5}},
-        {{9457,3},{9498,2},{509,2},{515,2},{9438,2}},
-        {{1726,1},{9076,4}},
-        {{554,25},{9418,25},{16001,20}},
-        {{5067,1},{9498,30},{9068,15}},
-        {{9021,20},{9075,20},{1734,1}},
-        {{9022,20},{9068,20},{1735,1},{5057,1},{5037,1}},
+        {{9424,1}, {503,1}},
+        {{500,2},{517,2},{501,2}},
+        {{513,3},{9414,2}},
+        {{516,2},{16001,2},{555,3}},
+        {{547,3},{503,5}},
+        {{1126,5},{556,3},{551,5}},
+        {{9457,3},{9498,2},{1325,2},{515,2},{9438,2}},
+        {{1727,1},{9076,4}},
+        {{554,25},{9418,25},{13075,1}},
+        {{13097,1},{556,30},{9021,15}},
+        {{9019,15},{9075,15},{1734,1},{13138,1}},
+        {{9022,20},{9068,20},{1735,1},{13019,1}},
     };
-    static UInt32 count[] = {2,3,2,3,3,3,5,2,3,3,3,5};
+    static UInt32 count[] = {2,3,2,3,2,3,5,2,3,3,4,4};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -34801,9 +34803,9 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType
     }
 
     if(sendType == 0)
-        GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, true, FromCoolSummer);
+        GetPackage()->Add(awardArray[awardType][0], itemCount, true, true, FromCoolSummer);
     else if(sendType == 1)
-        GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
+        GetPackage()->Add(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
     else if(sendType == 2)
         m_Package->ItemNotify(awardArray[awardType][0], itemCount);
 }
@@ -35808,7 +35810,7 @@ void Player::GetMemoirAward(UInt8 type)
     //1分享到微博，0分享到微信
     if(type)
     {
-        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS))
+        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS) || GetVar(VAR_MEMOIR_WEIBO_COUNT) >= 5)
             return;
         SYSMSGV(title, 5234);
         SYSMSGV(content, 5235);
@@ -35817,7 +35819,9 @@ void Player::GetMemoirAward(UInt8 type)
         {
             mailPackageManager.push(mail->id, MemoirAward[1], 3, true);
         }
-        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 6)
+        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+        SetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS, 1);
+        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 3)
         {
             SYSMSGV(title, 5236);
             SYSMSGV(content, 5237);
@@ -35827,11 +35831,11 @@ void Player::GetMemoirAward(UInt8 type)
                 mailPackageManager.push(mail->id, MemoirAward[3], 3, true);
             }
         }
-        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+        sendMsgCode(0, 4047);
     }
     else
     {
-        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS))
+        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS) || GetVar(VAR_MEMOIR_WEIXIN_COUNT) >= 5)
             return;
         SYSMSGV(title, 5234);
         SYSMSGV(content, 5235);
@@ -35840,7 +35844,9 @@ void Player::GetMemoirAward(UInt8 type)
         {
             mailPackageManager.push(mail->id, MemoirAward[0], 3, true);
         }
-        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 6)
+        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+        SetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS, 1);
+        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 3)
         {
             SYSMSGV(title, 5236);
             SYSMSGV(content, 5237);
@@ -35850,8 +35856,9 @@ void Player::GetMemoirAward(UInt8 type)
                 mailPackageManager.push(mail->id, MemoirAward[2], 3, true);
             }
         }
-        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+        sendMsgCode(0, 4047);
     }
+    sendMemoirAwardInfo();
 }
 
 void Player::sendMemoirAwardInfo()
