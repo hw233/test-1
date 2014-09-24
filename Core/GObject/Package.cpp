@@ -1728,12 +1728,11 @@ namespace GObject
 		return ret;
 	}
 
-    bool Package::eraseEquip(UInt32 id)
+    bool Package::eraseEquip(UInt32 id, UInt8 index)
     {
-        item_elem_iter iter;
-        if(GetItemSubClass(id) == Item_Zhenyuan)
+        if(index == 1)
         {
-            iter = m_ItemsZY.find(ItemKey(id));
+            item_elem_iter iter = m_ItemsZY.find(ItemKey(id));
             if(iter == m_ItemsZY.end())
                 return false;
             SendDelEquipData(static_cast<ItemEquip *>(iter->second));
@@ -1742,7 +1741,7 @@ namespace GObject
         }
         else
         {
-            iter = m_Items.find(ItemKey(id));
+            item_elem_iter iter = m_Items.find(ItemKey(id));
             if(iter == m_Items.end())
                 return false;
             SendDelEquipData(static_cast<ItemEquip *>(iter->second));
@@ -1756,9 +1755,15 @@ namespace GObject
 	{
 		if(!IsEquipId(id)) return false;
 
-        item_elem_iter iter;
+        item_elem_iter iter = m_Items.find(ItemKey(id));
         ItemBase * item;
-        if(GetItemSubClass(id) == Item_Zhenyuan)
+        if(iter != m_Items.end())
+        {
+            item = iter->second;
+            m_Items.erase(iter);
+            -- m_Size;
+        }
+        else
         {
             iter = m_ItemsZY.find(ItemKey(id));
             if(iter == m_ItemsZY.end())
@@ -1766,15 +1771,6 @@ namespace GObject
             item = iter->second;
             m_ItemsZY.erase(iter);
             -- m_SizeZY;
-        }
-        else
-        {
-            iter = m_Items.find(ItemKey(id));
-            if(iter == m_Items.end())
-                return false;
-            item = iter->second;
-            m_Items.erase(iter);
-            -- m_Size;
         }
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", id);
@@ -1805,7 +1801,12 @@ namespace GObject
 		m_Items.erase(iter);
 		-- m_Size;
         */
-        if(!eraseEquip(equip->getId()))
+        UInt8 index;
+        if(IsZhenYuan(equip->getClass()))
+            index = 1;
+        else
+            index = 0;
+        if(!eraseEquip(equip->getId(), index))
             return false;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
