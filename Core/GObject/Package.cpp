@@ -971,6 +971,13 @@ namespace GObject
                 m_ItemsFormula[ItemKey(typeId, bind)] = item;
                 ++ m_SizeFormula;
             }
+            else if(GetItemSubClass(typeId) == Item_SL)
+            {
+                if(item->Size() + m_SizeSL > m_Owner->getPacksize(5))
+                    return item;
+                m_ItemsSL[ItemKey(typeId, bind)] = item;
+                ++ m_SizeSL;
+            }
             else
             {
                 if(item->Size() + m_Size > m_Owner->getPacksize(0) + 50)
@@ -1728,25 +1735,23 @@ namespace GObject
 		return ret;
 	}
 
-    bool Package::eraseEquip(UInt32 id, UInt8 index)
+    bool Package::eraseEquip(UInt32 id)
     {
-        if(index == 1)
+        item_elem_iter iter = m_Items.find(ItemKey(id));
+        if(iter != m_Items.end())
         {
-            item_elem_iter iter = m_ItemsZY.find(ItemKey(id));
+            SendDelEquipData(static_cast<ItemEquip *>(iter->second));
+            m_Items.erase(iter);
+            -- m_Size;
+        }
+        else
+        {
+            iter = m_ItemsZY.find(ItemKey(id));
             if(iter == m_ItemsZY.end())
                 return false;
             SendDelEquipData(static_cast<ItemEquip *>(iter->second));
             m_ItemsZY.erase(iter);
             -- m_SizeZY;
-        }
-        else
-        {
-            item_elem_iter iter = m_Items.find(ItemKey(id));
-            if(iter == m_Items.end())
-                return false;
-            SendDelEquipData(static_cast<ItemEquip *>(iter->second));
-            m_Items.erase(iter);
-            -- m_Size;
         }
         return true;
     }
@@ -1801,12 +1806,7 @@ namespace GObject
 		m_Items.erase(iter);
 		-- m_Size;
         */
-        UInt8 index;
-        if(IsZhenYuan(equip->getClass()))
-            index = 1;
-        else
-            index = 0;
-        if(!eraseEquip(equip->getId(), index))
+        if(!eraseEquip(equip->getId()))
             return false;
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
@@ -6246,7 +6246,7 @@ namespace GObject
 			return false;
         if(isSL && cur > m_Owner->getPacksize(5))
 			return false;
-		if(!isSoul && !isGem && !isGem && !isSL && cur > m_Owner->getPacksize(0) + 50)
+		if(!isSoul && !isGem && !isFormula && !isSL && cur > m_Owner->getPacksize(0) + 50)
 			return false;
 		if(!item->IncItem(num))
 			return false;
@@ -6311,6 +6311,7 @@ namespace GObject
         bool isSoul = GetItemSubClass(item->GetTypeId()) == Item_Soul;
         bool isGem = (GetItemSubClass(item->GetTypeId()) == Item_Gem || GetItemSubClass(item->GetTypeId()) == Item_EvolutionGem);
         bool isFormula = GetItemSubClass(item->GetTypeId()) == Item_Formula;
+        bool isSL = GetItemSubClass(item->GetTypeId()) == Item_SL;
 		UInt16 cur;
         if(isSoul)
             cur = m_SizeSoul;
@@ -6318,6 +6319,8 @@ namespace GObject
             cur = m_SizeGem;
         else if(isFormula)
             cur = m_SizeFormula;
+        else if(isSL)
+            cur = m_SizeSL;
         else
             cur = m_Size;
 		UInt16 oldq = item->Size(), newq = item->Size(item->Count() - num);
@@ -6330,6 +6333,8 @@ namespace GObject
 		    m_SizeGem = cur;
         else if(isFormula)
 		    m_SizeFormula = cur;
+        else if(isSL)
+		    m_SizeSL = cur;
         else
 		    m_Size = cur;
 
@@ -7954,6 +7959,10 @@ namespace GObject
             else if(GetItemSubClass(itemId) == Item_Formula)
             {
                 m_ItemsFormula.erase(ItemKey(itemId, bind));
+            }
+            else if(GetItemSubClass(itemId) == Item_SL)
+            {
+                m_ItemsSL.erase(ItemKey(itemId, bind));
             }
             else
             {

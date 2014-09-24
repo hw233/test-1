@@ -8695,7 +8695,7 @@ namespace GObject
             st << Stream::eos;
             send(st);
             static_cast<ItemEquip *>(zhenyuan)->DoEquipBind();
-            GetPackage()->eraseEquip(zhenyuan->getId(), 1);
+            GetPackage()->eraseEquip(zhenyuan->getId());
             GameAction()->doStrong(this, SthSetZhenYuan, 0, 0);
         }
     }

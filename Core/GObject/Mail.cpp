@@ -88,7 +88,7 @@ bool MailPackage::takeIt( Player * player, bool gm )
         else
             required += size;
 	}
-	if(required > package->GetRestPackageSize(0) || required1 > package->GetRestPackageSize(1) || required1 > package->GetRestPackageSize(3) || required4 > package->GetRestPackageSize(4) || required5 > package->GetRestPackageSize(5))
+	if(required > package->GetRestPackageSize(0) || required1 > package->GetRestPackageSize(1) || required3 > package->GetRestPackageSize(3) || required4 > package->GetRestPackageSize(4) || required5 > package->GetRestPackageSize(5))
 		return false;
 	for(it = _items.begin(); it != _items.end(); ++ it)
 	{

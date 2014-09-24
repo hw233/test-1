@@ -3869,6 +3869,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 UInt16 c1 = 0;
                 UInt16 c3 = 0;
                 UInt16 c4 = 0;
+                UInt16 c5 = 0;
                 for(UInt8 i = 0; i < c; i++)
                 {
                     ItemClass cur = GetItemSubClass(items[i]);
@@ -3878,10 +3879,12 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         ++c3;
                     else if(cur == Item_Formula)
                         ++c4;
+                    else if(cur == Item_SL)
+                        ++c5;
                     else
                         ++c0;
                 }
-                if(player->GetPackage()->GetRestPackageSize() < c0 || player->GetPackage()->GetRestPackageSize(1) < c1 || player->GetPackage()->GetRestPackageSize(3) < c3 || player->GetPackage()->GetRestPackageSize(4) < c4)
+                if(player->GetPackage()->GetRestPackageSize() < c0 || player->GetPackage()->GetRestPackageSize(1) < c1 || player->GetPackage()->GetRestPackageSize(3) < c3 || player->GetPackage()->GetRestPackageSize(4) < c4 || player->GetPackage()->GetRestPackageSize(5) < c5)
                 {
                     // 背包空间不足
                     player->sendMsgCode(0, 1011);
