@@ -4189,6 +4189,20 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if (type == 25 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        curType = 25;
+        GObject::GVAR.SetVar(GObject::GVAR_MEMOIR_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_MEMOIR_END, end);
+
+        return;
+    }
+
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;

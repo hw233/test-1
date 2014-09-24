@@ -1165,7 +1165,7 @@ CREATE TABLE `xinmo` (
     `attack` int(10) unsigned NOT NULL DEFAULT 0,
     `hp` int(10) unsigned NOT NULL DEFAULT 0,
     `action` int(10) unsigned NOT NULL DEFAULT 0,
-    `cridec` float(5,2) unsigned NOT NULL DEFAULT '0.00',
+    `cridec` float(5,4) unsigned NOT NULL DEFAULT '0.00',
     `skilllev` varchar(255) NOT NULL DEFAULT '',
     `payBack` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)

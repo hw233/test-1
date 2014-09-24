@@ -701,6 +701,17 @@ public:
             return false;
     } 
 
+    inline static bool getMemoirTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_MEMOIR_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_MEMOIR_END);
+        UInt32 now = TimeUtil::Now() ;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
     inline static bool getWorldCupTime(UInt32 time = 0 )
     {
         UInt32 end1 = TimeUtil::MkTime(2014, 6, 28);
