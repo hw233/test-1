@@ -790,23 +790,37 @@ bool Trade::appendTradeItems(ItemBase** items, UInt16 itemNum)
 	if (itemNum == 0)
 		return true;
 	UInt16 grids = 0, grids1 = 0;
+    UInt16 grids3 = 0;
+    UInt16 grids4 = 0;
+    UInt16 grids5 = 0;
 	Package* package = _owner->GetPackage();
 	for (UInt16 i = 0; i < itemNum; ++i)
 	{
 		if (items[i] == NULL)
 			continue;
 		if (IsEquipId(items[i]->getId()))
-			++grids;
+        {
+            if(IsZhenYuanItem(items[i]->GetTypeId()))
+                ++grids4;
+            else
+			    ++grids;
+        }
 		else
         {
             UInt16 size = package->GetItemUsedGrids(items[i]->getId(), items[i]->Count());
             if(GetItemSubClass(items[i]->getId()) == Item_Soul)
                 grids1 += size;
+            else if(GetItemSubClass(items[i]->getId()) == Item_Gem || GetItemSubClass(items[i]->getId()) == Item_EvolutionGem)
+                grids3 += size;
+            else if(GetItemSubClass(items[i]->getId()) == Item_Formula)
+                grids4 += size;
+            else if(GetItemSubClass(items[i]->getId()) == Item_SL)
+                grids5 += size;
             else
                 grids += size;
         }
 	}
-	if (grids > package->GetRestPackageSize(0) || grids1 > package->GetRestPackageSize(1))
+	if (grids > package->GetRestPackageSize(0) || grids1 > package->GetRestPackageSize(1) || grids3 > package->GetRestPackageSize(3) || grids4 > package->GetRestPackageSize(4) || grids5 > package->GetRestPackageSize(5))
 	{
 		_owner->sendMsgCode(2, 1015);
 		return false;

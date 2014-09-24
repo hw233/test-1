@@ -7288,7 +7288,7 @@ void Fighter::dismantleGem(UInt8 pos, UInt8 type)
     if(m_xingchen.gems[pos-1] == 0)
         return;
 
-    if(_owner->GetPackage()->GetRestPackageSize() < 1)
+    if(_owner->GetPackage()->GetRestPackageSize(3) < 1)
     {
         _owner->sendMsgCode(0, 1011);
         return;

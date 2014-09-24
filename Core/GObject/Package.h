@@ -44,6 +44,17 @@ namespace GObject
 #define PURPLEADJVAL_TYPE  1
 #define ORANGEADJVAL_TYPE  2
 
+#define PACKAGE_0 1
+#define PACKAGE_1 2
+#define PACKAGE_2 4
+#define PACKAGE_3 8
+#define PACKAGE_4 16
+#define PACKAGE_5 32
+#define PACKAGE_0_3 (PACKAGE_0 | PACKAGE_3)
+#define PACKAGE_0_4 (PACKAGE_0 | PACKAGE_4)
+#define PACKAGE_1_5 (PACKAGE_1 | PACKAGE_5)
+#define PACKAGE_0_3_4 (PACKAGE_0 | PACKAGE_3 | PACKAGE_4)
+
 	class Fighter;
 	class Player;
 
@@ -146,7 +157,7 @@ namespace GObject
         bool   eraseEquip(UInt32 id);     //删除背包道具容器
 		bool   DelEquip(UInt32 id, UInt16 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt16 toWhere = 0);
-		bool   DelEquip3(ItemEquip *);
+		//bool   DelEquip3(ItemEquip *);
         UInt8  GetPart(ItemEquip*);
 		bool   EquipTo(UInt32 id, Fighter * fgt, UInt8 part, ItemEquip *&, bool = false);
 		UInt32 SellItem(UInt32 id, UInt16 num, bool bind = false);
@@ -187,10 +198,17 @@ namespace GObject
                 return m_SizeSoul;
             else if(type == 2)
                 return m_SizeLS;
+            else if(type == 3)
+                return m_SizeGem;
+            else if(type == 4)
+                return m_SizeFormula + m_SizeZY;
+            else if(type == 5)
+                return m_SizeSL;
             return 0;
         }
 		inline UInt16 GetMaxPackageSize() const { return m_Owner->getPacksize(); }
 		inline UInt16 GetRestPackageSize(UInt8 type = 0) const { return (m_Owner->getPacksize(type) > GetUsedPackageSize(type)) ? (m_Owner->getPacksize(type) - GetUsedPackageSize(type)) : 0; }
+		UInt16 GetRestPackageSizeMin(UInt32 type = PACKAGE_0);
 		inline bool IsFull() const { return m_Owner->getPacksize() <= m_Size; }
 
 	public:
@@ -268,7 +286,7 @@ namespace GObject
         void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);
         void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt16 fromWhere);
 
-		inline ItemBase * FindItem(UInt32 id, bool bind = false)
+		ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
             item_elem_iter iter;
             if(GetItemSubClass(id) == Item_Soul)
@@ -277,11 +295,33 @@ namespace GObject
                 if(iter == m_ItemsSoul.end())
                     return NULL;
             }
+            else if(GetItemSubClass(id) == Item_Gem || GetItemSubClass(id) == Item_EvolutionGem)
+            {
+			    iter = m_ItemsGem.find(ItemKey(id, bind));
+                if(iter == m_ItemsGem.end())
+                    return NULL;
+            }
+            else if(GetItemSubClass(id) == Item_Formula)
+            {
+			    iter = m_ItemsFormula.find(ItemKey(id, bind));
+                if(iter == m_ItemsFormula.end())
+                    return NULL;
+            }
+            else if(GetItemSubClass(id) == Item_SL)
+            {
+			    iter = m_ItemsSL.find(ItemKey(id, bind));
+                if(iter == m_ItemsSL.end())
+                    return NULL;
+            }
             else
             {
 			    iter = m_Items.find(ItemKey(id, bind));
                 if(iter == m_Items.end())
-                    return NULL;
+                {
+                    iter = m_ItemsZY.find(ItemKey(id, bind));
+                    if(iter == m_ItemsZY.end())
+                        return NULL;
+                }
             }
 			return iter->second;
 		}
@@ -323,6 +363,9 @@ namespace GObject
         bool TryAddTempItem(ItemBase * item, UInt32 num);
         bool TryDelTempItem(ItemBase * item, UInt32 num);
         bool TryBuySoulItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        bool TryBuyGemItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        bool TryBuyFormulaItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
+        bool TryBuySLItem(UInt32 typeId, UInt32 num, bool bind /*= false */);
         void SendTempItemInfo();
         void SendSingleTempEquipData(ItemEquip * equip);
         void SendTempItemData(ItemBase * item);
@@ -365,10 +408,18 @@ namespace GObject
 		ItemCont m_Items;
 		ItemCont m_ItemsSoul;
 		ItemCont m_ItemsLS;     //灵侍背包
+		ItemCont m_ItemsGem; //宝石背包
+		ItemCont m_ItemsFormula; //阵法背包
+		ItemCont m_ItemsZY; //阵元背包
+		ItemCont m_ItemsSL; //元神背包
         ItemCont m_ItemsTemporary; //临时物品
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
 		UInt16 m_SizeLS;    //already used lingshi grids
+		UInt16 m_SizeGem;  //宝石
+		UInt16 m_SizeFormula;  //阵法
+		UInt16 m_SizeZY;  //阵元
+		UInt16 m_SizeSL;  //元神
         UInt16 m_TempItemSize;
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;

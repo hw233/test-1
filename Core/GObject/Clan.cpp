@@ -4338,7 +4338,10 @@ void Clan::clanBigBossOperate(Player * player, UInt8 command, BinaryReader & brd
             break;
         case 2:
             {
-                if (player->getId() != getLeaderId())
+                ClanMember * mem = getClanMember(player);
+                if(!mem)
+                    return;
+                if (player->getId() != getLeaderId() && !this->getClanBigBoss()->CheckPlayerCanBeReq(player,mem))
                     return;
                 UInt8 appoint_hour = 0;
                 brd >> appoint_hour;
@@ -4347,7 +4350,24 @@ void Clan::clanBigBossOperate(Player * player, UInt8 command, BinaryReader & brd
             break;
         case 3:
             this->getClanBigBoss()->attack(player);
-
+            break;
+        case 4:
+            {
+                if (player->getId() != getLeaderId())
+                    return;
+                this->getClanBigBoss()->RetOpenPlayer(player);
+            }
+            break;
+        case 5:
+            {
+                if (player->getId() != getLeaderId())
+                    return;
+                UInt64 id1 = 0;
+                UInt64 id2 = 0;
+                brd >> id1 >> id2;
+                this->getClanBigBoss()->SetOpenPlayer(id1,id2);
+                this->getClanBigBoss()->RetOpenPlayer(player);
+            }
             break;
         default:
             break;
@@ -5697,11 +5717,11 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8 a
         {{9076,3},{509,3},{549,1},{515,3},{9418,3}},
     };
     static MailPackage::MailItem s_item1[][5] = {
-        {{500,3},{503,3},{501,3},{0,0},{0,0}},
-        {{516,3},{547,3},{9424,3},{0,0},{0,0}},
-        {{9600,3},{554,3},{1325,3},{0,0},{0,0}},
-        {{556,5},{9338,5},{9498,5},{9457,5},{0,0}},
-        {{5066,1},{5025,1},{5055,1},{5145,1},{0,0}},
+        {{57,3},{555,3},{56,3},{0,0},{0,0}},
+        {{503,3},{9424,3},{9418,3},{0,0},{0,0}},
+        {{9600,3},{554,3},{9414,5},{0,0},{0,0}},
+        {{556,5},{9338,5},{9457,5},{9371,10},{0,0}},
+        {{5005,2},{5025,2},{5055,2},{5035,2},{0,0}},
     };
     MailPackage::MailItem *items;
     if(actType == 1)
@@ -5830,7 +5850,7 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
         if(actType == 1)
             addClanTitle(1, 0);
         else
-            addClanTitle(6, 0);
+            addClanTitle(7, 0);
     }
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
