@@ -31,7 +31,7 @@ namespace GObject
     class Evolution
     {
         public:
-            Evolution(Fighter * fgt):_process(0),_award(0),fairyskill(0),success(0){
+            Evolution(Fighter * fgt):_process(0),_award(0),success(0){
                 _fighter = fgt;
                 memset(&_evolution,0,sizeof(_evolution)) ;
                 memset(&_task9,0,sizeof(_task9)) ;
@@ -67,24 +67,6 @@ namespace GObject
             UInt8 GetTaskAward(UInt8 index);
 
 
-            // TODO
-            // 装备仙界技能
-            void setFairySkill(UInt16 pl, bool = true);
-            inline void upFairySkill(UInt16 pl, bool writedb = true) { setFairySkill(pl, writedb); }
-            // 卸下仙界技能
-            void offFairySkill(bool = true);
-            // 增加一个可装备的仙界技能
-            bool addNewFairySkill(UInt16 pl, bool = true, bool = false);
-            // 删除一个可装备的仙界技能
-            bool delFairySkill(UInt16 pl, bool = true);
-            inline UInt16 getFairySkill() { return fairyskill / SKILL_LEVEL_MAX; }
-            inline UInt16 getFairySkillLevel() { return fairyskill % SKILL_LEVEL_MAX; }
-            inline UInt16 getFairySkillAndLevel() { return fairyskill; }
-            // 是否装备了pl这个仙界技能
-            inline bool isFairySkillUp(UInt16 pl) { return SKILL_ID(fairyskill) == SKILL_ID(pl); }
-            // 是否有pl这个可装备的仙界技能
-            int hasFairySkill(UInt16 pl);
-
             void SendTaskInfo(UInt8 taskId);
             Player * getOwner();
 
@@ -102,7 +84,6 @@ namespace GObject
             Fighter * _fighter;
             ItemEquip * _evolution[e_xq_max];// 仙界装备
             struct task9Player _task9[TASK9_COUNT];
-            UInt16 fairyskill;
             static UInt32 npcIds[EVOLUTION_TASKMAX];
             UInt32 randomTime;
             UInt8 success;

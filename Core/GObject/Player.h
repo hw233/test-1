@@ -1390,6 +1390,15 @@ namespace GObject
             }
             return c;
         } 
+        inline UInt8 getFighterPos(UInt32 fighterId) 
+        { 
+            for(int i = 0 ; i < 5;++i)
+            {
+                if(_playerData.lineup[i].fighter && _playerData.lineup[i].fighter->getId() == fighterId) 
+                    return _playerData.lineup[i].pos;
+            }
+            return 0;
+        } 
 
 		inline void SetSessionID(int session) { _session = session; }
 		inline int GetSessionID() const { return _session; }

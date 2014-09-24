@@ -166,6 +166,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackStun100(), _passiveSkillOnAttackStun100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAttackBlind100(), _passiveSkillOnAttackBlind100);
     updatePassiveSkill100(_fighter->getPassiveSkillCondition100(), _passiveSkillCondition100);
+    updatePassiveSkill100(_fighter->getPassiveSkillEvolution100(), _passiveSkillEvolution100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnAtkDmg100(), _passiveSkillOnAtkDmg100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnPetProtect100(), _passiveSkillOnPetProtect100);
     updatePassiveSkill100(_fighter->getPassiveSkillOnGetDmg100(), _passiveSkillOnGetDmg100);
@@ -263,10 +264,10 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         if(passiveSkill && passiveSkill->effect && passiveSkill->effect->eft[0] == GData::e_eft_control_ball)
             setSkillControlBall(passiveSkill);
     }
-    const GData::SkillBase* fairySkill = GData::skillManager[_fighter->getEvolution()->getFairySkillAndLevel()];  //ÎÞË«¼¼ÄÜ
-    if(fairySkill)
-            setSkillEvolution(fairySkill);
 
+    idx = 0;
+    while(NULL != (passiveSkill = getPassiveSkillEvolution100(idx)))
+        setSkillEvolution(passiveSkill);
 }
 
 void BattleFighter::initPassiveSkillByLingshi()
@@ -383,7 +384,7 @@ void BattleFighter::updateBuffExtras()
 	_attrExtra.reset();
 	if(_formEffect != NULL)
 	{
-		addAttrExtra(_attrExtra, _formEffect->attrExtra);
+		//addAttrExtra(_attrExtra, _formEffect->attrExtra);
 	}
 	addAttrExtra(_attrExtra, _fighter->getAttrExtraEquip());
 	UInt32 ext = (_flag & 0x03) + ((_flag >> 2) & 0x03);
@@ -1283,6 +1284,11 @@ const GData::SkillBase* BattleFighter::getPassiveSkillOnAttackBlind100(size_t& i
 const GData::SkillBase* BattleFighter::getPassiveSkillCondition100(size_t& idx, bool noPossibleTarget)
 {
     return getPassiveSkill100(_passiveSkillCondition100, idx, noPossibleTarget);
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillEvolution100(size_t& idx, bool noPossibleTarget)
+{
+    return getPassiveSkill100(_passiveSkillEvolution100, idx, noPossibleTarget);
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillOnAtkDmg100(size_t& idx, bool noPossibleTarget)

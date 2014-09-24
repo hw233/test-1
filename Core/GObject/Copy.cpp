@@ -213,7 +213,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
         return false;
 
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90, 100, 110, 120, 130, 140};
-    //static UInt16 spots[] = {16386, 16388, 16390, 16391, 16392, 16400};
+    static UInt16 lvls2[] = {80, 90, 100, 110, 120, 130};
 
     if (id < 100 && id > sizeof(lvls)/sizeof(UInt8))
         return false;
@@ -234,6 +234,11 @@ bool copyCheckLevel(Player* pl, UInt8 id)
 
     if (id < 100 && pl->GetLev() < lvls[id-1]) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
+        return false;
+    }
+
+    if (id >= 100 && pl->GetLev() < lvls2[id-100]) {
+        SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls2[id-100]);
         return false;
     }
     return true;
