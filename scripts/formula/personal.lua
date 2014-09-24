@@ -71,6 +71,8 @@ soul_potential = {1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,2}
 -- 战斗力系数
 bp_factor_atk      = 1.2      -- 物理攻击
 bp_factor_magatk   = 1.2      -- 法术攻击
+bp_factor_fairyatk = 0.4
+bp_factor_fairydef = 0.1
 bp_factor_def      = 0.3      -- 物理防御
 bp_factor_magdef   = 0.3      -- 法术防御
 bp_factor_hp       = 0.4      -- 生命
@@ -617,8 +619,8 @@ function calcBattlePoint(fgt)
     bp = bp + (fgt:getBaseMagRes() + fgt:getExtraMagRes())/100 * bp_factor_magres
     bp = bp + fgt:getExtraCriticalDmgImmune() * bp_factor_crtdmgimm 
 
-    bp = bp + fgt:getExtraFairyAtk() * bp_factor_atk
-    bp = bp + fgt:getExtraFairyDef() * bp_factor_def
+    bp = bp + fgt:getExtraFairyAtk() * bp_factor_fairyatk
+    bp = bp + fgt:getExtraFairyDef() * bp_factor_fairydef
     --if fgt:getExtraFairyAtk() ~= 0 then
     --    print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
     --    print("攻系数："..bp_factor_atk)

@@ -3088,6 +3088,48 @@ void OnServerWorldSay(GameMsgHdr & hdr , const void *data)
     st << Stream::eos;
     NETWORK()->SendToServerWar(st);
 }
+void OnPaperQuestion(GameMsgHdr & hdr ,const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    UInt8 type = 0;
+    br >> opt >> type;
+    switch(type)
+    {
+        case 1:
+            QuestionPaper::Instance().EnterPaper(player);
+            break;
+        case 2:
+        {
+            UInt16 option = 0;
+            std::string str;
+            UInt8 flag = 0;
+            br >> option >> flag;
+            if(flag)
+            {
+                br >> str; 
+                std::string str_sql= "'";
+                std::string str_sql1= "|";
+                std::string str_sql2= ";";
+                while(str.find(str_sql) != std::string::npos)
+                    str.replace(str.find(str_sql),str_sql.length(),"//");
+                while(str.find(str_sql1) != std::string::npos)
+                    str.replace(str.find(str_sql1),str_sql1.length(),"//");
+                while(str.find(str_sql2) != std::string::npos)
+                    str.replace(str.find(str_sql2),str_sql2.length(),"//");
+            }
+            QuestionPaper::Instance().AnswerQuestion(player,option,str);
+        }
+            break;
+        case 3:
+            QuestionPaper::Instance().ReceiveAward(player);
+            break;
+        default:
+            break;
+    }
+}
 
 void OnFlyRoadAward(GameMsgHdr & hdr , const void *data)
 {
