@@ -1693,6 +1693,8 @@ struct DBClanBigBoss
     UInt32 hp;
     UInt32 atk;
     UInt32 matk;
+    UInt64 player1;
+    UInt64 player2;
 };
 
 struct DBCard
@@ -1763,6 +1765,13 @@ struct DBQuestionPaper
     std::string answer;
     std::string award;
     UInt32  totaltime;
+};
+struct DBExchangeTreasureLog 
+{
+    UInt64 playerId;
+    UInt32 date;
+    UInt32 itemid;
+    UInt32 count;
 };
 
 }
@@ -3851,7 +3860,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN (GObject::DBClanBigBoss)
-SPECIALDEF(7)
+SPECIALDEF(9)
     (
     UInt32, clanid,
     UInt8, status,
@@ -3859,7 +3868,9 @@ SPECIALDEF(7)
     UInt32, last,
     UInt32, hp,
     UInt32, atk,
-    UInt32, matk
+    UInt32, matk,
+    UInt64, player1,
+    UInt64, player2
     )
 SPECIALEND()
 
@@ -3992,6 +4003,16 @@ SPECIALDEF(7)
     std::string, task9,
 	UInt32, rTime,
     UInt8 , success
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBExchangeTreasureLog)
+SPECIALDEF(4)
+(
+    UInt64, playerId,
+    UInt32, date,
+    UInt32, itemid,
+    UInt32, count
 )
 SPECIALEND()
 }

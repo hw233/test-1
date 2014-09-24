@@ -11629,3 +11629,65 @@ function getFlyRoadAward(player, index, isdouble)
     end
     return true
 end
+
+local TreasureHouseAward = {
+    [1] = {13196, 5088},
+    [2] = {13016, 5088},
+    [3] = {13036, 5088},
+    [4] = {13056, 5088},
+    [5] = {13096, 5088},
+    [6] = {13156, 5088},
+    [7] = {13116, 5088},
+    [8] = {13136, 5088},
+    [9] = {13076, 5088},
+    [10] = {7021, 128},
+    [11] = {7121, 128},
+    [12] = {7221, 128},
+    [13] = {7321, 128},
+    [14] = {7421, 128},
+    [15] = {7521, 128},
+    [16] = {7621, 128},
+    [17] = {7721, 128},
+    [18] = {503, 28},
+    [19] = {515, 78},
+    [20] = {9457, 28},
+    [21] = {9600, 28},
+    [22] = {9498, 28},
+    [23] = {1733, 5088},
+    [24] = {1732, 5088},
+    [25] = {1734, 5088},
+    [26] = {1735, 5088},
+    [27] = {9076, 88},
+    [28] = {9022, 168},
+    [29] = {9075, 148},
+    [30] = {9068, 158},
+    [31] = {9649, 20}
+}
+
+function exchangeTreasure(player,index,num,now)
+    local item = TreasureHouseAward[index]
+    if item == nil then
+        return false
+    end
+
+    local package = player:GetPackage()
+    if #item > package:GetRestPackageSize() then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    local var = player:GetVar(873)
+    local tmp = item[2]
+    if var < tmp * num then
+        player:sendMsgCode(2, 1011, 0)
+        return false;
+    end
+    var = var - tmp * num
+    player:SetVar(873,var)
+    package:Add(item[1], num, true)
+    player:SetExchangeTreasureLog(now,item[1],num,true)
+
+    return true
+end
+
+
+

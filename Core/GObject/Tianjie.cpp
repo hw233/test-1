@@ -2110,7 +2110,8 @@ void Tianjie::startBoss()
     {
         _ng = it->second;
         std::vector<GData::NpcFData>& nflist = _ng->getList();
-        m_bossMaxHp =  nflist[0].fighter->getMaxHP();
+        //m_bossMaxHp =  nflist[0].fighter->getMaxHP();
+        m_bossMaxHp =  worldBoss.getLastHP(0);
         _hp = m_bossMaxHp;
 
         broadBossAppear(s_tjBoss[m_bossIndex][1], m_loc);

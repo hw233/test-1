@@ -2467,6 +2467,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             else if(3 == type)
                 player->getShakeMoneyBagLog();
         }
+        break;
 
         case 0x16:
         {
@@ -2474,6 +2475,40 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             br >> type;
             //player->GetMemoirAward(type);
         }
+        break;
+
+        case 0x17:
+        {
+            if(!World::getTreasureTime())
+                return;
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+                case 0:
+                    player->RetTreasureInfo();
+                    break;
+                case 1:
+                {
+                    UInt8 id = 0;
+                    UInt32 num = 0;
+                    br >> id >> num;
+                    if(num == 0)
+                        return;
+                    UInt32 now = TimeUtil::Now();
+                    if(GameAction()->exchangeTreasure(player,id,num,now))
+                        player->RetTreasureInfo();
+                }
+                    break;
+                case 2:
+                    player->GetExchangeTreasureLog(); 
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        break;
 
         default:
         break;
