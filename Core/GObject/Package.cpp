@@ -1157,12 +1157,14 @@ namespace GObject
 		if(itype == NULL) return NULL;
 		switch(itype->subClass)
 		{
+#if 0
         case Item_Formula6:
         case Item_Formula7:
         case Item_Formula8:
         case Item_Formula9:
             ++m_SizeZY;
             break;
+#endif
 		case Item_Weapon:
 		case Item_Armor1:
 		case Item_Armor2:
@@ -1538,10 +1540,20 @@ namespace GObject
 
 	ItemBase* Package::AddEquip2(ItemEquip * equip, UInt16 FromWhere)
 	{
-		ItemBase *& e = m_Items[ItemKey(equip->getId())];
-		if(e == NULL)
-			++ m_Size;
-		e = equip;
+        if(IsZhenYuanItem(equip->GetTypeId()))
+        {
+            ItemBase *& e = m_ItemsZY[ItemKey(equip->getId())];
+            if(e == NULL)
+                ++ m_SizeZY;
+            e = equip;
+        }
+        else
+        {
+            ItemBase *& e = m_Items[ItemKey(equip->getId())];
+            if(e == NULL)
+                ++ m_Size;
+            e = equip;
+        }
 
         if (equip->getClass() != Item_Trump && equip->getClass() != Item_Fashion &&
             equip->getClass() != Item_Halo &&  equip->getClass() != Item_InnateTrump &&

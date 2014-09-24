@@ -20670,7 +20670,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
         return;
     if(copy_or_front == 0)
     {
-        if(GetFreePackageSize(PACKAGE_0_3) < 1)
+        if(GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1)
         {
             sendMsgCode(0, 1011);
             return;
@@ -20678,7 +20678,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
     }
     else if(copy_or_front == 1)
     {
-        if(GetFreePackageSize(PACKAGE_0_3_4) < 1)
+        if(GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3_4) < 1)
         {
             sendMsgCode(0, 1011);
             return;
@@ -20686,7 +20686,7 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
     }
     else
     {
-        if(GetFreePackageSize(PACKAGE_0_3) < 1)
+        if(GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1)
         {
             sendMsgCode(0, 1011);
             return;

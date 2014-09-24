@@ -639,6 +639,12 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
     {
     case 0:     //封妖
         {
+            if(pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_1_5) < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
+
             if(level != dpd->curLevel + 1)
                 break;
             else
@@ -797,6 +803,11 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
 {
     if(!checkTownDeamon(pl))
         return;
+    if(pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_1_5) < 1+levels/5)
+    {
+        pl->sendMsgCode(0, 1011);
+        return;
+    }
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 

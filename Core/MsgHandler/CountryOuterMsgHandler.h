@@ -6648,6 +6648,11 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             GObject::Fighter * fgt = player->findFighter(fighterId);
             if(!fgt)
                 break;
+            if(itemId2 == 0 && player->GetPackage()->GetRestPackageSize(5) < 1)
+            {
+                player->sendMsgCode(0, 1011);
+                return;
+            }
 
             UInt8 idx = fgt->getSoulSkillIdx(itemId1);
             if(idx == 0xFF)

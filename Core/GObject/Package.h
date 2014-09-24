@@ -52,6 +52,7 @@ namespace GObject
 #define PACKAGE_5 32
 #define PACKAGE_0_3 (PACKAGE_0 | PACKAGE_3)
 #define PACKAGE_0_4 (PACKAGE_0 | PACKAGE_4)
+#define PACKAGE_1_5 (PACKAGE_1 | PACKAGE_5)
 #define PACKAGE_0_3_4 (PACKAGE_0 | PACKAGE_3 | PACKAGE_4)
 
 	class Fighter;
