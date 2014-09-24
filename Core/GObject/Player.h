@@ -922,6 +922,13 @@ namespace GObject
         UInt32 count;
     };
 
+    struct ExchangeTreasureLog
+    {
+        UInt32 date;
+        UInt32 itemid;
+        UInt32 count;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -3681,6 +3688,7 @@ namespace GObject
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
         std::vector<ShakeMoneyBagLog *> _shakeMoneyBagLog;
+        std::vector<ExchangeTreasureLog*> _exchangeTreasureLog;
 
         inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
         inline void setMyAnnouncement(std::string & an, bool toDB)
@@ -3712,6 +3720,10 @@ namespace GObject
         void getLuckyBagExtraAward();
         UInt32 getClanJoinTime();
         void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
+        void SetExchangeTreasureLog(UInt32 date, UInt32 itemid, UInt32 count, bool toDB = true);
+        void GetExchangeTreasureLog();
+        void RetTreasureInfo();
+        void TreasureConsumeAct(UInt32 c);
 
     private:
         //玩家位置（包括层数、当层位置）

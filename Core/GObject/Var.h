@@ -854,6 +854,11 @@ namespace GObject
         VAR_MEMOIR_WEIXIN_COUNT = 858, //三年回忆录微信领取次数
         VAR_MEMOIR_WEIBO_COUNT = 859, //三年回忆录微博领取次数
 
+        //871 -890 for dtc
+        VAR_TREASURE_CONSUME = 871, //藏宝阁个人消费累计数
+        VAR_TREASURE_CONSUME_EXT = 872, //藏宝阁个人消费累计积分剩余数
+        VAR_TREASURE_SCORE = 873, //藏宝阁个人积分数
+
         VAR_MAX,
     };
 

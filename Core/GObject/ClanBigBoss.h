@@ -76,6 +76,9 @@ namespace GObject
         void process(UInt32 now);
         void GMAttackBoss(UInt32 attack_boss);
         void SetDirty(Player* player,bool _iscbbbuf);
+        void SetOpenPlayer(UInt64 id1,UInt64 id2);
+        bool CheckPlayerCanBeReq(Player* player,ClanMember* mem);
+        void RetOpenPlayer(Player* pl);
             
         inline bool setHP(UInt32 hp)
         {
@@ -118,6 +121,9 @@ namespace GObject
         Int32 _lastMAtk;
         bool _flag;
         UInt8 _buffer;
+        
+        Player* openPlayer1;
+        Player* openPlayer2;
     };
 
     class ClanBigBossMgr : public Singleton <ClanBigBossMgr>

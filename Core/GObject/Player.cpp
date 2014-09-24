@@ -5414,7 +5414,10 @@ namespace GObject
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
         if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3 && ci->purchaseType != ZhengHun && ci->purchaseType != JieHun && ci->purchaseType != LiHun && ci->purchaseType != TrainFighter && ci->purchaseType != DINGQINGXINWU)
+        {
             CarnivalConsumeAct(c);
+            TreasureConsumeAct(c);
+        }
         return _playerData.gold;
 	}
 
@@ -28727,15 +28730,15 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
 
             static UInt32 awards1[10][4][2] = {
                 {{503,5},  {500,1}, {501,1}, {49,20}},
-                {{9360,5},  {9093,5}, {0,0}, {50,10}},
+                {{517,5},  {551,5}, {0,0}, {70,10}},
                 {{9418,5}, {9414,5}, {9424,5}, {100,10}},
-                {{555,10}, {556,5}, {0,0}, {200,10}},
-                {{9338,5}, {554,5}, {0,0},{220,10}},
-                {{16001,5}, {16000,5}, {0,0},{75,10}},
-                {{9498,10}, {9497,5}, {0,0},{180,10}},
+                {{555,10}, {556,5}, {0,0}, {150,10}},
+                {{9338,5}, {554,5}, {0,0},{175,10}},
+                {{8000,5}, {33,5}, {0,0},{75,10}},
+                {{9498,10}, {9497,5}, {0,0},{175,10}},
                 {{9600,10}, {9500,5}, {0,0},{100,10}},
-                {{9021,5}, {9068,5}, {0,0},{1198,5}},
-                {{1733,1}, {0,0}, {0,0},{999,2}},
+                {{9019,5}, {9022,5}, {0,0},{1100,5}},
+                {{1735,1}, {0,0}, {0,0},{999,1}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
@@ -28977,7 +28980,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,2));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,3));
                 st << static_cast<UInt8>(5 - GET_BIT_8(consume3,0));
-                st << static_cast<UInt8>(2 - GET_BIT_8(consume3,1));
+                st << static_cast<UInt8>(1 - GET_BIT_8(consume3,1));
             }
             st << Stream::eos;
             send(st);
@@ -29014,10 +29017,10 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             };
             static UInt32 everydayAward1[5][7][2] = {
                 { {15, 3}, {500, 3}, {501, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9424, 3}, {503, 3}, {513, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {547, 3}, {9424, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
-                { {9457, 3}, {134, 3}, {554, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {13236, 1}, {13136, 1}, {13016, 1}, {13036, 1}, {13196, 1}, {0, 0}, {0, 0} },
+                { {9424, 3}, {547, 3}, {57, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {9371, 3}, {9600, 3}, {517, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
+                { {9457, 3}, {1325, 3}, {556, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {13116, 1}, {13136, 1}, {13156, 1}, {13036, 1}, {13056, 1}, {0, 0}, {0, 0} },
             };
  
             UInt8 totalPackageSize = 0;
@@ -35889,6 +35892,60 @@ void Player::sendMemoirAwardInfo()
     st << Stream::eos;
     send(st);
 }
+
+void Player::SetExchangeTreasureLog(UInt32 date, UInt32 itemid, UInt32 count, bool toDB)
+{
+    ExchangeTreasureLog * lg = new ExchangeTreasureLog;
+    lg->date = date;
+    lg->itemid = itemid;
+    lg->count = count;
+    _exchangeTreasureLog.push_back(lg);
+
+    if(toDB)
+        DB().PushUpdateData("insert into `exchange_treasure_log`(playerId, data, itemid, count) values(%" I64_FMT "u, %u, %u, %u)", getId(), date, itemid, count);
+}
+
+void Player::GetExchangeTreasureLog()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x17);
+    st << static_cast<UInt8>(2);
+    st << static_cast<UInt32>(_exchangeTreasureLog.size());
+    for(std::vector<ExchangeTreasureLog*>::iterator i = _exchangeTreasureLog.begin(), e = _exchangeTreasureLog.end(); i!=e ; ++i)
+    {
+        st << (*i)->date;
+        st << (*i)->itemid;
+        st << (*i)->count;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::RetTreasureInfo()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x17);
+    st << static_cast<UInt8>(0);
+    st << GetVar(VAR_TREASURE_CONSUME) << GetVar(VAR_TREASURE_SCORE);         
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::TreasureConsumeAct(UInt32 c)
+{
+    //if(!World::getTreasureConsume())
+    //    return;
+    AddVar(VAR_TREASURE_CONSUME, c);
+    AddVar(VAR_TREASURE_CONSUME_EXT, c);
+   
+    while(GetVar(VAR_TREASURE_CONSUME_EXT) >= 30)
+    {
+        UInt32 tmp = GetVar(VAR_TREASURE_CONSUME_EXT) - 30;
+        SetVar(VAR_TREASURE_CONSUME_EXT,tmp);
+        AddVar(VAR_TREASURE_SCORE, 10);
+    }
+}
+
 
 } // namespace GObject
 

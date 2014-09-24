@@ -796,6 +796,18 @@ public:
             return false;
     }
 
+    inline static bool getTreasureTime(UInt32 time = 0 )
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 begin = TimeUtil::MkTime(2014, 10, 7);
+        UInt32 end = TimeUtil::MkTime(2014, 10, 12);
+
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static void setNeedRechargeRank(bool v)
     { _needrechargerank = v; }
     inline static bool getNeedRechargeRank()

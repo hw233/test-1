@@ -47,6 +47,8 @@ ClanBigBoss::ClanBigBoss(Clan* clan)
     _flag = false;
     _buffer = 0;
     _ng = NULL;    
+    openPlayer1 = NULL;
+    openPlayer2 = NULL;
     
 }
 
@@ -86,9 +88,15 @@ void ClanBigBoss::ReqBossAppointment(UInt8 app_time/* 时间点数 */,std::strin
     m_final = false;
     s_pds.clear();
     updateInfo();
+    UInt64 id1 = 0; 
+    UInt64 id2 = 0; 
+    if(openPlayer1)
+        id1 = openPlayer1->getId();
+    if(openPlayer2)
+        id2 = openPlayer2->getId();
 
     //TODO DB
-    DB4().PushUpdateData("REPLACE INTO `clanbigboss` VALUES(%u, %u, %u, %u, %u, %u, %u)",_clan->getId(),static_cast<UInt8>(_status), appointment_time,_lastTime,_lastHp,_lastAtk,_lastMAtk);
+    DB4().PushUpdateData("REPLACE INTO `clanbigboss` VALUES(%u, %u, %u, %u, %u, %u, %u, %" I64_FMT "u, %" I64_FMT "u)",_clan->getId(),static_cast<UInt8>(_status), appointment_time,_lastTime,_lastHp,_lastAtk,_lastMAtk,id1,id2);
         
     Stream st;
     SYSMSGVP(st, 983,_clan->getName().c_str(),str.c_str(),app_time);
@@ -794,6 +802,15 @@ void ClanBigBoss::ReturnBossInfo(Player* pl,UInt8 status)
     switch(status)
     {
         case 0 :
+        {
+            UInt64 id1 = 0;
+            UInt64 id2 = 0;
+            if(openPlayer1)
+                id1 = openPlayer1->getId();
+            if(openPlayer2)
+                id2 = openPlayer2->getId();
+            st << id1 << id2;
+        }
             break;
         case 1:
             leaveTime = appointment_time - TimeUtil::Now();
@@ -890,6 +907,13 @@ void ClanBigBoss::LoadFromDB(DBClanBigBoss* dcbb)
     appointment_time = dcbb->app_time;
     m_BossHP = _lastHp;
     
+    Player * pl1 = globalPlayers[dcbb->player1];
+    Player * pl2 = globalPlayers[dcbb->player2];
+    if(pl1)
+        openPlayer1 = pl1;
+    if(pl2)
+        openPlayer2 = pl2;
+    
     if(_status != CLAN_BIGBOSS_NOINIT && _status != CLAN_BIGBOSS_OVER)
         ClanBigBossMgr::Instance().insertMap(_clan->getId(),this); 
 
@@ -942,6 +966,67 @@ void ClanBigBoss::SetDirty(Player* player,bool _iscbbbuf)
 
 }
 
+void ClanBigBoss::SetOpenPlayer(UInt64 id1,UInt64 id2)
+{
+    UInt64 playerid1 = 0; 
+    UInt64 playerid2 = 0; 
+    Player * pl1 = globalPlayers[id1];
+    Player * pl2 = globalPlayers[id2];
+    //if(pl1 != NULL)
+    {
+        openPlayer1 = pl1; 
+        if(openPlayer1)
+        {
+            ClanMember * mem = _clan->getClanMember(openPlayer1);
+            if(!mem)
+                return;
+            if(CheckPlayerCanBeReq(openPlayer1,mem))
+                playerid1 = openPlayer1->getId();
+        }
+    }
+    //if(pl2 != NULL)
+    {
+        openPlayer2 = pl2; 
+        if(openPlayer2)
+        {
+            ClanMember * mem = _clan->getClanMember(openPlayer2);
+            if(!mem)
+                return;
+            if(CheckPlayerCanBeReq(openPlayer2,mem))
+                playerid2 = openPlayer2->getId();
+        }
+    }
+    
+    //TODO DB
+    DB4().PushUpdateData("UPDATE `clanbigboss` SET `player1` = %u, `player2` = %u WHERE `clanid` = %u ",playerid1,playerid2,_clan->getId());
+}
+
+bool ClanBigBoss::CheckPlayerCanBeReq(Player* player,ClanMember* mem)
+{
+    if(player != openPlayer1 && player != openPlayer2)
+        return false;
+
+    if(mem->cls != 2 && mem->cls != 3) 
+        return false;
+    return true;
+}
+
+void ClanBigBoss::RetOpenPlayer(Player* pl)
+{
+    Stream st(REP::CLAN_COPY);
+    st << static_cast<UInt8>(0x10) << static_cast<UInt8>(6);
+    if(openPlayer1)
+        st << openPlayer1->getId();
+    else
+        st << static_cast<UInt64>(0);
+    if(openPlayer2)
+        st << openPlayer2->getId();
+    else
+        st << static_cast<UInt64>(0);
+    
+    st << Stream::eos;
+    pl->send(st);
+}
 
 ///////////////////////////
 
