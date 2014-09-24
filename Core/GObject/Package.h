@@ -156,7 +156,7 @@ namespace GObject
         bool   eraseEquip(UInt32 id);     //删除背包道具容器
 		bool   DelEquip(UInt32 id, UInt16 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt16 toWhere = 0);
-		bool   DelEquip3(ItemEquip *);
+		//bool   DelEquip3(ItemEquip *);
         UInt8  GetPart(ItemEquip*);
 		bool   EquipTo(UInt32 id, Fighter * fgt, UInt8 part, ItemEquip *&, bool = false);
 		UInt32 SellItem(UInt32 id, UInt16 num, bool bind = false);
@@ -304,6 +304,12 @@ namespace GObject
             {
 			    iter = m_ItemsFormula.find(ItemKey(id, bind));
                 if(iter == m_ItemsFormula.end())
+                    return NULL;
+            }
+            else if(GetItemSubClass(id) == Item_Zhenyuan)
+            {
+			    iter = m_ItemsZY.find(ItemKey(id, bind));
+                if(iter == m_ItemsZY.end())
                     return NULL;
             }
             else

@@ -1150,14 +1150,12 @@ namespace GObject
 		if(itype == NULL) return NULL;
 		switch(itype->subClass)
 		{
-#if 0
         case Item_Formula6:
         case Item_Formula7:
         case Item_Formula8:
         case Item_Formula9:
             ++m_SizeZY;
             break;
-#endif
 		case Item_Weapon:
 		case Item_Armor1:
 		case Item_Armor2:
@@ -1732,24 +1730,52 @@ namespace GObject
 
     bool Package::eraseEquip(UInt32 id)
     {
-        item_elem_iter iter = m_Items.find(ItemKey(id));
-        if(iter == m_Items.end())
-            return false;
-		SendDelEquipData(static_cast<ItemEquip *>(iter->second));
-        m_Items.erase(iter);
-        -- m_Size;
+        item_elem_iter iter;
+        if(GetItemSubClass(id) == Item_Zhenyuan)
+        {
+            iter = m_ItemsZY.find(ItemKey(id));
+            if(iter == m_ItemsZY.end())
+                return false;
+            SendDelEquipData(static_cast<ItemEquip *>(iter->second));
+            m_ItemsZY.erase(iter);
+            -- m_SizeZY;
+        }
+        else
+        {
+            iter = m_Items.find(ItemKey(id));
+            if(iter == m_Items.end())
+                return false;
+            SendDelEquipData(static_cast<ItemEquip *>(iter->second));
+            m_Items.erase(iter);
+            -- m_Size;
+        }
         return true;
     }
 
 	bool Package::DelEquip(UInt32 id, UInt16 toWhere)
 	{
 		if(!IsEquipId(id)) return false;
-		item_elem_iter iter = m_Items.find(ItemKey(id));
-		if(iter == m_Items.end())
-			return false;
-		ItemBase * item = iter->second;
-		m_Items.erase(iter);
-		-- m_Size;
+
+        item_elem_iter iter;
+        ItemBase * item;
+        if(GetItemSubClass(id) == Item_Zhenyuan)
+        {
+            iter = m_ItemsZY.find(ItemKey(id));
+            if(iter == m_ItemsZY.end())
+                return false;
+            item = iter->second;
+            m_ItemsZY.erase(iter);
+            -- m_SizeZY;
+        }
+        else
+        {
+            iter = m_Items.find(ItemKey(id));
+            if(iter == m_Items.end())
+                return false;
+            item = iter->second;
+            m_Items.erase(iter);
+            -- m_Size;
+        }
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
 		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", id);
 		if((toWhere != 0 && item->getQuality() >= 4) || (Item_LBling <= item->GetItemType().subClass && Item_LBxin >= item->GetItemType().subClass && (static_cast<ItemLingbao*>(item))->getLbColor()>=4))
@@ -1799,7 +1825,7 @@ namespace GObject
 		SAFE_DELETE(equip);
 		return true;
 	}
-
+#if 0
 	bool Package::DelEquip3(ItemEquip * equip)
 	{
 		item_elem_iter iter = m_Items.find(equip->getId());
@@ -1811,7 +1837,7 @@ namespace GObject
 		SendDelEquipData(equip);
 		return true;
 	}
-
+#endif
     /**
      *  @return  0表示有问题
      */
@@ -2700,6 +2726,7 @@ namespace GObject
 			}
 		}
 
+        cit = m_ItemsZY.begin();
 		for (; cit != m_ItemsZY.end(); ++cit)
         {
             count ++;
@@ -3881,7 +3908,7 @@ namespace GObject
             return 2;
         }
 
-		if(GetRestPackageSize() < 1)
+		if(GetRestPackageSize(3) < 1)
 		{
 			m_Owner->sendMsgCode(0, 1011);
 			return 2;

@@ -1748,7 +1748,7 @@ function ItemNormal_00000495(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (2 + 2*num/99) then
+    if package:GetRestPackageSize() < (2 + 2*num/99)  or package:GetRestPackageSize(5) < (1 + 4*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -3010,7 +3010,7 @@ function ItemNormal_00000033(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < num then
+    if package:GetRestPackageSize(5) < num then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
@@ -5134,7 +5134,7 @@ function ItemNormal_00009131(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (3+num/99) then
+    if package:GetRestPackageSize() < (2+2*num/99) or package:GetRestPackageSize(5) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -5158,7 +5158,7 @@ function ItemNormal_00009132(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (3+num/99) then
+    if package:GetRestPackageSize() < (3+num/99) or package:GetRestPackageSize() < (1+2*num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8286,7 +8286,7 @@ function ItemNormal_00010180(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (2+(2*num*2)/99) then
+    if package:GetRestPackageSize() < (1+num/99) or package:GetRestPackageSize(5) < (1+2*num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8432,7 +8432,7 @@ function ItemNormal_00010188(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (5+(5*num*1)/99) then
+    if package:GetRestPackageSize() < (4+(4*num)/99) or package:GetRestPackageSize(5) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8485,7 +8485,7 @@ function ItemNormal_00010191(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (4+(4*num*1)/99) then
+    if package:GetRestPackageSize() < (3+(3*num)/99) or package:GetRestPackageSize(5) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8613,7 +8613,7 @@ function ItemNormal_00010199(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (7+(7*num*8)/99) then
+    if package:GetRestPackageSize() < (7+(7*num*8)/99) or package:GetRestPackageSize(5) < (1+(2*num)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -9432,7 +9432,7 @@ function ItemNormal_00010248(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (8+(8*num*3)/99) then
+    if package:GetRestPackageSize() < (8+(8*num*3)/99) or package:GetRestPackageSize(5) < (1+(3*num)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -11190,7 +11190,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
-    if package:GetRestPackageSize() < num then
+    if package:GetRestPackageSize() < num or package:GetRestPackageSize(5) < num then
         player:sendMsgCode(2, 1011, 0)
         return 0; 
     end
@@ -12029,7 +12029,7 @@ end
 function ItemNormal_00016051(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < 1 + num/99 then
+    if package:GetRestPackageSize() < 1 + num/99 or package:GetRestPackageSize(5) < 1 + num/99 then
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end

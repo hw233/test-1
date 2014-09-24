@@ -3727,7 +3727,7 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
                 brd >> type;
                 brd >> id;
 
-                if((player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_4) < 1) && (type != 1))
+                if((player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3_4) < 1) && (type != 1))
                 {
                     player->sendMsgCode(1, 1014);
                     return;

@@ -20668,10 +20668,29 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
 #endif
     if(indexPut == 0 || indexPut > 5)
         return;
-    if(GetFreePackageSize() < 1)
+    if(copy_or_front == 0)
     {
-        sendMsgCode(0, 1011);
-        return;
+        if(GetFreePackageSize(PACKAGE_0_3) < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+    }
+    else if(copy_or_front == 1)
+    {
+        if(GetFreePackageSize(PACKAGE_0_3_4) < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+    }
+    else
+    {
+        if(GetFreePackageSize(PACKAGE_0_3) < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
     }
 
     UInt8 i;
