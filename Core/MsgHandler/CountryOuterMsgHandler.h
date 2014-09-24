@@ -2472,7 +2472,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         {
             UInt8 type = 0;
             br >> type;
-            player->GetMemoirAward(type);
+            //player->GetMemoirAward(type);
         }
 
         default:
