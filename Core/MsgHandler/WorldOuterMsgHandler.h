@@ -3447,7 +3447,8 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
             {
                 UInt8 IsDouble = 0;
                 brd >> IsDouble;
-                player->GetFlyRoadGift(IsDouble);
+                GameMsgHdr hdr(0x388, player->getThreadId(), player, sizeof(IsDouble));
+                GLOBAL().PushMsg(hdr, &IsDouble);
             }
        }
        case 0x45:

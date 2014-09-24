@@ -3089,6 +3089,13 @@ void OnServerWorldSay(GameMsgHdr & hdr , const void *data)
     NETWORK()->SendToServerWar(st);
 }
 
+void OnFlyRoadAward(GameMsgHdr & hdr , const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 IsDouble = *reinterpret_cast<const UInt8 *>(data);
+    player->GetFlyRoadGift(IsDouble);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 
 

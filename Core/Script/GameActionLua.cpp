@@ -1997,11 +1997,6 @@ namespace Script
 		assert(player != NULL);
         return Call<bool>("getRedBeanAward", player, index, count);
     }
-    void GameActionLua::getFlyRoadAward(Player * player, UInt8 index, bool isdouble)
-    {
-		assert(player != NULL);
-        return Call<void>("getFlyRoadAward", player, index, isdouble);
-    }
     bool GameActionLua::getFeiShengDan(Player * player, UInt8 index)
     {
 		assert(player != NULL);
@@ -2011,6 +2006,11 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<bool>("getFeiShengDanAward", player, index);
+    }
+    bool GameActionLua::getFlyRoadAward(Player * player, UInt8 index, UInt8 isdouble)
+    {
+		assert(player != NULL);
+        return Call<bool>("getFlyRoadAward", player, index, isdouble);
     }
 }
 

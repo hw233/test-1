@@ -426,9 +426,9 @@ namespace Script
         bool getShuShanWeiWei_XDPB_Award(Player * player, UInt8 opt);
         Table getShuShanWeiWei_MSYJ_Award(Player * player);
         bool getRedBeanAward(Player * player, UInt8 index, UInt32 count);
-        void getFlyRoadAward(Player * player, UInt8 index, bool isdouble);
         bool getFeiShengDan(Player * player, UInt8 index);
         bool getFeiShengAward(Player * player, UInt8 index);
+        bool getFlyRoadAward(Player * player, UInt8 index, UInt8 isdouble);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

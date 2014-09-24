@@ -35748,8 +35748,6 @@ void Player::CarnivalConsumeAct(UInt32 c)
 
 void Player::SendFlyRoadGiftInfo()
 {
-    if(GetLev() < 80)
-        return;
     Stream st(REP::ACT);
     st << static_cast<UInt8>(0x37);
     st << static_cast<UInt8>(1);
@@ -35760,27 +35758,100 @@ void Player::SendFlyRoadGiftInfo()
 
 void Player::GetFlyRoadGift(UInt8 IsDouble)
 {
-    UInt32 currentPos = 0;
+    UInt8 currentPos = 0;
     currentPos = GetVar(VAR_FLY_ROAD_GIFT_GOT_NUM);
-    if(currentPos >= 10 || GetVar(VAR_FLY_ROAD_GIFT_TODAY_STATUS) || GetLev() < 80)
+    if(currentPos >= 10 || GetLev() < 80)
         return;
+    if(GetVar(VAR_FLY_ROAD_GIFT_TODAY_STATUS))
+    {
+        sendMsgCode(0, 2233);
+        return;
+    }
 
     if(IsDouble)
     {
         ConsumeInfo ci(FLYROADGETAWARD,0,0);
-        if (getGold() < 100)
+        if (getGold() < 20)
         {
             sendMsgCode(0, 1104);
             return;
         }
-        useGold(100, &ci);
-        GameAction()->getFlyRoadAward(this, currentPos + 1, true);
+        useGold(20, &ci);
     }
-    else
-        GameAction()->getFlyRoadAward(this, currentPos + 1, false);
+    if(!GameAction()->getFlyRoadAward(this, currentPos + 1, IsDouble))
+        return;
 
     SetVar(VAR_FLY_ROAD_GIFT_TODAY_STATUS, 1);
     AddVar(VAR_FLY_ROAD_GIFT_GOT_NUM, 1);
+    SendFlyRoadGiftInfo();
+}
+
+void Player::GetMemoirAward(UInt8 type)
+{
+    static MailPackage::MailItem MemoirAward[][3] = {
+        {{503, 1}, {500, 1}, {15, 1}}, //微信分享
+        {{9424, 1}, {501, 1}, {15, 1}}, //微博分享
+        {{9371, 3}, {9457, 3}, {556, 3}}, //微信终极
+        {{9600, 3}, {1126, 3}, {1325, 3}} //微博终极
+    };
+
+    //1分享到微博，0分享到微信
+    if(type)
+    {
+        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS))
+            return;
+        SYSMSGV(title, 5234);
+        SYSMSGV(content, 5235);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, MemoirAward[1], 3, true);
+        }
+        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 6)
+        {
+            SYSMSGV(title, 5236);
+            SYSMSGV(content, 5237);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, MemoirAward[3], 3, true);
+            }
+        }
+        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+    }
+    else
+    {
+        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS))
+            return;
+        SYSMSGV(title, 5234);
+        SYSMSGV(content, 5235);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            mailPackageManager.push(mail->id, MemoirAward[0], 3, true);
+        }
+        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 6)
+        {
+            SYSMSGV(title, 5236);
+            SYSMSGV(content, 5237);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, MemoirAward[2], 3, true);
+            }
+        }
+        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+    }
+}
+
+void Player::sendMemoirAwardInfo()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x16);
+    st << static_cast<UInt8>(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS));
+    st << static_cast<UInt8>(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS));
+    st << Stream::eos;
+    send(st);
 }
 
 } // namespace GObject

@@ -3661,6 +3661,8 @@ namespace GObject
 
         void GetFlyRoadGift(UInt8);
         void SendFlyRoadGiftInfo();
+        void GetMemoirAward(UInt8);
+        void sendMemoirAwardInfo();
 
         void hideVipLvlFlag(UInt8);
         void ReturnFlyRoadInfo();

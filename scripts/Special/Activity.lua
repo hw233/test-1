@@ -11596,39 +11596,36 @@ function getWeiXinShop(index)
 end
 
 local FlyRoadAward = {
-    [1] = {1, 1, 1},
-    [2] = {1, 1, 1},
-    [3] = {1, 1, 1},
-    [4] = {1, 1, 1},
-    [5] = {1, 1, 1},
-    [6] = {1, 1, 1},
-    [7] = {1, 1, 1},
-    [8] = {1, 1, 1},
-    [9] = {1, 1, 1},
-    [10] = {1, 1, 1},
-    [11] = {1, 2, 1},
-    [12] = {1, 2, 1},
-    [13] = {1, 2, 1},
-    [14] = {1, 2, 1},
-    [15] = {1, 2, 1},
-    [16] = {1, 2, 1},
-    [17] = {1, 2, 1},
-    [18] = {1, 2, 1},
-    [19] = {1, 2, 1},
-    [20] = {1, 2, 1}
+    [1] = {{17102, 5}, {17104,1}, {17107,1}, {17110,1}},
+    [2] = {{17102, 5}, {17105,1}, {17106,2}, {17109,1}, {17111,1}},
+    [3] = {{17102, 7}, {17103,1}, {17104,1}, {17107,1}},
+    [4] = {{17102, 7}, {17106,2}, {17109,2}},
+    [5] = {{17102, 10}, {17104,2}, {17107,1}, {17111,2}},
+    [6] = {{17102, 10}, {17103,1}, {17106,2}, {17110,2}},
+    [7] = {{17102, 13}, {17104,2}, {17105,1}, {17107,1}, {17111,2}},
+    [8] = {{17102, 13}, {17106,2}, {17109,2}, {17110,2}},
+    [9] = {{17102, 15}, {17103,1}, {17104,2}, {17105,1}, {17107,1}},
+    [10] = {{17102, 15}, {17103,2}, {17104,2}, {17106,2}, {17109,5}, {17110,5}, {17111,5}}
 }
 
 function getFlyRoadAward(player, index, isdouble)
-    if isdouble == true then
-        index = index + 10
-    end
-
     local item = FlyRoadAward[index]
     if item == nil then
-        return
+        return false
     end
 
-    sendItemPackageMail(player, msg_3, msg_3, item);
+    local package = player:GetPackage()
+    if #item > package:GetRestPackageSize() then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
 
+    for n = 1, #item do
+        if isdouble ~=0 then
+            package:AddItem(item[n][1], item[n][2] * 2, true)
+        else
+            package:AddItem(item[n][1], item[n][2], true)
+        end
+    end
     return true
 end

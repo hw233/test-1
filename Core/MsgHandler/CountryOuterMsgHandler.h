@@ -1475,7 +1475,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->getNewYearGiveGiftAward(0,0);
     pl->firstPotOfGoldReturn(0);
-    pl->SendFlyRoadGiftInfo();
+    if(pl->GetVar(VAR_FLY_ROAD_GIFT_GOT_NUM) < 10 && pl->GetLev() >= 80)
+        pl->SendFlyRoadGiftInfo();
 
     {
         GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, pl, 0);
@@ -2468,7 +2469,9 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 0x16:
         {
-
+            UInt8 type = 0;
+            br >> type;
+            player->GetMemoirAward(type);
         }
 
         default:
