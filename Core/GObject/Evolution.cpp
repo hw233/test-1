@@ -69,6 +69,8 @@ namespace GObject
             return 1;
         if(!getOwner())
             return 1;
+        if(!getOwner()->getLineupNum(_fighter->getId()))
+            return 0;
 
         UInt32 npcId = 0;
         if(!npcIds[type])
@@ -210,6 +212,8 @@ namespace GObject
     UInt8 Evolution::TryTask8(UInt8 task9)
     { 
         if(!task9)
+            return 0;
+        if(!getOwner()->getLineupNum(_fighter->getId()))
             return 0;
 
         --task9;
