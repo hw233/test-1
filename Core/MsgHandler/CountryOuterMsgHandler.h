@@ -3879,6 +3879,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         ++c3;
                     else if(cur == Item_Formula)
                         ++c4;
+                    else if(cur == Item_Zhenyuan)
+                        return;
                     else if(cur == Item_SL)
                         ++c5;
                     else

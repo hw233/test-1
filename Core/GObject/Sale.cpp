@@ -428,6 +428,8 @@ bool Sale::addSaleMailItems(UInt32 id)
         type = 3;
     else if(GetItemSubClass(item->getId()) == Item_Formula)
         type = 4;
+    else if(GetItemSubClass(item->getId()) == Item_SL)
+        type = 5;
     else
         type = 0;
 	if (usedGrids > package->GetRestPackageSize(type))
