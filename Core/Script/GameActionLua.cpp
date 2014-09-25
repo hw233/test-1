@@ -355,6 +355,7 @@ namespace Script
         CLASS_DEF(Player, sendUseRideItemInfo);
         CLASS_DEF(Player, getXuanTianNingLuLua);
         CLASS_DEF(Player, GetCollectCard);
+        CLASS_DEF(Player, SetExchangeTreasureLog);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);
@@ -2014,7 +2015,6 @@ namespace Script
 		assert(player != NULL);
         return Call<bool>("getFlyRoadAward", player, index, isdouble);
     }
-
     bool GameActionLua::getBaiFuBagAward(Player * player)
     {
 		assert(player != NULL);
@@ -2029,6 +2029,11 @@ namespace Script
     {
 		assert(player != NULL);
         return Call<bool>("getHitEggAward", player,count);
+    }
+    bool GameActionLua::exchangeTreasure(Player * player, UInt8 index, UInt32 num, UInt32 now)
+    {
+		assert(player != NULL);
+        return Call<bool>("exchangeTreasure", player, index, num, now);
     }
 }
 

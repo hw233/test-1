@@ -2637,6 +2637,8 @@ CREATE TABLE IF NOT EXISTS `clanbigboss` (
    `hp` int(10) unsigned NOT NULL,
    `atk` int(10) NOT NULL,
    `matk` int(10) NOT NULL,
+    `player1` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `player2` bigint(20) unsigned NOT NULL DEFAULT '0',
    PRIMARY KEY (`clanid`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -2725,3 +2727,10 @@ CREATE TABLE IF NOT EXISTS `shake_moneybag_log` (
     `count` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `exchange_treasure_log`;
+CREATE TABLE IF NOT EXISTS `exchange_treasure_log` (
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `data` int(10) unsigned NOT NULL DEFAULT '0',
+    `itemid` int(10) unsigned NOT NULL DEFAULT '0',
+    `count` int(10) unsigned NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -318,7 +318,7 @@ bool Dungeon::doAttack( Player * player, UInt8 difficulty, UInt8 level)
     {
         return false;
     }
-    if (player->GetPackage()->GetRestPackageSize() <= 0)
+    if (player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) <= 0)
     {
         player->sendMsgCode(0, 1011);
         return false;
@@ -825,7 +825,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
             DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %" I64_FMT "u", player->getId());
             return;
         }
-        if(player->GetPackage()->GetRestPackageSize() < 4)
+        if(player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 4)
         {
             player->delFlag(Player::AutoDungeon);
             Stream st(REP::COPY_AUTO_FIGHT);

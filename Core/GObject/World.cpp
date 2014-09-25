@@ -521,6 +521,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -550,6 +566,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
         ))
     {
 #if 0
@@ -1470,6 +1488,22 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  25)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
 
          )
         bRechargeEnd = true;
@@ -5224,13 +5258,13 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{9600,25},{556,25},{9498,30}},
-        {{16001,25},{9600,20},{556,20},{9498,25}},
-        {{16001,20},{9600,15},{556,15},{9498,20}},
-        {{16001,15},{9600,10},{556,10},{9498,15}},
+        {{1325,30},{9600,25},{515,25},{9498,30}},
+        {{1325,25},{9600,20},{515,20},{9498,25}},
+        {{1325,20},{9600,15},{515,15},{9498,20}},
+        {{1325,15},{9600,10},{515,10},{9498,15}},
     };
     static MailPackage::MailItem s_item2[][4] = {
-        {{17805,1}},
+        {{17810,1}},
         {{0,0}},
         {{0,0}},
         {{0,0}},

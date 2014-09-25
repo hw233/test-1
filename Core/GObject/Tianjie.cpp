@@ -148,8 +148,8 @@ static const UInt32 s_tjTotalBoxId[] = {9127, 9128, 9129, 9130};
 static const UInt32 s_tjEventRewardId = 9131;
 static const UInt32 s_tjTotalRewardId = 9132;
                                        //59, 69,  79,  89,  99,  109, 119, 129, 139, 149, 999
-static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1671,1534,1535,1399};
-static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,17809,9162,9163,17801};
+static const UInt32 s_tjWeaponId[] =   {1650,1651,1652,1529,1530,1531,1660,1671,1534,1535,1400};
+static const UInt32 s_tjNameCardId[] = {9154,9155,9156,9157,9158,9159,9908,17809,9162,9163,17808};
 static  MailPackage::MailItem s_eventItem[2]= {{30,10}, {509,1}};
 #define TJ_START_TIME_HOUR 19 
 #define TJ_START_TIME_MIN  45
@@ -300,6 +300,9 @@ bool Tianjie::isPlayerInTj(int playerLevel)
 }
 bool Tianjie::isOpenTj(Player* pl)
 {
+    if(m_currOpenedTjLevel != 999 && m_currOpenedTjLevel > 129)
+        return false;
+
     int playerLevel = pl->GetLev();
     //在手动开启的天劫运行中,又达到了自动天劫的等级
     UInt32 maxLevel = GVAR.GetVar(GVAR_MAX_LEVEL);
@@ -743,6 +746,9 @@ void Tianjie::onTianjieReq( GameMsgHdr& hdr, const void* data)
 }
 void Tianjie::notifyTianjieStatus(Player* pl)
 {
+    if(m_currOpenedTjLevel != 999 && m_currOpenedTjLevel > 129)
+        return;
+
     Stream st1(REQ::TIANJIE);
     UInt8 type1 = 5; //通知
     UInt8 status1 =  m_isTjOpened;
@@ -2110,7 +2116,8 @@ void Tianjie::startBoss()
     {
         _ng = it->second;
         std::vector<GData::NpcFData>& nflist = _ng->getList();
-        m_bossMaxHp =  nflist[0].fighter->getMaxHP();
+        //m_bossMaxHp =  nflist[0].fighter->getMaxHP();
+        m_bossMaxHp =  worldBoss.getLastHP(0);
         _hp = m_bossMaxHp;
 
         broadBossAppear(s_tjBoss[m_bossIndex][1], m_loc);

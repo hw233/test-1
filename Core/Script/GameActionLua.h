@@ -432,6 +432,7 @@ namespace Script
         bool getBaiFuBagAward(Player * player);
         bool getXCTJCountAward(Player * player,UInt8 type, UInt8 index);
         bool getHitEggAward(Player * player,UInt8 count);
+        bool exchangeTreasure(Player * player, UInt8 index, UInt32 num, UInt32 now);
 
 	private:
 		Player* _player1;	//?ű???????Ϊ????1

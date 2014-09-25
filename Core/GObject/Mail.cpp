@@ -64,6 +64,9 @@ bool MailPackage::takeIt( Player * player, bool gm )
 {
 	Package * package = player->GetPackage();
 	UInt16 required = 0, required1 = 0;
+    UInt16 required3 = 0;
+    UInt16 required4 = 0;
+    UInt16 required5 = 0;
 	std::map<UInt16, UInt16>::iterator it;
 	for(it = _items.begin(); it != _items.end(); ++ it)
 	{
@@ -76,10 +79,16 @@ bool MailPackage::takeIt( Player * player, bool gm )
         UInt16 size = package->GetItemUsedGrids(it->first, it->second & 0x00FF, bind);
         if(GetItemSubClass(it->first) == Item_Soul)
             required1 += size;
+        else if(GetItemSubClass(it->first) == Item_Gem || GetItemSubClass(it->first) == Item_EvolutionGem)
+            required3 += size;
+        else if(GetItemSubClass(it->first) == Item_Formula || GetItemSubClass(it->first) == Item_Zhenyuan)
+            required4 += size;
+        else if(GetItemSubClass(it->first) == Item_SL)
+            required5 += size;
         else
             required += size;
 	}
-	if(required > package->GetRestPackageSize(0) || required1 > package->GetRestPackageSize(1))
+	if(required > package->GetRestPackageSize(0) || required1 > package->GetRestPackageSize(1) || required3 > package->GetRestPackageSize(3) || required4 > package->GetRestPackageSize(4) || required5 > package->GetRestPackageSize(5))
 		return false;
 	for(it = _items.begin(); it != _items.end(); ++ it)
 	{

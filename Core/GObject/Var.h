@@ -588,6 +588,9 @@ namespace GObject
         VAR_DIRECTPURCNT2 = 607, // 幸运星活动直购次数(超值专区)
         VAR_FEAST_GIFT_LOGIN = 608, //周年庆套装——生辰宝甲
         VAR_PRIVATE_RECHARGE = 609, //私人定制对应的每日充值
+        VAR_PACKAGE_SIZE_GEM = 610, //宝石背包空间
+        VAR_PACKAGE_SIZE_FORMULA = 611, //阵法、阵元背包空间
+        VAR_PACKAGE_SIZE_SL = 612, //元神背包空间
 
         //621-660 for lib 
         VAR_AIRBOOK_LOGIN = 621,    //天书奇缘登陆
@@ -856,6 +859,11 @@ namespace GObject
         VAR_MEMOIR_TODAY_WEIBO_STATUS = 857, //三年回忆录当天微博领取状态
         VAR_MEMOIR_WEIXIN_COUNT = 858, //三年回忆录微信领取次数
         VAR_MEMOIR_WEIBO_COUNT = 859, //三年回忆录微博领取次数
+
+        //871 -890 for dtc
+        VAR_TREASURE_CONSUME = 871, //藏宝阁个人消费累计数
+        VAR_TREASURE_CONSUME_EXT = 872, //藏宝阁个人消费累计积分剩余数
+        VAR_TREASURE_SCORE = 873, //藏宝阁个人积分数
 
         VAR_MAX,
     };
@@ -1374,6 +1382,9 @@ namespace GObject
             REGISTER_VAR(VAR_DIRECTPURCNT2, CYCLE_NONE);
             REGISTER_VAR(VAR_FEAST_GIFT_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_PRIVATE_RECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_PACKAGE_SIZE_GEM, CYCLE_NONE);
+            REGISTER_VAR(VAR_PACKAGE_SIZE_FORMULA, CYCLE_NONE);
+            REGISTER_VAR(VAR_PACKAGE_SIZE_SL, CYCLE_NONE);
             REGISTER_VAR(VAR_STRENGTH_LEVEL, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN, CYCLE_NONE);
             REGISTER_VAR(VAR_AIRBOOK_LOGIN_AWARD, CYCLE_NONE);
