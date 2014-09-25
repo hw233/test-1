@@ -34792,9 +34792,9 @@ void Player::sendCoolSummerAward(UInt8 awardType, UInt8 randType, UInt8 sendType
     }
 
     if(sendType == 0)
-        GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, true, FromCoolSummer);
+        GetPackage()->Add(awardArray[awardType][0], itemCount, true, true, FromCoolSummer);
     else if(sendType == 1)
-        GetPackage()->AddItem(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
+        GetPackage()->Add(awardArray[awardType][0], itemCount, true, false, FromCoolSummer);
     else if(sendType == 2)
         m_Package->ItemNotify(awardArray[awardType][0], itemCount);
 }
