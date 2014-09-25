@@ -36031,6 +36031,8 @@ void Player::getXCTJCountAward(UInt8 type)  //type 从0开始
         award = 0;
         AddVar(VAR_XCTJ_REPEAT,1);
         SYSMSG_BROADCASTV(5238,getCountry(), getName().c_str());
+        SYSMSG_BROADCASTV(5238,getCountry(), getName().c_str());
+        SYSMSG_BROADCASTV(5238,getCountry(), getName().c_str());
     }
     SetVar(VAR_XCTJ_AWARD , award);
     char str[16] = {0};
