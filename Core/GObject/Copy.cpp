@@ -741,7 +741,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
         FastMutex::ScopedLock lk(_mutex);
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
-            if(World::getJiqirenAct())
+            if(World::getJiqirenAct() && !TimeUtil::SameDay(TimeUtil::Now(),TimeUtil::MkTime(2014, 9, 29)))
                 pl->handleJiqirenAct_copy();
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
@@ -760,7 +760,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
     } else {
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
-            if(World::getJiqirenAct())
+            if(World::getJiqirenAct() && !TimeUtil::SameDay(TimeUtil::Now(),TimeUtil::MkTime(2014, 9, 29)))
                 pl->handleJiqirenAct_copy();
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;

@@ -991,7 +991,11 @@ function LuckyDrawBox(player, id)
     end
 
     local package = player:GetPackage()
-    package:Add(item, 1, true)
+    if getNationalDayHigh() then
+        package:Add(item, 2, true)
+    else
+        package:Add(item, 1, true)
+    end
 end
 
 function sendWinReward(player, lootlvl, typeId)
@@ -9385,7 +9389,11 @@ function GetBDSupermanPrice(player, itemId, isUsed)
             function ExJob(player, id)
                 if id >= 4 then
                     local package = player:GetPackage()
-                    package:AddItem(9229, 1, true)
+                    if getNationalDayHigh() then
+                        package:AddItem(9229, 2, true)
+                    else
+                        package:AddItem(9229, 1, true)
+                    end
                 end
             end
 

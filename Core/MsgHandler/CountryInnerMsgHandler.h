@@ -755,8 +755,8 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 	player->sendDailyInfo();
 
     player->checkDungeonTimeout(time);
-    player->buildClanTask(true);
-    player->clearFinishCount();
+    player->buildClanTask(true,time);
+    player->clearFinishCount(time);
     /*
     if (World::_thanksgiving)
         player->resetThanksgiving();
