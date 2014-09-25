@@ -1078,6 +1078,9 @@ void NewHeroIsland::rankReward()
 
     SYSMSG_BROADCASTV(2312);
 
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
     UInt16 n = 0;
     for (NHISortAll::iterator i = _sorts.begin(); i != _sorts.end(); ++i, ++n)
     {
@@ -1085,6 +1088,7 @@ void NewHeroIsland::rankReward()
             continue;
 
         UInt16 count = (World::_wday == 6 || World::_wday == 7) ? 2 : 1;
+        count *= nationalDayF;
         UInt16 prestige = 0;
         if (n < 5)
         {
@@ -1167,6 +1171,9 @@ void NewHeroIsland::rankReward1()
         for(UInt8 j = 0; j < 3; ++ j)
             scores[j] += _scores[i][j];
     }
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
     UInt8 sort[3] = {0};
     UInt8 i,j,k;
     for(i = k = 0; i < sizeof(scores)/sizeof(scores[0]); ++ i)
@@ -1205,6 +1212,7 @@ void NewHeroIsland::rankReward1()
             cnt2 = 1;
             cnt3 = 1;
         }
+        prestige *= nationalDayF;
         //MailPackage::MailItem item[] = {{MailPackage::Prestige, prestige*count}, {9408, cnt1*count}, {9409, cnt2*count}, {9410, cnt3*count},};
         MailPackage::MailItem item[] = {{9408, cnt1*count}, {9409, cnt2*count}, {9410, cnt3*count},};
         SYSMSGV(content, 2319, _stage, (*it)->score[_stage-1], prestige, item[0].count, item[1].count, item[2].count);
@@ -1242,6 +1250,9 @@ void NewHeroIsland::checkAddExp(UInt32 now)
     if(_expTime > now)
         return;
     UInt8 factor = (World::_wday == 6 || World::_wday == 7) ? 2 : 1;
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
     for (NHISortAll::iterator it = _sorts.begin(); it != _sorts.end(); ++it)
     {
         if (*it && (*it)->player && (*it)->status != NEWHERO_ISLAND_ESCAPE)
@@ -1254,6 +1265,7 @@ void NewHeroIsland::checkAddExp(UInt32 now)
                 exp = calcExp(lvl) *3*factor*2;
             else
                 exp = calcExp(lvl) *3*factor;
+            exp *= nationalDayF;
             pd->player->AddExp(exp);
         }
     }

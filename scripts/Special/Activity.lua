@@ -9043,6 +9043,9 @@ function fairyPetLoot(player, lootlvl)
     if getHalfGold() then
         num = 2;
     end
+    if getNationalDayHigh() then
+        num = num * 2
+    end
     package:AddItem(9371, num, true, 0, 10);
 end
 

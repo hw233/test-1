@@ -46,15 +46,18 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
     UInt8 f = 1;
     if (cfg.rpServer&&plvl<70)
         f = 2;
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
 	
     if(plvl <= 90)
-		player->AddExp(f*2 * (duration * ((plvl - 40) * 6 + 20)));
+		player->AddExp(nationalDayF * f*2 * (duration * ((plvl - 40) * 6 + 20)));
 	else if(plvl <= 100)
-		player->AddExp(f*2 * (duration * ((plvl - 90) * 22 + 320)));
+		player->AddExp(nationalDayF * f*2 * (duration * ((plvl - 90) * 22 + 320)));
 	else if(plvl <= 114)
-		player->AddExp(f*2 * (duration * ((plvl - 100) * 140 + 540)));
+		player->AddExp(nationalDayF * f*2 * (duration * ((plvl - 100) * 140 + 540)));
 	else
-		player->AddExp(f*2 * (duration * 2500));
+		player->AddExp(nationalDayF * f*2 * (duration * 2500));
 	return duration;
 }
 
@@ -100,6 +103,8 @@ inline void addAchievement(UInt32& achieve, UInt8 lvl, UInt8& killStreak1, UInt8
         achieve += 10 * (lvl + 1);
 	if(World::_wday == 1)
 		achieve *= 2;
+    if(World::getNationalDayHigh())
+        achieve *= 2;
 
     // XXX: 阵营战时间减半后处理
     achieve *= 2;
@@ -159,6 +164,8 @@ void CountryBattle::process(UInt32 curtime)
 			UInt32 achieve = 0, loserAchieve = 2 * (lvl + 1);
 			if(World::_wday == 1)
 				loserAchieve *= 2;
+            if(World::getNationalDayHigh())
+                loserAchieve *= 2;
 
             UInt32 thisDay = TimeUtil::SharpDay();
             UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(cbd1->player, created));
@@ -725,6 +732,8 @@ void CountryBattle::restCount( UInt32 curtime, UInt8 lvl, UInt8 side )
 			UInt8 achievement = 2 * (lvl + 1);
 			if(World::_wday == 1)
 				achievement *= 2;
+            if(World::getNationalDayHigh())
+                achievement *= 2;
 			cbd->restCountTime = curtime + 60;
 			_score[side] += gotScore;
 			cbd->player->getAchievement(achievement);

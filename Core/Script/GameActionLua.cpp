@@ -172,6 +172,7 @@ namespace Script
 		lua_tinker::def(_L, "getCoolSummer", GObject::World::getCoolSummer);
 		lua_tinker::def(_L, "getSeekingHer", GObject::World::getSeekingHer);
 		lua_tinker::def(_L, "getGGTime", GObject::World::getGGTime);  //情义罗盘
+		lua_tinker::def(_L, "getNationalDayHigh", GObject::World::getNationalDayHigh);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);

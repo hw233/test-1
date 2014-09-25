@@ -366,7 +366,7 @@ void NewCountryBattle::checkAddExp(UInt32 curtime)
             UInt32 exp = 16 * ((plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25);
             if (cfg.rpServer && player->GetLev() < 70)
                 exp *= 2;
-            player->AddExp(exp);
+            player->AddExp(World::getNationalDayHigh() ? (exp * 2) : exp);
         }
         ++ iter;
     }
@@ -378,11 +378,11 @@ void NewCountryBattle::addAchievement(Player * player, UInt8 achieve)
     if(!player || !achieve) return;
     if(player->isOnline())
     {
-        player->pendAchievement(achieve);
+        player->pendAchievement(World::getNationalDayHigh() ? (achieve * 2) : achieve);
         player->checkLastBattled();
     }
     else
-        player->getAchievement(achieve);
+        player->getAchievement(World::getNationalDayHigh() ? (achieve * 2) : achieve);
 }
 
 void NewCountryBattle::allotPlayers()
@@ -873,6 +873,11 @@ void NewCountryBattle::handleBattle()
     UInt32 index = 0;
     UInt32 j = 0;
     TRACE_LOG("NewCountryBattle=>>size蜀山论剑该轮次的玩家总数量:[%u]", size * 2 + m_joinByePlayer.size());
+
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
+
     for(std::map<Player *, Player *>::iterator iter = m_pairPlayer.begin(); iter != m_pairPlayer.end(); ++iter, ++j)
     {
         Player * player1 = iter->first;
@@ -907,6 +912,7 @@ void NewCountryBattle::handleBattle()
         UInt8 kills2 = ncbpData2->currKillStreak;
         UInt16 achieve = 0;
         UInt16 loserAchieve = COUNT_LOSEACHIEVE(achLvl1, achLvl2);
+        loserAchieve *= nationalDayF;
 
         UInt32 thisDay = TimeUtil::SharpDay();
         UInt32 endDay = TimeUtil::SharpDay(6, PLAYER_DATA(player1, created));
@@ -943,6 +949,7 @@ void NewCountryBattle::handleBattle()
             ncbpData1->totalWin ++;
             kills1 = ncbpData1->currKillStreak > 10 ? 10 : ncbpData1->currKillStreak;
             achieve = COUNT_WINACHIEVE(kills1, kills2, achLvl1, achLvl2);
+            achieve *= nationalDayF;
             ncbpData1->setAchievementLevel(achieve);
             if(ncbpData1->type != 1)
                 ncbpData1->type = 3;

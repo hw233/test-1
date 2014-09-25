@@ -139,6 +139,10 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     UInt64 exp = 0 ; //LIB   EXP
     UInt32 damage = 0;
 
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
+
     if (!pl) return false;
     UInt32 now = TimeUtil::Now();
     if(final)
@@ -247,6 +251,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             {
                 damage = oldHP - newHP;
                 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                exp *= nationalDayF;
                 if (exp < 1000)
                     exp = 1000;
                pl->pendExp(exp);
@@ -321,8 +326,9 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         {
             pl->_lastNg = _ng;
             exp = _ng->getExp()*expfactor; 
+            exp *= nationalDayF;
             pl->pendExp(exp );
-            _ng->getLoots(pl, pl->_lastLoot, 1, NULL);
+            _ng->getLoots(pl, pl->_lastLoot, 1, NULL, nationalDayF);
         }
     }
 
@@ -478,34 +484,39 @@ void WBoss::reward(Player* player)
     bool notify4_10 = false;
     bool notify11_20 = false;
     UInt32 j = 0;
+
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
+
     for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(); i != m_atkinfo.rend(); ++i, ++j)
     {
         (*i).player->wBossUdpLog(1096 + m_idx);
         if (j < AWARD_AREA1)
         {
-            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4 * nationalDayF},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
-            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 4);
+            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 4 * nationalDayF);
         }
 
         if (j >= AWARD_AREA1 && j < AWARD_AREA2)
         {
-            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2 * nationalDayF},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
             if (!notify4_10)
             {
-                SYSMSG_BROADCASTV(558, trumpFrag[tlvl], 2);
+                SYSMSG_BROADCASTV(558, trumpFrag[tlvl], 2 * nationalDayF);
                 notify4_10 = true;
             }
         }
 
         if (j >= AWARD_AREA2 && j < AWARD_MAN)
         {
-            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1 * nationalDayF},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
             if (!notify11_20)
             {
-                SYSMSG_BROADCASTV(571, trumpFrag[tlvl], 1);
+                SYSMSG_BROADCASTV(571, trumpFrag[tlvl], 1 * nationalDayF);
                 notify11_20 = true;
             }
         }
