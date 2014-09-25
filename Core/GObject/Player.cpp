@@ -35995,10 +35995,16 @@ void Player::giveOutTheWelfare(UInt8 type,std::string test)  //type 0-世界
     if(type)
     {
         if(getClan())
+        {
             SYSMSG_BROADCASTV(5239,getCountry(), getName().c_str(),getClan()->getName().c_str() , test.c_str());
+            SYSMSG_BROADCASTV(5239,getCountry(), getName().c_str(),getClan()->getName().c_str() , test.c_str());
+            SYSMSG_BROADCASTV(5239,getCountry(), getName().c_str(),getClan()->getName().c_str() , test.c_str());
+        }
     }
     else
     { 
+        SYSMSG_BROADCASTV(5240,getCountry(), getName().c_str(), test.c_str());
+        SYSMSG_BROADCASTV(5240,getCountry(), getName().c_str(), test.c_str());
         SYSMSG_BROADCASTV(5240,getCountry(), getName().c_str(), test.c_str());
     } 
     AddVar(VAR_XCTJ_FULI,1);
