@@ -725,6 +725,8 @@ namespace GObject
         if(plvl < 40)
             return 0;
         UInt64 exp = (plvl - 10) * ((plvl > 99 ? 99 : plvl) / 10) * 5 + 25;
+        if(World::getNationalDayHigh())
+            exp *= 2;
         return exp;
 	}
 
@@ -4112,6 +4114,10 @@ namespace GObject
 		if(it == GData::npcGroups.end())
 			return false;
 
+        UInt8 nationalDayF = 1;
+        if(World::getNationalDayHigh())
+            nationalDayF = 2;
+
 		GData::NpcGroup * ng = it->second;
         UInt16 bs = 0;
         if(type == 0)
@@ -4142,9 +4148,13 @@ namespace GObject
 
             if(getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO, now))
                 exp *= (18.f/10.f);
+
+            exp *= nationalDayF;
+
             pendExp(exp);
             pexp = exp;
-			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
+            ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
+
             //战胜NPC 成就
             GameAction()->doAttainment(this, 10351, npcId);
 
@@ -21988,7 +21998,7 @@ void Player::sendSaveGoldAct()
 }
 void Player::buyTownTjItem(const UInt32 itemId)
 {
-    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534,1661};
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534,1661,1672};
     int opt = -1;
     for (UInt8 i = 0; i < sizeof(s_items)/sizeof(s_items[0]); ++i)
     {
@@ -22047,7 +22057,7 @@ void Player::buyTownTjItem(const UInt32 itemId)
 }
 void Player::sendTownTjItemInfo()
 {
-    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534,1661};
+    static const UInt32 s_items[] = {1653,1654,1655,1532,1533,1534,1661,1672};
     UInt8 flag = GetVar(VAR_TJ_TOWN_ITEM_GOT);
     std::vector<ItemEquip*> items;
     std::vector<ItemEquip*> fgtItems;

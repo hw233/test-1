@@ -1680,6 +1680,10 @@ void AthleticsRank::TmExtraAward(UInt8 type)
 {
     size_t awardCnt = 10;
 
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
+
     if(cfg.merged && World::getMergeAthAct())
     {
         awardCnt = 30;
@@ -1770,6 +1774,9 @@ void AthleticsRank::TmExtraAward(UInt8 type)
                         tael = 9830 - ( i - 39 ) * 20;
                     else
                         tael = 600;
+
+                    prestige *= nationalDayF;
+                    tael *= nationalDayF;
 
                     RankList::iterator found = _ranks[1].find(start1L->player);
                     start1L->player->SetVar(VAR_LOCAL_PRESTIGE, prestige);
@@ -1911,6 +1918,8 @@ void AthleticsRank::TmExtraAward(UInt8 type)
             else
                 tael = 600;
 
+            prestige *= nationalDayF;
+            tael *= nationalDayF;
             AthleticsRankData *rank = *start1;
             rank->prestige = prestige;
             rank->tael = tael;

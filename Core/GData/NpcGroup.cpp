@@ -79,7 +79,7 @@ void NpcGroup::getLoots( GObject::Player * player, UInt8 lootlvl )
 	}
 }
 
-void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, UInt8 lootlvl, UInt8* atoCnt )
+void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, UInt8 lootlvl, UInt8* atoCnt , UInt8 factor)
 {
     if (lootlvl >= _loots.size())
     {
@@ -107,6 +107,7 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
             if(!player->checkClientIP())
                 bind = true;
 
+            lr[j].count *= factor;
             if (player->GetPackage()->Add(lr[j].id, lr[j].count, bind || lr[j].bind, true, FromNpc))
             {
                 ++cnt;

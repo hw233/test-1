@@ -254,7 +254,12 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
     if(!dm)
         return;
 
+    UInt8 nationalDayF = 1;
+    if(World::getNationalDayHigh())
+        nationalDayF = 2;
+
     exp = dm->exp;
+    exp *= nationalDayF;
     if(player->getBuffData(PLAYER_BUFF_QI_TIAN_CHU_MO))
         exp *= (18.f/10.f);
 
@@ -265,9 +270,15 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
         // TODO: lua function
 		GameAction()->onDungeonLootItemRoll(player, _dungeon->getId(), dpi.level[dpi.difficulty], dm->formated);
 		dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA1(player, dpi.difficulty) < 2 ? 40 : 0));
+        if(World::getNationalDayHigh())
+            dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA1(player, dpi.difficulty) < 2 ? 40 : 0));
 	}
 	else
+    {
 		dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA1(player, dpi.difficulty) < 2 ? 40 : 0));
+        if(World::getNationalDayHigh())
+            dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA1(player, dpi.difficulty) < 2 ? 40 : 0));
+    }
 	std::map<UInt16, UInt8> cloots;
 	for(std::vector<GData::LootResult>::iterator iter = player->_lastLoot.begin(); iter < player->_lastLoot.end(); ++ iter)
 	{

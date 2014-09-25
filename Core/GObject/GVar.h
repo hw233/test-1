@@ -173,6 +173,9 @@ namespace GObject
 
         GVAR_CLAN_LOCAL_RANK = 109,
 
+        GVAR_NATIONAL_DAY_BEGIN = 110,
+        GVAR_NATIONAL_DAY_END = 111,
+
         GVAR_MAX,
     };
 
