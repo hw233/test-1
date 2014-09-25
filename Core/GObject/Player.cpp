@@ -36066,7 +36066,7 @@ void Player::AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UI
     st << static_cast<UInt8>(0x19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(1) << static_cast<UInt8>(1);
     st << pl->getName() << static_cast<UInt8>(pl->getCountry())<< time << num << itemId << count;
     st << Stream::eos;
-    NETWORK()->Broadcast(st);
+    send(st);
 }
 void Player::sendXCTJMyAward()
 { 
