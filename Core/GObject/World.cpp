@@ -5731,7 +5731,7 @@ void World::SendXCTJAward()
         {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
         {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
     };
-    static MailPackage::MailItem card = {9979,1};   //暂无白马王子
+    static MailPackage::MailItem card = {17807,1};   //暂无白马王子
 
     SYSMSG(title, 5244);
     int pos = 0;
