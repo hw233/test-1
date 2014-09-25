@@ -2310,6 +2310,8 @@ function getHitEggAward(player,num)
             end
         end
 
+        index = math.random(1, 20)
+        print("index:"..index)
         if index > max  then
             max = index;
         end
@@ -2336,8 +2338,11 @@ function getHitEggAward(player,num)
         if index > 3 then
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]运气爆棚，砸金蛋竟然砸出个[4:"..item_id.."]x"..item_count.."，简直碉堡了！")
         end
-        package:AddItem(item_id, item_count, true, 0, 39);
-
+        if index == 20 then 
+            package:AddEquip(item_id , true, 0, 39);
+        else
+            package:AddItem(item_id, item_count, true, 0, 39);
+        end
         if max == index then
             itemId = item_id
             count = item_count

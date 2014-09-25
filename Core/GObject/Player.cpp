@@ -9130,8 +9130,8 @@ namespace GObject
         } 
         if(World::getXCTJTime())
         {
-            UInt32 goldLeft = GetVar(VAR_XCTJ_RECHARGE)%50;
-            m_Package->AddItem(16058, (goldLeft + r)/50, true, true);
+            UInt32 goldLeft = GetVar(VAR_XCTJ_RECHARGE)%80;
+            m_Package->AddItem(16058, (goldLeft + r)/80, true, false);
             AddVar(VAR_XCTJ_RECHARGE,r);
         }
         if(World::getGGTime())
@@ -35960,6 +35960,10 @@ UInt8 Player::HitEggInXCTJ(UInt8 type)
     UInt32 xctjCount = GetVar(VAR_XCTJ_COUNT);
     GameMsgHdr hdr(0x18C, WORKER_THREAD_WORLD, this, sizeof(xctjCount));
     GLOBAL().PushMsg(hdr, &xctjCount);
+
+    char str[16] = {0};
+    sprintf(str, "F_140925_%d",type+2);
+    udpLog("xicongtianjiang", str, "", "", "", "", "act");
     return 0;
 
     //AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 5);
@@ -35987,6 +35991,7 @@ void Player::giveOutTheWelfare(UInt8 type,std::string test)  //type 0-世界
 
     GameMsgHdr hdr(0x18B, WORKER_THREAD_WORLD, this, sizeof(type));
     GLOBAL().PushMsg(hdr, &type);
+
     if(type)
     {
         if(getClan())
@@ -35997,6 +36002,9 @@ void Player::giveOutTheWelfare(UInt8 type,std::string test)  //type 0-世界
         SYSMSG_BROADCASTV(5240,getCountry(), getName().c_str(), test.c_str());
     } 
     AddVar(VAR_XCTJ_FULI,1);
+    char str[16] = {0};
+    sprintf(str, "F_140925_%d",!type+11);
+    udpLog("xicongtianjiang", str, "", "", "", "", "act");
 } 
 
 /* ****************** */
@@ -36025,6 +36033,9 @@ void Player::getXCTJCountAward(UInt8 type)  //type 从0开始
         SYSMSG_BROADCASTV(5238,getCountry(), getName().c_str());
     }
     SetVar(VAR_XCTJ_AWARD , award);
+    char str[16] = {0};
+    sprintf(str, "F_140925_%d",type+5);
+    udpLog("xicongtianjiang", str, "", "", "", "", "act");
 } 
 void Player::sendXCTJInfo()
 { 
