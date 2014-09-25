@@ -1095,7 +1095,7 @@ function ItemNormal_00000427(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 4 then
+	if package:GetRestPackageSize() < 4 or package:GetRestPackageSize(3) < 4 then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -1217,7 +1217,7 @@ function ItemNormal_00000429(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 2 + (2*num*2)/99 then
+	if package:GetRestPackageSize() < 2 + (2*num*2)/99 or package:GetRestPackageSize(3) < 2 + (2*num*2)/99 then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -1289,7 +1289,7 @@ function ItemNormal_00000432(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 2 + (2*num*6)/99 then
+	if package:GetRestPackageSize() < 2 + (2*num*6)/99 or package:GetRestPackageSize(3) < 2 + (2*num*6)/99 then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -1668,7 +1668,7 @@ function ItemNormal_00000492(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (2 + 6 * num / 99) then
+    if package:GetRestPackageSize() < (2 + 6 * num / 99) or package:GetRestPackageSize(3) < (2 + 6 * num / 99) then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
@@ -1748,7 +1748,7 @@ function ItemNormal_00000495(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (2 + 2*num/99) then
+    if package:GetRestPackageSize() < (2 + 2*num/99)  or package:GetRestPackageSize(5) < (1 + 4*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -2718,7 +2718,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 	if player:GetLev() >= 40 then
 	   local package = player:GetPackage();
 	   local reqGrids = 21*num;
-	   if reqGrids <= 	package:GetRestPackageSize() then
+	   if reqGrids <= 	package:GetRestPackageSize() or num <= package:GetRestPackageSize(3) then
 	       package:DelItemSendMsg(iid, player);
            local fgt = player:getMainFighter();
            if fgt == nil then
@@ -3010,7 +3010,7 @@ function ItemNormal_00000033(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < num then
+    if package:GetRestPackageSize(5) < num then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
@@ -3433,7 +3433,7 @@ function ItemNormal_00009001(iid, num, bind, param)
     if now < doubleend then
         factor = 2
     end
-    if package:GetRestPackageSize() < (3*factor + num * 3 * factor / 99) then
+    if package:GetRestPackageSize() < (3*factor + num * 3 * factor / 99) or package:GetRestPackageSize(3) < (3*factor + num * 3 * factor / 99) then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
@@ -3908,7 +3908,7 @@ end
 function ItemNormal_00000007(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < (18+(18*num*12)/99) + 2*num then
+    if package:GetRestPackageSize() < (18+(18*num*12)/99) + 2*num or package:GetRestPackageSize() < (1+num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -3971,7 +3971,7 @@ end
 function ItemNormal_00000067(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-	if package:GetRestPackageSize() < (20 + num * 20 / 99) then		
+	if package:GetRestPackageSize() < (20 + num * 20 / 99) or package:GetRestPackageSize() < (1 + num / 99) then		
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
@@ -4817,7 +4817,7 @@ function ItemNormal_00009087(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (2+(2*num)/99) then
+    if package:GetRestPackageSize() < (2+(2*num)/99) or package:GetRestPackageSize(3) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -5134,7 +5134,7 @@ function ItemNormal_00009131(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (3+num/99) then
+    if package:GetRestPackageSize() < (2+2*num/99) or package:GetRestPackageSize(5) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -5158,7 +5158,7 @@ function ItemNormal_00009132(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (3+num/99) then
+    if package:GetRestPackageSize() < (3+num/99) or package:GetRestPackageSize() < (1+2*num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8286,7 +8286,7 @@ function ItemNormal_00010180(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (2+(2*num*2)/99) then
+    if package:GetRestPackageSize() < (1+num/99) or package:GetRestPackageSize(5) < (1+2*num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8432,7 +8432,7 @@ function ItemNormal_00010188(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (5+(5*num*1)/99) then
+    if package:GetRestPackageSize() < (4+(4*num)/99) or package:GetRestPackageSize(5) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8467,7 +8467,7 @@ function ItemNormal_00010190(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (5+(5*num*1)/99) then
+    if package:GetRestPackageSize() < (5+(5*num*1)/99) or package:GetRestPackageSize() < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8485,7 +8485,7 @@ function ItemNormal_00010191(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (4+(4*num*1)/99) then
+    if package:GetRestPackageSize() < (3+(3*num)/99) or package:GetRestPackageSize(5) < (1+num/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8502,7 +8502,7 @@ function ItemNormal_00010192(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (6+(6*num*1)/99) then
+    if package:GetRestPackageSize() < (6+(6*num*1)/99) or package:GetRestPackageSize() < (2+(2*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -8613,7 +8613,7 @@ function ItemNormal_00010199(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (7+(7*num*8)/99) then
+    if package:GetRestPackageSize() < (7+(7*num*8)/99) or package:GetRestPackageSize(5) < (1+(2*num)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -9432,7 +9432,7 @@ function ItemNormal_00010248(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (8+(8*num*3)/99) then
+    if package:GetRestPackageSize() < (8+(8*num*3)/99) or package:GetRestPackageSize(5) < (1+(3*num)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -9794,7 +9794,7 @@ function ItemNormal_00010266(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (num * 5) then
+    if package:GetRestPackageSize() < (num * 5) or package:GetRestPackageSize(3) < (num * 5) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -10000,7 +10000,7 @@ function ItemNormal_00010276(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < (1+(1*num*1)/99) then
+    if package:GetRestPackageSize(3) < (1+(1*num*1)/99) then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -10238,7 +10238,7 @@ function ItemNormal_00009279(iid, num, bind, param)
     local isz = #items
     local used = 0
     for n = 1,num do
-        if package:GetRestPackageSize() < 2 then
+        if package:GetRestPackageSize() < 2 or package:GetRestPackageSize(3) < 2 then
             if used ~= 0 then
                 package:DelItemSendMsg(iid, player);
             end
@@ -10529,7 +10529,7 @@ function ItemNormal_00009215(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-    if package:GetRestPackageSize() < 14 then
+    if package:GetRestPackageSize() < 14 or package:GetRestPackageSize(3) < 1 then
 		player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -11190,7 +11190,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
-    if package:GetRestPackageSize() < num then
+    if package:GetRestPackageSize() < num or package:GetRestPackageSize(5) < num then
         player:sendMsgCode(2, 1011, 0)
         return 0; 
     end
@@ -11504,7 +11504,7 @@ function ItemNormal_00009495(iid, num, bind, param)
     local chance = {8151, 8966, 9419, 9745, 9835, 9903, 9940, 9971, 9993, 9995, 9996, 9997, 9998, 9999, 9999, 10000, 10000, 10000}
     local card_num = 0;
 
-    if package:GetRestPackageSize() < num + 2*num/99 then
+    if package:GetRestPackageSize(3) < num + 2*num/99 then
         player:sendMsgCode(2, 1011, 0);
         return false
     end
@@ -12029,7 +12029,7 @@ end
 function ItemNormal_00016051(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    if package:GetRestPackageSize() < 1 + num/99 then
+    if package:GetRestPackageSize() < 1 + num/99 or package:GetRestPackageSize(5) < 1 + num/99 then
         player:sendMsgCode(2, 1011, 0);
         return 0;
     end
@@ -13855,6 +13855,7 @@ local ItemNormal_Table = {
     [9616] = ItemNormal_00009611,
     [9617] = ItemNormal_00009611,
     [9618] = ItemNormal_00009611,
+    [9620] = ItemNormal_00009611,
     [9621] = ItemNormal_00009611,
     [9622] = ItemNormal_00009611,
     [9623] = ItemNormal_00009611,
@@ -13863,6 +13864,8 @@ local ItemNormal_Table = {
     [9626] = ItemNormal_00009611,
     [9627] = ItemNormal_00009611,
     [9628] = ItemNormal_00009611,
+    [9629] = ItemNormal_00009611,
+    [9630] = ItemNormal_00009611,
     [9631] = ItemNormal_00009611,
     [9632] = ItemNormal_00009611,
     [9633] = ItemNormal_00009611,
@@ -13871,6 +13874,8 @@ local ItemNormal_Table = {
     [9636] = ItemNormal_00009611,
     [9637] = ItemNormal_00009611,
     [9638] = ItemNormal_00009611,
+    [9639] = ItemNormal_00009611,
+    [9640] = ItemNormal_00009611,
     [9641] = ItemNormal_00009611,
     [9642] = ItemNormal_00009611,
     [9643] = ItemNormal_00009611,
@@ -13887,6 +13892,8 @@ local ItemNormal_Table = {
     [9656] = ItemNormal_00009611,
     [9657] = ItemNormal_00009611,
     [9658] = ItemNormal_00009611,
+    [9659] = ItemNormal_00009611,
+    [9660] = ItemNormal_00009611,
     [9661] = ItemNormal_00009611,
     [9662] = ItemNormal_00009611,
     [9663] = ItemNormal_00009611,
@@ -13895,6 +13902,7 @@ local ItemNormal_Table = {
     [9666] = ItemNormal_00009611,
     [9667] = ItemNormal_00009611,
     [9668] = ItemNormal_00009611,
+    [9669] = ItemNormal_00009611,
     [9671] = ItemNormal_00009611,
     [9672] = ItemNormal_00009611,
     [9673] = ItemNormal_00009611,

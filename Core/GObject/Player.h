@@ -38,7 +38,6 @@
 #include "KangJiTianMo.h"
 #include "MonsterKettle.h"
 
-
 namespace Battle
 {
 	class BattleSimulator;
@@ -923,6 +922,13 @@ namespace GObject
         UInt32 count;
     };
 
+    struct ExchangeTreasureLog
+    {
+        UInt32 date;
+        UInt32 itemid;
+        UInt32 count;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 150;
@@ -1390,6 +1396,15 @@ namespace GObject
             }
             return c;
         } 
+        inline UInt8 getFighterPos(UInt32 fighterId) 
+        { 
+            for(int i = 0 ; i < 5;++i)
+            {
+                if(_playerData.lineup[i].fighter && _playerData.lineup[i].fighter->getId() == fighterId) 
+                    return _playerData.lineup[i].pos;
+            }
+            return 0;
+        } 
 
 		inline void SetSessionID(int session) { _session = session; }
 		inline int GetSessionID() const { return _session; }
@@ -1760,7 +1775,7 @@ namespace GObject
         UInt8 getPIcCount();
         void checkPIcCount();
 
-		inline UInt16 getPacksize(UInt8 type = 0)
+		UInt16 getPacksize(UInt8 type = 0)
         {
             if(type == 0)
                 return _playerData.packSize;
@@ -1768,7 +1783,38 @@ namespace GObject
                 return _playerData.packSizeSoul;
             else if(type == 2)
                 return _playerData.packSizeLS;
-            return 0;
+            else if(type == 3)
+            {
+                UInt16 size = GetVar(VAR_PACKAGE_SIZE_GEM);
+                if(size == 0)
+                {
+                    size = 200;
+                    SetVar(VAR_PACKAGE_SIZE_GEM, size);
+                }
+                return size;
+            }
+            else if(type == 4)
+            {
+                UInt16 size = GetVar(VAR_PACKAGE_SIZE_FORMULA);
+                if(size == 0)
+                {
+                    size = 200;
+                    SetVar(VAR_PACKAGE_SIZE_FORMULA, size);
+                }
+                return size;
+            }
+            else if(type == 5)
+            {
+                UInt16 size = GetVar(VAR_PACKAGE_SIZE_SL);
+                if(size == 0)
+                {
+                    size = 200;
+                    SetVar(VAR_PACKAGE_SIZE_SL, size);
+                }
+                return size;
+            }
+            else
+                return 0;
         }
 
         void setLineupDirty(bool = true);
@@ -3642,6 +3688,7 @@ namespace GObject
         std::string _seekingHerMyAnnounce;
         std::vector<SeekingHerSendBeanLog *> _seekingHerSendBeanLog;
         std::vector<ShakeMoneyBagLog *> _shakeMoneyBagLog;
+        std::vector<ExchangeTreasureLog*> _exchangeTreasureLog;
 
         inline std::string getMyAnnouncement() { return _seekingHerMyAnnounce; }
         inline void setMyAnnouncement(std::string & an, bool toDB)
@@ -3673,6 +3720,10 @@ namespace GObject
         void getLuckyBagExtraAward();
         UInt32 getClanJoinTime();
         void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
+        void SetExchangeTreasureLog(UInt32 date, UInt32 itemid, UInt32 count, bool toDB = true);
+        void GetExchangeTreasureLog();
+        void RetTreasureInfo();
+        void TreasureConsumeAct(UInt32 c);
 
     private:
         //玩家位置（包括层数、当层位置）

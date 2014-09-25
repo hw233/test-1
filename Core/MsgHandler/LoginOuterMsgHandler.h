@@ -2492,6 +2492,8 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		{
             if (!pf || (pf && player->isOnline() && atoi(player->getDomain())==pf))
             {
+                if(player->getLastOnline() + 15 * 86400 < TimeUtil::Now())
+                    continue;
                 GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
                 GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
                 if(pmail != NULL)
@@ -2630,6 +2632,8 @@ void AddItemToAllFromBsByCountry(LoginMsgHdr &hdr,const void * data)
 		}
 		else
 		{
+            if(player->getLastOnline() + 15 * 86400 < TimeUtil::Now())
+                continue;
             if (player->getCountry()!=country)
                 continue;
 
@@ -4189,6 +4193,20 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if (type == 25 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        curType = 25;
+        GObject::GVAR.SetVar(GObject::GVAR_MEMOIR_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_MEMOIR_END, end);
+
+        return;
+    }
+
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;

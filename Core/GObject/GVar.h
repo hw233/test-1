@@ -173,9 +173,11 @@ namespace GObject
 
         GVAR_CLAN_LOCAL_RANK = 109,
 
-        GVAR_NATIONAL_DAY_BEGIN = 110,
-        GVAR_NATIONAL_DAY_END = 111,
+        GVAR_MEMOIR_BEGIN = 110,     //三年纪念录开启时间
+        GVAR_MEMOIR_END = 111,       //三年纪念录结束时间
 
+        GVAR_NATIONAL_DAY_BEGIN = 112, //国庆乐翻天开启
+        GVAR_NATIONAL_DAY_END = 113,   //国庆乐翻天结束
         GVAR_MAX,
     };
 

@@ -639,6 +639,12 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
     {
     case 0:     //封妖
         {
+            if(pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_1_5) < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
+
             if(level != dpd->curLevel + 1)
                 break;
             else
@@ -797,6 +803,11 @@ void TownDeamon::autoCompleteQuiteCheck(Player* pl, UInt16 levels)
 {
     if(!checkTownDeamon(pl))
         return;
+    if(pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_1_5) < 1+levels/5)
+    {
+        pl->sendMsgCode(0, 1011);
+        return;
+    }
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
@@ -1016,12 +1027,12 @@ void TownDeamon::addActivity(Player* pl)
 }
 void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 {
-    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100},{119,110}};
-    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534,1661};
+    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100},{119,110}, {129, 120}};
+    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534,1661, 1672};
     UInt32 v = GVAR.GetVar(GVAR_TJ_TOWN_999_BUG);
     UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i < (int)(sizeof(s_tjLevTownLev)/sizeof(sizeof(s_tjLevTownLev[0]))); ++i)
     {
         if (townLevel != s_tjLevTownLev[i][1])
             continue;
@@ -1045,8 +1056,8 @@ void TownDeamon::getTjItem(Player* pl, UInt8 townLevel)
 
 void TownDeamon::sendTjItemInfo(Player* pl)
 {
-    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}, {119,110}};
-    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534,1661};
+    static const int s_tjLevTownLev[][2] = {{59,50},{69,60},{79,70},{89,80},{99,90},{109,100}, {119,110}, {129, 120}};
+    static const int s_tjItemId[] = {1653, 1654, 1655, 1532, 1533, 1534,1661, 1672};
     UInt32 v = GVAR.GetVar(GVAR_TJ_TOWN_999_BUG);
     UInt8 tjLevel = GObject::Tianjie::instance().getLastPassedLevel();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();

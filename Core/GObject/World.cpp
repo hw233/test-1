@@ -516,6 +516,22 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -544,6 +560,9 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 8, 30)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  6)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  13)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
         ))
     {
 #if 0
@@ -1453,6 +1472,30 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  28)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  29)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  30)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  1)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  2)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  3)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  5)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  6)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  7)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  8)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  9)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)
@@ -1721,6 +1764,7 @@ void World::World_OldMan_Refresh(void *)
 {
     if(!getOldManTime())
         return ;
+    const UInt32 oldManId = 4245;
     UInt32 now = TimeUtil::Now();
     UInt32 time = now - TimeUtil::SharpDay(0, now);
     if(_oldMan._time < 8*3600  ) 
@@ -1746,7 +1790,7 @@ void World::World_OldMan_Refresh(void *)
            UInt16 loc;
            UInt32 npcId;
        };
-       MapNpc mapNpc = {_oldMan._spot, 4246};
+       MapNpc mapNpc = {_oldMan._spot, oldManId};
        GameMsgHdr hdr1(0x328, thrId, NULL, sizeof(MapNpc));
        GLOBAL().PushMsg(hdr1, &mapNpc);
        _oldMan._loc = 0;
@@ -1774,7 +1818,7 @@ void World::World_OldMan_Refresh(void *)
             UInt32 npcId;
         };
         //4246 萌萌妹
-        MapNpc mapNpc = {_oldMan._spot, 4245};
+        MapNpc mapNpc = {_oldMan._spot, oldManId};
         GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
         GLOBAL().PushMsg(hdr, &mapNpc);
 
@@ -1782,7 +1826,7 @@ void World::World_OldMan_Refresh(void *)
         _oldMan._players.clear();
         GObject::globalPlayers.enumerate(player_enum_AskOldMan, 0);
         GObject::MOData mo;
-        mo.m_ID = 4245;
+        mo.m_ID = oldManId;
         mo.m_Hide = false;
         mo.m_Spot = _oldMan._spot;
         mo.m_Type = 100;
@@ -4278,11 +4322,11 @@ void World::Send11PlayerRankAward()
     World::initRCRank();
     int pos = 0;
     static MailPackage::MailItem s_item[][5] = {
-        {{9498,40},{554,30},{9457,40},{9075,30},{0,0}},
-        {{9498,35},{554,25},{9457,35},{9075,20},{0,0}},
-        {{9498,30},{554,20},{9457,30},{9075,15},{0,0}},
+        {{9498,40},{556,30},{9600,40},{9076,50},{0,0}},
+        {{9498,35},{556,25},{9600,35},{9076,40},{0,0}},
+        {{9498,30},{556,20},{9600,30},{9076,25},{0,0}},
     };
-    static MailPackage::MailItem card = {9998,1};
+    static MailPackage::MailItem card = {17806,1};   //XXX可能会有问题
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
@@ -4496,7 +4540,7 @@ void World::Send11ClanRankAward()
 {
     World::initRCRank();
     int pos = 0;
-    UInt32 ClanAwardID[5] = {9338,1325,503,1126,9389};
+    UInt32 ClanAwardID[5] = {9338,134,503,1126,9389};
     UInt32 ClanAwardNum[][5]={
         {180,150,180,150,180},
         {150,120,150,120,150},
@@ -4551,7 +4595,7 @@ void World::Send11CountryRankAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] ={
-         {{9600,5},{134,3},{509,3},{9498,3},{16001,3}},
+         {{9457,5},{1325,3},{509,3},{9498,3},{16001,3}},
     };
     ClanGradeSort::iterator i = World::clanGradeSort.begin();
     UInt32 EM=0,KL=0;
@@ -5192,13 +5236,13 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{16001,30},{9600,25},{556,25},{9498,30}},
-        {{16001,25},{9600,20},{556,20},{9498,25}},
-        {{16001,20},{9600,15},{556,15},{9498,20}},
-        {{16001,15},{9600,10},{556,10},{9498,15}},
+        {{1325,30},{9600,25},{515,25},{9498,30}},
+        {{1325,25},{9600,20},{515,20},{9498,25}},
+        {{1325,20},{9600,15},{515,15},{9498,20}},
+        {{1325,15},{9600,10},{515,10},{9498,15}},
     };
     static MailPackage::MailItem s_item2[][4] = {
-        {{17805,1}},
+        {{17810,1}},
         {{0,0}},
         {{0,0}},
         {{0,0}},

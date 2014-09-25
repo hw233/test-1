@@ -2467,13 +2467,53 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
             else if(3 == type)
                 player->getShakeMoneyBagLog();
         }
+        break;
 
         case 0x16:
         {
+            if(!World::getMemoirTime())
+                return;
             UInt8 type = 0;
             br >> type;
-            //player->GetMemoirAward(type);
+            if(type == 2)
+                player->sendMemoirAwardInfo();
+            else
+                player->GetMemoirAward(type);
         }
+        break;
+
+        case 0x17:
+        {
+            if(!World::getTreasureTime())
+                return;
+            UInt8 type = 0;
+            br >> type;
+            switch(type)
+            {
+                case 0:
+                    player->RetTreasureInfo();
+                    break;
+                case 1:
+                {
+                    UInt8 id = 0;
+                    UInt32 num = 0;
+                    br >> id >> num;
+                    if(num == 0)
+                        return;
+                    UInt32 now = TimeUtil::Now();
+                    if(GameAction()->exchangeTreasure(player,id,num,now))
+                        player->RetTreasureInfo();
+                }
+                    break;
+                case 2:
+                    player->GetExchangeTreasureLog(); 
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        break;
 
         default:
         break;
@@ -2674,7 +2714,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
 	if(!player->hasChecked())
 		return;
 
-	if(player->GetPackage()->GetRestPackageSize() < (bmr._unBindNum > 0 ? 1 : 0) + (bmr._bindNum > 0 ? 1 : 0))
+	if(player->GetPackage()->GetRestPackageSize(3) < (bmr._unBindNum > 0 ? 1 : 0) + (bmr._bindNum > 0 ? 1 : 0))
 	{
 		player->sendMsgCode(0, 1011);
 		return;
@@ -2938,7 +2978,7 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 1)
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1)
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -2979,7 +3019,7 @@ void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
     brd >> type;
     brd >> id;
 
-	if((pl->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+	if((pl->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3_4) < 1) && (type != 1))
 	{
 		pl->sendMsgCode(1, 1014);
 		return;
@@ -3722,7 +3762,7 @@ void OnXJFrontMapReq( GameMsgHdr& hdr, const void* data)
                 brd >> type;
                 brd >> id;
 
-                if((player->GetPackage()->GetRestPackageSize() < 1) && (type != 1))
+                if((player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3_4) < 1) && (type != 1))
                 {
                     player->sendMsgCode(1, 1014);
                     return;
@@ -3860,7 +3900,28 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 UInt16 items[4] = {0};
                 UInt8 c = GData::store.getItemsByDiscount(discountType, items);
                 if (!c) return;
-                if (player->GetPackage()->GetRestPackageSize() < c)
+                UInt16 c0 = 0;
+                UInt16 c1 = 0;
+                UInt16 c3 = 0;
+                UInt16 c4 = 0;
+                UInt16 c5 = 0;
+                for(UInt8 i = 0; i < c; i++)
+                {
+                    ItemClass cur = GetItemSubClass(items[i]);
+                    if(cur == Item_Soul)
+                        ++c1;
+                    else if(cur == Item_Gem || cur == Item_EvolutionGem)
+                        ++c3;
+                    else if(cur == Item_Formula)
+                        ++c4;
+                    else if(cur == Item_Zhenyuan)
+                        return;
+                    else if(cur == Item_SL)
+                        ++c5;
+                    else
+                        ++c0;
+                }
+                if(player->GetPackage()->GetRestPackageSize() < c0 || player->GetPackage()->GetRestPackageSize(1) < c1 || player->GetPackage()->GetRestPackageSize(3) < c3 || player->GetPackage()->GetRestPackageSize(4) < c4 || player->GetPackage()->GetRestPackageSize(5) < c5)
                 {
                     // 背包空间不足
                     player->sendMsgCode(0, 1011);
@@ -6193,7 +6254,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             br >> optType;
             br >> copyIndex;
 
-            if((optType == 0 || optType == 2) && player->GetPackage()->GetRestPackageSize() < 1)
+            if((optType == 0 || optType == 2) && (player->GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1))
             {
                 player->sendMsgCode(1, 1014);
                 return;
@@ -6622,6 +6683,11 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             GObject::Fighter * fgt = player->findFighter(fighterId);
             if(!fgt)
                 break;
+            if(itemId2 == 0 && player->GetPackage()->GetRestPackageSize(5) < 1)
+            {
+                player->sendMsgCode(0, 1011);
+                return;
+            }
 
             UInt8 idx = fgt->getSoulSkillIdx(itemId1);
             if(idx == 0xFF)

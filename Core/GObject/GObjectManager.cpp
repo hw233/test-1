@@ -3129,6 +3129,32 @@ namespace GObject
 
         lc.finalize();
 
+        // Load player exchange_treasure_log 
+        {
+            lc.prepare("Loading player CarnivalConsume exchange_treasure_log:");
+            lc.reset(1000);
+            last_id = 0xFFFFFFFFFFFFFFFFull;
+            pl = NULL;
+            DBExchangeTreasureLog etdata;
+            if(execu->Prepare("SELECT `playerId`, `data`, `itemid`, `count` FROM `exchange_treasure_log` ORDER BY  `playerId`", etdata) != DB::DB_OK)
+                return false;
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                if(etdata.playerId != last_id)
+                {
+                    last_id = etdata.playerId;
+                    pl = globalPlayers[last_id];
+                }
+                if(pl == NULL)
+                    continue;
+                pl->SetExchangeTreasureLog(etdata.date, etdata.itemid,etdata.count,false);
+            }
+        }
+
+        lc.finalize();
+
+
 		/*lc.prepare("Loading mail package:");
 		lc.reset(50);
 		last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -4539,7 +4565,7 @@ namespace GObject
         lc.prepare("Loading clanbigboss:");
         lc.reset(1000);
         DBClanBigBoss dcbb;
-        if (execu->Prepare("SELECT `clanid`, `status`, `app_time`, `last`, `hp`, `atk`, `matk` FROM `clanbigboss` ", dcbb) != DB::DB_OK)
+        if (execu->Prepare("SELECT `clanid`, `status`, `app_time`, `last`, `hp`, `atk`, `matk`,`player1`,`player2` FROM `clanbigboss` ", dcbb) != DB::DB_OK)
             return false;
         clan = NULL;
         lastId = 0xFFFFFFFF;

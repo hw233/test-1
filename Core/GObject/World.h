@@ -712,6 +712,17 @@ public:
             return false;
     } 
 
+    inline static bool getMemoirTime()
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_MEMOIR_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_MEMOIR_END);
+        UInt32 now = TimeUtil::Now() ;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
     inline static bool getWorldCupTime(UInt32 time = 0 )
     {
         UInt32 end1 = TimeUtil::MkTime(2014, 6, 28);
@@ -791,6 +802,18 @@ public:
         UInt32 _fireTimeBegin = TimeUtil::SharpDay(0, now) + 8 * 60 * 60;
         UInt32 _fireTimeEnd = TimeUtil::SharpDay(0, now) + 21 * 60 * 60 + 60;
         if(now >= _fireTimeBegin && now <= _fireTimeEnd)
+            return true;
+        else
+            return false;
+    }
+
+    inline static bool getTreasureTime(UInt32 time = 0 )
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 begin = TimeUtil::MkTime(2014, 10, 7);
+        UInt32 end = TimeUtil::MkTime(2014, 10, 12);
+
+        if( now >= begin && now <= end)
             return true;
         else
             return false;

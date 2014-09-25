@@ -975,6 +975,9 @@ namespace GObject
         xxlMapInfo[0]="";
         xxlMapInfo[1]="";
         xxlMapInfo[2]="";
+        SetVar(VAR_PACKAGE_SIZE_GEM, 200);
+        SetVar(VAR_PACKAGE_SIZE_FORMULA, 200);
+        SetVar(VAR_PACKAGE_SIZE_SL, 200);
     }
 
 
@@ -3527,7 +3530,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << getPacksize(0) << getPacksize(1) << getPacksize(3) << getPacksize(4) << getPacksize(5) << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -4546,6 +4549,12 @@ namespace GObject
             _playerData.packSize += EACH_EXTEND_NUM;
             updateDB(32, _playerData.packSize);
         }
+        else if(type == 3)
+            AddVar(VAR_PACKAGE_SIZE_GEM, EACH_EXTEND_NUM);
+        else if(type == 4)
+            AddVar(VAR_PACKAGE_SIZE_FORMULA, EACH_EXTEND_NUM);
+        else if(type == 5)
+            AddVar(VAR_PACKAGE_SIZE_SL, EACH_EXTEND_NUM);
         else
         {
             _playerData.packSizeSoul += EACH_EXTEND_NUM;
@@ -5415,7 +5424,10 @@ namespace GObject
             SetVar(VAR_LUCKYSTAR_IS_CONSUME, 1);
         setLuckyStarCondition();
         if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3 && ci->purchaseType != ZhengHun && ci->purchaseType != JieHun && ci->purchaseType != LiHun && ci->purchaseType != TrainFighter && ci->purchaseType != DINGQINGXINWU)
+        {
             CarnivalConsumeAct(c);
+            TreasureConsumeAct(c);
+        }
         return _playerData.gold;
 	}
 
@@ -8826,7 +8838,7 @@ namespace GObject
             return;
         if(!hasChecked())
             return;
-        if (GetPackage()->GetRestPackageSize() <= 0)
+        if (GetPackage()->GetRestPackageSize(4) <= 0)
         {
             sendMsgCode(0, 1011);
             return;
@@ -19327,23 +19339,25 @@ void EventTlzAuto::notify(bool isBeginAuto)
     ///////////////////////////////////////////////
     bool Player::checkTrumpMutually(UInt32 trumpid)
     {
-        static UInt32 muttrumps[][2] = {
-            {1529, 1532},
-            {1530, 1533},
-            {1531, 1534},
-            {1650, 1653},
-            {1651, 1654},
-            {1652, 1655},
+        static UInt32 muttrumps[][4] = {
+            {1529, 1532, 0, 0},
+            {1530, 1533, 0, 0},
+            {1531, 1534, 0, 0},
+            {1650, 1653, 1671, 1672},
+            {1651, 1654, 0, 0},
+            {1652, 1655, 0, 0},
         };
         if ((trumpid >= 1529 && trumpid <= 1534)
-                || (trumpid >= 1650 && trumpid <= 1655))
+                || (trumpid >= 1650 && trumpid <= 1655) || (trumpid >= 1671 && trumpid <= 1672))
         {
             size_t i = 0;
-            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*2); ++i)
+            for (; i < sizeof(muttrumps)/(sizeof(UInt32)*4); ++i)
             {
-                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1])
+                if (trumpid == muttrumps[i][0] || trumpid == muttrumps[i][1] || trumpid == muttrumps[i][2] || trumpid == muttrumps[i][3])
                     break;
             }
+            if(i == sizeof(muttrumps)/(sizeof(UInt32)*4))
+                return false;
 
             for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
             {
@@ -19356,7 +19370,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
                 {
                     if (!trumpids[j])
                         continue;
-                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1])
+                    if (trumpids[j] == muttrumps[i][0] || trumpids[j] == muttrumps[i][1] || trumpids[j] == muttrumps[i][2] || trumpids[j] == muttrumps[i][3])
                     {
                         sendMsgCode(0, 1032);
                         return true;
@@ -20667,10 +20681,29 @@ void Player::getCopyFrontAwardByIndex(UInt8 copy_or_front, UInt8 index, UInt8 in
 #endif
     if(indexPut == 0 || indexPut > 5)
         return;
-    if(GetFreePackageSize() < 1)
+    if(copy_or_front == 0)
     {
-        sendMsgCode(0, 1011);
-        return;
+        if(GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+    }
+    else if(copy_or_front == 1)
+    {
+        if(GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3_4) < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+    }
+    else
+    {
+        if(GetPackage()->GetRestPackageSizeMin(PACKAGE_0_3) < 1)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
     }
 
     UInt8 i;
@@ -21369,73 +21402,87 @@ void Player::getNewYearGiveGiftAward(UInt8 dayOrder, UInt8 result)
             UInt8 validMaxDay = 0;
             UInt8 serverDay = 0;
             UInt32 now = TimeUtil::Now();
-            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 9, 8))
+            if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014, 9, 29))
             {
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 8))
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 30))
             {
                 validMaxDay = 1;
                 serverDay = 1;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) < TimeUtil::MkTime(2014,9, 9))
             {
                 validMaxDay = 1;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 10))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 1))
             {
                 validMaxDay = 2;
                 serverDay = 2;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 11))
             {
                 validMaxDay = 2;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 12))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 2))
             {
                 validMaxDay = 3;
                 serverDay = 3;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 13))
             {
                 validMaxDay = 3;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 14))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 3))
             {
                 validMaxDay = 4;
                 serverDay = 4;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 15))
             {
                 validMaxDay = 4;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 16))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 4))
             {
                 validMaxDay = 5;
                 serverDay = 5;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 17))
             {
                 validMaxDay = 5;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 18))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 5))
             {
                 validMaxDay = 6;
                 serverDay = 6;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 19))
             {
                 validMaxDay = 6;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 20))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 6))
             {
                 validMaxDay = 7;
                 serverDay = 7;
             }
+#if 0
             else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 21))
             {
                 validMaxDay = 7;
             }
-            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 9, 22))
+#endif
+            else if(TimeUtil::SharpDay(0, now) == TimeUtil::MkTime(2014, 10, 7))
             {
                 validMaxDay = 8;
                 serverDay = 8;
@@ -26653,20 +26700,20 @@ void Player::Send11GradeAward(UInt8 type)
         SetVar(VAR_11AIRBOOK_AWARDSCORE,gradeAward[type-1]);
 
     static MailPackage::MailItem s_item[][6] = {
-        {{9418,1}, {503,1}},
-        {{500,2},{57,2},{9371,2}},
-        {{501,3},{9414,2}},
-        {{516,2},{16001,2},{503,2}},
-        {{547,3},{1126,3},{517,3}},
-        {{549,1},{554,3},{551,5}},
-        {{9457,3},{9498,2},{509,2},{515,2},{9438,2}},
-        {{1726,1},{9076,4}},
-        {{554,25},{9418,25},{16001,20}},
-        {{5067,1},{9498,30},{9068,15}},
-        {{9021,20},{9075,20},{1734,1}},
-        {{9022,20},{9068,20},{1735,1},{5057,1},{5037,1}},
+        {{9424,1}, {503,1}},
+        {{500,2},{517,2},{501,2}},
+        {{513,3},{9414,2}},
+        {{516,2},{16001,2},{555,3}},
+        {{547,3},{503,5}},
+        {{1126,5},{556,3},{551,5}},
+        {{9457,3},{9498,2},{1325,2},{515,2},{9438,2}},
+        {{1727,1},{9076,4}},
+        {{554,25},{9418,25},{13075,1}},
+        {{13097,1},{556,30},{9021,15}},
+        {{9019,15},{9075,15},{1734,1},{13138,1}},
+        {{9022,20},{9068,20},{1735,1},{13019,1}},
     };
-    static UInt32 count[] = {2,3,2,3,3,3,5,2,3,3,3,5};
+    static UInt32 count[] = {2,3,2,3,2,3,5,2,3,3,4,4};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -28707,15 +28754,15 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
 
             static UInt32 awards1[10][4][2] = {
                 {{503,5},  {500,1}, {501,1}, {49,20}},
-                {{9360,5},  {9093,5}, {0,0}, {50,10}},
+                {{517,5},  {551,5}, {0,0}, {70,10}},
                 {{9418,5}, {9414,5}, {9424,5}, {100,10}},
-                {{555,10}, {556,5}, {0,0}, {200,10}},
-                {{9338,5}, {554,5}, {0,0},{220,10}},
-                {{16001,5}, {16000,5}, {0,0},{75,10}},
-                {{9498,10}, {9497,5}, {0,0},{180,10}},
+                {{555,10}, {556,5}, {0,0}, {150,10}},
+                {{9338,5}, {554,5}, {0,0},{175,10}},
+                {{8000,5}, {33,5}, {0,0},{75,10}},
+                {{9498,10}, {9497,5}, {0,0},{175,10}},
                 {{9600,10}, {9500,5}, {0,0},{100,10}},
-                {{9021,5}, {9068,5}, {0,0},{1198,5}},
-                {{1733,1}, {0,0}, {0,0},{999,2}},
+                {{9019,5}, {9022,5}, {0,0},{1100,5}},
+                {{1735,1}, {0,0}, {0,0},{999,1}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
@@ -28957,7 +29004,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,2));
                 st << static_cast<UInt8>(10 - GET_BIT_8(consume2,3));
                 st << static_cast<UInt8>(5 - GET_BIT_8(consume3,0));
-                st << static_cast<UInt8>(2 - GET_BIT_8(consume3,1));
+                st << static_cast<UInt8>(1 - GET_BIT_8(consume3,1));
             }
             st << Stream::eos;
             send(st);
@@ -28994,10 +29041,10 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             };
             static UInt32 everydayAward1[5][7][2] = {
                 { {15, 3}, {500, 3}, {501, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9424, 3}, {503, 3}, {513, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {547, 3}, {9424, 3}, {551, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
-                { {9457, 3}, {134, 3}, {554, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {13236, 1}, {13136, 1}, {13016, 1}, {13036, 1}, {13196, 1}, {0, 0}, {0, 0} },
+                { {9424, 3}, {547, 3}, {57, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {9371, 3}, {9600, 3}, {517, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
+                { {9457, 3}, {1325, 3}, {556, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {13116, 1}, {13136, 1}, {13156, 1}, {13036, 1}, {13056, 1}, {0, 0}, {0, 0} },
             };
  
             UInt8 totalPackageSize = 0;
@@ -35809,7 +35856,7 @@ void Player::GetMemoirAward(UInt8 type)
     //1分享到微博，0分享到微信
     if(type)
     {
-        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS))
+        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS) || GetVar(VAR_MEMOIR_WEIBO_COUNT) >= 5)
             return;
         SYSMSGV(title, 5234);
         SYSMSGV(content, 5235);
@@ -35818,7 +35865,9 @@ void Player::GetMemoirAward(UInt8 type)
         {
             mailPackageManager.push(mail->id, MemoirAward[1], 3, true);
         }
-        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 6)
+        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+        SetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS, 1);
+        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 3)
         {
             SYSMSGV(title, 5236);
             SYSMSGV(content, 5237);
@@ -35828,11 +35877,11 @@ void Player::GetMemoirAward(UInt8 type)
                 mailPackageManager.push(mail->id, MemoirAward[3], 3, true);
             }
         }
-        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+        sendMsgCode(0, 4047);
     }
     else
     {
-        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS))
+        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS) || GetVar(VAR_MEMOIR_WEIXIN_COUNT) >= 5)
             return;
         SYSMSGV(title, 5234);
         SYSMSGV(content, 5235);
@@ -35841,7 +35890,9 @@ void Player::GetMemoirAward(UInt8 type)
         {
             mailPackageManager.push(mail->id, MemoirAward[0], 3, true);
         }
-        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 6)
+        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+        SetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS, 1);
+        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 3)
         {
             SYSMSGV(title, 5236);
             SYSMSGV(content, 5237);
@@ -35851,8 +35902,9 @@ void Player::GetMemoirAward(UInt8 type)
                 mailPackageManager.push(mail->id, MemoirAward[2], 3, true);
             }
         }
-        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+        sendMsgCode(0, 4047);
     }
+    sendMemoirAwardInfo();
 }
 
 void Player::sendMemoirAwardInfo()
@@ -35864,6 +35916,60 @@ void Player::sendMemoirAwardInfo()
     st << Stream::eos;
     send(st);
 }
+
+void Player::SetExchangeTreasureLog(UInt32 date, UInt32 itemid, UInt32 count, bool toDB)
+{
+    ExchangeTreasureLog * lg = new ExchangeTreasureLog;
+    lg->date = date;
+    lg->itemid = itemid;
+    lg->count = count;
+    _exchangeTreasureLog.push_back(lg);
+
+    if(toDB)
+        DB().PushUpdateData("insert into `exchange_treasure_log`(playerId, data, itemid, count) values(%" I64_FMT "u, %u, %u, %u)", getId(), date, itemid, count);
+}
+
+void Player::GetExchangeTreasureLog()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x17);
+    st << static_cast<UInt8>(2);
+    st << static_cast<UInt32>(_exchangeTreasureLog.size());
+    for(std::vector<ExchangeTreasureLog*>::iterator i = _exchangeTreasureLog.begin(), e = _exchangeTreasureLog.end(); i!=e ; ++i)
+    {
+        st << (*i)->date;
+        st << (*i)->itemid;
+        st << (*i)->count;
+    }
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::RetTreasureInfo()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x17);
+    st << static_cast<UInt8>(0);
+    st << GetVar(VAR_TREASURE_CONSUME) << GetVar(VAR_TREASURE_SCORE);         
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::TreasureConsumeAct(UInt32 c)
+{
+    //if(!World::getTreasureConsume())
+    //    return;
+    AddVar(VAR_TREASURE_CONSUME, c);
+    AddVar(VAR_TREASURE_CONSUME_EXT, c);
+   
+    while(GetVar(VAR_TREASURE_CONSUME_EXT) >= 30)
+    {
+        UInt32 tmp = GetVar(VAR_TREASURE_CONSUME_EXT) - 30;
+        SetVar(VAR_TREASURE_CONSUME_EXT,tmp);
+        AddVar(VAR_TREASURE_SCORE, 10);
+    }
+}
+
 
 } // namespace GObject
 

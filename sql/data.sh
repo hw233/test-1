@@ -74,6 +74,7 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140804_cLingbaoLevel.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140819_cIncense.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20140910_TitlePaper.sql
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_AddXinMo_0317.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";

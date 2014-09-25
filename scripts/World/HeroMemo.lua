@@ -31,7 +31,7 @@ function getHeroMemoAward(player, idx, soul)
     end
 
     if soul >= maxSoul[idx] then
-        if needsize[idx] <=  package:GetRestPackageSize() then
+        if needsize[idx] <=  package:GetRestPackageSize() or needsize[idx] <=  package:GetRestPackageSize(3) then
             local v = point2Award[maxSoul[idx]]
             local sz = #v
             for n = 1,sz,2 do

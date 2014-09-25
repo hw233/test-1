@@ -15,9 +15,9 @@ namespace GObject
 {
 
 SaleMgr gSaleMgr;
-static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 21, 34, 51, 60, 63};
-#define MAX_SALE_REQ  11
-#define MAX_TYPE_IDX  67
+static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 21, 34, 51, 60, 63,68};
+#define MAX_SALE_REQ  12
+#define MAX_TYPE_IDX  71
 
 SaleMgr::SaleMgr()
 {
@@ -860,7 +860,10 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     // 元神60 61元神技能 62元神
     // 灵宝63 64灵 65悟 66信
     // 阵元67
+    // 仙装68 69仙兵 70仙衣 71仙器
     //                     0   1   2   3   4   5   6   7   8   9
+    if(type >= 171 && type <= 173)
+        type -= 68;
     static UInt8 cvt[] = { 1,  4,  5,  6,  7,  8,  9,  10, 11, 1, // 0
                            16, 16, 20, 64, 65, 66, 1,  1,  1,  1, // 1
                            1,  1,  1,  1,  1,  1,  1,  1,  1,  19,// 2
@@ -871,7 +874,7 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
                            45, 46, 47, 48, 49, 50, 34, 34, 34, 34,// 7
                            0,  0,  0,  0,  0,  0,  0,  0,  0,  0, // 8
                            52, 53, 54, 55, 56, 57, 58, 59, 51, 51,// 9
-                           62, 61, 61                             // 10
+                           62, 61, 61, 69,70,71,                  // 10
                          };
 
     UInt8 res = cvt[type];
@@ -899,6 +902,10 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     else if(res > 63 && res < 67)
     { 
         parent = 63;
+    }
+    else if(res > 68 && res < 72)
+    { 
+        parent = 68;
     }
 
     switch(res)
