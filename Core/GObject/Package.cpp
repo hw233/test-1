@@ -8383,12 +8383,6 @@ namespace GObject
     {
         if(IsEquipId(typeId))
         {
-            if(!(TryBuyEquip(typeId, num, bind)))
-            {
-                m_Owner->sendMsgCode(0, 1011);
-                return NULL;
-            }
-
             item_elem_iter iterTemp = m_ItemsTemporary.find(ItemKey(typeId, bind));
             if(iterTemp == m_ItemsTemporary.end())
                 return NULL;
@@ -8397,6 +8391,22 @@ namespace GObject
                 return NULL;
 
             ItemBase * item = iterTemp->second;
+            if(IsZhenYuan(item->getClass()))
+            {
+		        if(GetRestPackageSize(4) < num)
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
+            else
+            {
+                if(!(TryBuyEquip(typeId, num, bind)))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
 
             DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", typeId, m_Owner->getId(), bind ? 1 : 0);
           
