@@ -3689,11 +3689,11 @@ namespace GObject
         void getFighterMinTimeAndCount(UInt32& petTime, UInt32& fighterTime, UInt8& fighterCount);
 
         void AddXCTJAward(UInt8 num ,UInt32 ItemId , UInt8 count);
-        void HitEggInXCTJ(UInt8 num);
+        UInt8 HitEggInXCTJ(UInt8 num);
         void giveOutTheWelfare(UInt8 type,std::string test);
         void getXCTJCountAward(UInt8 type);
         void sendXCTJInfo();
-        void AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count);
+        void AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time);
         void sendXCTJMyAward();
 
     private:

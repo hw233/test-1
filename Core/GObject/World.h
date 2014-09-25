@@ -72,7 +72,8 @@ struct XCTJAward
     UInt8 num;
     UInt32 itemId;
     UInt8 count;
-    XCTJAward(Player * pl2,UInt8 num2,UInt32 itemId2,UInt8 count2):pl(pl2),num(num2),itemId(itemId2),count(count2){ } 
+    UInt32 time;
+    XCTJAward(Player * pl2,UInt8 num2,UInt32 itemId2,UInt8 count2,UInt32 time2):pl(pl2),num(num2),itemId(itemId2),count(count2),time(time2){ } 
 };
 
 typedef std::list<Player*> LuckyDrawList;
@@ -810,7 +811,7 @@ public:
     inline static bool getBaiFuBagTime()
     { 
         UInt32 now = TimeUtil::Now();
-        UInt32 Begin = TimeUtil::MkTime(2014, 9, 23);
+        UInt32 Begin = TimeUtil::MkTime(2014, 10, 1);
         UInt32 End = TimeUtil::MkTime(2014, 10,3);
         if(now >= Begin && now <= End)
             return true;
@@ -821,9 +822,9 @@ public:
 
     inline static void setXCTJTime(bool v)
     { _xctj = v; }
-    inline static bool getXCTJTime()
+    inline static bool getXCTJTime(UInt32 time = 0)
     { 
-        UInt32 now = TimeUtil::Now();
+        UInt32 now = TimeUtil::Now() + time;
         UInt32 Begin = TimeUtil::MkTime(2014, 9, 23);
         UInt32 End = TimeUtil::MkTime(2014, 10,8);
         if(now >= Begin && now <= End)
@@ -1738,7 +1739,7 @@ public:
     void SendGuankaActAward();
     void SendTYSSClanAward(UInt8);
     void SendTYSSPlayerAward(UInt8);
-    void AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count);
+    void AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time);
     static void SendXCTJAward();
 
     static void SendAllAnswerEnd();

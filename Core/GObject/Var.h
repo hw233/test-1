@@ -823,6 +823,7 @@ namespace GObject
         VAR_XCTJ_AWARD = 827,       //喜从天降活跃度奖励领取
         VAR_XCTJ_REPEAT = 828,      //喜从天降奖励重复度
         VAR_XCTJ_FULI = 829,      //喜从天降福利发放次数
+        VAR_XCTJ_RECHARGE = 829,      //喜从天降充值
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
         VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL = 832, //酷爽一夏累积活跃值

@@ -9128,6 +9128,12 @@ namespace GObject
                 sendBaiFuBagInfo();
             }
         } 
+        if(World::getXCTJTime())
+        {
+            UInt32 goldLeft = GetVar(VAR_XCTJ_RECHARGE)%50;
+            m_Package->AddItem(16058, (goldLeft + r)/50, true, true);
+            AddVar(VAR_XCTJ_RECHARGE,r);
+        }
         if(World::getGGTime())
         {
             if(World::getGGTime() == 1)
@@ -35903,40 +35909,42 @@ void Player::AddXCTJAward(UInt8 num ,UInt32 itemId ,UInt8 count)
         UInt8 num;
         UInt32 itemId;
         UInt8 count;
+        UInt32 time;
     };
     struct XCTJAward bd ;
     bd.pl = this;
     bd.num = num;
     bd.itemId = itemId;
     bd.count = count;
+    bd.time = TimeUtil::Now();
 
     GameMsgHdr hdr(0x18A, WORKER_THREAD_WORLD, this, sizeof(bd));
     GLOBAL().PushMsg(hdr, &bd);
 
-    AddXCTJMyAward(this,num,itemId,count);
+    AddXCTJMyAward(this,num,itemId,count,TimeUtil::Now());
 } 
 
-void Player::HitEggInXCTJ(UInt8 type)
+UInt8 Player::HitEggInXCTJ(UInt8 type)
 { 
     static UInt8 SubNum[] = {1,9,44};
     static UInt8 nums[] = {1,10,50};
     if(type > 2)
-        return ;
+        return 2;
 
-    const UInt16 ItemId = 9371;
+    const UInt16 ItemId = 16058;
     UInt16 count = GetPackage()->GetItemAnyNum(ItemId) ;
     ItemBase * item = GetPackage()->FindItem(ItemId, true);
     if (!item)
         item =GetPackage()->FindItem(ItemId, false);
     if(item ==NULL)
-        return ;
+        return 2;
     if(SubNum[type] > count)
-        return ;
+        return 1;
 
     if (GetPackage()->GetRestPackageSize() <= nums[type])
     { 
         sendMsgCode(0, 1011);
-        return;
+        return 2;
     } 
 
     GetPackage()->DelItemAny(ItemId ,SubNum[type] );
@@ -35946,9 +35954,13 @@ void Player::HitEggInXCTJ(UInt8 type)
 
     if(GetVar(VAR_XCTJ_COUNT)/3000 < (GetVar(VAR_XCTJ_COUNT)+nums[type]*10)/3000)
     { 
-        SYSMSG_BROADCASTV(5238, getName().c_str());
     } 
     AddVar(VAR_XCTJ_COUNT,nums[type] * 10);
+
+    UInt32 xctjCount = GetVar(VAR_XCTJ_COUNT);
+    GameMsgHdr hdr(0x18C, WORKER_THREAD_WORLD, this, sizeof(xctjCount));
+    GLOBAL().PushMsg(hdr, &xctjCount);
+    return 0;
 
     //AddVar(VAR_MARRYBOARD_LIVELY,!type * 100 + num * 5);
     // char str[16] = {0};
@@ -35966,9 +35978,9 @@ void Player::giveOutTheWelfare(UInt8 type,std::string test)  //type 0-世界
     //    {4,4,3,3,3},
     //    {2,2,1,2,2}
     //};
-    UInt32 count = GetVar(VAR_XCTJ_COUNT);
+    UInt32 count = GetVar(VAR_XCTJ_REPEAT);
     UInt32 hasCount = GetVar(VAR_XCTJ_FULI);
-    if( count/3000 <= hasCount)
+    if( count <= hasCount)
         return ;
     if(type > 1 )
         return ;
@@ -35978,11 +35990,11 @@ void Player::giveOutTheWelfare(UInt8 type,std::string test)  //type 0-世界
     if(type)
     {
         if(getClan())
-            SYSMSG_BROADCASTV(5239, getName().c_str(),getClan()->getName().c_str() , test.c_str());
+            SYSMSG_BROADCASTV(5239,getCountry(), getName().c_str(),getClan()->getName().c_str() , test.c_str());
     }
     else
     { 
-        SYSMSG_BROADCASTV(5240, getName().c_str(), test.c_str());
+        SYSMSG_BROADCASTV(5240,getCountry(), getName().c_str(), test.c_str());
     } 
     AddVar(VAR_XCTJ_FULI,1);
 } 
@@ -36006,56 +36018,63 @@ void Player::getXCTJCountAward(UInt8 type)  //type 从0开始
     if(!GameAction()->getXCTJCountAward(this,type+1,(repeat%5)+1))
         return ;
     award |= (1<<type); 
-    SetVar(VAR_XCTJ_AWARD , award);
     if(award == 0x3F)
     {
         award = 0;
         AddVar(VAR_XCTJ_REPEAT,1);
+        SYSMSG_BROADCASTV(5238,getCountry(), getName().c_str());
     }
+    SetVar(VAR_XCTJ_AWARD , award);
 } 
 void Player::sendXCTJInfo()
 { 
-    Stream st(REP::COUNTRY_ACT);
+    UInt32 repeat = GetVar(VAR_XCTJ_REPEAT);
+    UInt32 fuli = GetVar(VAR_XCTJ_FULI);
+    Stream st(REP::COUNTRY_ACT); 
     st << static_cast<UInt8>(0x19);
+    st << static_cast<UInt8>(0x01);
     st << static_cast<UInt32>(GetVar(VAR_XCTJ_COUNT));
+    st << static_cast<UInt32>(GetVar(VAR_XCTJ_COUNT) - repeat *3000);
     st << static_cast<UInt8>(GetVar(VAR_XCTJ_AWARD));
-    st << static_cast<UInt8>(GetVar(VAR_XCTJ_REPEAT));
-    st << static_cast<UInt8>(GetVar(VAR_XCTJ_COUNT)/3000 - GetVar(VAR_XCTJ_FULI));
+    st << static_cast<UInt8>(repeat);
+    st << static_cast<UInt8>( repeat>=fuli?(repeat - fuli):0);
     st << Stream::eos;
     send(st);
 } 
-void Player::AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count)
+void Player::AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time)
 {
-    XCTJAward bfa(pl,num,itemId,count);
+    if(num == 0 )
+        return ;
+    XCTJAward bfa(pl,num,itemId,count,time);
     if(my_deque.size() >=50 )
         my_deque.pop_front();
     my_deque.push_back(bfa);
 
     //单个获奖信息广播
     Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(1) << static_cast<UInt8>(1);
-    st << pl->getName() << num << itemId << count;
+    st << static_cast<UInt8>(0x19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(1) << static_cast<UInt8>(1);
+    st << pl->getName() << static_cast<UInt8>(pl->getCountry())<< time << num << itemId << count;
     st << Stream::eos;
     NETWORK()->Broadcast(st);
 }
 void Player::sendXCTJMyAward()
 { 
-
     UInt32 size  = my_deque.size(); 
     Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(size); 
-    st << static_cast<UInt8>(19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(1) << static_cast<UInt8>(size);
+    st << static_cast<UInt8>(0x19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(1) << static_cast<UInt8>(size);
     for(UInt8 i = 0; i < size; ++ i)
     {
         if( my_deque[i].pl)
-            st << my_deque[i].pl->getName();
+            st << my_deque[i].pl->getName() << static_cast<UInt8>(my_deque[i].pl->getCountry());
         else
             st << "";
+        st<< my_deque[i].time;
         st<< my_deque[i].num ;
         st<< my_deque[i].itemId;
         st<< my_deque[i].count;
     }
     st << Stream::eos;
+    send(st);
 } 
 
 } // namespace GObject

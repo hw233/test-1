@@ -3712,7 +3712,6 @@ void OnXCTJRank ( GameMsgHdr& hdr,  const void* data )
     MSG_QUERY_PLAYER(player);
  
     UInt32 total = *((UInt32*)data);
-    total = player->GetVar(VAR_WORLDCUP_RES);
     if (!total)
         return;
 
@@ -3793,9 +3792,10 @@ void OnXCTJAwardInsert ( GameMsgHdr& hdr,  const void* data )
         UInt8 num;
 		UInt32 itemId;
         UInt8 count;
+        UInt32 time;
 	};
 	XCTJAward * ar = reinterpret_cast<XCTJAward *>(const_cast<void *>(data));
-    WORLD().AddWorldXCTJAward(ar->pl ,ar->num ,ar->itemId ,ar->count);
+    WORLD().AddWorldXCTJAward(ar->pl ,ar->num ,ar->itemId ,ar->count ,ar->time);
 } 
 bool enum_send_xctj_welfare(void * ptr, void * data )
 {

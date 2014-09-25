@@ -1380,7 +1380,7 @@ void World::World_Midnight_Check( World * world )
     b11TimeEnd = b11time && !get11Time(300);
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
 
-    bXCTJTimeEnd = bXCTJtime && !getXCTJTime();
+    bXCTJTimeEnd = bXCTJtime && !getXCTJTime(300);
 
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
@@ -3735,6 +3735,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             World::carnivalConsumeSort.insert(s);
         }
     }
+    if(World::getXCTJTime())
+    { 
+        UInt32 total = p->GetVar(VAR_XCTJ_COUNT);
+        if(total)
+        {
+            RCSort s;
+            s.player  = p;
+            s.total = total;
+            World::XCTJSort.insert(s);
+        }
+    } 
 
     return true;
 }
@@ -5672,17 +5683,39 @@ void World::SendCarnivalConsumeAward()
     }
     return;
 }
-void World::AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count)
+void World::AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time)
 { 
-    XCTJAward bfa(pl,num,itemId,count);
+    if(!pl)
+        return ;
+    if(num == 0 && itemId ==0 && count ==0)
+    {
+        UInt32 size  = xctj_deque.size(); 
+        Stream st(REP::COUNTRY_ACT);
+        st << static_cast<UInt8>(0x19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(0) << static_cast<UInt8>(size);
+        for(UInt8 i = 0; i < size; ++ i)
+        {
+            if( xctj_deque[i].pl)
+                st << xctj_deque[i].pl->getName() << static_cast<UInt8>(xctj_deque[i].pl->getCountry());
+            else
+                st << "" << static_cast<UInt8>(0);
+            st<<xctj_deque[i].time;
+            st<< xctj_deque[i].num ;
+            st<< xctj_deque[i].itemId;
+            st<< xctj_deque[i].count;
+        }
+        st << Stream::eos;
+        pl->send(st);
+        return ;
+    }
+    XCTJAward bfa(pl,num,itemId,count,time);
     if(xctj_deque.size() >=50 )
         xctj_deque.pop_front();
     xctj_deque.push_back(bfa);
 
     //单个获奖信息广播
     Stream st(REP::COUNTRY_ACT);
-    st << static_cast<UInt8>(19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(0) << static_cast<UInt8>(1);
-    st << pl->getName() << num << itemId << count;
+    st << static_cast<UInt8>(0x19) <<static_cast<UInt8>(0x03) << static_cast<UInt8>(0) << static_cast<UInt8>(1);
+    st << pl->getName() << static_cast<UInt8>(pl->getCountry())<< time << num << itemId << count;
     st << Stream::eos;
     NETWORK()->Broadcast(st);
 } 
