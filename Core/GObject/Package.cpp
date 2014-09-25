@@ -7881,7 +7881,16 @@ namespace GObject
 
             equip->SetSellTime(sellTime);
             TempEquip = equip;
-            -- m_Size;
+            if(IsZhenYuan(item->getClass()))
+            {
+                if(m_SizeZY > 0)
+                    -- m_SizeZY;
+            }
+            else
+            {
+                if(m_Size > 0)
+                    -- m_Size;
+            }
         }
         else
         {
@@ -7976,6 +7985,10 @@ namespace GObject
             {
                 m_ItemsSL.erase(ItemKey(itemId, bind));
             }
+            else if(IsZhenYuan(item->getClass()))
+            {
+                m_ItemsZY.erase(ItemKey(itemId, bind));
+            }
             else
             {
                 m_Items.erase(ItemKey(itemId, bind));
@@ -8029,13 +8042,24 @@ namespace GObject
             ItemEquip * TempEquip = static_cast<ItemEquip *>(iterTemp->second);
             if(TempEquip == NULL)
                 return false;
+            if(IsZhenYuan(TempEquip->getClass()))
+            {
+                ItemBase *& equip = m_ItemsZY[ItemKey(itemId)];
+                if(equip == NULL)
+                    ++ m_SizeZY;
 
-            ItemBase *& equip = m_Items[ItemKey(itemId)];
-            if(equip == NULL)
-                ++ m_Size;
+                TempEquip->SetSellTime(0);
+                equip = TempEquip;
+            }
+            else
+            {
+                ItemBase *& equip = m_Items[ItemKey(itemId)];
+                if(equip == NULL)
+                    ++ m_Size;
 
-            TempEquip->SetSellTime(0);
-            equip = TempEquip;
+                TempEquip->SetSellTime(0);
+                equip = TempEquip;
+            }
         }
         else
         {
@@ -8359,12 +8383,6 @@ namespace GObject
     {
         if(IsEquipId(typeId))
         {
-            if(!(TryBuyEquip(typeId, num, bind)))
-            {
-                m_Owner->sendMsgCode(0, 1011);
-                return NULL;
-            }
-
             item_elem_iter iterTemp = m_ItemsTemporary.find(ItemKey(typeId, bind));
             if(iterTemp == m_ItemsTemporary.end())
                 return NULL;
@@ -8373,6 +8391,22 @@ namespace GObject
                 return NULL;
 
             ItemBase * item = iterTemp->second;
+            if(IsZhenYuan(item->getClass()))
+            {
+		        if(GetRestPackageSize(4) < num)
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
+            else
+            {
+                if(!(TryBuyEquip(typeId, num, bind)))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return NULL;
+                }
+            }
 
             DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", typeId, m_Owner->getId(), bind ? 1 : 0);
           
