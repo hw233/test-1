@@ -35986,6 +35986,8 @@ void Player::giveOutTheWelfare(UInt8 type,std::string test)  //type 0-世界
     UInt32 hasCount = GetVar(VAR_XCTJ_FULI);
     if( count <= hasCount)
         return ;
+    if(!type && !getClan())
+        return ;
     if(type > 1 )
         return ;
 

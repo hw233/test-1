@@ -2496,6 +2496,8 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
         break;
         case 0x19:  //喜从天降
         { 
+            if(!getXCTJTime())
+                return ;
             UInt8 type = 0;
             br >> type;
             switch(type)

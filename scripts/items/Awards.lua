@@ -2310,8 +2310,6 @@ function getHitEggAward(player,num)
             end
         end
 
-        index = math.random(1, 20)
-        print("index:"..index)
         if index > max  then
             max = index;
         end

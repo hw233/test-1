@@ -825,7 +825,7 @@ public:
     inline static bool getXCTJTime(UInt32 time = 0)
     { 
         UInt32 now = TimeUtil::Now() + time;
-        UInt32 Begin = TimeUtil::MkTime(2014, 9, 23);
+        UInt32 Begin = TimeUtil::MkTime(2014, 10, 1);
         UInt32 End = TimeUtil::MkTime(2014, 10,8);
         if(now >= Begin && now <= End)
             return true;
