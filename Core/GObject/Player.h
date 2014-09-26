@@ -3624,7 +3624,6 @@ namespace GObject
         void seekingHer_Announce(std::string );
         void seekingHer_GetSendBeanLog();
         void getShakeMoneyBagLog();
-        void sendShakeMoneyBagInfo();
         void SetSeekingHerSendBeanLog(UInt64 &, UInt32 &, UInt32 &, UInt8 &, bool);
         void SetShakeMoneyBagLog(UInt32 , UInt32 , bool);
         void getSeekingHerCharmAward();

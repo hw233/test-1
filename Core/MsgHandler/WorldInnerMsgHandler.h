@@ -3632,6 +3632,7 @@ void OnCarnivalRankReturn( GameMsgHdr& hdr,  const void* data )
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x15);
     st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(player->GetVar(VAR_CARNIVAL_CONSUME_SHAKE_TIMES));
     size_t offset = st.size();
     UInt32 count = 0;
     st << count;
