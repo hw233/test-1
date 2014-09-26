@@ -1453,6 +1453,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  19)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  21)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  22)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  23)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  24)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  25)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  26)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
+
          )
         bRechargeEnd = true;
     if (cfg.rpServer)

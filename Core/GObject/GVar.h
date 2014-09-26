@@ -173,6 +173,9 @@ namespace GObject
 
         GVAR_CLAN_LOCAL_RANK = 109,
 
+        GVAR_MEMOIR_BEGIN = 110,     //三年纪念录开启时间
+        GVAR_MEMOIR_END = 111,       //三年纪念录结束时间
+
         GVAR_MAX,
     };
 

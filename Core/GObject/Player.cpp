@@ -35796,7 +35796,7 @@ void Player::GetMemoirAward(UInt8 type)
     //1分享到微博，0分享到微信
     if(type)
     {
-        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS))
+        if(GetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS) || GetVar(VAR_MEMOIR_WEIBO_COUNT) >= 5)
             return;
         SYSMSGV(title, 5234);
         SYSMSGV(content, 5235);
@@ -35805,7 +35805,9 @@ void Player::GetMemoirAward(UInt8 type)
         {
             mailPackageManager.push(mail->id, MemoirAward[1], 3, true);
         }
-        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 6)
+        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+        SetVar(VAR_MEMOIR_TODAY_WEIBO_STATUS, 1);
+        if(GetVar(VAR_MEMOIR_WEIBO_COUNT) == 3)
         {
             SYSMSGV(title, 5236);
             SYSMSGV(content, 5237);
@@ -35815,11 +35817,11 @@ void Player::GetMemoirAward(UInt8 type)
                 mailPackageManager.push(mail->id, MemoirAward[3], 3, true);
             }
         }
-        AddVar(VAR_MEMOIR_WEIBO_COUNT, 1);
+        sendMsgCode(0, 4047);
     }
     else
     {
-        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS))
+        if(GetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS) || GetVar(VAR_MEMOIR_WEIXIN_COUNT) >= 5)
             return;
         SYSMSGV(title, 5234);
         SYSMSGV(content, 5235);
@@ -35828,7 +35830,9 @@ void Player::GetMemoirAward(UInt8 type)
         {
             mailPackageManager.push(mail->id, MemoirAward[0], 3, true);
         }
-        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 6)
+        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+        SetVar(VAR_MEMOIR_TODAY_WEIXIN_STATUS, 1);
+        if(GetVar(VAR_MEMOIR_WEIXIN_COUNT) == 3)
         {
             SYSMSGV(title, 5236);
             SYSMSGV(content, 5237);
@@ -35838,8 +35842,9 @@ void Player::GetMemoirAward(UInt8 type)
                 mailPackageManager.push(mail->id, MemoirAward[2], 3, true);
             }
         }
-        AddVar(VAR_MEMOIR_WEIXIN_COUNT, 1);
+        sendMsgCode(0, 4047);
     }
+    sendMemoirAwardInfo();
 }
 
 void Player::sendMemoirAwardInfo()
