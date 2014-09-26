@@ -1589,11 +1589,25 @@ namespace GObject
 
 	bool Package::MoveEquipFromPack(ItemEquip * equip)
 	{
-		item_elem_iter iter = m_Items.find(equip->getId());
-		if(iter == m_Items.end())
-			return false;
-		m_Items.erase(iter);
-		-- m_Size;
+        if(IsZhenYuanItem(equip->GetTypeId()))
+        {
+            item_elem_iter iter = m_ItemsZY.find(equip->getId());
+            if(iter == m_ItemsZY.end())
+                return false;
+            m_ItemsZY.erase(iter);
+            if(m_SizeZY > 0)
+                -- m_SizeZY;
+        }
+        else
+        {
+            item_elem_iter iter = m_Items.find(equip->getId());
+            if(iter == m_Items.end())
+                return false;
+            m_Items.erase(iter);
+            if(m_Size > 0)
+                -- m_Size;
+        }
+
 		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		SendDelEquipData(equip);
 		return true;
