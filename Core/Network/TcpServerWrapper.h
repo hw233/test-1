@@ -113,7 +113,7 @@ namespace Network
 		}
 		inline void UnInit()
 		{
-            printf("pid: %u, m_Active = %u\n", getpid(), m_Active);
+            //printf("pid: %u, m_Active = %u\n", getpid(), m_Active);
 			m_Active = false;
 			m_TcpService->uninit();
 		}
