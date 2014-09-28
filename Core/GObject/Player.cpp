@@ -25693,7 +25693,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
         if(flag == e_sla_none)
         {
             if(World::getSurnameLegend2())
-                GetPackage()->AddItem(16009, 1, true, false, FromNpc);
+                GetPackage()->AddItem(16010, 1, true, false, FromNpc);
             else
                 GetPackage()->AddItem(16050, 1, true, false, FromNpc);
         }
@@ -25705,7 +25705,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
                 if(World::getSurnameLegend2())
                 {
                     if(flag == e_sla_hi || flag == e_sla_cb || flag == e_sla_ncb || flag == e_sla_ccb || flag == e_sla_clb || flag == e_sla_mr)
-                        GetPackage()->AddItem(16009, 1, true, false, FromNpc);
+                        GetPackage()->AddItem(16010, 1, true, false, FromNpc);
                 }
                 else
                     GetPackage()->AddItem(16050, 1, true, false, FromNpc);
