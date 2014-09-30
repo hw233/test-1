@@ -975,9 +975,6 @@ namespace GObject
         xxlMapInfo[0]="";
         xxlMapInfo[1]="";
         xxlMapInfo[2]="";
-        SetVar(VAR_PACKAGE_SIZE_GEM, 200);
-        SetVar(VAR_PACKAGE_SIZE_FORMULA, 200);
-        SetVar(VAR_PACKAGE_SIZE_SL, 200);
     }
 
 
