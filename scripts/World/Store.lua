@@ -220,7 +220,7 @@ function loadStore()
         store:add(2, 9425, 80)
         store:add(2, 9438, 30)
 
-        if getXCTJTime() then
+        if getXCTJTime(300) then
             store:add(2, 16058, 30)
         end
 

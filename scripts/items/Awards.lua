@@ -2304,7 +2304,7 @@ function getHitEggAward(player,num)
         local item_id = 0;
         local item_count = 0;
         for k = 1,#chance_egg do
-            if g < chance_egg[k] then
+            if g <= chance_egg[k] then
                 index = k
                 break;
             end
@@ -2318,7 +2318,7 @@ function getHitEggAward(player,num)
             local r = math.random(1, 10000)
             local idx = 0;
             for k = 1,#chance_19 do
-                if r < chance_19[k] then
+                if r <= chance_19[k] then
                     idx = k
                     break;
                 end
