@@ -11186,10 +11186,17 @@ function ItemNormal_00009382(iid, num, bind, param)
     local itmeId = 16050;
     local player = GetPlayer()
     local package = player:GetPackage()
-    local items = { 500, 15, 501, 33, 9424, 551, 503, 8000, 9457, 1325, 1126, 134, 515, 16038 }
+    local items1 = { 500, 15, 501, 33, 9424, 551, 503, 8000, 9457, 1325, 1126, 134, 515, 16038 }
+    local items2 = { 15, 9088, 512, 33, 9371, 551, 501, 513, 503, 1325, 134, 507, 509, 515 }
     local chance = { 1500,3000,3900,4800,5700,6600,7400,8200,8800,9100,9400,9600,9800,10000 }
     local card_num = 0;
     local used_num = player:GetVar(452);
+    local items
+    if getSurnameLegend() then
+        items = items1
+    else
+        items = items2
+    end
     if package:GetRestPackageSize() < num or package:GetRestPackageSize(5) < num then
         player:sendMsgCode(2, 1011, 0)
         return 0; 
@@ -11209,7 +11216,7 @@ function ItemNormal_00009382(iid, num, bind, param)
         --else
             package:Add(items[g], 1, true, false, 2)
         --end
-        if iid == itmeId and getSurnameLegend() then
+        if iid == itmeId and (getSurnameLegend() or getSurnameLegend2()) then
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
             if used_num + n > 30 then
@@ -11254,7 +11261,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
-    if iid == itmeId and getSurnameLegend() then
+    if iid == itmeId and (getSurnameLegend() or getSurnameLegend2()) then
         local origNum = player:GetVar(452)
         if origNum < 50 and origNum + num >= 50 then
             player:getLuckyBagExtraAward()
@@ -11534,7 +11541,7 @@ function ItemNormal_00009495(iid, num, bind, param)
         end
         player:luaUdpLog("qingguanliulizhan", "F_140317_"..j, "act")
 
-        if getSurnameLegend() then
+        if getSurnameLegend() or getSurnameLegend2() then
             local used_num = player:GetVar(452);
             local rand_card = math.random(1,10000);
             local card_chance = 3000;
@@ -11577,7 +11584,7 @@ function ItemNormal_00009495(iid, num, bind, param)
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
-    if getSurnameLegend() then
+    if getSurnameLegend() or getSurnameLegend2() then
         player:AddVar(452, num)
     end
     player:sendLuckyBagInfo()

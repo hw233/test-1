@@ -155,6 +155,7 @@ namespace Script
 		lua_tinker::def(_L, "getFoolBao", GObject::World::getFoolBao);
 		lua_tinker::def(_L, "getHalfGold", GObject::World::getHalfGold);
 		lua_tinker::def(_L, "getSurnameLegend", GObject::World::getSurnameLegend);
+		lua_tinker::def(_L, "getSurnameLegend2", GObject::World::getSurnameLegend2);
 		lua_tinker::def(_L, "getHappyFireTime", GObject::World::getHappyFireTime);
 		lua_tinker::def(_L, "getWorldCupTime", GObject::World::getWorldCupTime);
 		lua_tinker::def(_L, "getWorldCupTime2", GObject::World::getWorldCupTime2);

@@ -9161,7 +9161,7 @@ end
 --蜀山传奇掉落活动
 function SurnameLegendLoot(player,lootlvl)
     DropActLoot(player,lootlvl)
-    if not getSurnameLegend() then
+    if (not getSurnameLegend()) and (not getSurnameLegend2()) then
         return
     end
     if lootlvl > 3 then
@@ -9174,7 +9174,11 @@ function SurnameLegendLoot(player,lootlvl)
         [3] = 1,
     };
     local package = player:GetPackage();
-    package:AddItem(16050, itemNum[lootlvl], true,0,10);
+    if getSurnameLegend() then
+        package:AddItem(16050, itemNum[lootlvl], true,0,10);
+    else
+        package:AddItem(16010, itemNum[lootlvl], true,0,10);
+    end
 end
 
 -- 万圣节套装
@@ -10076,9 +10080,20 @@ function GetLuckyBagAward(player)
         return false;
     end
 
-    local items = {
+    local items
+    local items1 = {
        {9371,5}, {134,2}, {9457,2}, {9338,2}, {9600,2}, {1325,2}
     }
+
+    local items2 = {
+       {513,6}, {505,6}, {511,6}, {512,6}, {510,6}
+    }
+    if getSurnameLegend() then
+        items = items1
+    else
+        items = items2
+    end
+
     for i = 1 , 5  do
         local num = player:GetVar(452+i);
         if num < 1 then
@@ -10094,7 +10109,12 @@ function GetLuckyBagAward(player)
         player:GetPackage():Add(item[1],item[2],true,false,32);
     end
     player:sendLuckyBagInfo();
-    Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
+    if getSurnameLegend() then
+        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_136)
+    else
+        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_145)
+    end
+
     player:luaUdpLog("huodong", "F_130910_1", "act")
     return true
 end
