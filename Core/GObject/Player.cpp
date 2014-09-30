@@ -8242,7 +8242,12 @@ namespace GObject
             {
                 UInt8 day = (TimeUtil::SharpDay(0, now) - _playerData.nextIcReset )/86400 ;
                 UInt8 oldValue = getMaxIcCount(getVipLevel(),1);
-                UInt32 value = getMaxIcCount(getVipLevel()) - _playerData.icCount + (day) * oldValue;
+                Int32 value = getMaxIcCount(getVipLevel()) - _playerData.icCount + (day) * oldValue;
+                if(value < 0 )
+                    value = 0;
+                else if(value > 255)
+                    value = 255;
+
                 if((value + oldValue) > 255 )
                     SetVar(VAR_NEWYEARSPEED_COUNT,255 - oldValue );
                 else
