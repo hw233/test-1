@@ -7224,7 +7224,10 @@ namespace GObject
     void Player::clearFinishCount(UInt32 nextday)
     {
         if(World::getJiqirenAct() && !TimeUtil::SameDay(nextday ,TimeUtil::MkTime(2014, 9, 29)))
+        {
             handleJiqirenAct_shiyamen();
+            handleJiqirenAct_erlking();
+        }
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
         _playerData.smFreeCount = 0;
@@ -30177,19 +30180,139 @@ void Player::handleJiqirenAct_dungeon()
     SetVar(VAR_JIQIREN_DUNGEON, dungeon);
 }
 
-static const UInt32 Need_tael[16] = { 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 500, 500, 500, 100 };
-static const UInt32 Need_gold[16] = { 0, 20, 40, 60, 0, 20, 40, 60, 0, 20, 0, 50, 0, 0, 0, 0 };
+void Player::handleJiqirenAct_xjfrontMap()
+{
+    if(!World::getJiqirenAct())
+        return;
+    int front = GetVar(VAR_JIQIREN_XJFRONTMAP);
+    int goldCnt = XJFrontMap::getGoldCount(PLAYER_DATA(this, xjfrontGoldCnt));
+    int freeCnt = XJFrontMap::getFreeCount() - PLAYER_DATA(this, xjfrontFreeCnt);
+    UInt8 fcnt = GET_BIT_8(front, 0);
+    UInt8 gcnt1 = GET_BIT_8(front, 1);
+    UInt8 gcnt2 = GET_BIT_8(front, 2);
+    UInt8 gcnt3 = GET_BIT_8(front, 3);
+    if(goldCnt == 3)
+    {
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 2)
+    {
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 1)
+    {
+        gcnt3 += 1;
+    }
+    if(freeCnt > 0)
+        fcnt += freeCnt;
+    front = SET_BIT_8(front, 0, fcnt);
+    front = SET_BIT_8(front, 1, gcnt1);
+    front = SET_BIT_8(front, 2, gcnt2);
+    front = SET_BIT_8(front, 3, gcnt3);
+    SetVar(VAR_JIQIREN_XJFRONTMAP, front);
+}
+
+void Player::handleJiqirenAct_fairycopy()
+{
+    if(!World::getJiqirenAct())
+        return;
+    int copy = GetVar(VAR_JIQIREN_FAIRYCOPY);
+    int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
+    int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    if (World::_wday == 6)
+        freeCnt -= PlayerCopy::FREECNT;
+    else if (World::_wday == 7)
+        freeCnt += PlayerCopy::FREECNT;
+    UInt8 fcnt = GET_BIT_8(copy, 0);
+    UInt8 gcnt1 = GET_BIT_8(copy, 1);
+    UInt8 gcnt2 = GET_BIT_8(copy, 2);
+    UInt8 gcnt3 = GET_BIT_8(copy, 3);
+    if(goldCnt == 3)
+    {
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 2)
+    {
+        gcnt2 += 1;
+        gcnt3 += 1;
+    }
+    else if(goldCnt == 1)
+    {
+        gcnt3 += 1;
+    }
+    if(freeCnt > 0)
+        fcnt += freeCnt;
+    copy = SET_BIT_8(copy, 0, fcnt);
+    copy = SET_BIT_8(copy, 1, gcnt1);
+    copy = SET_BIT_8(copy, 2, gcnt2);
+    copy = SET_BIT_8(copy, 3, gcnt3);
+    SetVar(VAR_JIQIREN_FAIRYCOPY, copy);
+}
+
+void Player::handleJiqirenAct_erlking()
+{
+    if(!World::getJiqirenAct())
+        return;
+    UInt32 info = GetVar(VAR_ERLKING_USE_FREE_NUM_DAY);
+    int remain = 5 - info;
+    if(remain > 0)
+    {
+        UInt32 sum = GetVar(VAR_JIQIREN_ERLKING) + remain;
+        SetVar(VAR_JIQIREN_ERLKING, sum);
+    }
+}
+
+static const UInt32 Need_tael[25] = { 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 500, 500, 500, 100, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 800};
+static const UInt32 Need_gold[25] = { 0, 20, 40, 60, 0, 20, 40, 60, 0, 20, 0, 50, 0, 0, 0, 0, 0, 20, 40, 60, 0, 20, 40, 60, 0};
 void Player::completeJiqirenTask(UInt8 type, UInt8 count)
 {
     //type==>0:副本免费 1:副本付费1 2:副本付费2 3:副本付费3
     //       4:阵图免费 5:阵图付费1 6:阵图付费2 7:阵图付费3
     //       8:决战之地(简单)免费 9:决战之地(简单)付费 10:决战之地(困难)免费 11:决战之地(困难)付费
     //       12:帮派任务 13:衙门任务 14:师门任务 15:锁妖塔
-    if(!World::getJiqirenAct() || type >= 16 || !count)
+    //       16:璇玑阵图免费 17:璇玑阵图付费1 18:璇玑阵图付费2 19:璇玑阵图付费3
+    //       20:仙界副本免费 21:仙界副本付费1 22:仙界副本付费2 23:仙界副本付费3
+    //       24:妖王再临免费 
+    if(!World::getJiqirenAct() || type >= 25 || !count)
         return;
-    if((type <= 11 && GetFreePackageSize() < 30*count) || (type == 15 && GetFreePackageSize() < 50*count))
+    if(type <= 3 && (GetFreePackageSize() < 20*count || GetPackage()->GetRestPackageSize(3) < 2*count || GetPackage()->GetRestPackageSize(5) < count))
     {
         sendMsgCode(0, 1011);
+        return;
+    }
+    if(type >= 4 && type < 8 && (GetFreePackageSize() < 10*count || GetPackage()->GetRestPackageSize(4) < 2*count || GetPackage()->GetRestPackageSize(3) < 2*count))
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type >= 8 && type < 12 && (GetFreePackageSize() < 20*count || GetPackage()->GetRestPackageSize(3) < 2*count))
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 15 && GetFreePackageSize() < 50*count) 
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type >= 16 && type < 20 && (GetFreePackageSize() < 2 * count || GetPackage()->GetRestPackageSize(4) < 7*count))
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type >= 20 && type < 24 && (GetFreePackageSize() < 5*count) || GetPackage()->GetRestPackageSize(3) < 2*count )
+    {
+        sendMsgCode(0, 1011);
+        return;
+    }
+    if(type == 24 && (GetPackage()->GetRestPackageSize() < ((7*count)/99+1) || GetPackage()->GetRestPackageSize(2) < count))
+    {
+        sendMsgCode(0, 8050);
         return;
     }
     UInt32 tael = Need_tael[type] * count;
@@ -30270,13 +30393,39 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
 
         SetVar(VAR_JIQIREN_DUNGEON, SET_BIT_8(info, (type%4), (curCnt-count)));
     }
-    else
+    else if(type >= 12 && type < 16)
     {
         UInt32 info = GetVar(VAR_JIQIREN_SYBS);
         UInt8 curCnt = GET_BIT_8(info, (type%4));
         if(curCnt < count || (type == 12 && !getClan()))
             return;
         SetVar(VAR_JIQIREN_SYBS, SET_BIT_8(info, (type%4), (curCnt-count)));
+    }
+    else if(type >= 16 && type < 20)
+    {
+        UInt32 info = GetVar(VAR_JIQIREN_XJFRONTMAP);
+        UInt8 curCnt = GET_BIT_8(info, (type%4));
+        if(curCnt < count || GetLev() < 75)
+            return;
+
+        SetVar(VAR_JIQIREN_XJFRONTMAP, SET_BIT_8(info, (type%4), (curCnt-count)));  
+    }
+    else if(type >= 20 && type < 24)
+    {
+        UInt32 info = GetVar(VAR_JIQIREN_FAIRYCOPY);
+        UInt8 curCnt = GET_BIT_8(info, type);
+        if(curCnt < count || GetLev() < 80)
+            return;
+        SetVar(VAR_JIQIREN_FAIRYCOPY, SET_BIT_8(info, type, (curCnt-count)));   
+    }
+    else 
+    {
+        if(GetErlking()->getMaxLevel(this) == 0)
+            return;
+        UInt8 curCnt = static_cast<UInt8>(GetVar(VAR_JIQIREN_ERLKING));
+        if(curCnt < count)
+            return;
+        SetVar(VAR_JIQIREN_ERLKING,(curCnt - count));  
     }
     ConsumeInfo ci(DailyActivity, 0, 0);
     useTael(tael, &ci);
@@ -30360,6 +30509,30 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
                 townDeamonManager->getJiqirenAward(this);
             }
             break;
+        case 16:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_XJFrontMap(this, 1);
+            break;
+        case 17:
+        case 18:
+        case 19:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_XJFrontMap(this, 0);
+            break;
+        case 20:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_FairyCopy(this, 1);
+            break;
+        case 21:
+        case 22:
+        case 23:
+            for(UInt8 i = 0; i < count; ++ i)
+                GameAction()->getJiqirenAward_FairyCopy(this, 0);
+            break;
+        case 24:
+            GetErlking()->getJiqirenAward(this,count);
+            break;
+
     }
     sendJiqirenInfo();
     char action[16] = "";
@@ -30373,6 +30546,8 @@ void Player::sendJiqirenInfo()
     UInt32 front = GetVar(VAR_JIQIREN_FRONTMAP);
     UInt32 dungeon = GetVar(VAR_JIQIREN_DUNGEON);
     UInt32 sybs = GetVar(VAR_JIQIREN_SYBS);
+    UInt32 xjfront = GetVar(VAR_JIQIREN_XJFRONTMAP);
+    UInt32 fairycopy = GetVar(VAR_JIQIREN_FAIRYCOPY);
 
 	Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x10) << static_cast<UInt8>(0);
@@ -30387,6 +30562,11 @@ void Player::sendJiqirenInfo()
 
     st << static_cast<UInt8>(GET_BIT_8(sybs, 0)) << static_cast<UInt8>(GET_BIT_8(sybs, 1));
     st << static_cast<UInt8>(GET_BIT_8(sybs, 2)) << static_cast<UInt8>(GET_BIT_8(sybs, 3));
+    st << static_cast<UInt8>(GET_BIT_8(xjfront, 0)) << static_cast<UInt8>(GET_BIT_8(xjfront, 1));
+    st << static_cast<UInt8>(GET_BIT_8(xjfront, 2)) << static_cast<UInt8>(GET_BIT_8(xjfront, 3));
+    st << static_cast<UInt8>(GET_BIT_8(fairycopy, 0)) << static_cast<UInt8>(GET_BIT_8(fairycopy, 1));
+    st << static_cast<UInt8>(GET_BIT_8(fairycopy, 2)) << static_cast<UInt8>(GET_BIT_8(fairycopy, 3));
+    st << static_cast<UInt8>(GetVar(VAR_JIQIREN_ERLKING));
     st << Stream::eos;
     send(st);
 }

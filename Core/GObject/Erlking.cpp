@@ -335,5 +335,50 @@ void Erlking::AutoBattle(UInt8 copyId, UInt16 num)
     m_owner->send(st);
 }
 
+UInt8 Erlking::getMaxLevel(Player* pl)
+{
+    UInt8 i = ERLKING_MAX_COPY_NUM;
+    while(i)
+    {
+        GData::ErlkingData::erlkingInfo * info = GData::erlkingData.getErlkingInfo(i);
+        if(NULL == info)
+            return 0;
+
+        UInt8 curMark = GetErlkingStatus(i);
+        if(ERLKING_MARKC == curMark)
+            break;
+        i--; 
+    }
+    return i;
+}
+
+void Erlking::getJiqirenAward(Player * pl,UInt8 num)
+{
+    if(!pl) return;
+    if(0 == num && num > 5)
+        return;
+    UInt8 level = getMaxLevel(pl);
+   
+    GData::ErlkingData::erlkingInfo * info = GData::erlkingData.getErlkingInfo(level);
+    if(NULL == info)
+        return;
+
+    GData::NpcGroups::iterator it = GData::npcGroups.find(info->npcgroup);
+    if(it == GData::npcGroups.end())
+        return;
+
+    GData::NpcGroup * ng = it->second;
+    if(NULL == ng)
+        return;    
+
+    for(UInt8 i=0; i<num; i++)
+    {
+        pl->pendExp(ng->getExp());
+        ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+    }
+    pl->checkLastBattled();
+
+}
+
 }
 

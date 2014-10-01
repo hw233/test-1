@@ -41,6 +41,10 @@ namespace GObject
 
         void AutoBattle(UInt8 copyId, UInt16 num);
 
+        UInt8 getMaxLevel(Player* pl);
+
+        void getJiqirenAward(Player * pl,UInt8 num);
+
         Player* m_owner;
     };
 }
