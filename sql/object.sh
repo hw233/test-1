@@ -172,8 +172,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearCoolSummer.sql     #清除酷爽一夏
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_tianjieExtendLevel.sql #增加天劫
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #国庆长假乐不停(var349)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clean_jiqiren.sql     #清除机器人
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #国庆长假乐不停(var349)
 }
 
 #sh player_jiguan.sh
