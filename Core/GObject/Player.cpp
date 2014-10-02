@@ -25688,18 +25688,27 @@ void Player::getRYHBAward(UInt8 idx, UInt8 cnt)
 
 void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
 {
-    if (World::getSurnameLegend())
+    if (World::getSurnameLegend() || World::getSurnameLegend2())
     {
         if(flag == e_sla_none)
         {
-            GetPackage()->AddItem(16050, 1, true, false, FromNpc);
+            if(World::getSurnameLegend2())
+                GetPackage()->AddItem(16009, 1, true, false, FromNpc);
+            else
+                GetPackage()->AddItem(16050, 1, true, false, FromNpc);
         }
         else if(flag == e_sla_cb || flag == e_sla_clb || flag == e_sla_hi || flag == e_sla_ncb || flag == e_sla_rb || flag == e_sla_mr || flag == e_sla_ccb)
         {
             UInt32 status = GetVar(VAR_SURNAME_LEGEND_STATUS);
             if(!(status & flag))
             {
-                GetPackage()->AddItem(16050, 1, true, false, FromNpc);
+                if(World::getSurnameLegend2())
+                {
+                    if(flag == e_sla_hi || flag == e_sla_cb || flag == e_sla_ncb || flag == e_sla_ccb || flag == e_sla_clb || flag == e_sla_mr)
+                        GetPackage()->AddItem(16009, 1, true, false, FromNpc);
+                }
+                else
+                    GetPackage()->AddItem(16050, 1, true, false, FromNpc);
 
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
@@ -30306,7 +30315,7 @@ void Player::completeJiqirenTask(UInt8 type, UInt8 count)
         sendMsgCode(0, 1011);
         return;
     }
-    if(type >= 20 && type < 24 && (GetFreePackageSize() < 5*count) || GetPackage()->GetRestPackageSize(3) < 2*count )
+    if(type >= 20 && type < 24 && (GetFreePackageSize() < 5*count || GetPackage()->GetRestPackageSize(3) < 2*count))
     {
         sendMsgCode(0, 1011);
         return;
