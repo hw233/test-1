@@ -5423,7 +5423,8 @@ namespace GObject
         if(ci && ci->purchaseType != Discount3  && ci->purchaseType != Discount5 && ci->purchaseType != Discount8 && ci->purchaseType != DiscountSp1 && ci->purchaseType != DiscountSp2 && ci->purchaseType != DiscountSp3 && ci->purchaseType != ZhengHun && ci->purchaseType != JieHun && ci->purchaseType != LiHun && ci->purchaseType != TrainFighter && ci->purchaseType != DINGQINGXINWU)
         {
             CarnivalConsumeAct(c);
-            TreasureConsumeAct(c);
+            if(World::getTreasureTime())
+                TreasureConsumeAct(c);
         }
         return _playerData.gold;
 	}

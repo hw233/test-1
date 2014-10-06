@@ -1410,7 +1410,7 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
     UInt8 type = _msg->type;
     UInt32 v = p->GetVar(var); 
     UInt32 value1 = 0 ;
-    if(p->getServerNo()!= serverNo)
+    if(cfg.merged && p->getServerNo()!= serverNo)
         return true;
     if(type == 1 )
         value1 = value ;
