@@ -11262,7 +11262,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     if card_num > 0 then
         SendMsg(player, 0x35, "获得卡牌 x"..card_num);
     end
-    if (iid == itmeId and getSurnameLegend()) or (iid = itmeId2 and getSurnameLegend2()) then
+    if (iid == itmeId and getSurnameLegend()) or (iid == itmeId2 and getSurnameLegend2()) then
         local origNum = player:GetVar(452)
         if origNum < 50 and origNum + num >= 50 then
             player:getLuckyBagExtraAward()
