@@ -1542,8 +1542,8 @@ function initActTime(y, m, d)
   local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --众里寻他
-  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 9, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 11, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTmq4= { ['year'] = 2014, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
