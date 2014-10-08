@@ -178,6 +178,10 @@ namespace GObject
 
         GVAR_NATIONAL_DAY_BEGIN = 112, //国庆乐翻天开启
         GVAR_NATIONAL_DAY_END = 113,   //国庆乐翻天结束
+
+        GVAR_SURNAMELEGEND2_BEGIN = 114, //青光琉璃盏
+        GVAR_SURNAMELEGEND2_END = 115,  //青光琉璃盏
+
         GVAR_MAX,
     };
 

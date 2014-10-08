@@ -1410,7 +1410,7 @@ inline bool player_enum_setvar(GObject::Player* p, void* msg)
     UInt8 type = _msg->type;
     UInt32 v = p->GetVar(var); 
     UInt32 value1 = 0 ;
-    if(p->getServerNo()!= serverNo)
+    if(cfg.merged && p->getServerNo()!= serverNo)
         return true;
     if(type == 1 )
         value1 = value ;
@@ -3834,13 +3834,25 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 2 && begin <= end)
     {
+        if(GObject::World::getSurnameLegend2())
+        {
+            Stream st(SPEP::ACTIVITYONOFF);
+            st << ret << Stream::eos;
+            NETWORK()->SendMsgToClient(hdr.sessionID, st);
+            return;
+        }
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
         curType = 3;
         if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END) < TimeUtil::Now())
             GObject::globalPlayers.enumerate(player_enum_2, &curType);
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, begin);
         GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
-        ret = 1;
+        return;
     }
     else if (type == 3 && begin <= end && !GObject::World::inActive_opTime_20130531())
     {
@@ -4219,7 +4231,28 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if (type == 27 && begin <= end)
+    {
+        if(GObject::World::getSurnameLegend())
+        {
+            Stream st(SPEP::ACTIVITYONOFF);
+            st << ret << Stream::eos;
+            NETWORK()->SendMsgToClient(hdr.sessionID, st);
+            return;
+        }
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
 
+        curType = 3;
+        if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND2_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND2_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND2_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND2_END, end);
+        return;
+    }
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;

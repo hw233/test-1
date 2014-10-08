@@ -1105,6 +1105,17 @@ public:
         return _surnamelegend;
     }
 
+    inline static bool getSurnameLegend2(UInt32 time = 0)
+    {
+        UInt32 begin = GVAR.GetVar(GVAR_SURNAMELEGEND2_BEGIN);
+        UInt32 end = GVAR.GetVar(GVAR_SURNAMELEGEND2_END);
+        UInt32 now = TimeUtil::Now() + time;
+        if( now >= begin && now <= end)
+            return true;
+        else
+            return false;
+    }
+
     inline static void setSnowAct(bool v)
     {
         UInt32 begin = GVAR.GetVar(GVAR_CHRISTMAS_PILESNOW_BEGIN);
@@ -1741,6 +1752,7 @@ public:
     void SendItem9343Award();
     void SendFoolBaoAward();
     void SendSurnameLegendAward();
+    void SendSurnameLegendAward2();
     void Send11AirBookAward();
     void Send11CountryRankAward();
     void Send11PlayerRankAward();

@@ -4843,6 +4843,10 @@ void GMHandler::OnSurnameleg(GObject::Player *player, std::vector<std::string>& 
             GVAR.SetVar(GObject::GVAR_NATIONAL_DAY_BEGIN, TimeUtil::SharpDayT(0));
             GVAR.SetVar(GObject::GVAR_NATIONAL_DAY_END, TimeUtil::SharpDayT(5));
             break;
+        case 39:
+            GVAR.SetVar(GObject::GVAR_SURNAMELEGEND2_BEGIN, TimeUtil::SharpDayT(0));
+            GVAR.SetVar(GObject::GVAR_SURNAMELEGEND2_END, TimeUtil::SharpDayT(5));
+            break;
 
     }
 }

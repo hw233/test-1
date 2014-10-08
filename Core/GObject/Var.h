@@ -864,6 +864,9 @@ namespace GObject
         VAR_TREASURE_CONSUME = 871, //藏宝阁个人消费累计数
         VAR_TREASURE_CONSUME_EXT = 872, //藏宝阁个人消费累计积分剩余数
         VAR_TREASURE_SCORE = 873, //藏宝阁个人积分数
+        VAR_JIQIREN_XJFRONTMAP = 874, //机器人之璇玑阵图未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
+        VAR_JIQIREN_FAIRYCOPY = 875,  //机器人之仙界副本未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
+        VAR_JIQIREN_ERLKING= 876,  //机器人之妖王未完成次数
 
         VAR_MAX,
     };
@@ -1632,6 +1635,13 @@ namespace GObject
             REGISTER_VAR(VAR_XCTJ_REPEAT, CYCLE_NONE);
             REGISTER_VAR(VAR_XCTJ_FULI, CYCLE_NONE);
             REGISTER_VAR(VAR_XCTJ_RECHARGE, CYCLE_NONE);
+            
+            REGISTER_VAR(VAR_TREASURE_CONSUME, CYCLE_NONE);
+            REGISTER_VAR(VAR_TREASURE_CONSUME_EXT, CYCLE_NONE);
+            REGISTER_VAR(VAR_TREASURE_SCORE, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_XJFRONTMAP, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_FAIRYCOPY, CYCLE_NONE);
+            REGISTER_VAR(VAR_JIQIREN_ERLKING, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

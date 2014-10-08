@@ -3546,6 +3546,9 @@ namespace GObject
         void handleJiqirenAct_copy();
         void handleJiqirenAct_frontMap();
         void handleJiqirenAct_dungeon();
+        void handleJiqirenAct_xjfrontMap();
+        void handleJiqirenAct_fairycopy();
+        void handleJiqirenAct_erlking();
         void completeJiqirenTask(UInt8, UInt8);
         void sendJiqirenInfo();
         void sevensoul_fixed();
