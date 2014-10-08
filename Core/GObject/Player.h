@@ -2157,7 +2157,7 @@ namespace GObject
         UInt32 getClanTask();
         bool finishClanTask(UInt32);
         void delClanTask();
-        void buildClanTask(bool fReset = false);
+        void buildClanTask(bool fReset = false,UInt32 nextday = 0);
         void resetClanTask();
         UInt32 getClanTaskId();
         bool isClanTask(UInt32);
@@ -2183,7 +2183,7 @@ namespace GObject
         bool ColorTaskOutOfAccept(UInt8 type, bool = false);
         void ColorTaskAccept(UInt8 type, UInt32 taskid);
         void ColorTaskAbandon(UInt8 type, UInt32 taskid);
-        void clearFinishCount();
+        void clearFinishCount(UInt32 nextday = 0);
         void checkDungeonTimeout(UInt32 now);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);

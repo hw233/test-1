@@ -279,7 +279,7 @@ UInt8 FrontMap::getCount(Player* pl)
     if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, frontUpdate)) ||
             getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt) ||
             getFreeCount() < PLAYER_DATA(pl, frontFreeCnt)) {
-        if(World::getJiqirenAct())
+        if(World::getJiqirenAct()&& !TimeUtil::SameDay(TimeUtil::Now(),TimeUtil::MkTime(2014, 9, 29)))
             pl->handleJiqirenAct_frontMap();
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         PLAYER_DATA(pl, frontFreeCnt) = 0;

@@ -389,8 +389,8 @@ bool enum_midnight(void * ptr, void* next)
     else
     {
         pl->checkDungeonTimeout(nextday);
-        pl->buildClanTask(true);
-        pl->clearFinishCount();
+        pl->buildClanTask(true,nextday);
+        pl->clearFinishCount(nextday);
         /*
         if (World::_thanksgiving)
             pl->resetThanksgiving();

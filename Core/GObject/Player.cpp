@@ -7201,7 +7201,7 @@ namespace GObject
     {
         if(now >= _playerData.dungeonEnd)
         {
-            if(World::getJiqirenAct())
+            if(World::getJiqirenAct() && !TimeUtil::SameDay(now,TimeUtil::MkTime(2014, 9, 29)))
                 handleJiqirenAct_dungeon();
             _playerData.dungeonEnd = TimeUtil::SharpDay(1, now);
             _playerData.dungeonCnt = 0;
@@ -7211,9 +7211,9 @@ namespace GObject
         }
     }
 
-    void Player::clearFinishCount()
+    void Player::clearFinishCount(UInt32 nextday)
     {
-        if(World::getJiqirenAct())
+        if(World::getJiqirenAct() && !TimeUtil::SameDay(nextday ,TimeUtil::MkTime(2014, 9, 29)))
             handleJiqirenAct_shiyamen();
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
@@ -7292,7 +7292,7 @@ namespace GObject
         }
     }
 
-    void Player::buildClanTask(bool fReset)
+    void Player::buildClanTask(bool fReset,UInt32 nextday)
     {
         bool writeDB = false;
         do
@@ -7326,7 +7326,7 @@ namespace GObject
             GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
         } while(false);
 
-        if(fReset && World::getJiqirenAct())
+        if(fReset && World::getJiqirenAct() && !TimeUtil::SameDay(nextday ,TimeUtil::MkTime(2014, 9, 29)))
             handleJiqirenAct_clan();
         if(fReset && _playerData.ctFinishCount != 0)
         {
