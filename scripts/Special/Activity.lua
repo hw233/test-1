@@ -9109,7 +9109,6 @@ end
 --喜从天降
 function XCTJLoot(player,lootlvl)
     if not getXCTJTime() then
-        print("XX")
         return
     end
     if lootlvl > 3 then
