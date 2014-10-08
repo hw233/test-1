@@ -85,6 +85,10 @@ namespace GObject
         if((level == 0 || level == 1) && (pl->getRaceBattlePos() % 10) == 0)
             return;
 
+        UInt8 nationalDayF = 1;
+        if(World::getNationalDayHigh())
+            nationalDayF = 2;
+
         UInt32 rank = 0;
         bool found = false;
         for(UInt8 i = 6; i >= 1; i--)
@@ -126,8 +130,8 @@ namespace GObject
             if(type <= 5)
             {
                 static UInt32 achievement[] = {300, 220, 180, 150, 120, 100};
-                pl->getAchievement(achievement[type]);
-                pl->setTotalAchievement(pl->getTotalAchievement() + achievement[type]);
+                pl->getAchievement(achievement[type] * nationalDayF);
+                pl->setTotalAchievement(pl->getTotalAchievement() + achievement[type] * nationalDayF);
             }
         }
 
@@ -161,8 +165,8 @@ namespace GObject
             if(type <= 9)
             {
                 static UInt32 achievement[] = {40, 45, 50, 55, 60, 65, 70, 75, 80, 85};
-                pl->getAchievement(achievement[type]);
-                pl->setTotalAchievement(pl->getTotalAchievement() + achievement[type]);
+                pl->getAchievement(achievement[type] * nationalDayF);
+                pl->setTotalAchievement(pl->getTotalAchievement() + achievement[type] * nationalDayF);
             }
         }
 
@@ -388,6 +392,10 @@ namespace GObject
     {
         if(!pl)
             return;
+        UInt8 nationalDayF = 1;
+        if(World::getNationalDayHigh())
+            nationalDayF = 2;
+
         UInt8 awardlevel = pl->getAwardLevel();
         UInt8 pos = pl->getRaceBattlePos();
         UInt8 level = pos / 10;
@@ -402,11 +410,13 @@ namespace GObject
             }
             else
             {
-                pl->GetPackage()->Add(9457, awardlevel - 3, true, false);
-                pl->setTotalItemCnt(pl->getTotalItemCnt() + awardlevel - 3);
+                pl->GetPackage()->Add(9457, (awardlevel - 3) * nationalDayF, true, false);
+                pl->setTotalItemCnt(pl->getTotalItemCnt() + (awardlevel - 3) * nationalDayF);
             }
         }
+
         UInt32 achievement = 100 * (awardlevel - 1);
+        achievement *= nationalDayF;
         if(awardlevel == 6)
             achievement += 100;
         pl->getAchievement(achievement);
@@ -729,6 +739,12 @@ namespace GObject
             achievement = 30;
         else
             achievement = 15;
+
+        UInt8 nationalDayF = 1;
+        if(World::getNationalDayHigh())
+            nationalDayF = 2;
+        achievement *= nationalDayF;
+
         pl->getAchievement(achievement);
         pl->setTotalAchievement(pl->getTotalAchievement() + achievement);
 

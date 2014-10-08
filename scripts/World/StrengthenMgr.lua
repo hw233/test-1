@@ -193,8 +193,14 @@ local grade11 = {
 function GetSthCheckFlag(idx)
     local flag = checkFlag[idx];
     if flag == nil then
+        if idx == 1 then
+            print("nil:0")
+        end
         return 0;
     else
+        if idx == 1 then
+            print("return : ".. flag)
+        end
         return flag;
     end
 end

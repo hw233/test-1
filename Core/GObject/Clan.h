@@ -630,6 +630,7 @@ public:
     void SendClanMemberGrade(Player* player);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
     void sendImpeachMail(Player* player, Player* leader);
+    void sendXCTJWelfare(Player * pl);
 
 public:
 	inline UInt8 getLev() { return _level; }

@@ -821,6 +821,12 @@ namespace GObject
         VAR_FAIRYCOPY_FREE = 823, //仙界副本免费次数
         VAR_FAIRYCOPY_GOLD = 824, //仙界副本付费次数
             
+        VAR_BAIFU_BAG_STATUE = 825 , //百服大礼包状态  0-未满足 1-未领取 2-已领取
+        VAR_XCTJ_COUNT = 826,       //喜从天降活跃度
+        VAR_XCTJ_AWARD = 827,       //喜从天降活跃度奖励领取
+        VAR_XCTJ_REPEAT = 828,      //喜从天降奖励重复度
+        VAR_XCTJ_FULI = 829,      //喜从天降福利发放次数
+        VAR_XCTJ_RECHARGE = 830,      //喜从天降充值
         //831-850 for qimj
         VAR_COOL_SUMMER_AWARD_TYPE = 831,        //酷爽一夏奖励类型
         VAR_COOL_SUMMER_ACTIVE_POINT_TOTAL = 832, //酷爽一夏累积活跃值
@@ -1620,6 +1626,12 @@ namespace GObject
             REGISTER_VAR(VAR_KETTLE_LOCK, CYCLE_NONE);
             REGISTER_VAR(VAR_FAIRYCOPY_FREE, CYCLE_DAY);
             REGISTER_VAR(VAR_FAIRYCOPY_GOLD, CYCLE_DAY);
+            REGISTER_VAR(VAR_BAIFU_BAG_STATUE, CYCLE_NONE);
+            REGISTER_VAR(VAR_XCTJ_COUNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_XCTJ_AWARD, CYCLE_NONE);
+            REGISTER_VAR(VAR_XCTJ_REPEAT, CYCLE_NONE);
+            REGISTER_VAR(VAR_XCTJ_FULI, CYCLE_NONE);
+            REGISTER_VAR(VAR_XCTJ_RECHARGE, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

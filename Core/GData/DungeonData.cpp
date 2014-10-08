@@ -14,6 +14,11 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
 {
 	std::vector<const LootItem *>::const_iterator it;
 	bool replace = false;
+
+    UInt8 nationalDayF = 1;
+    if(WORLD().getNationalDayHigh())
+        nationalDayF = 2;
+
 	if(specialItem != 0)
 	{
 		gemDecrease = 100;//for weekday Saturday activity
@@ -23,8 +28,8 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
 		{
 			LootResult lr;
 			lr.id = specialItem;
-			lr.count = 1;
-			player->GetPackage()->Add(specialItem, 1, true, true, FromDungeon);
+			lr.count = nationalDayF;
+			player->GetPackage()->Add(specialItem, nationalDayF, true, true, FromDungeon);
 			player->_lastLoot.push_back(lr);
 		}
 	}
@@ -74,6 +79,7 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
                 {
                     lr[j].id = specialItem;
                     lr[j].count = 1;
+                    lr[j].count *= nationalDayF;
                     replace = false;
                     specialItem = 0;
                     if(GDataManager::getNeedBindLevel30CFD(lr[j].id))

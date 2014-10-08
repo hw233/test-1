@@ -4206,6 +4206,19 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
+    else if (type == 26 && begin <= end )
+    {
+        ret = 1;
+        Stream st(SPEP::ACTIVITYONOFF);
+        st << ret << Stream::eos;
+        NETWORK()->SendMsgToClient(hdr.sessionID, st);
+
+        curType = 26;
+        GObject::GVAR.SetVar(GObject::GVAR_NATIONAL_DAY_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_NATIONAL_DAY_END, end);
+
+        return;
+    }
 
 
     Stream st(SPEP::ACTIVITYONOFF);

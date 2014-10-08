@@ -6379,5 +6379,32 @@ void Clan::sendImpeachMail(Player* player, Player* leader)
 		(*offset)->player->GetMailBox()->newMail(NULL, 0x01, title, content);
 	}
 }
+void Clan::sendXCTJWelfare(Player * pl)
+{ 
+    MailPackage::MailItem mitem[5] = {{503,3}, {500,3},{509,2},{17103,3},{17109,3}};
+    SYSMSGV(title, 5241,pl->getCountry(), pl->getName().c_str());
+    SYSMSGV(content, 5242,pl->getCountry(), pl->getName().c_str(),getName().c_str());
+	Members::iterator it = _members.begin();
+    for (; it != _members.end(); ++it)
+	{
+        Player * player = (*it)->player; 
+        if( player == NULL )
+            continue ; 
+        MailItemsInfo itemsInfo(mitem, Activity, 5);
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        if(mail)
+            mailPackageManager.push(mail->id, mitem, 5, true);
+        std::string strItems;
+        for(int i = 0; i < 5; ++ i)
+        {
+            strItems += Itoa(mitem[i].id);
+            strItems += ",";
+            strItems += Itoa(mitem[i].count);
+            strItems += "|";
+        }
+        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %" I64_FMT "u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+	}
+
+} 
 
 }
