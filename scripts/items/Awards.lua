@@ -939,7 +939,7 @@ function RunBlueDiamondAward(player, opt)
         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."通过财富罗盘获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
    
-   if opt ==8 and (items[j][1] == 9022 or items[j][1] == 1732 or items[j][1] == 509 or items[j][1] == 134 or items[j][1] == 1733) then 
+   if opt ==8 and (items[j][1] == 9022 or items[j][1] == 1734 or items[j][1] == 515 or items[j][1] == 17107 or items[j][1] == 1735) then 
         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."在激情大转盘中幸运的获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
     local extraAward_9191 = {
