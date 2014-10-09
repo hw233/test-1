@@ -5923,7 +5923,7 @@ UInt8 World::getRoseDemonTimeLevel()
         return 3;    //活动还有10分钟
     if( time > begin - 15*60 )
         return 4;    //活动还有15分钟
-    return 1;
+    return 0;
 }
 void World::RoseDemonAppear()
 {
