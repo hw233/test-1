@@ -1914,22 +1914,29 @@ void World::World_RoseDemon_Refresh(void *)
     switch(type)
     { 
         case 0:
-            if(now > _roseDemon._time)
-                RoseDemonAppear();
-            break;
-        case 1:
-            if(_roseDemon.setSpot.size())
+            if(_roseDemon._type)   //非0-》0转换表示活动结束
             {
                for(std::set<UInt16>::iterator it = _roseDemon.setSpot.begin(); it!= _roseDemon.setSpot.end();++it) 
                    RoseDemonDisappear(*it);
+               _roseDemon.setSpot.clear();
+               SYSMSG_BROADCASTV(418); 
             }
-            _roseDemon.setSpot.clear();
+            break;
+        case 1:
+            if(now > _roseDemon._time)
+                RoseDemonAppear();
             break;
         case 2:
         case 3:
         case 4:
+            if(_roseDemon._type != type)
+                SYSMSG_BROADCASTV(417,(type-1)*5); 
+            break;
+        default:
             break;
     } 
+    if(_roseDemon._type != type)
+        _roseDemon._type = type; 
 }
 
 void World::Tianjie_Refresh(void*)
@@ -5907,9 +5914,9 @@ UInt8 World::getRoseDemonTimeLevel()
     UInt32 begin = getRoseDemonBeginTime();
     
     if(time > begin+ 900 )
-        return 1;    //活动结束
+        return 0;    //活动结束
     if( begin <= time && time <= (begin + 900))
-        return 0;
+        return 1;
     if( time > begin - 5*60 )
         return 2;    //活动还有5分钟
     if( time > begin - 10*60 )

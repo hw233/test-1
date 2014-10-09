@@ -57,9 +57,10 @@ struct stOldMan
 
 struct stRoseDemon
 {
+    UInt8 _type ;
     UInt32 _time ;
     std::set<UInt16> setSpot;
-    stRoseDemon():_time(0){}
+    stRoseDemon():_type(0),_time(0){}
 };
 struct stArenaExtra
 {

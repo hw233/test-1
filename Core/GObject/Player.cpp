@@ -36443,6 +36443,7 @@ void Player::OnRoseDemonGetAward(UInt8 times)
             break;
     }
     GetPackage()->AddItem(16053,(i+1)*times, true, false);   //欢乐礼包(9439) 其他活动要修改
+    SYSMSG_BROADCASTV(419,getCountry(),getName().c_str(),(i+1)*times); 
 
     char str[16] = {0};
     sprintf(str, "F_131205_5");
