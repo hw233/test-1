@@ -5976,7 +5976,7 @@ void World::FindRoseDemon(Player * pl)
     GameMsgHdr h(0x34A,  pl->getThreadId(), pl, sizeof(UInt8));
     GLOBAL().PushMsg(h, &times);
 
-    GameMsgHdr hdr(0x15A, WORKER_THREAD_WORLD, player, sizeof(UInt32));
+    GameMsgHdr hdr(0x15A, WORKER_THREAD_WORLD, pl, sizeof(UInt32));
     GLOBAL().PushMsg(hdr, &data);
 } 
 }

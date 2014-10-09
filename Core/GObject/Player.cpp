@@ -36449,6 +36449,26 @@ void Player::OnRoseDemonGetAward(UInt8 times)
     udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
 }
 
+void Player::sendRoseDemonInfo()
+{
+    UInt32 time = TimeUtil::Now() - TimeUtil::SharpDay(0, TimeUtil::Now());
+    UInt32 begin = World::getRoseDemonBeginTime();
+    UInt32 end = begin + 15*60;
+    UInt8 type = 0;
+    if(time >= begin && time <= end)
+        type = 1 ;
+    if(time > end)
+        type = 2;
+   
+    Stream st(REP::ACTIVE) ;
+    st << static_cast<UInt8>(0x70);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(type);
+    if(type == 0)
+        st << static_cast<UInt32>( time > begin ? 0 :(begin-time));
+    st << Stream::eos;
+    send(st);
+}
 
 } // namespace GObject
 

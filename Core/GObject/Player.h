@@ -3741,6 +3741,7 @@ namespace GObject
         void sendXCTJInfo();
         void AddXCTJMyAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time);
         void sendXCTJMyAward();
+        void sendRoseDemonInfo();
 
     private:
         //玩家位置（包括层数、当层位置）

@@ -3491,9 +3491,11 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
                     player->sendRoseDemonInfo();
                     break;
                 case 2:
-                    GameMsgHdr hdr(0x15B, WORKER_THREAD_WORLD, player, 0);
-                    GLOBAL().PushMsg(hdr, NULL);
-                    break;
+                    {
+                        GameMsgHdr hdr(0x15B, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                        break;
+                    }
                 case 3:
                     WORLD().FindRoseDemon(player);
                     break;

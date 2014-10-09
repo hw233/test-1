@@ -1804,7 +1804,7 @@ public:
     { 
         UInt32 now = TimeUtil::Now();
         UInt32 time = now - TimeUtil::SharpDay(0, now);
-        return  (time > 15*3600) ? (19*3600):(13*3600+1800);
+        return  (time > 13*3600 + 60*45) ? (19*3600):(13*3600+1800);
     } 
     static void RoseDemonAppear();
     static void RoseDemonDisappear(UInt16 spot);
