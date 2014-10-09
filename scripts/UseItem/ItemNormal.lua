@@ -12070,6 +12070,35 @@ function ItemNormal_00016051(id, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016053(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 4  then
+        player:sendMsgCode(2, 1011, 0);
+        return 0;
+    end
+
+    local prob = {9700,9950,9995,10000}
+    local items = {16054,16055,16056,16057}
+
+    for k = 1, num do
+        local p = math.random(1, 10000)
+        local i = 1
+        for n = 1, #prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+        package:AddItem(items[i], 1 , 1, 0, 2);
+        if i > 1 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."使用了一个玫瑰精灵之心获得了一个".."[4:"..items[1].."]".."，运气逆天了！");
+        end
+    end
+
+    package:DelItemSendMsg(id, player);
+    return num;
+end
 
 local ItemNormal_Table = {
     [1] = ItemNormal_00000001,
@@ -14588,6 +14617,7 @@ local ItemNormal_Table = {
     [16045] = ItemNormal_00016043,
     [16046] = ItemNormal_00016043,
     [16051] = ItemNormal_00016051,
+    [16053] = ItemNormal_00016053,
 
     [17002] = ItemNormal_00017002,
     [17003] = ItemNormal_00017003,

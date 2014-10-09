@@ -5940,14 +5940,14 @@ void World::RoseDemonAppear()
         if( _roseDemon.setSpot.find(spot) != _roseDemon.setSpot.end())
             continue;
         UInt8 thrId = mapCollection.getCountryFromSpot(spot);
-        struct MapNpc
-        {
-            UInt16 loc;
-            UInt32 npcId;
-        };
-        MapNpc mapNpc = {spot, roseDemonId};
-        GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
-        GLOBAL().PushMsg(hdr, &mapNpc);
+        GObject::MOData mo;
+        mo.m_ID = roseDemonId;
+        mo.m_Hide = false;
+        mo.m_Spot = spot;
+        mo.m_Type = 100;
+        mo.m_ActionType = 0;
+        GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
+        GLOBAL().PushMsg(hdr1, &mo);
         _roseDemon.setSpot.insert(spot);
     }
     _roseDemon._time += 60; 
@@ -5956,14 +5956,14 @@ void World::RoseDemonDisappear(UInt16 roseDemonSpot)
 {
     const UInt32 roseDemonId = 4246;
     UInt8 thrId = mapCollection.getCountryFromSpot(roseDemonSpot);
-    GObject::MOData mo;
-    mo.m_ID = roseDemonId;
-    mo.m_Hide = false;
-    mo.m_Spot = roseDemonSpot;
-    mo.m_Type = 100;
-    mo.m_ActionType = 0;
-    GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
-    GLOBAL().PushMsg(hdr1, &mo);
+    struct MapNpc
+    {
+        UInt16 loc;
+        UInt32 npcId;
+    };
+    MapNpc mapNpc = {roseDemonSpot, roseDemonId};
+    GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
+    GLOBAL().PushMsg(hdr, &mapNpc);
 }
 void World::FindRoseDemon(Player * pl)
 { 
