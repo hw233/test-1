@@ -2449,6 +2449,13 @@ void OnGetFindOldManAward( GameMsgHdr &hdr, const void * data)
     UInt32 flag = *reinterpret_cast<const UInt32 *>(data);
     player->GetFindOldManAward(flag);
 }
+
+void OnRoseDemonGetAward( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 count = *reinterpret_cast<const UInt8 *>(data);
+    player->OnRoseDemonGetAward(count);
+}
 void OnGetInteresingBag( GameMsgHdr &hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);

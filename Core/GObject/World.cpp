@@ -230,6 +230,7 @@ RCSortType World::seekingHerZhiNvSort;
 RCSortType World::seekingHerCharmSort;
 RCSortType World::carnivalConsumeSort;
 RCSortType World::XCTJSort;
+RCSortType World::RoseDemonSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -262,6 +263,9 @@ UInt8 World::_snakespringequipact = 0;
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
 stOldMan World::_oldMan ;
+
+stRoseDemon World::_roseDemon ;
+
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
@@ -1897,7 +1901,35 @@ void World::World_OldMan_Refresh(void *)
         if(_oldMan._spot != 0)
             SYSMSG_BROADCASTV(573,_oldMan._spot); 
     }
-
+}
+void World::World_RoseDemon_Refresh(void *)
+{
+    if(!World::getRoseDemonTime())
+        return ;
+    UInt8 type = getRoseDemonTimeLevel();
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);
+    if(_roseDemon._time < getRoseDemonBeginTime()  ) 
+        _roseDemon._time = getRoseDemonBeginTime();
+    switch(type)
+    { 
+        case 0:
+            if(now > _roseDemon._time)
+                RoseDemonAppear();
+            break;
+        case 1:
+            if(_roseDemon.setSpot.size())
+            {
+               for(std::set<UInt16>::iterator it = _roseDemon.setSpot.begin(); it!= _roseDemon.setSpot.end();++it) 
+                   RoseDemonDisappear(*it);
+            }
+            _roseDemon.setSpot.clear();
+            break;
+        case 2:
+        case 3:
+        case 4:
+            break;
+    } 
 }
 
 void World::Tianjie_Refresh(void*)
@@ -2766,6 +2798,7 @@ bool World::Init()
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
     AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
+    AddTimer(5 * 1000, World_RoseDemon_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
@@ -3835,6 +3868,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             s.player  = p;
             s.total = total;
             World::XCTJSort.insert(s);
+        }
+    } 
+    if(World::getRoseDemonTime())
+    { 
+        UInt32 total = p->GetVar(VAR_ROSEDEMON_COUNT);
+        if(total)
+        {
+            RCSort s;
+            s.player  = p;
+            s.total = total;
+            World::RoseDemonSort.insert(s);
         }
     } 
 
@@ -5856,5 +5900,84 @@ void World::SendXCTJAward()
     //GObject::globalPlayers.enumerate(player_enum_clearVar746, 0);
 } 
 
+UInt8 World::getRoseDemonTimeLevel()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);
+    UInt32 begin = getRoseDemonBeginTime();
+    
+    if(time > begin+ 900 )
+        return 1;    //活动结束
+    if( begin <= time && time <= (begin + 900))
+        return 0;
+    if( time > begin - 5*60 )
+        return 2;    //活动还有5分钟
+    if( time > begin - 10*60 )
+        return 3;    //活动还有10分钟
+    if( time > begin - 15*60 )
+        return 4;    //活动还有15分钟
+    return 1;
+}
+void World::RoseDemonAppear()
+{
+    if(_roseDemon.setSpot.size() >= MAX_ROSEDEMON_COUNT)
+        return ;
+    const UInt32 roseDemonId = 4246;
+
+    UInt8 count = MAX_ROSEDEMON_COUNT - _roseDemon.setSpot.size();
+    for(UInt8 i = 0; i < count; ++i)
+    {
+        UInt16 spot = GetRandomSpot();
+        if(!spot)
+            return ;
+        if( _roseDemon.setSpot.find(spot) != _roseDemon.setSpot.end())
+            continue;
+        UInt8 thrId = mapCollection.getCountryFromSpot(spot);
+        struct MapNpc
+        {
+            UInt16 loc;
+            UInt32 npcId;
+        };
+        MapNpc mapNpc = {spot, roseDemonId};
+        GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
+        GLOBAL().PushMsg(hdr, &mapNpc);
+        _roseDemon.setSpot.insert(spot);
+    }
+    _roseDemon._time += 60; 
+}
+void World::RoseDemonDisappear(UInt16 roseDemonSpot)
+{
+    const UInt32 roseDemonId = 4246;
+    UInt8 thrId = mapCollection.getCountryFromSpot(roseDemonSpot);
+    GObject::MOData mo;
+    mo.m_ID = roseDemonId;
+    mo.m_Hide = false;
+    mo.m_Spot = roseDemonSpot;
+    mo.m_Type = 100;
+    mo.m_ActionType = 0;
+    GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
+    GLOBAL().PushMsg(hdr1, &mo);
+}
+void World::FindRoseDemon(Player * pl)
+{ 
+    UInt16 loc = pl->getLocation();
+    UInt8 times = 1;
+    if( _roseDemon.setSpot.find(loc) == _roseDemon.setSpot.end())
+    { 
+        pl->sendMsgCode(0,2218);  //待改
+        return ;
+    } 
+    if(_roseDemon.setSpot.size() > 90)
+        times = 2;
+    RoseDemonDisappear(loc);
+    pl->AddVar(VAR_ROSEDEMON_COUNT ,times);
+    UInt32 data = pl->GetVar(VAR_ROSEDEMON_COUNT);
+
+    GameMsgHdr h(0x34A,  pl->getThreadId(), pl, sizeof(UInt8));
+    GLOBAL().PushMsg(h, &times);
+
+    GameMsgHdr hdr(0x15A, WORKER_THREAD_WORLD, player, sizeof(UInt32));
+    GLOBAL().PushMsg(hdr, &data);
+} 
 }
 

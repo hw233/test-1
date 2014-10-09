@@ -3085,6 +3085,7 @@ namespace GObject
         void OpTYSS(UInt8 type , UInt8 flag = 0,UInt64 playerid = 0);
         void EatLingGuo(UInt32 num);
         void GetFindOldManAward(UInt32 type = 0 );
+        void OnRoseDemonGetAward(UInt8 count = 0 );
         void getInterestingAward(UInt8 type);
         void sendInterestingBag(Player* pl);
         void getInteresingBag(UInt64 pid);

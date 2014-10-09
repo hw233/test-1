@@ -29344,6 +29344,7 @@ void Player::GetFindOldManAward(UInt32 type)
     udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
 }
 
+
 void Player::getInterestingAward(UInt8 type)
 {
     if(!World::getOldManTime())
@@ -36421,6 +36422,31 @@ void Player::TreasureConsumeAct(UInt32 c)
         SetVar(VAR_TREASURE_CONSUME_EXT,tmp);
         AddVar(VAR_TREASURE_SCORE, 10);
     }
+}
+
+void Player::OnRoseDemonGetAward(UInt8 times)
+{
+    static UInt32 chance[] = { 7000 ,9500 , 9900,10000};
+    if(!World::getOldManTime())
+        return ;
+    if(GetLev()<30)
+    {
+        SYSMSG_BROADCASTV(2109, GetLev(), 30 );
+        return ; 
+    }
+    if(times ==0)
+        return ;
+    UInt8 i =0;
+    for( ; i < 4; ++i)
+    {
+        if(uRand(10000) < chance[i])
+            break;
+    }
+    GetPackage()->AddItem(16053,(i+1)*times, true, false);   //欢乐礼包(9439) 其他活动要修改
+
+    char str[16] = {0};
+    sprintf(str, "F_131205_5");
+    udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
 }
 
 
