@@ -5934,7 +5934,7 @@ void World::RoseDemonAppear()
 {
     if(_roseDemon.setSpot.size() >= MAX_ROSEDEMON_COUNT)
         return ;
-    const UInt32 roseDemonId = 4246;
+    const UInt32 roseDemonId = 4247;
 
     UInt8 count = MAX_ROSEDEMON_COUNT - _roseDemon.setSpot.size();
     for(UInt8 i = 0; i < count; ++i)
@@ -5959,7 +5959,7 @@ void World::RoseDemonAppear()
 }
 void World::RoseDemonDisappear(UInt16 roseDemonSpot)
 {
-    const UInt32 roseDemonId = 4246;
+    const UInt32 roseDemonId = 4247;
     UInt8 thrId = mapCollection.getCountryFromSpot(roseDemonSpot);
     struct MapNpc
     {
@@ -6000,7 +6000,7 @@ void World::SendRoseDemonAward()
         {{16054, 15}, {503, 10}, {500, 10}, {16056, 2}},
         {{16054, 10}, {503,  6}, {500,  6}, {16056, 1}}
     };
-    static MailPackage::MailItem card = {17807,1};   //暂无白马王子
+    static MailPackage::MailItem card = {17811,1};   //暂无白马王子
     SYSMSG(title, 420);
     UInt32 pos = 1;
     for (RCSortType::iterator i = World::RoseDemonSort.begin(), e = World::RoseDemonSort.end(); i != e; ++i)
