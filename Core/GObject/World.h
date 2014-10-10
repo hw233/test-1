@@ -1812,6 +1812,7 @@ public:
     static void FindRoseDemon(Player *pl);
 
     static void SendXCTJAward();
+    static void SendRoseDemonAward();
 
     static void SendAllAnswerEnd();
     static void SendAnswerAward();

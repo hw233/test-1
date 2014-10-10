@@ -379,6 +379,7 @@ bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bXCTJTimeEnd = false;
+bool bRoseDemonTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
 bool bGratirudeTimeEnd = false;
@@ -1390,6 +1391,7 @@ void World::World_Midnight_Check( World * world )
     bool b11time = get11Time();
     bool bWCtime = getWorldCupTime();
     bool bXCTJtime = getXCTJTime();
+    bool bRoseDemonTime = getRoseDemonTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
     bool bbCarnivalTime = getCarnivalConsume();
@@ -1447,6 +1449,7 @@ void World::World_Midnight_Check( World * world )
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
 
     bXCTJTimeEnd = bXCTJtime && !getXCTJTime(300);
+    bXCTJTimeEnd = bRoseDemonTime && !getRoseDemonTime(300);
 
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
@@ -1672,6 +1675,8 @@ void World::World_Midnight_Check( World * world )
     if(bXCTJTimeEnd)
         world->SendXCTJAward();
 
+    if(bRoseDemonTimeEnd)
+        world->SendRoseDemonAward();
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -1908,7 +1913,7 @@ void World::World_RoseDemon_Refresh(void *)
         return ;
     UInt8 type = getRoseDemonTimeLevel();
     UInt32 now = TimeUtil::Now();
-    UInt32 time = now - TimeUtil::SharpDay(0, now);
+    //UInt32 time = now - TimeUtil::SharpDay(0, now);
     if(_roseDemon._time < getRoseDemonBeginTime()  ) 
         _roseDemon._time = getRoseDemonBeginTime();
     switch(type)
@@ -5986,5 +5991,39 @@ void World::FindRoseDemon(Player * pl)
     GameMsgHdr hdr(0x15A, WORKER_THREAD_WORLD, pl, sizeof(UInt32));
     GLOBAL().PushMsg(hdr, &data);
 } 
+void World::SendRoseDemonAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][4] = {
+        {{16054, 25}, {503, 20}, {500, 20}, {16057, 1}},
+        {{16054, 20}, {503, 15}, {500, 15}, {16056, 3}},
+        {{16054, 15}, {503, 10}, {500, 10}, {16056, 2}},
+        {{16054, 10}, {503,  6}, {500,  6}, {16056, 1}}
+    };
+    static MailPackage::MailItem card = {17807,1};   //暂无白马王子
+    SYSMSG(title, 420);
+    UInt32 pos = 1;
+    for (RCSortType::iterator i = World::RoseDemonSort.begin(), e = World::RoseDemonSort.end(); i != e; ++i)
+    {
+        if(pos >= 1 && pos < 8)     //奖励前7名
+        {
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 421, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
+                if(pos ==1)
+                    mailPackageManager.push(mail->id, &card, 1, true);
+            }
+        }
+        pos++;
+        if (pos > 7)
+            break;
+    }
+    return;
+       
+}
 }
 
