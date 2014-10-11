@@ -5989,6 +5989,7 @@ void World::FindRoseDemon(Player * pl)
     if(_roseDemon.setSpot.size() > static_cast<UInt32>(_roseDemon._size - 10))
         times = 2;
     RoseDemonDisappear(loc);
+    _roseDemon.setSpot.erase(loc);
     pl->AddVar(VAR_ROSEDEMON_COUNT ,times);
     UInt32 data = pl->GetVar(VAR_ROSEDEMON_COUNT);
 

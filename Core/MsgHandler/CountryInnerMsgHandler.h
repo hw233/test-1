@@ -2248,7 +2248,7 @@ void OnDelMapObj( GameMsgHdr& hdr, const void * data)
     if (!map)
         return;
     //map->Hide(mapNpc->npcId);
-    UInt32 npcId = map->DelObject(mapNpc->npcId);
+    UInt32 npcId = map->DelObject(mapNpc->npcId,mapNpc->loc);
     map->Hide(npcId);
 }
 
