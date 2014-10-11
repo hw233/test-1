@@ -180,7 +180,17 @@ void Map::AddSpot( UInt16 id, const std::string& name, UInt8 type, UInt8 country
 
 bool Map::AddObject(MOData& mo)
 {
-    if (m_MOMap.find(mo.m_ID) != m_MOMap.end())
+    if(mo.m_ID == 4247)
+    {
+       for(UInt8 i = 0 ; i < 10 ; ++i) 
+       {
+           if(m_MOMap.find(mo.m_ID) != m_MOMap.end())
+                ++mo.m_ID;
+       }
+       if(i == 10)
+           return false;
+    }
+    else if (m_MOMap.find(mo.m_ID) != m_MOMap.end())
         return false;
 
 	MapObject* mapObject = new(std::nothrow) MapObject(mo);
