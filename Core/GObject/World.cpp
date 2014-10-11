@@ -1924,7 +1924,9 @@ void World::World_RoseDemon_Refresh(void *)
                for(std::set<UInt16>::iterator it = _roseDemon.setSpot.begin(); it!= _roseDemon.setSpot.end();++it) 
                    RoseDemonDisappear(*it);
                _roseDemon.setSpot.clear();
-               SYSMSG_BROADCASTV(418); 
+               RCSortType::iterator i = World::RoseDemonSort.begin();
+               if(i!= World::RoseDemonSort.end() && i->player)
+                   SYSMSG_BROADCASTV(422,i->player->getCountry(),i->player->getName().c_str()); 
             }
             break;
         case 1:
