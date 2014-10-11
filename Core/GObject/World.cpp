@@ -1932,8 +1932,11 @@ void World::World_RoseDemon_Refresh(void *)
             }
             break;
         case 1:
-            if(time > _roseDemon._time)
+            if(time >= _roseDemon._time)
+            {
                 RoseDemonAppear();
+                _roseDemon._time = time + 60; 
+            }
             break;
         case 2:
         case 3:
@@ -5960,7 +5963,6 @@ void World::RoseDemonAppear()
         _roseDemon.setSpot.insert(spot);
     }
     _roseDemon._size = _roseDemon.setSpot.size();
-    _roseDemon._time += 60; 
 }
 void World::RoseDemonDisappear(UInt16 roseDemonSpot)
 {
