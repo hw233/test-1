@@ -1913,8 +1913,8 @@ void World::World_RoseDemon_Refresh(void *)
         return ;
     UInt8 type = getRoseDemonTimeLevel();
     UInt32 now = TimeUtil::Now();
-    //UInt32 time = now - TimeUtil::SharpDay(0, now);
-    if(_roseDemon._time < getRoseDemonBeginTime()  ) 
+    UInt32 time = now - TimeUtil::SharpDay(0, now);   //当天时间
+    if( time < getRoseDemonBeginTime()  ) 
         _roseDemon._time = getRoseDemonBeginTime();
     switch(type)
     { 
@@ -1924,13 +1924,15 @@ void World::World_RoseDemon_Refresh(void *)
                for(std::set<UInt16>::iterator it = _roseDemon.setSpot.begin(); it!= _roseDemon.setSpot.end();++it) 
                    RoseDemonDisappear(*it);
                _roseDemon.setSpot.clear();
+               _roseDemon._size = 0;
                RCSortType::iterator i = World::RoseDemonSort.begin();
                if(i!= World::RoseDemonSort.end() && i->player)
                    SYSMSG_BROADCASTV(422,i->player->getCountry(),i->player->getName().c_str()); 
+               _roseDemon._time = 0;
             }
             break;
         case 1:
-            if(now > _roseDemon._time)
+            if(time > _roseDemon._time)
                 RoseDemonAppear();
             break;
         case 2:
@@ -5951,12 +5953,13 @@ void World::RoseDemonAppear()
         mo.m_ID = roseDemonId;
         mo.m_Hide = false;
         mo.m_Spot = spot;
-        mo.m_Type = 100;
+        mo.m_Type = 101;
         mo.m_ActionType = 0;
         GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
         GLOBAL().PushMsg(hdr1, &mo);
         _roseDemon.setSpot.insert(spot);
     }
+    _roseDemon._size = _roseDemon.setSpot.size();
     _roseDemon._time += 60; 
 }
 void World::RoseDemonDisappear(UInt16 roseDemonSpot)
@@ -5981,7 +5984,7 @@ void World::FindRoseDemon(Player * pl)
         pl->sendMsgCode(0,2218);  //待改
         return ;
     } 
-    if(_roseDemon.setSpot.size() > 90)
+    if(_roseDemon.setSpot.size() > static_cast<UInt32>(_roseDemon._size - 10))
         times = 2;
     RoseDemonDisappear(loc);
     pl->AddVar(VAR_ROSEDEMON_COUNT ,times);
