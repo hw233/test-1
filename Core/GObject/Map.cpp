@@ -182,13 +182,14 @@ bool Map::AddObject(MOData& mo)
 {
     if(mo.m_ID == 4247)
     {
-       for(UInt8 i = 0 ; i < 10 ; ++i) 
-       {
-           if(m_MOMap.find(mo.m_ID) != m_MOMap.end())
+        UInt8 i = 0;
+        for(; i < 10 ; ++i) 
+        {
+            if(m_MOMap.find(mo.m_ID) != m_MOMap.end())
                 ++mo.m_ID;
-       }
-       if(i == 10)
-           return false;
+        }
+        if(i == 10)
+            return false;
     }
     else if (m_MOMap.find(mo.m_ID) != m_MOMap.end())
         return false;
