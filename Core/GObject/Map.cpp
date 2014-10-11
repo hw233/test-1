@@ -187,6 +187,8 @@ bool Map::AddObject(MOData& mo)
         {
             if(m_MOMap.find(mo.m_ID) != m_MOMap.end())
                 ++mo.m_ID;
+            else 
+                break;
         }
         if(i == 10)
             return false;
@@ -202,14 +204,25 @@ bool Map::AddObject(MOData& mo)
 	return true;
 }
 
-void Map::DelObject(UInt32 id)
+UInt32 Map::DelObject(UInt32 id ,UInt16 spot)
 {
 	MOMap::iterator it = m_MOMap.find(id);
+    if(id == 4247)
+    {
+       for(UInt8 i = 0; i < 10 ; ++i) 
+       {
+            if(it == m_MOMap.end() || it->second->GetSpot()!=spot)
+                it = m_MOMap.find(++id);
+            else
+                break;
+       }
+    }
 	if(it != m_MOMap.end())
 	{
 		SAFE_DELETE(it->second);
 		m_MOMap.erase(it);
 	}
+    return id;
 }
 
 void Map::DelObjects()

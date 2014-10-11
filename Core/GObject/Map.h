@@ -90,7 +90,7 @@ public:
 	inline const MapData& GetMapData() { return m_MapData; }
 
 	bool AddObject(MOData& mo);
-	void DelObject(UInt32 id);
+	UInt32 DelObject(UInt32 id ,UInt16 spot = 0);
 	void DelObjects();	//all objects
 	MapObject* GetObject(UInt32 id);
 

@@ -2247,8 +2247,9 @@ void OnDelMapObj( GameMsgHdr& hdr, const void * data)
     Map * map = Map::FromSpot(mapNpc->loc);
     if (!map)
         return;
-    map->Hide(mapNpc->npcId);
-    map->DelObject(mapNpc->npcId);
+    //map->Hide(mapNpc->npcId);
+    UInt32 npcId = map->DelObject(mapNpc->npcId);
+    map->Hide(npcId);
 }
 
 void OnAddMapObj( GameMsgHdr& hdr, const void * data)
