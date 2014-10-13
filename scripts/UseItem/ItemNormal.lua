@@ -12093,7 +12093,7 @@ function ItemNormal_00016053(id, num, bind, param)
         end
         package:AddItem(items[i], 1 , 1, 0, 2);
         if i > 1 then
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."使用了一个玫瑰精灵之心获得了一个".."[4:"..items[1].."]".."，运气逆天了！");
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."使用了一个玫瑰精灵之心获得了一个".."[4:"..items[i].."]".."，运气逆天了！");
         end
     end
 
