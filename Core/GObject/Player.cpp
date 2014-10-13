@@ -36446,8 +36446,13 @@ void Player::OnRoseDemonGetAward(UInt8 times)
     SYSMSG_BROADCASTV(419,getCountry(),getName().c_str(),(i+1)*times); 
 
     char str[16] = {0};
-    sprintf(str, "F_131205_5");
-    udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
+    sprintf(str, "F_141012_1");
+    udpLog("meiguijingling", str, "", "", "", "", "act");
+
+    char str[16] = {0};
+    sprintf(str, "F_141012_%d",i+2);
+    udpLog("meiguijingling", str, "", "", "", "", "act");
+
 }
 
 void Player::sendRoseDemonInfo()

@@ -3944,7 +3944,7 @@ void OnSendRoseDemonRank ( GameMsgHdr& hdr,  const void* data )
         if (i->player == player)
         {
             Stream st(REP::ACTIVE);
-            st << static_cast<UInt8>(0x70)<< static_cast<UInt8>(0x04) << static_cast<UInt8>(2);
+            st << static_cast<UInt8>(0x70)<< static_cast<UInt8>(0x02) << static_cast<UInt8>(2);
             st << i->total << static_cast<UInt8>(rank > 255 ? 255 : rank) << Stream::eos;
             player->send(st);
             break;

@@ -1449,7 +1449,7 @@ void World::World_Midnight_Check( World * world )
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
 
     bXCTJTimeEnd = bXCTJtime && !getXCTJTime(300);
-    bXCTJTimeEnd = bRoseDemonTime && !getRoseDemonTime(300);
+    bRoseDemonTimeEnd = bRoseDemonTime && !getRoseDemonTime(300);
 
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
@@ -1928,6 +1928,7 @@ void World::World_RoseDemon_Refresh(void *)
                if(i!= World::RoseDemonSort.end() && i->player)
                    SYSMSG_BROADCASTV(422,i->player->getCountry(),i->player->getName().c_str()); 
                _roseDemon._time = 0;
+               SYSMSG_BROADCASTV(418); 
             }
             break;
         case 1:
@@ -5981,7 +5982,7 @@ void World::FindRoseDemon(Player * pl)
     UInt32 times = 1;
     if( _roseDemon.setSpot.find(loc) == _roseDemon.setSpot.end())
     { 
-        pl->sendMsgCode(0,2218);  //待改
+        pl->sendMsgCode(0,2234);  //已改
         return ;
     } 
     RoseDemonDisappear(loc);
