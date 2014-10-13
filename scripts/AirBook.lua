@@ -1,7 +1,7 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
-os.execute("zcat log/DB/TRACE20141007.gz |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[00:[0,1,2,3,4,5][0-9]:\" > test1007.txt")  --需要修改cat语句已限制时间段
-os.execute("zcat log/DB/TRACE20141007.gz |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[01:[0,1,2,3][0-9]:\" >> test1007.txt")  --需要修改cat语句已限制时间段
+--os.execute("cat log/DB/TRACE20141007 |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[00:[0,1,2,3,4,5][0-9]:\" > test1007.txt")  --需要修改cat语句已限制时间段
+--os.execute("cat log/DB/TRACE20141007 |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[01:[0,1,2,3][0-9]:\" >> test1007.txt")  --需要修改cat语句已限制时间段
 
 --os.execute("cat log/DB/TRACE20141007bak |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[00:[0,1,2,3,4,5][0-9]:\" > test1007.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20141007bak |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[01:[0,1,2,3][0-9]:\" >> test1007.txt")  --需要修改cat语句已限制时间段
@@ -114,7 +114,7 @@ fileOpen = io.open("sql/updates/Object_20141007.txt","w")
 for key,value in pairs(result) do
     --local strs = string.format("UPDATE snow set score = score + %s where playerId = %s;",result[key],key)   --只影响总积分 
     --local strs = string.format("UPDATE var set data = data + %s where playerId = %s and id = 873;",result[key],key)   --只影响总积分 
-    local strs = string.format("%d,%d,%d",tonumber(key)/(2^48),tonumber(key)%(2^48),tonumber(result[key]))   --只影响总积分 
+    local strs = string.format("%s,%d",key,tonumber(result[key]))   --只影响总积分 
     print(strs)   --用于查看sql语句
     fileOpen:write(strs);
     fileOpen:write("\n")

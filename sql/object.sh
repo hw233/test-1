@@ -175,7 +175,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clean_jiqiren.sql     #清除机器人
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_reset_newyeargift_var.sql  #国庆长假乐不停(var349)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_updatevar685.sql  #修改累计加速次数
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_deletevar871-873.sql  #藏宝阁
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_deletevar871-873.sql  #藏宝阁
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
 }
 
 #sh player_jiguan.sh

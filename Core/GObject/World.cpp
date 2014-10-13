@@ -543,6 +543,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 18)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -574,6 +582,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
         ))
     {
 #if 0
@@ -1555,6 +1564,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 18)
 
          )
         bRechargeEnd = true;
@@ -5230,10 +5247,10 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9457,50},{9498,50},{509,40},{515,30},{9022,40}},
-        {{9457,30},{9498,30},{509,30},{515,25},{0,0}},
-        {{9457,20},{9498,20},{509,20},{515,15},{0,0}},
-        {{9457,10},{9498,10},{509,10},{515,10},{0,0}},
+        {{9457,50},{9600,50},{556,40},{17107,30},{17105,40}},
+        {{9457,30},{9600,30},{556,30},{17107,20},{0,0}},
+        {{9457,20},{9600,20},{556,20},{17107,15},{0,0}},
+        {{9457,10},{9600,10},{556,10},{17107,10},{0,0}},
     };
     //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     UInt8 mark = 0;
@@ -5606,12 +5623,12 @@ void World::SendSeekingHerNiuLangAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][6] = {
-        {{503, 20}, {134, 20}, {9418, 20}, {1734, 1}, {9991, 1}},
-        {{503, 15}, {134, 15}, {9418, 15}, {500, 15}, {0, 0}},
-        {{503, 10}, {134, 10}, {9418, 10}, {500, 10}, {0, 0}},
-        {{503,  8}, {134,  8}, {9418,  8}, {500,  8}, {0, 0}},
-        {{503,  6}, {134,  6}, {9418,  6}, {500,  6}, {0, 0}},
-        {{503,  3}, {134,  3}, {9418,  3}, {500,  3}, {0, 0}},
+        {{17103, 20}, {134, 20}, {9498, 20}, {1734, 1}, {17814, 1}},
+        {{17103, 15}, {134, 15}, {9498, 15}, {500, 15}, {0, 0}},
+        {{17103, 10}, {134, 10}, {9498, 10}, {500, 10}, {0, 0}},
+        {{17103,  8}, {134,  8}, {9498,  8}, {500,  8}, {0, 0}},
+        {{17103,  6}, {134,  6}, {9498,  6}, {500,  6}, {0, 0}},
+        {{17103,  3}, {134,  3}, {9498,  3}, {500,  3}, {0, 0}},
     };
 
     SYSMSG(title, 5218);
@@ -5641,12 +5658,12 @@ void World::SendSeekingHerZhiNvAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][6] = {
-        {{503, 20}, {134, 20}, {9418, 20}, {1735, 1}, {9990, 1}},
-        {{503, 15}, {134, 15}, {9418, 15}, {500, 15}, {0, 0}},
-        {{503, 10}, {134, 10}, {9418, 10}, {500, 10}, {0, 0}},
-        {{503,  8}, {134,  8}, {9418,  8}, {500,  8}, {0, 0}},
-        {{503,  6}, {134,  6}, {9418,  6}, {500,  6}, {0, 0}},
-        {{503,  3}, {134,  3}, {9418,  3}, {500,  3}, {0, 0}},
+        {{17103, 20}, {134, 20}, {9498, 20}, {1735, 1}, {17813, 1}},
+        {{17103, 15}, {134, 15}, {9498, 15}, {500, 15}, {0, 0}},
+        {{17103, 10}, {134, 10}, {9498, 10}, {500, 10}, {0, 0}},
+        {{17103,  8}, {134,  8}, {9498,  8}, {500,  8}, {0, 0}},
+        {{17103,  6}, {134,  6}, {9498,  6}, {500,  6}, {0, 0}},
+        {{17103,  3}, {134,  3}, {9498,  3}, {500,  3}, {0, 0}},
     };
 
     SYSMSG(title, 5216);
@@ -5677,12 +5694,12 @@ void World::SendSeekingHerCharmAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][6] = {
-        {{9022, 20}, {515, 30}, {1734,  1}, {1735, 1}, {9989, 1}},
-        {{9022, 15}, {515, 25}, {9498, 25}, {1734, 1}, {0, 0}},
-        {{9022, 10}, {515, 20}, {9498, 20}, {1734, 1}, {0, 0}},
-        {{9022,  8}, {515, 15}, {9498, 15}, {1734, 1}, {0, 0}},
-        {{515,   6}, {503, 10}, {9498, 10}, {9022, 5}, {0, 0}},
-        {{515,   4}, {503,  5}, {9498,  5}, {9022, 3}, {0, 0}},
+        {{9022, 30}, {17105, 40}, {1734,  1}, {1735, 1}, {17812, 1}},
+        {{9022, 15}, {17105, 25}, {17103, 25}, {1734, 1}, {0, 0}},
+        {{9022, 10}, {17105, 20}, {17103, 20}, {1734, 1}, {0, 0}},
+        {{9022,  8}, {17105, 15}, {17103, 15}, {1734, 1}, {0, 0}},
+        {{17105, 6}, {503,   10}, {17103, 10}, {9022, 5}, {0, 0}},
+        {{17105, 4}, {503,    5}, {17103,  5}, {9022, 3}, {0, 0}},
     };
 
     SYSMSG(title, 5214);

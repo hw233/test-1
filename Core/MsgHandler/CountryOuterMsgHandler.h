@@ -2362,10 +2362,11 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
 
         case 0x12:
         {
-            if(!World::getSeekingHer())
-                return;
             UInt8 opt = 0;
             br >> opt;
+            if(!World::getSeekingHer() && opt != 0x11)
+                return;
+
             if(0x01 == opt)
             {
                 GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, player, 0);
@@ -2407,7 +2408,7 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                 sb.beanCount = 0;
                 std::string wordstmp = "";
                 br >> sb.userId >> sb.beanType >> sb.beanCount;
-                if(sb.beanType == 3 || sb.beanType == 4)
+                if(sb.beanType == 2 || sb.beanType == 3)
                 {
                     br >> wordstmp;
                     if(wordstmp.size() >= 128)

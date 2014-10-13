@@ -120,10 +120,10 @@ function loadStore()
     end
     store:add(2, 17017, 50)
     if getSeekingHer() then
-        store:add(2, 16025, 9)
-        store:add(2, 16026, 99)
-        store:add(2, 16027, 520)
-        store:add(2, 16028, 1000)
+        store:add(2, 16054, 1)
+        store:add(2, 16055, 19)
+        store:add(2, 16056, 99)
+        store:add(2, 16057, 999)
     end
 
     if getGGTime(300) == 2 then 
@@ -196,7 +196,8 @@ function loadStore()
     end
 
     if getHappyFireTime(300) then
-        store:add(2, 16048, 20)
+        --store:add(2, 16048, 20)
+        store:add(2, 16059, 20)
     end
 
     if getCollectCardAct() then
