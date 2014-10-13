@@ -36461,9 +36461,9 @@ void Player::OnRoseDemonGetAward(UInt8 times)
     sprintf(str, "F_141012_1");
     udpLog("meiguijingling", str, "", "", "", "", "act");
 
-    char str[16] = {0};
-    sprintf(str, "F_141012_%d",i+2);
-    udpLog("meiguijingling", str, "", "", "", "", "act");
+    char str1[16] = {0};
+    sprintf(str1, "F_141012_%d",i+2);
+    udpLog("meiguijingling", str1, "", "", "", "", "act");
 
 }
 
