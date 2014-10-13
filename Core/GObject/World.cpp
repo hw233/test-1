@@ -1924,7 +1924,6 @@ void World::World_RoseDemon_Refresh(void *)
                for(std::set<UInt16>::iterator it = _roseDemon.setSpot.begin(); it!= _roseDemon.setSpot.end();++it) 
                    RoseDemonDisappear(*it);
                _roseDemon.setSpot.clear();
-               _roseDemon._size = 0;
                RCSortType::iterator i = World::RoseDemonSort.begin();
                if(i!= World::RoseDemonSort.end() && i->player)
                    SYSMSG_BROADCASTV(422,i->player->getCountry(),i->player->getName().c_str()); 
@@ -5962,7 +5961,6 @@ void World::RoseDemonAppear()
         GLOBAL().PushMsg(hdr1, &mo);
         _roseDemon.setSpot.insert(spot);
     }
-    _roseDemon._size = _roseDemon.setSpot.size();
 }
 void World::RoseDemonDisappear(UInt16 roseDemonSpot)
 {
@@ -5980,14 +5978,12 @@ void World::RoseDemonDisappear(UInt16 roseDemonSpot)
 void World::FindRoseDemon(Player * pl)
 { 
     UInt16 loc = pl->getLocation();
-    UInt8 times = 1;
+    UInt32 times = 1;
     if( _roseDemon.setSpot.find(loc) == _roseDemon.setSpot.end())
     { 
         pl->sendMsgCode(0,2218);  //待改
         return ;
     } 
-    if(_roseDemon.setSpot.size() > static_cast<UInt32>(_roseDemon._size - 10))
-        times = 2;
     RoseDemonDisappear(loc);
     _roseDemon.setSpot.erase(loc);
     pl->AddVar(VAR_ROSEDEMON_COUNT ,times);

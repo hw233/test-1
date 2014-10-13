@@ -36427,7 +36427,7 @@ void Player::TreasureConsumeAct(UInt32 c)
 void Player::OnRoseDemonGetAward(UInt8 times)
 {
     static UInt32 chance[] = { 7000 ,9500 , 9900,10000};
-    if(!World::getOldManTime())
+    if(!World::getRoseDemonTime())
         return ;
     if(GetLev()<30)
     {

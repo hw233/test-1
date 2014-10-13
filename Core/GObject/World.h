@@ -59,9 +59,8 @@ struct stRoseDemon
 {
     UInt8 _type ;
     UInt32 _time ;
-    UInt8 _size ;
     std::set<UInt16> setSpot;
-    stRoseDemon():_type(0),_time(0),_size(0){}
+    stRoseDemon():_type(0),_time(0){}
 };
 struct stArenaExtra
 {
