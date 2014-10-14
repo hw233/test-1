@@ -19413,7 +19413,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1541, 1541},
             {1542, 1542},
             {1544, 1544},
-            {1670, 1670}
+            {1670, 1670},
+            {1673, 1673}
         };
 
         if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
@@ -19421,6 +19422,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
          || (innateTrumpid >= 1541 && innateTrumpid <= 1542)
          || (innateTrumpid >= 1544 && innateTrumpid <= 1544)
          || (innateTrumpid >= 1670 && innateTrumpid <= 1670)
+         || (innateTrumpid >= 1673 && innateTrumpid <= 1673)
          )
         {
             size_t i = 0;

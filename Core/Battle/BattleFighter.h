@@ -1075,8 +1075,9 @@ public:
     bool makeShieldDamage(UInt32& u);
 
     BattleFighter* summonSelf(float factor, UInt8 last);
+    BattleFighter* summonSelf2(float factor, UInt8 last);
     void clearSkill();
-    void setSummonFactor(UInt32 aura, float factor, UInt8 last);
+    void setSummonFactor(UInt32 aura, float factor, UInt8 last, UInt16 skillId);
     bool releaseSummon();
     inline void setMoAuraBuf(UInt8 value, UInt8 last) { if(last == 0) return; _moAuraBuf = value; _moAuraBufLast = last; }
     inline void resetMoAuraBuf() { _moAuraBuf = 0; _moAuraBufLast = 0; }
@@ -1779,6 +1780,16 @@ private:
     const GData::SkillBase* _skillEvolution;
     const GData::SkillBase* getSkillEvolution() { return _skillEvolution; }
     void setSkillEvolution(const GData::SkillBase* skill) { _skillEvolution = skill; }
+
+    const GData::SkillBase* _skillBMTL;
+    const GData::SkillBase* getSkillBMTL() { return _skillBMTL; }
+    void setSkillBMTL(const GData::SkillBase* skill) { _skillBMTL = skill; }
+    UInt8 _BMTLCnt;
+    UInt8 getBMTLCnt() { return _BMTLCnt; }
+    void setBMTLCnt(UInt8 cnt) { _BMTLCnt = cnt; }
+    UInt8 _BMTLCnt2;
+    UInt8 getBMTLCnt2() { return _BMTLCnt2; }
+    void setBMTLCnt2(UInt8 cnt) { _BMTLCnt2 = cnt; }
 
 public:
 	enum StatusFlag

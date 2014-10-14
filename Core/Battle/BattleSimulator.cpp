@@ -2066,6 +2066,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
                         appendStatusChange(e_stAtkReduce, value, 0, bf);
                     }
+                    calcBMTLCnt(target_fighter);
                 }
 #if 0
                 else
@@ -2216,6 +2217,21 @@ void BattleSimulator::doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* 
     {
         appendDefStatus(e_skill, passiveSkill->getId(), bf);
         doSkillEffectExtraCounter(bf, bo, passiveSkill);
+    }
+}
+
+void BattleSimulator::calcBMTLCnt(BattleFighter* bf)
+{
+    if(!bf)
+        return;
+    UInt8 target_side = bf->getSide();
+    for(UInt8 pos = 0; pos < 25; ++pos)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        if(bo->getSkillBMTL())
+            bo->setBMTLCnt(bo->getBMTLCnt() + 1);
     }
 }
 
@@ -4139,7 +4155,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             }
         }
         //道、万剑诀
-        else if(SKILL_ID(skill->getId()) == 27 || SKILL_ID(skill->getId()) == 498 || SKILL_ID(skill->getId()) == 200)
+        else if(SKILL_ID(skill->getId()) == 27 || SKILL_ID(skill->getId()) == 498 || SKILL_ID(skill->getId()) == 200 || SKILL_ID(skill->getId()) == 283)
         {
             UInt8 excepts[25] = {0};
             UInt8 exceptCnt = 0;
@@ -4169,6 +4185,9 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                     bf->setTyslSSFactor(ef->value / 100.0f);
                 }
             }
+            else if(SKILL_ID(skill->getId()) == 283)
+                cnt = 5;
+
             for(int i = 0; i < cnt; ++ i)
             {
                 BattleFighter* rnd_bf = getRandomFighter(target_side, excepts, exceptCnt);
@@ -7237,6 +7256,96 @@ UInt32 BattleSimulator::doAttack( int pos )
                 ++ rcnt;
             }
             _activeFgt = NULL;
+        }
+    }
+
+    for(UInt8 side = 0; side < 2; side++)
+    {
+        for(UInt8 i = 0; i < 25; i++)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
+            if(bo == NULL || bo->getHP() == 0)
+                continue;
+            UInt8 curCnt = bo->getBMTLCnt();
+            UInt8 lastCnt = bo->getBMTLCnt2();
+            if(curCnt == lastCnt)
+                continue;
+            if(curCnt > 0)
+                appendDefStatus(e_bimutianluo, curCnt, bo);
+            else
+                appendDefStatus(e_unBimutianluo, curCnt, bo);
+            bo->setBMTLCnt2(curCnt);
+        }
+        if(_defList.size() > 0 || _scList.size() > 0)
+        {
+            appendToPacket(0, -1, -1, 0, 0, false, false);
+            ++ rcnt;
+        }
+    }
+    if(bf->getHP() > 0 && _winner == 0 && bf->getBMTLCnt() >= 3)
+    {
+        const GData::SkillBase* skill = bf->getSkillBMTL();
+        if(skill)
+        {
+            UInt8 emptyList[25] = {0};
+            UInt8 emptyCnt = 0;
+            UInt8 snowmanList[25] = {0};
+            UInt8 snowmanCnt = 0;
+            UInt8 target_side = bf->getSide();
+            UInt8 target_pos;
+
+            for(UInt8 pos = 0; pos < 25; pos++)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
+                if(bo == NULL || bo->getHP() == 0)
+                {
+                    emptyList[emptyCnt] = pos;
+                    ++emptyCnt;
+                }
+                else if(bo->getId() == 5679)
+                {
+                    snowmanList[snowmanCnt] = pos;
+                    ++snowmanCnt;
+                }
+            }
+
+            if(emptyCnt > 0)
+                target_pos = emptyList[uRand(emptyCnt)];
+            else if(snowmanCnt > 0)
+                target_pos = snowmanList[uRand(snowmanCnt)];
+            else
+                target_pos = 0xFF;
+
+            if(target_pos != 0xFF)
+            {
+                UInt8 curCnt = bf->getBMTLCnt() - 3;
+                bf->setBMTLCnt(curCnt);
+                if(curCnt > 0)
+                    appendDefStatus(e_bimutianluo, curCnt, bf);
+                else
+                    appendDefStatus(e_unBimutianluo, curCnt, bf);
+                bf->setBMTLCnt(curCnt);
+
+                appendDefStatus(e_skill, skill->getId(), bf);
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
+                if(bo && bo->getHP() != 0)
+                {
+                    bo->setHP(0);
+                    removeFighterStatus(bo);
+                }
+                BattleFighter * newf = bf->summonSelf2(skill->effect->efv[0], skill->effect->efl[0]);
+                if(newf != NULL)
+                {
+                    newf->setSideAndPos(target_side, target_pos);
+                    setObject(target_side, target_pos, newf);
+                    insertFighterStatus2Current(newf);
+
+                    appendDefStatus(e_Summon, newf->getPortrait(), newf);
+                    UInt32 value = static_cast<UInt32>(newf->getAura());
+                    appendStatusChange(e_stAura, value, 0, newf);
+                    appendInitDefStatus(newf);
+                }
+            }
         }
     }
 
