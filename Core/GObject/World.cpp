@@ -1949,6 +1949,8 @@ void World::World_RoseDemon_Refresh(void *)
             }
             break;
         case 1:
+            if(_roseDemon._type != 1)
+               SYSMSG_BROADCASTV(423); 
             if(time >= _roseDemon._time)
             {
                 RoseDemonAppear();
