@@ -868,6 +868,9 @@ namespace GObject
         VAR_JIQIREN_FAIRYCOPY = 875,  //机器人之仙界副本未完成次数(1byte免费，2byte付费1，3byte付费2，4byte付费3)
         VAR_JIQIREN_ERLKING= 876,  //机器人之妖王未完成次数
 
+        // 891 - 900 for libo
+        VAR_ROSEDEMON_COUNT = 891,
+
         VAR_MAX,
     };
 
@@ -1642,6 +1645,7 @@ namespace GObject
             REGISTER_VAR(VAR_JIQIREN_XJFRONTMAP, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_FAIRYCOPY, CYCLE_NONE);
             REGISTER_VAR(VAR_JIQIREN_ERLKING, CYCLE_NONE);
+            REGISTER_VAR(VAR_ROSEDEMON_COUNT, CYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -3481,7 +3481,27 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
            GLOBAL().PushMsg(h, &data);
            break;
        }
-
+       case 0x70:
+       { 
+            UInt8 opt = 0;
+            brd >> opt;
+            switch(opt)
+            {
+                case 1:
+                    break;
+                case 2:
+                    {
+                        GameMsgHdr hdr(0x15B, WORKER_THREAD_WORLD, player, 0);
+                        GLOBAL().PushMsg(hdr, NULL);
+                        break;
+                    }
+                case 3:
+                    WORLD().FindRoseDemon(player);
+                    break;
+            }
+            player->sendRoseDemonInfo();
+       } 
+       break;
        default:
             break;
     }
