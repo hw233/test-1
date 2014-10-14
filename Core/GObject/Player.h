@@ -3732,6 +3732,7 @@ namespace GObject
         void GetExchangeTreasureLog();
         void RetTreasureInfo();
         void TreasureConsumeAct(UInt32 c);
+        void UdpAccRecharge(UInt8 c);
 
         void AddXCTJAward(UInt8 num ,UInt32 ItemId , UInt8 count);
         UInt8 HitEggInXCTJ(UInt8 num);

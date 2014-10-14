@@ -937,9 +937,9 @@ public:
     inline static bool getQQGameOnlineAwardAct()
     { return _qqgameonlineawardact; }
 
-    inline static void setAccRecharge(bool v)
+    inline static void setAccRecharge(UInt8 v)
     { _accrecharge = v; }
-    inline static bool getAccRecharge()
+    inline static UInt8 getAccRecharge()
     { return _accrecharge; }
 
     inline static void setMiLuZhiJiaoAct(bool v)
@@ -1475,7 +1475,7 @@ public:
     static bool _singleday;
     static bool _thanksgiving;
     static bool _christmas;
-    static bool _accrecharge;
+    static UInt8 _accrecharge;
     static bool _newyear;
     static bool _blueactiveday;
     static bool _rechargeactive;
