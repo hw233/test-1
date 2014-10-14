@@ -9451,7 +9451,7 @@ namespace GObject
     void Player::sendTodayRechargeInfo()
     {
         Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << Stream::eos;
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << static_cast<UInt8>(GetVar(VAR_RECHARGE_TODAY_COUNTED)) << Stream::eos;
         send((st));
     }
 
@@ -36434,6 +36434,14 @@ void Player::TreasureConsumeAct(UInt32 c)
         SetVar(VAR_TREASURE_CONSUME_EXT,tmp);
         AddVar(VAR_TREASURE_SCORE, 10);
     }
+}
+
+void Player::UdpAccRecharge(UInt8 num)
+{
+    char str[16] = {0};
+    sprintf(str, "F_141013_%d",num);
+    udpLog("dianliangtianchi", str, "", "", "", "", "act");
+    //printf("num is %d",num);
 }
 
 void Player::OnRoseDemonGetAward(UInt8 times)

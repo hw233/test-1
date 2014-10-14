@@ -106,7 +106,7 @@ bool World::_halloween = false;
 bool World::_singleday = false;
 bool World::_thanksgiving = false;
 bool World::_christmas = false;
-bool World::_accrecharge = false;
+UInt8 World::_accrecharge = 0;
 bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
@@ -583,6 +583,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 18)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 25)
         ))
     {
 #if 0
