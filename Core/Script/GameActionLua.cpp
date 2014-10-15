@@ -358,6 +358,7 @@ namespace Script
         CLASS_DEF(Player, getXuanTianNingLuLua);
         CLASS_DEF(Player, GetCollectCard);
         CLASS_DEF(Player, SetExchangeTreasureLog);
+        CLASS_DEF(Player, UdpAccRecharge);
 
         CLASS_ADD(MoFang);
         CLASS_DEF(MoFang, randTuzhi);

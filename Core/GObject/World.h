@@ -54,6 +54,14 @@ struct stOldMan
     std::set<UInt64> _players;
     stOldMan():_loc(0),_spot(0),_time(0){}
 };
+
+struct stRoseDemon
+{
+    UInt8 _type ;
+    UInt32 _time ;
+    std::set<UInt16> setSpot;
+    stRoseDemon():_type(0),_time(0){}
+};
 struct stArenaExtra
 {
     UInt8 week;
@@ -680,6 +688,19 @@ public:
         else
             return false;
     } 
+
+    inline static bool  getRoseDemonTime(UInt32 time = 0)
+    {
+       // UInt32 begin = GVAR.GetVar(GVAR_OLDMAN_BEGIN);
+       // UInt32 end = GVAR.GetVar(GVAR_OLDMAN_END);
+        UInt32 begin = TimeUtil::MkTime(2014, 10, 20);
+        UInt32 end = TimeUtil::MkTime(2014, 10, 26);
+        UInt32 now = TimeUtil::Now() + time;
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    } 
     inline static bool getCoolSummer(UInt32 time = 0)
     {
         UInt32 begin = TimeUtil::MkTime(2014, 9, 21);
@@ -937,9 +958,9 @@ public:
     inline static bool getQQGameOnlineAwardAct()
     { return _qqgameonlineawardact; }
 
-    inline static void setAccRecharge(bool v)
+    inline static void setAccRecharge(UInt8 v)
     { _accrecharge = v; }
-    inline static bool getAccRecharge()
+    inline static UInt8 getAccRecharge()
     { return _accrecharge; }
 
     inline static void setMiLuZhiJiaoAct(bool v)
@@ -1462,6 +1483,7 @@ public:
     static UInt32 _moneyLogged;
     static MoneyIn _moneyIn[7][2];
     static stOldMan _oldMan;
+    static stRoseDemon _roseDemon;
 
 	static int _activityStage;
 	static bool _actAvailable;//??????+6??
@@ -1475,7 +1497,7 @@ public:
     static bool _singleday;
     static bool _thanksgiving;
     static bool _christmas;
-    static bool _accrecharge;
+    static UInt8 _accrecharge;
     static bool _newyear;
     static bool _blueactiveday;
     static bool _rechargeactive;
@@ -1631,6 +1653,7 @@ public:
 #define ANSWER_BROADCASTB_TIME 19*60*60 + 25*60 
 #define ANSWER_BEGIN_TIME      19*60*60 + 30*60
 #define ANSWER_ALLEND_TIME     19*60*60 + 45*60
+#define MAX_ROSEDEMON_COUNT 100
 
 public:
     static RCSortType answerScoreSort;     //一战成名排名
@@ -1653,6 +1676,8 @@ public:
     static RCSortType seekingHerCharmSort;     //众里寻她魅力值排名
     static RCSortType carnivalConsumeSort;     //狂欢购物排名
     static RCSortType XCTJSort;               //喜从天降排名
+    static RCSortType RoseDemonSort;               //玫瑰精灵排名
+
     static void initRCRank();
     static void initRP7RCRank();
     static void WorldCupAward(UInt8 num , UInt32 res);  //公布答案
@@ -1694,7 +1719,8 @@ private:
     static void World_Boss_Refresh(void*);
     static void World_Boss_Prepare(void*);
     static void World_OldMan_Refresh(void*);   //圣诞老人刷新
-    static void World_MarryBoard_Refresh(void*);   //圣诞老人刷新
+    static void World_MarryBoard_Refresh(void*);   //结婚
+    static void World_RoseDemon_Refresh(void *);   //玫瑰精灵
     static void World_Marry_Process(void*);   //婚礼执行
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
@@ -1774,7 +1800,19 @@ public:
     void SendTYSSClanAward(UInt8);
     void SendTYSSPlayerAward(UInt8);
     void AddWorldXCTJAward(Player *pl ,UInt8 num ,UInt32 itemId ,UInt8 count,UInt32 time);
+    static UInt8 getRoseDemonTimeLevel();
+    static UInt32 getRoseDemonBeginTime()
+    { 
+        UInt32 now = TimeUtil::Now();
+        UInt32 time = now - TimeUtil::SharpDay(0, now);
+        return  (time > 13*3600 + 60*45) ? (19*3600):(13*3600+1800);
+    } 
+    static void RoseDemonAppear();
+    static void RoseDemonDisappear(UInt16 spot);
+    static void FindRoseDemon(Player *pl);
+
     static void SendXCTJAward();
+    static void SendRoseDemonAward();
 
     static void SendAllAnswerEnd();
     static void SendAnswerAward();

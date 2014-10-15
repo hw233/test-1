@@ -356,6 +356,8 @@ MSG_REG_2(GameMsgHdr, 0x347, OnSetCFriendSuccess);
 MSG_REG_2(GameMsgHdr, 0x348, OnSendSpreadAwardInfo);
 MSG_REG_2(GameMsgHdr, 0x349, OnSpreadGetAward);
 
+MSG_REG_2(GameMsgHdr, 0x34A, OnRoseDemonGetAward);
+
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
 MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);

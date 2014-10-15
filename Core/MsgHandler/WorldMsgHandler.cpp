@@ -125,6 +125,9 @@ MSG_REG_2(GameMsgHdr, 0x157, SetSeekingHerCharmRank);
 MSG_REG_2(GameMsgHdr, 0x158, SetSeekingHerBeanTotalRank);
 MSG_REG_2(GameMsgHdr, 0x159, SetCarnivalConsumeRank);
 
+MSG_REG_2(GameMsgHdr, 0x15A, OnRoseDemonRank);    // 积分有变化
+MSG_REG_2(GameMsgHdr, 0x15B, OnSendRoseDemonRank);  //获得积分排名 
+
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x165, OnSpreadModifyVar);
 MSG_REG_2(GameMsgHdr, 0x166, OnSetTYSSScore);

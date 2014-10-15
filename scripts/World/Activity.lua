@@ -654,11 +654,11 @@ function onActivityCheck(tm)
           is_0921_0924 = false
       end
 
-      if tm >= actTime510 and tm < actTime510_1 then
-          is_0926_0927 = true
-      else
-          is_0926_0927 = false
-      end
+      --if tm >= actTime510 and tm < actTime510_1 then
+      --    is_0926_0927 = true
+      --else
+      --    is_0926_0927 = false
+      --end
       
       if tm >= actTime511 and tm < actTime511_1 then
           setRechargeActive(true, 16)
@@ -1182,9 +1182,11 @@ function onActivityCheck(tm)
 
   -- ACC
   if tm >= actTime2014_01_25 and tm < (actTime2014_01_25 + 267*86400) then
-      setAccRecharge(true)
+      setAccRecharge(1)
+  elseif tm >= actTime2014_10_18 and tm < (actTime2014_10_18 + 7*86400) then
+      setAccRecharge(2)
   else
-      setAccRecharge(false)
+      setAccRecharge(0)
   end
 
   if tm >= actTime2013_12_24 and tm < actTime2013_12_26 then
@@ -1312,7 +1314,7 @@ function initActTime(y, m, d)
   --变身法宝(11/14-11/18)
   local  SerStartTm509= { ['year'] = 2012, ['month'] = 11, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   --商城限购(9/26-9/27)
-  local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTm510= { ['year'] = 2012, ['month'] = 9, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm511= { ['year'] = 2012, ['month'] = 9, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm512= { ['year'] = 2012, ['month'] = 10, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm513= { ['year'] = 2012, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1515,6 +1517,7 @@ function initActTime(y, m, d)
   local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2013_05_18 = { ['year'] = 2013, ['month'] = 5, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2014_01_25 = { ['year'] = 2014, ['month'] = 1, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2014_10_18 = { ['year'] = 2014, ['month'] = 10, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   
   --圣诞节活动（麋鹿之角）
   local  SerStartTm2013_12_24 = { ['year'] = 2013, ['month'] = 12, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -1542,8 +1545,8 @@ function initActTime(y, m, d)
   local  SerStartTmq2= { ['year'] = 2014, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   --众里寻他
-  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 8, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 8, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer1= { ['year'] = 2014, ['month'] = 10, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartSeekingHer2= { ['year'] = 2014, ['month'] = 10, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTmq4= { ['year'] = 2014, ['month'] = 9, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
@@ -1732,8 +1735,8 @@ function initActTime(y, m, d)
   actTime509 = os.time(SerStartTm509);
   actTime509_1 = os.time(SerStartTm509) + 5 * 86400;
 
-  actTime510 = os.time(SerStartTm510);
-  actTime510_1 = os.time(SerStartTm510) + 2 * 86400;
+  --actTime510 = os.time(SerStartTm510);
+  --actTime510_1 = os.time(SerStartTm510) + 2 * 86400;
 
   actTime511 = os.time(SerStartTm511);
   actTime511_1 = os.time(SerStartTm511) + 4 * 86400;
@@ -2030,6 +2033,7 @@ function initActTime(y, m, d)
   actTime2013_04_14= os.time(SerStartTm2013_04_14)
   actTime2013_05_18= os.time(SerStartTm2013_05_18)
   actTime2014_01_25= os.time(SerStartTm2014_01_25)
+  actTime2014_10_18= os.time(SerStartTm2014_10_18)
   actTime2013_12_24= os.time(SerStartTm2013_12_24)
   actTime2013_12_26= os.time(SerStartTm2013_12_26)
 
