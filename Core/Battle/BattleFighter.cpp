@@ -93,7 +93,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
    ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
    ,_tyslSSCnt(0), _tyslSSFactor(0),_tyslSSAddCnt(true), _tyslSSCnt2(0)
    ,_controlBallCnt(0), _controlBallCnt2(0), _skillControlBall(NULL),_evolutionCnt(0),_skillEvolution(NULL)
-   ,_skillBMTL(NULL), _BMTLCnt(0), _BMTLCnt2(0)
+   ,_skillBMTL(NULL), _skillBMTL2(NULL),_BMTLCnt(0), _BMTLCnt2(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -2589,6 +2589,7 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     bf->setXiangMoChanZhangSkill(NULL);
     bf->setBiLanTianYiSkill(NULL);
     bf->setSkillControlBall(NULL);
+    bf->setSkillBMTL2(bf->getSkillBMTL());
     bf->setSkillBMTL(NULL);
     return bf;
 }
@@ -2605,10 +2606,11 @@ BattleFighter* BattleFighter::summonSelf2(float factor, UInt8 last)
     bf->initStats(false);
     bf->clearSkill();
 
-    bf->setSummonFactor(30, factor, last, 28309);
+    bf->setSummonFactor(75, factor, last, 28309);
     bf->setXiangMoChanZhangSkill(NULL);
     bf->setBiLanTianYiSkill(NULL);
     bf->setSkillControlBall(NULL);
+    bf->setSkillBMTL2(bf->getSkillBMTL());
     bf->setSkillBMTL(NULL);
     return bf;
 }

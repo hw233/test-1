@@ -1784,6 +1784,9 @@ private:
     const GData::SkillBase* _skillBMTL;
     const GData::SkillBase* getSkillBMTL() { return _skillBMTL; }
     void setSkillBMTL(const GData::SkillBase* skill) { _skillBMTL = skill; }
+    const GData::SkillBase* _skillBMTL2;
+    const GData::SkillBase* getSkillBMTL2() { return _skillBMTL2; }
+    void setSkillBMTL2(const GData::SkillBase* skill) { _skillBMTL2 = skill; }
     UInt8 _BMTLCnt;
     UInt8 getBMTLCnt() { return _BMTLCnt; }
     void setBMTLCnt(UInt8 cnt) { _BMTLCnt = cnt; }

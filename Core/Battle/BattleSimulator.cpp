@@ -7234,31 +7234,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
-    //UInt8 Evolution = bf->getEvolutionCnt() ;
-    if(bf->getHP() > 0 && _winner == 0 && bf->getEvolutionCnt() >= 2)  //LIBO
-    {
-        const GData::SkillBase* passiveSkill = bf->getSkillEvolution();
-        if(passiveSkill)
-        {
-            _activeFgt = bf;
-            UInt8 curCnt = bf->getEvolutionCnt() - 2;  //LIBO
-            if(curCnt > 0)
-                appendDefStatus(e_evolution, curCnt, bf);
-            else
-                appendDefStatus(e_unEvolution, curCnt, bf);
-            bf->setEvolutionCnt(curCnt);
-            //std::cout << "Evolution: Skill:" << static_cast<UInt32>(curCnt) << std::endl;
-            doSkillAttackByEvolution(bf, passiveSkill);
-            //++ rcnt;
-            if(_defList.size() > 0 || _scList.size() > 0)
-            {
-                appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
-                ++ rcnt;
-            }
-            _activeFgt = NULL;
-        }
-    }
-
+    _activeFgt = NULL;
     for(UInt8 side = 0; side < 2; side++)
     {
         for(UInt8 i = 0; i < 25; i++)
@@ -7270,20 +7246,29 @@ UInt32 BattleSimulator::doAttack( int pos )
             UInt8 lastCnt = bo->getBMTLCnt2();
             if(curCnt == lastCnt)
                 continue;
+            if(!_activeFgt)
+                _activeFgt = bo;
             if(curCnt > 0)
                 appendDefStatus(e_bimutianluo, curCnt, bo);
             else
                 appendDefStatus(e_unBimutianluo, curCnt, bo);
             bo->setBMTLCnt2(curCnt);
         }
+    }
+    if(_activeFgt)
+    {
         if(_defList.size() > 0 || _scList.size() > 0)
         {
-            appendToPacket(0, -1, -1, 0, 0, false, false);
+            appendToPacket(_activeFgt->getSide(), -1, 0, 0, 0, false, false);
             ++ rcnt;
         }
+        _activeFgt = NULL;
     }
+
+
     if(bf->getHP() > 0 && _winner == 0 && bf->getBMTLCnt() >= 3)
     {
+        _activeFgt = bf;
         const GData::SkillBase* skill = bf->getSkillBMTL();
         if(skill)
         {
@@ -7324,9 +7309,10 @@ UInt32 BattleSimulator::doAttack( int pos )
                     appendDefStatus(e_bimutianluo, curCnt, bf);
                 else
                     appendDefStatus(e_unBimutianluo, curCnt, bf);
-                bf->setBMTLCnt(curCnt);
 
-                appendDefStatus(e_skill, skill->getId(), bf);
+                bf->setBMTLCnt2(curCnt);
+                appendDefStatus(e_skill, 24209/*skill->getId()*/, bf);
+
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
                 if(bo && bo->getHP() != 0)
                 {
@@ -7347,7 +7333,39 @@ UInt32 BattleSimulator::doAttack( int pos )
                 }
             }
         }
+        if(_defList.size() > 0 || _scList.size() > 0)
+        {
+            appendToPacket(bf->getSide(), bf->getPos(), 0, 0, 0, false, false);
+            ++ rcnt;
+        }
+        _activeFgt = NULL;
     }
+
+    //UInt8 Evolution = bf->getEvolutionCnt() ;
+    if(bf->getHP() > 0 && _winner == 0 && bf->getEvolutionCnt() >= 2)  //LIBO
+    {
+        const GData::SkillBase* passiveSkill = bf->getSkillEvolution();
+        if(passiveSkill)
+        {
+            _activeFgt = bf;
+            UInt8 curCnt = bf->getEvolutionCnt() - 2;  //LIBO
+            if(curCnt > 0)
+                appendDefStatus(e_evolution, curCnt, bf);
+            else
+                appendDefStatus(e_unEvolution, curCnt, bf);
+            bf->setEvolutionCnt(curCnt);
+            //std::cout << "Evolution: Skill:" << static_cast<UInt32>(curCnt) << std::endl;
+            doSkillAttackByEvolution(bf, passiveSkill);
+            //++ rcnt;
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(bf->getSide(), bf->getPos(), 0, 2, passiveSkill->getId(), false, false);
+                ++ rcnt;
+            }
+            _activeFgt = NULL;
+        }
+    }
+
 
     //必须放在doAttack函数的最后面，牵涉到回合数的计算
     for(UInt8 side = 0; side < 2; side++)
@@ -8035,6 +8053,7 @@ bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo)
                 setStatusChange(static_cast<BattleFighter*>(bo), summoner->getSide(), summoner->getPos(), 1, 0, e_stAura, aura, 0, false);
             }
 
+            doBMTLDispearAttack(static_cast<BattleFighter*>(bo));
             fSummonOrMirror = true;
             break;
         }
@@ -8979,6 +8998,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         }
         if(bf->releaseSummon())
         {
+            //doBMTLDispearAttack(bf);
             appendDefStatus(e_unSummon, 0, bf);
             onDead(true, bf);
             break;
@@ -16127,7 +16147,6 @@ void BattleSimulator::doEvolution(BattleFighter* bf)
 {
     if(!bf)
         return;
-
     if(bf->getSkillEvolution())
         bf->setEvolutionCnt(bf->getEvolutionCnt() + 1);
 
@@ -16379,6 +16398,32 @@ float BattleSimulator::getBFEvolutionDefend(BattleFighter* bf)
        */
 
     return def;
+}
+
+void BattleSimulator::doBMTLDispearAttack(BattleFighter* bf)
+{
+    if(!bf)
+        return;
+    const GData::SkillBase* skill = bf->getSkillBMTL2();
+    if(!skill)
+        return;
+    appendDefStatus(e_skill, 24209/*skill->getId()*/, bf);
+    UInt8 target_side = 1 - bf->getSide();
+    UInt8 excepts[25] = {0};
+    UInt8 exceptCnt = 0;
+    for(int i = 0; i < 25; i++)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
+        if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+            continue;
+        if(bo->isSoulOut() || bo->isLingQu())
+        {
+            excepts[exceptCnt] = bo->getPos();
+            ++exceptCnt;
+        }
+    }
+    BattleFighter* rnd_bf = getRandomFighter(target_side, excepts, exceptCnt);
+    doSSMakeDamage(bf, rnd_bf, 0.3);
 }
 
 } // namespace Battle
