@@ -10043,9 +10043,11 @@ function ItemNormal_00010277(iid, num, bind, param)
     end
     --package:Add(5067, num*1, true, false, 2);
     local isz = #items
-    local r = math.random(1,isz)
-    local item = items[r]
-    package:Add(item[1], item[2], true, 0, 2);
+    for i = 1, num do
+        local r = math.random(1,isz)
+        local item = items[r]
+        package:Add(item[1], item[2], true, 0, 2);
+    end
 
     package:DelItemSendMsg(iid, player);
     return num;
