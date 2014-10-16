@@ -30058,6 +30058,8 @@ void Player::handleJiqirenAct_copy()
     int copy = GetVar(VAR_JIQIREN_COPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    int goldDefault = PlayerCopy::getGoldCount(getVipLevel());
+    int freeDefault = PlayerCopy::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30074,21 +30076,41 @@ void Player::handleJiqirenAct_copy()
     UInt8 gcnt3 = GET_BIT_8(copy, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     copy = SET_BIT_8(copy, 0, fcnt);
     copy = SET_BIT_8(copy, 1, gcnt1);
     copy = SET_BIT_8(copy, 2, gcnt2);
@@ -30103,6 +30125,8 @@ void Player::handleJiqirenAct_frontMap()
     int front = GetVar(VAR_JIQIREN_FRONTMAP);
     int goldCnt = FrontMap::getGoldCount(getVipLevel()) - PLAYER_DATA(this, frontGoldCnt);
     int freeCnt = FrontMap::getFreeCount() - PLAYER_DATA(this, frontFreeCnt);
+    int goldDefault = FrontMap::getGoldCount(getVipLevel());
+    int freeDefault = FrontMap::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, frontUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, frontUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30119,21 +30143,41 @@ void Player::handleJiqirenAct_frontMap()
     UInt8 gcnt3 = GET_BIT_8(front, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     front = SET_BIT_8(front, 0, fcnt);
     front = SET_BIT_8(front, 1, gcnt1);
     front = SET_BIT_8(front, 2, gcnt2);
@@ -30213,6 +30257,8 @@ void Player::handleJiqirenAct_xjfrontMap()
     int front = GetVar(VAR_JIQIREN_XJFRONTMAP);
     int goldCnt = XJFrontMap::getGoldCount(PLAYER_DATA(this, xjfrontGoldCnt));
     int freeCnt = XJFrontMap::getFreeCount() - PLAYER_DATA(this, xjfrontFreeCnt);
+    int goldDefault = XJFrontMap::getGoldCount();
+    int freeDefault = XJFrontMap::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, xjfrontUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, xjfrontUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30225,21 +30271,41 @@ void Player::handleJiqirenAct_xjfrontMap()
     UInt8 gcnt3 = GET_BIT_8(front, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     front = SET_BIT_8(front, 0, fcnt);
     front = SET_BIT_8(front, 1, gcnt1);
     front = SET_BIT_8(front, 2, gcnt2);
@@ -30254,6 +30320,8 @@ void Player::handleJiqirenAct_fairycopy()
     int copy = GetVar(VAR_JIQIREN_FAIRYCOPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    int goldDefault = PlayerCopy::getGoldCount(getVipLevel());
+    int freeDefault = PlayerCopy::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30270,21 +30338,41 @@ void Player::handleJiqirenAct_fairycopy()
     UInt8 gcnt3 = GET_BIT_8(copy, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     copy = SET_BIT_8(copy, 0, fcnt);
     copy = SET_BIT_8(copy, 1, gcnt1);
     copy = SET_BIT_8(copy, 2, gcnt2);
@@ -35427,8 +35515,8 @@ void Player::getSeekingHerCharmAward()
         {{9600, 3}, {17110, 3}, {551, 3}, {501, 3}, {9418, 3}},
         {{134, 5}, {1325, 5}, {17107, 5}, {9438, 5}, {17111, 5}},
         {{9498, 10}, {9600, 10}, {17103, 15}, {501, 10}, {0, 0}},
-        {{1734, 1}, {9076, 8}, {17105, 8}, {9600, 10}, {0, 0}},
-        {{1735, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {17105, 20}},
+        {{1742, 1}, {9076, 8}, {17105, 8}, {9600, 10}, {0, 0}},
+        {{1741, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {17105, 20}},
     };
 
     UInt32 charmPoint = GetVar(VAR_SEEKING_HER_CHARM_POINT);
