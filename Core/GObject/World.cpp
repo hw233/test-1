@@ -106,7 +106,7 @@ bool World::_halloween = false;
 bool World::_singleday = false;
 bool World::_thanksgiving = false;
 bool World::_christmas = false;
-bool World::_accrecharge = false;
+UInt8 World::_accrecharge = 0;
 bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
@@ -230,6 +230,7 @@ RCSortType World::seekingHerZhiNvSort;
 RCSortType World::seekingHerCharmSort;
 RCSortType World::carnivalConsumeSort;
 RCSortType World::XCTJSort;
+RCSortType World::RoseDemonSort;
 ClanGradeSort World::tyss_ClanSort;
 bool World::_needrechargerank = false;
 bool World::_needconsumerank = false;
@@ -262,6 +263,9 @@ UInt8 World::_snakespringequipact = 0;
 stArenaExtra World::stArenaOld[2];
 stArenaExtra World::stArena;
 stOldMan World::_oldMan ;
+
+stRoseDemon World::_roseDemon ;
+
 /** 0：侠骨；1：柔情；2财富；3传奇 **/
 RCSortType World::killMonsterSort[4];
 UInt8 World::m_sysDailogPlatform = SYS_DIALOG_ALL_PLATFORM;
@@ -375,6 +379,7 @@ bool bQiShiBanEnd = false;
 bool bTYSSEnd = false;
 bool bWCTimeEnd = false;
 bool bXCTJTimeEnd = false;
+bool bRoseDemonTimeEnd = false;
 bool bCoolSummerTimeEnd = false;
 bool bSeekingHerTimeEnd = false;
 bool bGratirudeTimeEnd = false;
@@ -578,6 +583,8 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 18)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 25)
         ))
     {
 #if 0
@@ -1395,6 +1402,7 @@ void World::World_Midnight_Check( World * world )
     bool b11time = get11Time();
     bool bWCtime = getWorldCupTime();
     bool bXCTJtime = getXCTJTime();
+    bool bRoseDemonTime = getRoseDemonTime();
     bool bCoolSummerTime = getCoolSummer();
     bool bSeekingHerTime = getSeekingHer();
     bool bbCarnivalTime = getCarnivalConsume();
@@ -1452,6 +1460,7 @@ void World::World_Midnight_Check( World * world )
     bWCTimeEnd = bWCtime && !getWorldCupTime(300);
 
     bXCTJTimeEnd = bXCTJtime && !getXCTJTime(300);
+    bRoseDemonTimeEnd = bRoseDemonTime && !getRoseDemonTime(300);
 
     bWCTimeEnd2 = bWCtime2 && !getWorldCupTime2(300);
     //七石斗法活动结束
@@ -1685,6 +1694,8 @@ void World::World_Midnight_Check( World * world )
     if(bXCTJTimeEnd)
         world->SendXCTJAward();
 
+    if(bRoseDemonTimeEnd)
+        world->SendRoseDemonAward();
   //  std::cout<<"true?:"<<bHappyFireEnd<<std::endl;
   //  std::cout<<"first?:"<<bhappyfirend<<std::endl;
   //  std::cout<<"second?:"<<getHappyFireTime(300)<<std::endl;
@@ -1914,7 +1925,51 @@ void World::World_OldMan_Refresh(void *)
         if(_oldMan._spot != 0)
             SYSMSG_BROADCASTV(573,_oldMan._spot); 
     }
-
+}
+void World::World_RoseDemon_Refresh(void *)
+{
+    if(!World::getRoseDemonTime())
+        return ;
+    UInt8 type = getRoseDemonTimeLevel();
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);   //当天时间
+    if( time < getRoseDemonBeginTime()  ) 
+        _roseDemon._time = getRoseDemonBeginTime();
+    switch(type)
+    { 
+        case 0:
+            if(_roseDemon._type)   //非0-》0转换表示活动结束
+            {
+               for(std::set<UInt16>::iterator it = _roseDemon.setSpot.begin(); it!= _roseDemon.setSpot.end();++it) 
+                   RoseDemonDisappear(*it);
+               _roseDemon.setSpot.clear();
+               RCSortType::iterator i = World::RoseDemonSort.begin();
+               if(i!= World::RoseDemonSort.end() && i->player)
+                   SYSMSG_BROADCASTV(422,i->player->getCountry(),i->player->getName().c_str()); 
+               _roseDemon._time = 0;
+               SYSMSG_BROADCASTV(418); 
+            }
+            break;
+        case 1:
+            if(_roseDemon._type != 1)
+               SYSMSG_BROADCASTV(423); 
+            if(time >= _roseDemon._time)
+            {
+                RoseDemonAppear();
+                _roseDemon._time = time + 60; 
+            }
+            break;
+        case 2:
+        case 3:
+        case 4:
+            if(_roseDemon._type != type)
+                SYSMSG_BROADCASTV(417,(type-1)*5); 
+            break;
+        default:
+            break;
+    } 
+    if(_roseDemon._type != type)
+        _roseDemon._type = type; 
 }
 
 void World::Tianjie_Refresh(void*)
@@ -2783,6 +2838,7 @@ bool World::Init()
 	AddTimer(5 * 1000, SpreadCheck, static_cast<void *>(NULL), (5 - now % 5) * 1000);
     
     AddTimer(5 * 1000, World_OldMan_Refresh, static_cast<void*>(NULL), 5 * 1000);
+    AddTimer(5 * 1000, World_RoseDemon_Refresh, static_cast<void*>(NULL), 5 * 1000);
     //开服战世界boss
     UInt32 value = GVAR.GetVar(GVAR_SERVERWAR_XIUWEI);
     UInt32 overTime = GVAR.GetOverTime(GVAR_SERVERWAR_XIUWEI);
@@ -3852,6 +3908,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
             s.player  = p;
             s.total = total;
             World::XCTJSort.insert(s);
+        }
+    } 
+    if(World::getRoseDemonTime())
+    { 
+        UInt32 total = p->GetVar(VAR_ROSEDEMON_COUNT);
+        if(total)
+        {
+            RCSort s;
+            s.player  = p;
+            s.total = total;
+            World::RoseDemonSort.insert(s);
         }
     } 
 
@@ -5873,5 +5940,116 @@ void World::SendXCTJAward()
     //GObject::globalPlayers.enumerate(player_enum_clearVar746, 0);
 } 
 
+UInt8 World::getRoseDemonTimeLevel()
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 time = now - TimeUtil::SharpDay(0, now);
+    UInt32 begin = getRoseDemonBeginTime();
+    
+    if(time > begin+ 900 )
+        return 0;    //活动结束
+    if( begin <= time && time <= (begin + 900))
+        return 1;
+    if( time > begin - 5*60 )
+        return 2;    //活动还有5分钟
+    if( time > begin - 10*60 )
+        return 3;    //活动还有10分钟
+    if( time > begin - 15*60 )
+        return 4;    //活动还有15分钟
+    return 0;
+}
+void World::RoseDemonAppear()
+{
+    if(_roseDemon.setSpot.size() >= MAX_ROSEDEMON_COUNT)
+        return ;
+    const UInt32 roseDemonId = 4247;
+
+    UInt8 count = MAX_ROSEDEMON_COUNT - _roseDemon.setSpot.size();
+    for(UInt8 i = 0; i < count; ++i)
+    {
+        UInt16 spot = GetRandomSpot();
+        if(!spot)
+            return ;
+        if( _roseDemon.setSpot.find(spot) != _roseDemon.setSpot.end())
+            continue;
+        UInt8 thrId = mapCollection.getCountryFromSpot(spot);
+        GObject::MOData mo;
+        mo.m_ID = roseDemonId;
+        mo.m_Hide = false;
+        mo.m_Spot = spot;
+        mo.m_Type = 101;
+        mo.m_ActionType = 0;
+        GameMsgHdr hdr1(0x329, thrId, NULL, sizeof(mo));
+        GLOBAL().PushMsg(hdr1, &mo);
+        _roseDemon.setSpot.insert(spot);
+    }
+}
+void World::RoseDemonDisappear(UInt16 roseDemonSpot)
+{
+    const UInt32 roseDemonId = 4247;
+    UInt8 thrId = mapCollection.getCountryFromSpot(roseDemonSpot);
+    struct MapNpc
+    {
+        UInt16 loc;
+        UInt32 npcId;
+    };
+    MapNpc mapNpc = {roseDemonSpot, roseDemonId};
+    GameMsgHdr hdr(0x328, thrId, NULL, sizeof(MapNpc));
+    GLOBAL().PushMsg(hdr, &mapNpc);
+}
+void World::FindRoseDemon(Player * pl)
+{ 
+    UInt16 loc = pl->getLocation();
+    UInt32 times = 1;
+    if( _roseDemon.setSpot.find(loc) == _roseDemon.setSpot.end())
+    { 
+        pl->sendMsgCode(0,2234);  //已改
+        return ;
+    } 
+    RoseDemonDisappear(loc);
+    _roseDemon.setSpot.erase(loc);
+    pl->AddVar(VAR_ROSEDEMON_COUNT ,times);
+    UInt32 data = pl->GetVar(VAR_ROSEDEMON_COUNT);
+
+    GameMsgHdr h(0x34A,  pl->getThreadId(), pl, sizeof(UInt8));
+    GLOBAL().PushMsg(h, &times);
+
+    GameMsgHdr hdr(0x15A, WORKER_THREAD_WORLD, pl, sizeof(UInt32));
+    GLOBAL().PushMsg(hdr, &data);
+} 
+void World::SendRoseDemonAward()
+{
+    World::initRCRank();
+    static MailPackage::MailItem s_item[][4] = {
+        {{16054, 25}, {503, 20}, {500, 20}, {16057, 1}},
+        {{16054, 20}, {503, 15}, {500, 15}, {16056, 3}},
+        {{16054, 15}, {503, 10}, {500, 10}, {16056, 2}},
+        {{16054, 10}, {503,  6}, {500,  6}, {16056, 1}}
+    };
+    static MailPackage::MailItem card = {17811,1};   //暂无白马王子
+    SYSMSG(title, 420);
+    UInt32 pos = 1;
+    for (RCSortType::iterator i = World::RoseDemonSort.begin(), e = World::RoseDemonSort.end(); i != e; ++i)
+    {
+        if(pos >= 1 && pos < 8)     //奖励前7名
+        {
+            int type = pos > 3 ? 4 : pos;
+            SYSMSGV(content, 421, pos);
+            MailItemsInfo itemsInfo(s_item[type-1], Activity, 4);
+            Mail * mail = i->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+            if(mail)
+            {
+                mailPackageManager.push(mail->id, s_item[type-1], 4, true);
+                if(pos ==1)
+                    mailPackageManager.push(mail->id, &card, 1, true);
+            }
+        }
+        pos++;
+        if (pos > 7)
+            break;
+    }
+    return;
+       
+}
 }
 

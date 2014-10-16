@@ -9451,7 +9451,7 @@ namespace GObject
     void Player::sendTodayRechargeInfo()
     {
         Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << Stream::eos;
+        st << static_cast<UInt8>(19) << GetVar(VAR_RECHARGE_TODAY) << static_cast<UInt8>(GetVar(VAR_RECHARGE_CONDCNT)) << static_cast<UInt8>(GetVar(VAR_RECHARGE_TODAY_COUNTED)) << Stream::eos;
         send((st));
     }
 
@@ -21801,10 +21801,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F, 0x50};
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016, 17031};
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F, 0x50, 0x51};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016, 17031, 17112};
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷 318:桑巴荣耀
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253, 17032};
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253, 17032, 319};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -29346,6 +29346,7 @@ void Player::GetFindOldManAward(UInt32 type)
     udpLog("shengdanzhuomicang", str, "", "", "", "", "act");
 }
 
+
 void Player::getInterestingAward(UInt8 type)
 {
     if(!World::getOldManTime())
@@ -30059,6 +30060,8 @@ void Player::handleJiqirenAct_copy()
     int copy = GetVar(VAR_JIQIREN_COPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    int goldDefault = PlayerCopy::getGoldCount(getVipLevel());
+    int freeDefault = PlayerCopy::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30075,21 +30078,41 @@ void Player::handleJiqirenAct_copy()
     UInt8 gcnt3 = GET_BIT_8(copy, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     copy = SET_BIT_8(copy, 0, fcnt);
     copy = SET_BIT_8(copy, 1, gcnt1);
     copy = SET_BIT_8(copy, 2, gcnt2);
@@ -30104,6 +30127,8 @@ void Player::handleJiqirenAct_frontMap()
     int front = GetVar(VAR_JIQIREN_FRONTMAP);
     int goldCnt = FrontMap::getGoldCount(getVipLevel()) - PLAYER_DATA(this, frontGoldCnt);
     int freeCnt = FrontMap::getFreeCount() - PLAYER_DATA(this, frontFreeCnt);
+    int goldDefault = FrontMap::getGoldCount(getVipLevel());
+    int freeDefault = FrontMap::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, frontUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, frontUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30120,21 +30145,41 @@ void Player::handleJiqirenAct_frontMap()
     UInt8 gcnt3 = GET_BIT_8(front, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     front = SET_BIT_8(front, 0, fcnt);
     front = SET_BIT_8(front, 1, gcnt1);
     front = SET_BIT_8(front, 2, gcnt2);
@@ -30214,6 +30259,8 @@ void Player::handleJiqirenAct_xjfrontMap()
     int front = GetVar(VAR_JIQIREN_XJFRONTMAP);
     int goldCnt = XJFrontMap::getGoldCount(PLAYER_DATA(this, xjfrontGoldCnt));
     int freeCnt = XJFrontMap::getFreeCount() - PLAYER_DATA(this, xjfrontFreeCnt);
+    int goldDefault = XJFrontMap::getGoldCount();
+    int freeDefault = XJFrontMap::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, xjfrontUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, xjfrontUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30226,21 +30273,41 @@ void Player::handleJiqirenAct_xjfrontMap()
     UInt8 gcnt3 = GET_BIT_8(front, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     front = SET_BIT_8(front, 0, fcnt);
     front = SET_BIT_8(front, 1, gcnt1);
     front = SET_BIT_8(front, 2, gcnt2);
@@ -30255,6 +30322,8 @@ void Player::handleJiqirenAct_fairycopy()
     int copy = GetVar(VAR_JIQIREN_FAIRYCOPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    int goldDefault = PlayerCopy::getGoldCount(getVipLevel());
+    int freeDefault = PlayerCopy::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30271,21 +30340,41 @@ void Player::handleJiqirenAct_fairycopy()
     UInt8 gcnt3 = GET_BIT_8(copy, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     copy = SET_BIT_8(copy, 0, fcnt);
     copy = SET_BIT_8(copy, 1, gcnt1);
     copy = SET_BIT_8(copy, 2, gcnt2);
@@ -35428,8 +35517,8 @@ void Player::getSeekingHerCharmAward()
         {{9600, 3}, {17110, 3}, {551, 3}, {501, 3}, {9418, 3}},
         {{134, 5}, {1325, 5}, {17107, 5}, {9438, 5}, {17111, 5}},
         {{9498, 10}, {9600, 10}, {17103, 15}, {501, 10}, {0, 0}},
-        {{1734, 1}, {9076, 8}, {17105, 8}, {9600, 10}, {0, 0}},
-        {{1735, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {17105, 20}},
+        {{1742, 1}, {9076, 8}, {17105, 8}, {9600, 10}, {0, 0}},
+        {{1741, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {17105, 20}},
     };
 
     UInt32 charmPoint = GetVar(VAR_SEEKING_HER_CHARM_POINT);
@@ -36437,6 +36526,65 @@ void Player::TreasureConsumeAct(UInt32 c)
     }
 }
 
+void Player::UdpAccRecharge(UInt8 num)
+{
+    char str[16] = {0};
+    sprintf(str, "F_141013_%d",num);
+    udpLog("dianliangtianchi", str, "", "", "", "", "act");
+    //printf("num is %d",num);
+}
+
+void Player::OnRoseDemonGetAward(UInt8 times)
+{
+    static UInt32 chance[] = { 7000 ,9500 , 9900,10000};
+    if(!World::getRoseDemonTime())
+        return ;
+    if(GetLev()<30)
+    {
+        SYSMSG_BROADCASTV(2109, GetLev(), 30 );
+        return ; 
+    }
+    if(times ==0)
+        return ;
+    UInt8 i =0;
+    for( ; i < 4; ++i)
+    {
+        if(uRand(10000) < chance[i])
+            break;
+    }
+    GetPackage()->AddItem(16053,(i+1)*times, true, false);   //欢乐礼包(9439) 其他活动要修改
+    SYSMSG_BROADCASTV(419,getCountry(),getName().c_str(),(i+1)*times); 
+
+    char str[16] = {0};
+    sprintf(str, "F_141012_1");
+    udpLog("meiguijingling", str, "", "", "", "", "act");
+
+    char str1[16] = {0};
+    sprintf(str1, "F_141012_%d",i+2);
+    udpLog("meiguijingling", str1, "", "", "", "", "act");
+
+}
+
+void Player::sendRoseDemonInfo()
+{
+    UInt32 time = TimeUtil::Now() - TimeUtil::SharpDay(0, TimeUtil::Now());
+    UInt32 begin = World::getRoseDemonBeginTime();
+    UInt32 end = begin + 15*60;
+    UInt8 type = 0;
+    if(time >= begin && time <= end)
+        type = 1 ;
+    if(time > end)
+        type = 2;
+   
+    Stream st(REP::ACTIVE) ;
+    st << static_cast<UInt8>(0x70);
+    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(type);
+    if(type == 0)
+        st << static_cast<UInt32>( time > begin ? 0 :(begin-time));
+    st << Stream::eos;
+    send(st);
+}
 
 } // namespace GObject
 

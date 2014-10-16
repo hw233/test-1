@@ -2247,8 +2247,9 @@ void OnDelMapObj( GameMsgHdr& hdr, const void * data)
     Map * map = Map::FromSpot(mapNpc->loc);
     if (!map)
         return;
-    map->Hide(mapNpc->npcId);
-    map->DelObject(mapNpc->npcId);
+    //map->Hide(mapNpc->npcId);
+    UInt32 npcId = map->DelObject(mapNpc->npcId,mapNpc->loc);
+    map->Hide(npcId);
 }
 
 void OnAddMapObj( GameMsgHdr& hdr, const void * data)
@@ -2448,6 +2449,13 @@ void OnGetFindOldManAward( GameMsgHdr &hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     UInt32 flag = *reinterpret_cast<const UInt32 *>(data);
     player->GetFindOldManAward(flag);
+}
+
+void OnRoseDemonGetAward( GameMsgHdr &hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 count = *reinterpret_cast<const UInt8 *>(data);
+    player->OnRoseDemonGetAward(count);
 }
 void OnGetInteresingBag( GameMsgHdr &hdr, const void * data)
 {

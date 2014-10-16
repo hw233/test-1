@@ -1159,6 +1159,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
       //  pl->sendHappyXXLInfo();
       //  pl->sendXXLMapInfo();
     }
+    if (World::getRoseDemonTime())
+    {
+        pl->sendRoseDemonInfo();
+    }
     if(!pl->GetVar(VAR_ONCE_ONDAY))
     {
         pl->sendNovLoginInfo();
