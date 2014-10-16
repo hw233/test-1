@@ -2598,7 +2598,7 @@ BattleFighter* BattleFighter::summonSelf2(float factor, UInt8 last)
     bf->initStats(false);
     bf->clearSkill();
 
-    bf->setSummonFactor(75, factor, last, 28309);
+    bf->setSummonFactor(100, factor, last, 28309);
     bf->setXiangMoChanZhangSkill(NULL);
     bf->setBiLanTianYiSkill(NULL);
     bf->setSkillControlBall(NULL);

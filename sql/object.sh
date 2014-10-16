@@ -178,6 +178,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_deletevar871-873.sql  #藏宝阁
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearSeekingHer.sql     #清除众里寻她
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
 }
 
 #sh player_jiguan.sh
