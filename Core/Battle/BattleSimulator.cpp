@@ -4194,7 +4194,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
                 }
             }
             else if(SKILL_ID(skill->getId()) == 283)
-                cnt = 5;
+                cnt = 4;
 
             for(int i = 0; i < cnt; ++ i)
             {
@@ -7244,10 +7244,10 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     if(bf->getHP() > 0 && _winner == 0 && bf->getBMTLCnt() >= 3)
     {
-        _activeFgt = bf;
         const GData::SkillBase* skill = bf->getSkillBMTL();
         if(skill)
         {
+            _activeFgt = bf;
             UInt8 emptyList[25] = {0};
             UInt8 emptyCnt = 0;
             UInt8 snowmanList[25] = {0};
@@ -7286,7 +7286,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 else
                     appendDefStatus(e_unBimutianluo, curCnt, bf);
 
-                appendDefStatus(e_skill, 24209/*skill->getId()*/, bf);
+                appendDefStatus(e_skill, skill->getId(), bf);
 
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
                 if(bo && bo->getHP() != 0)
@@ -7301,19 +7301,19 @@ UInt32 BattleSimulator::doAttack( int pos )
                     setObject(target_side, target_pos, newf);
                     insertFighterStatus2Current(newf);
 
-                    appendDefStatus(e_Summon, newf->getPortrait(), newf);
+                    appendDefStatus(e_Summon, 1049, newf);
                     UInt32 value = static_cast<UInt32>(newf->getAura());
                     appendStatusChange(e_stAura, value, 0, newf);
                     appendInitDefStatus(newf);
                 }
             }
+            if(_defList.size() > 0 || _scList.size() > 0)
+            {
+                appendToPacket(bf->getSide(), bf->getPos(), 0, 0, 0, false, false);
+                ++ rcnt;
+            }
+            _activeFgt = NULL;
         }
-        if(_defList.size() > 0 || _scList.size() > 0)
-        {
-            appendToPacket(bf->getSide(), bf->getPos(), 0, 0, 0, false, false);
-            ++ rcnt;
-        }
-        _activeFgt = NULL;
     }
 
     //UInt8 Evolution = bf->getEvolutionCnt() ;
@@ -16382,7 +16382,7 @@ void BattleSimulator::doBMTLDispearAttack(BattleFighter* bf)
     const GData::SkillBase* skill = bf->getSkillBMTL2();
     if(!skill)
         return;
-    appendDefStatus(e_skill, 24209/*skill->getId()*/, bf);
+    appendDefStatus(e_skill, skill->getId(), bf);
     UInt8 target_side = 1 - bf->getSide();
     UInt8 excepts[25] = {0};
     UInt8 exceptCnt = 0;
