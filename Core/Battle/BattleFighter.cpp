@@ -1054,14 +1054,6 @@ void BattleFighter::postInit()
 const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool noPossibleTarget)
 {
     GData::SkillItem* resSkillItem = NULL;
-    if(0 && NULL!= getSkillEvolution())   //ÏÉ½ç¼¼ÄÜ
-    {
-        if(getEvolutionCnt() >=2)       
-        {
-            std::cout<< "EvolutionSkill"<< std::endl;
-            return getSkillEvolution();
-        }
-    }
     if(NULL != _peerlessSkill.base)
     {
         bool isValid = false;

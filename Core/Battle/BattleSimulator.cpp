@@ -8973,7 +8973,6 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         }
         if(bf->releaseSummon())
         {
-            //doBMTLDispearAttack(bf);
             appendDefStatus(e_unSummon, 0, bf);
             onDead(true, bf);
             break;
@@ -16122,15 +16121,13 @@ void BattleSimulator::doEvolution(BattleFighter* bf)
 {
     if(!bf)
         return;
-    if(bf->getSkillEvolution())
-        bf->setEvolutionCnt(bf->getEvolutionCnt() + 1);
-
-    UInt8 curCnt = bf->getEvolutionCnt();
-    if(curCnt > 0)
-        appendDefStatus(e_evolution, curCnt, bf);
-    else
-        appendDefStatus(e_unEvolution, curCnt, bf);
-    //std::cout << "Evolution: " << static_cast<UInt32>(curCnt) << std::endl;
+    if(!bf->getSkillEvolution())
+        return;
+    UInt8 curCnt = bf->getEvolutionCnt() + 1;
+    if(curCnt > 5)
+        return;
+    bf->setEvolutionCnt(curCnt);
+    appendDefStatus(e_evolution, curCnt, bf);
 }
 
 void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::SkillBase *skill)
