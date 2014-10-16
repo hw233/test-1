@@ -2231,7 +2231,15 @@ void BattleSimulator::calcBMTLCnt(BattleFighter* bf)
         if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
             continue;
         if(bo->getSkillBMTL())
-            bo->setBMTLCnt(bo->getBMTLCnt() + 1);
+        {
+            UInt8 bmtlCnt = bo->getBMTLCnt();
+            if(bmtlCnt < 5)
+            {
+                ++bmtlCnt;
+                bo->setBMTLCnt(bmtlCnt);
+                appendDefStatus(e_bimutianluo, bmtlCnt , bo);
+            }
+        }
     }
 }
 
@@ -7234,38 +7242,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
     }
 
-    _activeFgt = NULL;
-    for(UInt8 side = 0; side < 2; side++)
-    {
-        for(UInt8 i = 0; i < 25; i++)
-        {
-            BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, i));
-            if(bo == NULL || bo->getHP() == 0)
-                continue;
-            UInt8 curCnt = bo->getBMTLCnt();
-            UInt8 lastCnt = bo->getBMTLCnt2();
-            if(curCnt == lastCnt)
-                continue;
-            if(!_activeFgt)
-                _activeFgt = bo;
-            if(curCnt > 0)
-                appendDefStatus(e_bimutianluo, curCnt, bo);
-            else
-                appendDefStatus(e_unBimutianluo, curCnt, bo);
-            bo->setBMTLCnt2(curCnt);
-        }
-    }
-    if(_activeFgt)
-    {
-        if(_defList.size() > 0 || _scList.size() > 0)
-        {
-            appendToPacket(_activeFgt->getSide(), -1, 0, 0, 0, false, false);
-            ++ rcnt;
-        }
-        _activeFgt = NULL;
-    }
-
-
     if(bf->getHP() > 0 && _winner == 0 && bf->getBMTLCnt() >= 3)
     {
         _activeFgt = bf;
@@ -7310,7 +7286,6 @@ UInt32 BattleSimulator::doAttack( int pos )
                 else
                     appendDefStatus(e_unBimutianluo, curCnt, bf);
 
-                bf->setBMTLCnt2(curCnt);
                 appendDefStatus(e_skill, 24209/*skill->getId()*/, bf);
 
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));

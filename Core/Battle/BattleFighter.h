@@ -1789,10 +1789,7 @@ private:
     void setSkillBMTL2(const GData::SkillBase* skill) { _skillBMTL2 = skill; }
     UInt8 _BMTLCnt;
     UInt8 getBMTLCnt() { return _BMTLCnt; }
-    void setBMTLCnt(UInt8 cnt) { _BMTLCnt = cnt; }
-    UInt8 _BMTLCnt2;
-    UInt8 getBMTLCnt2() { return _BMTLCnt2; }
-    void setBMTLCnt2(UInt8 cnt) { _BMTLCnt2 = cnt; }
+    void setBMTLCnt(UInt8 cnt) { if(cnt > 5) cnt = 5; _BMTLCnt = cnt; }
 
 public:
 	enum StatusFlag

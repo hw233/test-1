@@ -369,8 +369,8 @@ private:
         e_evolution = 139,    // 仙火
         e_unEvolution = 140,    // 仙火消失
 
-        e_bimutianluo = 103,//141,    //无常印记
-        e_unBimutianluo = 104,//142,    //无常印记消失
+        e_bimutianluo = 141,    //无常印记
+        e_unBimutianluo = 142,    //无常印记消失
 
         e_MAX_STATE,
     };
