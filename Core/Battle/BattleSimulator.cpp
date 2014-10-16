@@ -7248,6 +7248,17 @@ UInt32 BattleSimulator::doAttack( int pos )
         if(skill)
         {
             _activeFgt = bf;
+
+            {
+            int target_side, target_pos, cnt;
+            getSkillTarget(bf, skill, target_side, target_pos, cnt);
+            std::vector<AttackAct> atkAct;
+            atkAct.clear();
+            if(doSkillAttack(bf, skill, target_side, target_pos, cnt, &atkAct))
+                ++ rcnt;
+            setStatusChange(bf, bf->getSide(), bf->getPos(), 1, skill, e_stMagDef, bf->getMagDefend()*0.2, 2, bf->getSide() != 0);
+            }
+
             UInt8 emptyList[25] = {0};
             UInt8 emptyCnt = 0;
             UInt8 snowmanList[25] = {0};
@@ -7286,7 +7297,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 else
                     appendDefStatus(e_unBimutianluo, curCnt, bf);
 
-                appendDefStatus(e_skill, skill->getId(), bf);
+                //appendDefStatus(e_skill, skill->getId(), bf);
 
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, target_pos));
                 if(bo && bo->getHP() != 0)
