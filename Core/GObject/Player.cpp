@@ -99,6 +99,7 @@
 #include "GObject/Evolution.h"
 #include "GObject/DarkDargon.h"
 #include "GData/IncenseTable.h"
+#include "GObject/Horcrux.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -3668,6 +3669,13 @@ namespace GObject
                 else
                     st << static_cast<UInt32>(0);
             }
+            for(UInt8 i = 0; i < 4; ++i)
+            { 
+                if(fgt->getHorcrux()->GetEquip(i))
+                    st << static_cast<UInt32>(fgt->getHorcrux()->GetEquip(i)->getId());
+                else
+                    st << static_cast<UInt32>(0);
+            } 
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);

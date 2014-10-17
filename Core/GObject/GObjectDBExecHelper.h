@@ -1774,6 +1774,15 @@ struct DBExchangeTreasureLog
     UInt32 count;
 };
 
+struct DBHorcruxAttr
+{
+	UInt32 id;
+    UInt32 value1;
+    UInt32 value2;
+    UInt32 value3;
+    UInt32 value4;
+};
+
 }
 
 namespace DB {
@@ -4013,6 +4022,16 @@ SPECIALDEF(4)
     UInt32, date,
     UInt32, itemid,
     UInt32, count
+)
+SPECIALEND()
+SPECIALBEGIN(GObject::DBHorcruxAttr)
+SPECIALDEF(5)
+(
+	UInt32, id,
+    UInt32, value1,
+    UInt32, value2,
+    UInt32, value3,
+    UInt32, value4
 )
 SPECIALEND()
 }

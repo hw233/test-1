@@ -30,6 +30,7 @@
 #define LNORMAL1_ID     9000
 #define LMOUNT_ID       9500
 #define RMOUNT_ID       9899
+#define HORCRUX_ID      10100
 #define RNORMAL1_ID     10999
 #define LBMIN_ID        11500
 #define LBMAX_ID        11999
@@ -132,6 +133,7 @@ enum ItemClass
     Item_Guji_Xin_Evade = 124, // 信·闪避古籍
     Item_Guji_Xin_Hitrate = 125, // 信·命中古籍
     Item_Guji_Dossier = 126, // 通用卷宗
+    Item_Horcrux = 127, // 魂器
 
     Item_Evolution = 170,   //仙界装备
     Item_Evolution1 ,Item_Evolution2,Item_Evolution3,  //仙兵，仙衣，仙器
@@ -191,6 +193,11 @@ inline bool IsLingShiItem(UInt32 id)
 	return id >= LLINGSHI_ID && id <= RLINGSHI_ID;
 }
 
+inline bool IsHorcruxItem(UInt32 id)
+{ 
+	return id >= HORCRUX_ID && id <= RNORMAL1_ID;
+} 
+
 /** 新增11,12级宝石 **/
 inline bool IsGemId2(UInt32 id)
 {
@@ -241,7 +248,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3) );
+	return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3) && subClass == Item_Horcrux );
 }
 
 inline bool IsZhenYuan(UInt8 subClass)

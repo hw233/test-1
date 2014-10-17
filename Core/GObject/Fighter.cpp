@@ -39,6 +39,7 @@
 #include "HoneyFall.h" 
 #include "GObject/Married.h"
 #include "Evolution.h"
+#include "Horcrux.h"
 
 namespace GObject
 {
@@ -78,7 +79,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), talent(0),
-    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0),_evl(NULL)
+    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0),_evl(NULL),_hor(NULL)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
     memset(_acupointsGold, 0, sizeof(_acupointsGold));
@@ -733,6 +734,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			if(writedb)
 				updateToDB(t[i], equip->getId());
         }
+        //else if(t[i] >= 0x71 && t[i] <= 0x74)
+        //{
+        //    Package::AppendHorcruxData(st, static_cast<ItemHorcrux *>(equip));
+		//	if(writedb)
+		//		updateToDB(t[i], equip->getId());
+        //}
 		else
 		{
 			st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0)
@@ -764,6 +771,12 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
                 lba.appendAttrToStream(st);
             }
+            else if(equip->getClass() == Item_Horcrux)
+            { 
+                ItemHorcruxAttr& horcruxAttr = (static_cast<ItemHorcrux *>(equip))->getHorcruxAttr();
+                for(UInt8 i = 0; i < 4; i++)
+                    st << horcruxAttr.getAttr(i);
+            } 
 
             if(0x70== t[i])
             {
@@ -8388,6 +8401,12 @@ Evolution * Fighter::getEvolution()
 void Fighter::UpdateIncenseToDB()
 {
     DB2().PushUpdateData("UPDATE `fighter` SET `incense` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _incense, _id, _owner->getId());
+}
+Horcrux* Fighter::getHorcrux()
+{
+    if(!_hor) 
+        _hor = new Horcrux(this);
+    return _hor;
 }
 
 /*

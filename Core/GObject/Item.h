@@ -323,6 +323,18 @@ namespace GObject
         ItemLingshiAttr m_lsAttr;
 	};
 
+    class ItemHorcrux : public ItemEquip
+    {
+        public:
+            ItemHorcrux(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData, ItemHorcruxAttr& horcruxAttr)
+                : ItemEquip(id, itemEquipType, itemEquipData), m_horcruxAttr(horcruxAttr)
+            {}
+
+            ItemHorcruxAttr& getHorcruxAttr() { return m_horcruxAttr; }
+        private:
+            ItemHorcruxAttr m_horcruxAttr;
+	};
+
 }
 
 #endif

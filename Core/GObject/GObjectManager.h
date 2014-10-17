@@ -551,6 +551,7 @@ namespace GObject
         static	bool loadFighterLingbaoFall();
         static	bool loadQuestionPaper();
         static bool loadFighterEvolution();
+        static bool loadHorcruxAttr();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
@@ -561,7 +562,7 @@ namespace GObject
 		static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
 		static ItemHalo * fetchHalo(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemInnateTrump * fetchInnateTrump(UInt32);
-		static ItemFashion * fetchFashion(UInt32);    //获取武器，基于fetchEquipment函数实现
+		        static ItemFashion * fetchFashion(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现
         static void checkLingbaoAttrType(ItemLingbao* lb);

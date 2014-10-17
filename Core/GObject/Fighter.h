@@ -172,6 +172,7 @@ struct ElixirAttr
 
 class Player;
 class Evolution;
+class Horcrux;
 class Fighter
 {
 public:
@@ -551,6 +552,8 @@ public:
     bool addLBSkill(UInt32 lbid, UInt16 skillid, UInt16 factor);
     bool delLBSkill(UInt32 lbid);
     void getAllLbSkills(Stream& st);
+
+    void loadHorcruxEquip(std::string& ee);
 
 
 
@@ -1140,12 +1143,15 @@ private:
     UInt8 lingbaoLevel[3];
     UInt32 lingbaoFall[3];  //祝福值
     Evolution * _evl;
+    Horcrux * _hor;      // 魂器
     UInt32 _incense;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
 
     Evolution * getEvolution();
+    Horcrux * getHorcrux();
+
     inline UInt8 getLingbaoLevel(UInt8 type) { if (type > 2) return 0; return lingbaoLevel[type];}
     inline void setLingbaoLevel(UInt8 type ,UInt8 val){ if(type > 2) return; lingbaoLevel[type] = val; }
 

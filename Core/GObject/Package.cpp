@@ -30,6 +30,7 @@
 #include "LBNameTmpl.h"
 #include "GData/lingbaoLevel.h"
 #include "GObject/Evolution.h"
+#include "GObject/Horcrux.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_FORGE_L2 17109    //仙装洗炼符
@@ -1334,6 +1335,13 @@ namespace GObject
                         DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                     }
                     break;
+                case Item_Horcrux:
+                    {
+                        ItemHorcruxAttr horcruxAttr;
+                        //getRandomHorcruxAttr(lv, itype->subClass, itype->quality, horcruxAttr);
+                        equip = new ItemHorcrux(id, itype, edata, horcruxAttr);
+                    }
+                    break;
 				default:
 					equip = new ItemEquip(id, itype, edata);
 					break;
@@ -1942,10 +1950,11 @@ namespace GObject
 		if(id != 0)
 		{
 			if (!IsEquipId(id)) return false;
-			item_elem_iter iter = m_Items.find(ItemKey(id));
-			if(iter == m_Items.end())
-				return false;
-			ItemBase * item = iter->second;
+            item_elem_iter iter ;
+            iter = m_Items.find(ItemKey(id));
+            if(iter == m_Items.end())
+                return false;
+            ItemBase * item = iter->second;
 			if(fgt->getLevel() < item->getReqLev())
 				return false;
             if (item->GetCareer() && fgt->getClass() != item->GetCareer())
@@ -2039,6 +2048,14 @@ namespace GObject
                     return false;
                 old  = fgt->getEvolution()->SetEvolutionEquip(part - 0x66 ,static_cast<GObject::ItemEquip *>(item));
                 break;
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+                if(item->getClass() != Item_Horcrux)
+                    return false;
+                old  = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 ,static_cast<GObject::ItemEquip *>(item));
+                break;
             default:
                 return false;
 			}
@@ -2101,6 +2118,11 @@ namespace GObject
             case 0x70:
 				old = fgt->setInnateTrump(NULL);
                 break;
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+                old = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 , NULL);
             default:
                 return false;
                 break;
@@ -2740,7 +2762,7 @@ namespace GObject
 		for (; cit != m_Items.end(); ++cit)
 		{
 			ItemBase * item = cit->second;
-			if(IsEquip(item->getClass()))
+            if(IsEquip(item->getClass()))
 			{
 				count ++;
 				ItemEquip * equip = static_cast<ItemEquip *>(item);
@@ -2789,7 +2811,6 @@ namespace GObject
             count++;
             AppendItemData(st, cit->second);
 		}
-
 		st.data<UInt16>(4) = count;
 		st << Stream::eos;
 		m_Owner->send(st);
@@ -2828,7 +2849,13 @@ namespace GObject
             ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
             lba.appendAttrToStream(st);
         }
-	}
+        else if(equip->getClass() == Item_Horcrux)
+        { 
+            ItemHorcruxAttr& horcruxAttr = (static_cast<ItemHorcrux *>(equip))->getHorcruxAttr();
+            for(UInt8 i = 0; i < 4; i++)
+                st << horcruxAttr.getAttr(i);
+        } 
+    }
 
 	void Package::AppendItemData( Stream& st, ItemBase * item )
 	{
@@ -8867,13 +8894,13 @@ namespace GObject
 		return lingshi;
 	}
 
-	void Package::lingshiUpgrade(UInt16 fighterId, UInt32 lsId, std::string& idStr)
+    void Package::lingshiUpgrade(UInt16 fighterId, UInt32 lsId, std::string& idStr)
     {
         Fighter * fgt = NULL;
         UInt8 pos = 0;
-		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
-		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
-			return;
+        ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
+        if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
+            return;
         ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
         if(lsAttr.lv >= GET_LS_MAXLEVEL(lingshi->getQuality()))
             return;
@@ -8930,13 +8957,13 @@ namespace GObject
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
-		Stream st(REP::ERLKING_INFO);
+        Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x13);
         st << fighterId << pos;
-		AppendLingshiData(st, lingshi);
-		st << Stream::eos;
-		m_Owner->send(st);
-		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        AppendLingshiData(st, lingshi);
+        st << Stream::eos;
+        m_Owner->send(st);
+        DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
 
         if(backCnt > 0)
         {
@@ -9375,5 +9402,20 @@ namespace GObject
             fgt->updateLingbaoFallToDB(type);
         return res;
     } 
-    
+ 
+
+    /* ****************** */
+    /* *****魂器装备***** */
+    /* ****************** */
+	//void Package::AppendHorcruxData(Stream& st, ItemHorcrux * horcrux)
+	//{
+	//	st << horcrux->getId() << static_cast<UInt8>(horcrux->GetBindStatus() ? 1 : 0);
+    //    st << static_cast<UInt16>(1);
+	//	st << horcrux->GetItemType().getId();
+
+    //    ItemHorcruxAttr& horcruxAttr = horcrux->getHorcruxAttr();
+    //    for(UInt8 i = 0; i < 4; i++)
+    //        st << horcruxAttr.getAttr(i);
+	//}
+   
 }

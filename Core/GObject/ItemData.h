@@ -264,6 +264,28 @@ namespace GObject
 
         ItemLingshiAttr(): lv(1), exp(0) {}
      };
+
+     struct ItemHorcruxAttr
+     {
+         //UInt32 attr_DefBao;  //抗暴
+         //UInt32 attr_DefPo;   //抗破击
+         //UInt32 attr_DefFan;  //抗反击
+         //UInt32 attr_DefFang; //攻击穿透
+         UInt32 attr[4];
+
+         ItemHorcruxAttr()
+         {
+            memset(attr,0,sizeof(attr));
+         }//: attr_DefBao(0), attr_DefPo(0),attr_DefFan(0),attr_DefFang(0) {}
+         void SetAttr(UInt32 value0 ,UInt32 value1, UInt32 value2, UInt32 value3)
+         { 
+             attr[0] = value0;
+             attr[1] = value1;
+             attr[2] = value2;
+             attr[3] = value3;
+         } 
+         UInt32 getAttr(UInt8 index){ if(index > 3) return 0 ; return attr[index];}
+     };
 }
 
 #endif

@@ -67,6 +67,7 @@ namespace GData
 	std::vector<ItemGemType *> mountTypes(400);
 	std::vector<ItemGemType *> lingshiTypes(1000);
 	std::vector<ItemGemType *> evolutionTypes(1000);
+	std::vector<ItemGemType *> horcruxTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
     std::map<UInt16, UInt16> skill2item;
 
@@ -975,6 +976,13 @@ namespace GData
 					lingshiTypes[wt->getId() - LLINGSHI_ID] = igt;
                 }
 				break;
+            case Item_Horcrux:
+				{
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
+					wt = igt;
+					horcruxTypes[wt->getId() - HORCRUX_ID] = igt;
+                }
+                break;
             case Item_PetEquip:
             case Item_PetEquip1:
             case Item_PetEquip2:

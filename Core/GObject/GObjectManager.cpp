@@ -337,6 +337,11 @@ namespace GObject
             fprintf(stderr, "loadEquipmentsSpirit error!\n");
             std::abort();
         }
+		if(!loadHorcruxAttr())
+        {
+            fprintf(stderr, "loadHorcruxAttr error!\n");
+            std::abort();
+        }
         if(!loadFightersPCChance())
         {
             fprintf(stderr, "loadFightersPCChance error!\n");
@@ -8349,6 +8354,37 @@ namespace GObject
 		lc.finalize();
 
         return true;
+    }
+
+	bool GObjectManager::loadHorcruxAttr()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading loadHorcrux attr:");
+        lc.reset(2000);
+        DBHorcruxAttr adha;
+        if(execu->Prepare("SELECT `id`, `value1`, `value2`, `value3`, `value4`  FROM `horcruxAttr` ", adha) != DB::DB_OK)
+            return false;
+
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            std::map<UInt32, ItemEquip *>::iterator it = equips.find(adha.id);
+            if(it == equips.end())
+                continue;
+
+            ItemEquip * equip = it->second;
+            if(equip == NULL)
+                continue;
+
+            ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(equip);
+            ItemHorcruxAttr& attr = horcrux->getHorcruxAttr();
+            attr.SetAttr(adha.value1, adha.value2, adha.value3, adha.value4);
+		}
+		lc.finalize();
+
+		return true;
     }
 }
 
