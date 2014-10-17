@@ -187,6 +187,9 @@ namespace lua_tinker
 		template<typename T1, typename T2, typename T3, typename T4, typename T5>
 		val2user(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) : user(new T(t1, t2, t3,t4,t5)) {}
 
+		template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+		val2user(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) : user(new T(t1, t2, t3,t4,t5,t6)) {}
+
 		~val2user() { delete ((T*)m_p); }
 	};
 
@@ -304,7 +307,7 @@ namespace lua_tinker
 	template<typename RVal, typename T1=void, typename T2=void, typename T3=void, typename T4=void, typename T5=void, typename T6=void>
 	struct functor
 	{
-		static int invoke(lua_State *L) { push(L,upvalue_<RVal(*)(T1,T2,T3,T4,T5,T6)>(L)(read<T1>(L,1),read<T2>(L,2),read<T3>(L,3),read<T4>(L,4),read<T5>(L,5),read<T6>(L,5))); return 1; }
+		static int invoke(lua_State *L) { push(L,upvalue_<RVal(*)(T1,T2,T3,T4,T5,T6)>(L)(read<T1>(L,1),read<T2>(L,2),read<T3>(L,3),read<T4>(L,4),read<T5>(L,5),read<T6>(L,6))); return 1; }
 	};
 
 	template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -488,6 +491,12 @@ namespace lua_tinker
 		static int invoke(lua_State *L) { push(L,(read<T*>(L,1)->*upvalue_<RVal(T::*)()>(L))()); return 1; }
 	};
 
+	template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+	struct mem_functor<void,T,T1,T2,T3,T4,T5,T6>
+	{
+		static int invoke(lua_State *L)  { (read<T*>(L,1)->*upvalue_<void(T::*)(T1,T2,T3,T4,T5,T6)>(L))(read<T1>(L,2),read<T2>(L,3),read<T3>(L,4),read<T4>(L,5),read<T5>(L,6),read<T6>(L,7)); return 0; }
+	};
+
 	template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
 	struct mem_functor<void,T,T1,T2,T3,T4,T5>
 	{
@@ -610,6 +619,16 @@ namespace lua_tinker
 	}
 
 	// constructor
+	template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+	int constructor(lua_State *L)
+	{
+		new(lua_newuserdata(L, sizeof(val2user<T>))) val2user<T>(read<T1>(L,2),read<T2>(L,3),read<T3>(L,4),read<T4>(L,5),read<T5>(L,6),read<T6>(L,7));
+		push_meta(L, class_name<typename class_type<T>::type>::name());
+		lua_setmetatable(L, -2);
+
+		return 1;
+	}
+
 	template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
 	int constructor(lua_State *L)
 	{
@@ -858,6 +877,36 @@ namespace lua_tinker
 			push(L, arg4);
 			push(L, arg5);
 			if(lua_pcall(L, 5, 1, errfunc) != 0)
+			{
+				lua_pop(L, 1);
+			}
+		}
+		else
+		{
+			print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
+		}
+
+		lua_remove(L, -2);
+		return pop<RVal>(L);
+	}
+
+	template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+	RVal call(lua_State* L, const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+	{
+		lua_pushcclosure(L, on_error, 0);
+		int errfunc = lua_gettop(L);
+
+		lua_pushstring(L, name);
+		lua_gettable(L, LUA_GLOBALSINDEX);
+		if(lua_isfunction(L,-1))
+		{
+			push(L, arg1);
+			push(L, arg2);
+			push(L, arg3);
+			push(L, arg4);
+			push(L, arg5);
+			push(L, arg6);
+			if(lua_pcall(L, 6, 1, errfunc) != 0)
 			{
 				lua_pop(L, 1);
 			}

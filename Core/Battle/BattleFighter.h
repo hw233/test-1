@@ -146,7 +146,12 @@ public:
     inline float getExtraCounterLevel() { return _attrExtra.counterlvl; } //¸½¼Ó·´»÷µÈ¼¶
     inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
     inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
-    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune+_fighter->getAcupointsGoldAttr(1); }
+    inline float getExtraCriticalDmgImmune() { return _attrExtra.criticaldmgimmune/*+_fighter->getAcupointsGoldAttr(1)*/; }
+
+    inline float getExtraCriticalDef() { return 1/*_attrExtraEquip.criticaldef*/; } //±©»÷¿¹ÐÔ
+    inline float getExtraPierceDef() { return 1/*_attrExtraEquip.piercedef*/; } //ÆÆ»÷¿¹ÐÔ
+    inline float getExtraCounterDef() { return 1/*_attrExtraEquip.counterdef*/; } //·´»÷¿¹ÐÔ
+    inline float getExtraAttackPierce() { return 1/*_attrExtraEquip.attackpierce*/; } //¹¥»÷´©Í¸
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 

@@ -113,7 +113,7 @@ public:
 	float calcHP(Battle::BattleFighter *);
 	float calcAction(Battle::BattleFighter *);
 
-	float calcDamage(float, float, float, float, float);
+	float calcDamage(float, float, float, float, float, float);
     float calcPracticeInc(GObject::Fighter * , bool merged);
     float calcBasePExp(GObject::Fighter *);
     float calcPExpNoBuf(GObject::Fighter *);

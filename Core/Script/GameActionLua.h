@@ -343,7 +343,6 @@ namespace Script
 		template<typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
 		inline R Call(const std::string& name, const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5);
 
-
 	protected:
 		void RegisterActionInterface();						//ע??C++?????ӿ?
 

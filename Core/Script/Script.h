@@ -55,6 +55,8 @@ public:
 	RVal call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
 	template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5>
 	RVal call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+	template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+	RVal call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
 
 	template<typename T>
 	void class_add(const char * name);
@@ -118,6 +120,12 @@ template<typename RVal, typename T1, typename T2, typename T3, typename T4, type
 RVal Script::call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 {
 	return lua_tinker::call<RVal>(_L, name, arg1, arg2, arg3, arg4, arg5);
+}
+
+template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+RVal Script::call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+{
+	return lua_tinker::call<RVal>(_L, name, arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 template<typename T>

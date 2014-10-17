@@ -2369,6 +2369,7 @@ void Fighter::rebuildEquipAttr()
             }
         } 
     } 
+    _attrExtraEquip.criticaldmgimmune += getAcupointsGoldAttr(1);
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 
@@ -7417,7 +7418,7 @@ UInt32 Fighter::calcBaseBattlePoint()
     //坐骑加成
     _owner->addMountAttrExtra(attrExtra);
     //凝结金丹  增加暴击伤害减免
-    attrExtra.criticaldmgimmune += getAcupointsGoldAttr(1);
+    //attrExtra.criticaldmgimmune += getAcupointsGoldAttr(1);
 
 	fgt->_maxHP = Script::BattleFormula::getCurrent()->calcHP(fgt);
 	UInt32 point = Script::BattleFormula::getCurrent()->calcBattlePoint(fgt);

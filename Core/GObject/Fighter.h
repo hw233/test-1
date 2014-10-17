@@ -716,6 +716,11 @@ public:
     inline float getExtraMagResLevel() { checkDirty(); return _attrExtraEquip.mreslvl; }
     inline float getExtraCriticalDmgImmune() { checkDirty(); return _attrExtraEquip.criticaldmgimmune; }
 
+    inline float getExtraCriticalDef() { checkDirty(); return 1/*_attrExtraEquip.criticaldef*/; } //暴击抗性
+    inline float getExtraPierceDef() { checkDirty(); return 1/*_attrExtraEquip.piercedef*/; } //破击抗性
+    inline float getExtraCounterDef() { checkDirty(); return 1/*_attrExtraEquip.counterdef*/; } //反击抗性
+    inline float getExtraAttackPierce() { checkDirty(); return 1/*_attrExtraEquip.attackpierce*/; } //攻击穿透
+
     inline float getExtraFairyAtk(){ checkDirty(); return _attrExtraEquip.fairyAck;}
     inline float getExtraFairyDef(){ checkDirty(); return _attrExtraEquip.fairyDef;}
 
