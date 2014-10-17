@@ -22231,10 +22231,10 @@ void Player::sendLongyuanActInfo()
 }
 void Player::sendLuckyBagInfo()
 {
-    if(!World::getSurnameLegend())
+    if(!World::getSurnameLegend() && !World::getSurnameLegend2())
         return ;
     Stream st(REP::ACTIVE);
-    st << static_cast<UInt8>(0x13) << static_cast<UInt8>(0x00);
+    st << (World::getSurnameLegend() ? static_cast<UInt8>(0x13) : static_cast<UInt8>(0x60)) << static_cast<UInt8>(0x00);
     for (UInt8 i = 0; i < 5; ++i)
     {
         st <<static_cast<UInt16>(GetVar(VAR_CARD_1+i));
@@ -24688,7 +24688,7 @@ void Player::setNuwaSignet(UInt8 idx)
 
 void Player::LuckyBagRank()
 {
-    if(World::getSurnameLegend())
+    if(World::getSurnameLegend() || World::getSurnameLegend2())
     {
         UInt32 LuckbagNum = GetVar(VAR_SURNAMELEGEND_USED);
         GameMsgHdr hdr(0x1C8, WORKER_THREAD_WORLD, this, sizeof(LuckbagNum));
@@ -25697,6 +25697,7 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
             if(!(status & flag))
             {
                 GetPackage()->AddItem(16050, 1, true, false, FromNpc);
+
                 status |= flag;
                 SetVar(VAR_SURNAME_LEGEND_STATUS, status);
             }

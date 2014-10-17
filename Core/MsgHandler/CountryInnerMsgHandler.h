@@ -2511,7 +2511,7 @@ void OnSurnameLegendAct( GameMsgHdr &hdr, const void * data  )
             player->sendLuckyBagInfo();
             break;
         case 0x03:
-            GameAction()->GetLuckyBagAward(player);
+                GameAction()->GetLuckyBagAward(player);
             break;
         /*
         case 0x04:

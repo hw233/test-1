@@ -3834,6 +3834,8 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
     }
     else if (type == 2 && begin <= end)
     {
+        if(GObject::World::getSurnameLegend2())
+            return;
         curType = 3;
         if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_BEGIN) > TimeUtil::Now()
                 || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND_END) < TimeUtil::Now())
@@ -4219,7 +4221,18 @@ void ControlActivityOnOff(LoginMsgHdr& hdr, const void* data)
 
         return;
     }
-
+    else if (type == 27 && begin <= end)
+    {
+        if(GObject::World::getSurnameLegend())
+            return;
+        curType = 3;
+        if(GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND2_BEGIN) > TimeUtil::Now()
+                || GObject::GVAR.GetVar(GObject::GVAR_SURNAMELEGEND2_END) < TimeUtil::Now())
+            GObject::globalPlayers.enumerate(player_enum_2, &curType);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_BEGIN, begin);
+        GObject::GVAR.SetVar(GObject::GVAR_SURNAMELEGEND_END, end);
+        ret = 1;
+    }
 
     Stream st(SPEP::ACTIVITYONOFF);
     st << ret << Stream::eos;

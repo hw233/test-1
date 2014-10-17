@@ -3458,6 +3458,30 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
            player->specialUdpLog(logType);
        }
        break;
+       case 0x60:
+       {
+           if (!World::getSurnameLegend2())
+               return;
+
+           struct Data
+           {
+               UInt8 type;
+               char name[32];
+           }data;
+
+           brd >> data.type;
+           if(0x04 == data.type)
+           {
+               std::string name;
+               brd >> name;
+               strncpy(data.name, name.c_str(), 31);
+           }
+
+           GameMsgHdr h(0x346,  player->getThreadId(), player, sizeof(data));
+           GLOBAL().PushMsg(h, &data);
+           break;
+       }
+
        default:
             break;
     }

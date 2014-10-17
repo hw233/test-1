@@ -1338,7 +1338,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         GLOBAL().PushMsg(hdr, NULL);
     }
     
-    if (World::getSurnameLegend())
+    if (World::getSurnameLegend() || World::getSurnameLegend2())
     {
         GameMsgHdr hdr(0x1C9, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);

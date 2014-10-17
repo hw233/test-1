@@ -362,6 +362,7 @@ bool bXiaoyaoEnd = false;
 bool bFoolBaoEnd =  false;
 bool bHalfGoldEnd = false;
 bool bSurnameLegendEnd = false;
+bool bSurnameLegendEnd2 = false;
 bool bHappyFireEnd = false;
 bool bGuankaEnd = false;
 bool b11TimeEnd = false;
@@ -1212,6 +1213,47 @@ void World::SendSurnameLegendAward()
         World::LuckyBagSort.clear();
     }
 }
+
+void World::SendSurnameLegendAward2()
+{
+    if(bSurnameLegendEnd2)
+    {
+        World::initRCRank();
+        static MailPackage::MailItem s_item[][3] = {
+            {{5068,1},{5138,1},{5108,1}},
+            {{5068,1},{5138,1},{5107,1}},
+            {{5068,1},{5137,1},{5107,1}},
+            {{5067,1},{5137,1},{5107,1}},
+            {{5067,1},{5137,1},{5106,1}},
+            {{5067,1},{5136,1},{5106,1}},
+            {{5066,1},{5136,1},{5106,1}},
+        };
+        int pos = 0;
+        for (RCSortType::iterator i = World::LuckyBagSort.begin(), e = World::LuckyBagSort.end(); i != e; ++i)
+        {
+            Player* player = i->player;
+            if (!player)
+                continue;
+            ++ pos;
+            SYSMSGV(title, 5250);
+            if(pos > 7)
+                break;
+            //UInt32 score = i->total;
+            if(pos > 0 && pos <= 7)     //奖励前7名
+            {
+                SYSMSGV(content, 5251, pos);
+                MailItemsInfo itemsInfo(s_item[pos-1], Activity, 3);
+                Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(mail)
+                {
+                    mailPackageManager.push(mail->id, s_item[pos-1], 3, true);
+                }
+            }
+        }
+        World::LuckyBagSort.clear();
+    }
+}
+
 void World::SendPopulatorRankAward(void*)
 {
     World::initRCRank();
@@ -1338,6 +1380,7 @@ void World::World_Midnight_Check( World * world )
     bool bMayDay = getMayDay();
     bool bfoolbao = getFoolBao();
     bool bsurnamelegend = getSurnameLegend();
+    bool bsurnamelegend2 = getSurnameLegend2();
     bool bhappyfirend = getHappyFireTime();
     bool bGuanka = getGuankaAct();
     bool b11time = get11Time();
@@ -1392,6 +1435,7 @@ void World::World_Midnight_Check( World * world )
     bHalfGoldEnd = bhalfgold && !getHalfGold();
     //蜀山传奇掉落活动是否结束
     bSurnameLegendEnd = bsurnamelegend && !getSurnameLegend(300);
+    bSurnameLegendEnd2 = bsurnamelegend2 && !getSurnameLegend2(300);
     //跨年大转盘
     bHappyFireEnd = bhappyfirend && !getHappyFireTime(300);
     bGuankaEnd = bGuanka && !getGuankaAct(300);
@@ -1575,6 +1619,8 @@ void World::World_Midnight_Check( World * world )
         world->SendFoolBaoAward();
     if(bSurnameLegendEnd)
         world->SendSurnameLegendAward();
+    if(bSurnameLegendEnd2)
+        world->SendSurnameLegendAward2();
     if(b11TimeEnd)
         world->Send11AirBookAward();
     if(bGGTimeEnd)
@@ -3621,6 +3667,17 @@ inline bool player_enum_rc(GObject::Player * p, int)
         World::popularitySort.insert(s);
     }
     if (World::getSurnameLegend())
+    {
+        UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
+        if (used)
+        {
+            RCSort s;
+            s.player = p;
+            s.total = used;
+            World::LuckyBagSort.insert(s);
+        }
+    }
+    if (World::getSurnameLegend2())
     {
         UInt32 used = p->GetVar(VAR_SURNAMELEGEND_USED);
         if (used)
