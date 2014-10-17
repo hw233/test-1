@@ -9895,6 +9895,7 @@ function getDragonKingAward(step, flag)
             [23] = {{318,1}},
             [24] = {{6253,1}},
             [25] = {{17032,1}},
+            [26] = {{319,1}},
         },
     }
     local chances = {
@@ -11202,6 +11203,9 @@ function onRecharge(player, r)
             
             if player:GetVar(173) == 1 and v <= 7 then
                 print("v is .." .. v)
+                if v <= 1 then
+                    return
+                end
                 vv = cond1[v] +  cond1[v-1]
                 if n >= (s + 6*86400) and n < (s + 7*86400)  and player:GetVar(172) >= vv then
                     player:AddVar(174, 1);

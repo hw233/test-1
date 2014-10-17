@@ -307,6 +307,7 @@ namespace GObject
         SANGBA       = 23,   //桑巴荣耀
         PUDU        = 24,   //普渡众生
         QTDS        = 25,   //齐天大圣
+        BMTL        = 26,   //碧目天罗
 
         DRAGONKING_MAX,
     };
