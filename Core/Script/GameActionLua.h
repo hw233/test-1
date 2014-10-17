@@ -415,6 +415,8 @@ namespace Script
         void getJiqirenAward_Copy(Player* player, UInt8 isFree);
         void getJiqirenAward_FrontMap(Player* player, UInt8 isFree);
         void getJiqirenAward_Dungeon(Player* player, UInt8 diff, UInt8 isFree);
+        void getJiqirenAward_XJFrontMap(Player* player, UInt8 isFree);
+        void getJiqirenAward_FairyCopy(Player* player, UInt8 isFree);
         UInt16 getSpeCard(UInt16 itemId);
         UInt16 getsuitAttr(UInt16 suitId);
         UInt32 getZhenyuanLootId(UInt8 idx);

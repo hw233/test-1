@@ -93,6 +93,8 @@ namespace GObject
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, xjfrontUpdate)) ||
                 getGoldCount() < PLAYER_DATA(pl, xjfrontGoldCnt) ||
                 getFreeCount() < PLAYER_DATA(pl, xjfrontFreeCnt)) {
+            if(World::getJiqirenAct() && !TimeUtil::SameDay(TimeUtil::Now(),TimeUtil::MkTime(2014, 9, 29)))
+                pl->handleJiqirenAct_xjfrontMap();
             PLAYER_DATA(pl, xjfrontUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, xjfrontFreeCnt) = 0;
             PLAYER_DATA(pl, xjfrontGoldCnt) = 0;

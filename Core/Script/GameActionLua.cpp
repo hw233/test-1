@@ -1944,6 +1944,16 @@ namespace Script
 		assert(player != NULL);
         Call<void>("getJiqirenAward_Dungeon", player, diff, isFree);
     }
+    void GameActionLua::getJiqirenAward_XJFrontMap(Player* player, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_XJFrontMap", player, isFree);
+    }
+    void GameActionLua::getJiqirenAward_FairyCopy(Player* player, UInt8 isFree)
+    {
+		assert(player != NULL);
+        Call<void>("getJiqirenAward_FairyCopy", player, isFree);
+    }
     
     UInt16 GameActionLua::getSpeCard(UInt16 itemId)
     {

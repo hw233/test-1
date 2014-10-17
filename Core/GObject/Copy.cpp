@@ -742,7 +742,10 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
             if(World::getJiqirenAct() && !TimeUtil::SameDay(TimeUtil::Now(),TimeUtil::MkTime(2014, 9, 29)))
+            {
                 pl->handleJiqirenAct_copy();
+                pl->handleJiqirenAct_fairycopy();
+            }
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
             PLAYER_DATA(pl, copyGoldCnt) = 0;
@@ -761,7 +764,10 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
         if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
             if(World::getJiqirenAct() && !TimeUtil::SameDay(TimeUtil::Now(),TimeUtil::MkTime(2014, 9, 29)))
+            {
                 pl->handleJiqirenAct_copy();
+                pl->handleJiqirenAct_fairycopy();
+            }
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
             PLAYER_DATA(pl, copyGoldCnt) = 0;
