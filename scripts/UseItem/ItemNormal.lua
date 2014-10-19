@@ -11264,7 +11264,7 @@ function ItemNormal_00009382(iid, num, bind, param)
     end
     if (iid == itmeId and getSurnameLegend()) or (iid == itmeId2 and getSurnameLegend2()) then
         local origNum = player:GetVar(452)
-        if origNum < 50 and origNum + num >= 50 then
+        if origNum < 50 and origNum + num >= 50 and getSurnameLegend() then
             player:getLuckyBagExtraAward()
         end
         player:AddVar(452, num)
