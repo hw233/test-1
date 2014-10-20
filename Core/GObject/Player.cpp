@@ -35397,6 +35397,15 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
         st << getName();
         st << Stream::eos;
         NETWORK()->SendToServerWar(st);
+
+        Stream st1(REP::COUNTRY_ACT);
+        st1 << static_cast<UInt8>(0x12);
+        st1 << static_cast<UInt8>(0x14);
+        st1 << static_cast<UInt8>(0);
+        st1 << words;
+        st1 << getName();
+        st1 << Stream::eos;
+        NETWORK()->Broadcast(st1);
     }
 
     UInt32 now = TimeUtil::Now();
