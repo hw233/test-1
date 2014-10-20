@@ -2086,29 +2086,37 @@ end
 
 function getRedBeanAward(player, index, count)
     local redBeanAward = {
-        [1] = { {15, 1}, {56, 1}, {500, 1}, {57, 1}, {511, 1}},
-        [2] = { {503, 1}, {500, 2}, {9123, 1}, {440, 1}, {516, 1}},
-        [3] = { {440, 2}, {9123, 2}, {1325, 2}, {9338, 2}, {1126, 8}},
-        [4] = { {134, 12}, {515, 8}, {440, 12}, {9123, 12}, {9433, 1}, {9076, 6}, {1735, 1}, {1734, 1}},
-        [5] = { {{503, 30}, {500, 30}, {501, 30}}, {{515, 17}}, {{509, 10}, {507, 10}}, {{9076, 15}}, {{9075, 6}}, {{9022, 6}}, {{9068, 8}}, {{1735, 1}}, {{1734, 1}}},
+        [1] = { {15, 1}, {56, 1}, {500, 1}, {57, 1}, {511, 1}, {512, 1}, {514, 1}, {505, 1}},
+        [2] = { {503, 2}, {500, 2}, {440, 2}, {516, 1}, {501, 2}, {547, 2}, {517, 2}, {551, 2}, {507, 1}, {509, 1}},
+        [3] = { {440, 2}, {1126, 8}, {9338, 3}, {1325, 3}, {134, 3}, {9414, 4}, {9600, 7}, {9425, 2}, {515, 2}, {9076, 1}, {1734, 1}, {1735, 1}},
+        [4] = { {{134, 12}, {1325, 12}}, {{515, 8}, {503, 20}, {514, 10}}, {{9600, 10}, {134, 10}, {554, 10}, {9414, 10}}, {{17103, 30}, {17109, 20}, {17110, 1}}, {{17105, 12}, {17104, 15}}, {{17107, 15}, {17106, 15}, {17103, 10}}, {{9076, 6}}, {{9075, 8}}, {{9022, 6}}, {{9068, 6}}, {{1734, 1}}, {{1735, 1}}},
     }
 
     local prob = {
-        [1] = {2000, 4000, 6000, 8000, 10000},
-        [2] = {2000, 4000, 6000, 8000, 10000},
-        [3] = {3000, 6000, 7300, 8600, 10000},
-        [4] = {2000, 3700, 5800, 7900, 8000, 9000, 9050, 10000},
-        [5] = {2000, 4000, 6000, 7200, 7800, 8400, 9200, 9600, 10000},
+        [1] = {1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000},
+        [2] = {1150, 2300, 3450, 4600, 5600, 6600, 7500, 8400, 9200, 10000},
+        [3] = {1250, 2500, 3750, 5000, 6250, 7090, 7890, 8690, 9390, 9990, 9995, 10000},
+        [4] = {1300, 2600, 3900, 5000, 6000, 7000, 7700, 8400, 9100, 9800, 9900, 10000},
     }
+
+    local broadflag = {
+        [1] = {0, 0, 0, 0, 0, 0, 0, 0};
+        [2] = {0, 0, 0, 1, 1, 1, 1, 1, 1, 1};
+        [3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        [4] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    }
+
+    local roseType = {16054, 16055, 16056, 16057}
 
     local award = redBeanAward[index]
     if award == nil then
         return false
     end
+    local roseId = roseType[index]
 
     local package = player:GetPackage();
-    if index == 5 then
-        if package:GetRestPackageSize() < 3 * count then
+    if index == 4 then
+        if package:GetRestPackageSize() < 4 * count then
             player:sendMsgCode(2, 1011, 0)
             return false
         end
@@ -2121,6 +2129,7 @@ function getRedBeanAward(player, index, count)
 
     local n = 1
     for i = 1, count do
+        local broadString = "[p:"..player:getCountry()..":"..player:getPName().."]使用了[4:"..roseId.."]获得了"
         local p = math.random(1, 10000)
         for j = 1, #award do
             if p <= prob[index][j] then
@@ -2128,18 +2137,22 @@ function getRedBeanAward(player, index, count)
                 break
             end
         end
-        if index == 5 then
+        if index == 4 then
             for k = 1, #award[n] do
                 package:Add(award[n][k][1], award[n][k][2], true, 0, 101)
+                broadString = broadString.."[4:"..award[n][k][1].."]x"..award[n][k][2]
             end
         else
             package:Add(award[n][1], award[n][2], true, 0, 101)
+            broadString = broadString.."[4:"..award[n][1].."]x"..award[n][2]
+        end
+        if broadflag[index][n] == 1 then
+            Broadcast(0x27, broadString)
         end
     end
-
-
     return true
 end
+
 local EnchantlingbaoLevel ={
     [1] = {10000},
     [2] = {5000},

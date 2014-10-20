@@ -947,7 +947,7 @@ end
 function RedBeanLoot(player)
     if getSeekingHer() then
         local package = player:GetPackage()
-        package:AddItem(16024, 1, true)
+        package:AddItem(16054, 1, true)
     end
 end
 

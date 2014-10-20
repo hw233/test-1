@@ -25750,18 +25750,18 @@ void Player::getSurnameLegendAward(SurnameLegendAwardFlag flag)
     }
     if(WORLD().getSeekingHer())
     {
-        if (flag == e_sla_none || flag == e_sla_ccb || flag == e_sla_ncb || flag == e_sla_clb || flag == e_sla_cb)
+        if (flag == e_sla_none || flag == e_sla_ncb || flag == e_sla_clb || flag == e_sla_cb || flag == e_sla_rb)
         {
             if(flag == e_sla_none)
             {
-                GetPackage()->Add(16024, 1, true, false, FromNpc);
+                GetPackage()->Add(16054, 1, true, false, FromNpc);
             }
             else
             {
                 UInt32 status = GetVar(VAR_SEEKING_HER_LOOT_STATUS);
                 if(!(status & flag))
                 {
-                    GetPackage()->Add(16024, 1, true, false, FromNpc);
+                    GetPackage()->Add(16054, 1, true, false, FromNpc);
                     status |= flag;
                     SetVar(VAR_SEEKING_HER_LOOT_STATUS, status);
                 }
@@ -35311,14 +35311,13 @@ void Player::shuShanWeiWei_WXSC(UInt8 opt, UInt8 pos, UInt32 count)
 
 void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, std::string words)
 {
-    static UInt32 beanPoint[5][3] = {
-        {1, 1, 16024},
-        {10, 9, 16025},
-        {110, 99, 16026},
-        {550, 520, 16027},
-        {1500, 1314, 16028}
+    static UInt32 beanPoint[4][3] = {
+        {1, 1, 16054},
+        {20, 19, 16055},
+        {110, 99, 16056},
+        {1200, 999, 16057},
     };
-    if(!(beanType >= 0 && beanType <= 4))
+    if(!(beanType >= 0 && beanType <= 3))
         return;
     if(0 == count)
         return;
@@ -35334,41 +35333,45 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     }
     if(!GameAction()->getRedBeanAward(this, beanType + 1, count))
         return;
-    if(getId() == userId)
-    {
-        receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
-        GameMsgHdr hdr2(0x158, WORKER_THREAD_WORLD, receiver, 0);
-        GLOBAL().PushMsg(hdr2, NULL);
-    }
-    else
-    {
-        AddVar(VAR_SEEKING_HER_CHARM_POINT, beanPoint[beanType][0] * count);
-        GameMsgHdr hdr1(0x157, WORKER_THREAD_WORLD, this, 0);
-        GLOBAL().PushMsg(hdr1, NULL);
-        GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, this, 0);
-        GLOBAL().PushMsg(hdr2, NULL);
 
-        receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
-        GameMsgHdr hdr3(0x158, WORKER_THREAD_WORLD, receiver, 0);
-        GLOBAL().PushMsg(hdr3, NULL);
-        getSeekingHerCharmAward();
+    if(World::getSeekingHer())
+    {
+        if(getId() == userId)
+        {
+            receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+            GameMsgHdr hdr2(0x158, WORKER_THREAD_WORLD, receiver, 0);
+            GLOBAL().PushMsg(hdr2, NULL);
+        }
+        else
+        {
+            AddVar(VAR_SEEKING_HER_CHARM_POINT, beanPoint[beanType][0] * count);
+            GameMsgHdr hdr1(0x157, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr1, NULL);
+            GameMsgHdr hdr2(0x182, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr2, NULL);
+
+            receiver->AddVar(VAR_SEEKING_HER_BEAN_TOTAL, beanPoint[beanType][1] * count);
+            GameMsgHdr hdr3(0x158, WORKER_THREAD_WORLD, receiver, 0);
+            GLOBAL().PushMsg(hdr3, NULL);
+            getSeekingHerCharmAward();
+        }
     }
     GetPackage()->DelItemAny(beanPoint[beanType][2], count);
 
-    if(1 == beanType)
+    if(0 == beanType)
     {
-        SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+        SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
     }
-    else if(2 == beanType)
+    else if(1 == beanType)
     {
-        SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str());
+        SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
         SYSMSGV(title, 5209, count);
         SYSMSGV(content, 5205, getCountry(), getName().c_str(), count);
         receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
     }
-    else if(3 == beanType)
+    else if(2 == beanType)
     {
-        SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+        SYSMSG_BROADCASTV(5224, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
         SYSMSGV(title, 5210, count);
         SYSMSGV(content, 5212, getCountry(), getName().c_str(), count);
         receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
@@ -35382,9 +35385,9 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
         st << Stream::eos;
         NETWORK()->Broadcast(st);
     }
-    else if(4 == beanType)
+    else if(3 == beanType)
     {
-        SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
+        SYSMSG_BROADCASTV(5203, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count, words.c_str());
         SYSMSGV(title, 5211, count);
         SYSMSGV(content, 5213, getCountry(), getName().c_str(), count);
         receiver->m_MailBox->newMail(NULL, 0x1, title, content, 0xFFFE0000);
@@ -35410,12 +35413,12 @@ void Player::getSeekingHerCharmAward()
     static UInt32 charmlvl[] = {200, 500, 1500, 4000, 8000, 16000, 32000};
     static MailPackage::MailItem charmPointAward[][7] = {
         {{9123, 2}, {440, 2}, {503, 2}, {500, 2}, {15, 5}},
-        {{503, 3}, {517, 3}, {512, 3}, {511, 3}, {0, 0}},
-        {{9600, 3}, {16001, 3}, {551, 3}, {501, 3}, {9418, 3}},
-        {{134, 5}, {1325, 5}, {9600, 5}, {9438, 5}, {9424, 5}},
-        {{9498, 10}, {9600, 10}, {9414, 10}, {501, 10}, {0, 0}},
-        {{1734, 1}, {9076, 8}, {515, 8}, {9600, 10}, {0, 0}},
-        {{1735, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {0, 0}},
+        {{17103, 3}, {517, 3}, {17109, 3}, {511, 3}, {0, 0}},
+        {{9600, 3}, {17110, 3}, {551, 3}, {501, 3}, {9418, 3}},
+        {{134, 5}, {1325, 5}, {17107, 5}, {9438, 5}, {17111, 5}},
+        {{9498, 10}, {9600, 10}, {17103, 15}, {501, 10}, {0, 0}},
+        {{1734, 1}, {9076, 8}, {17105, 8}, {9600, 10}, {0, 0}},
+        {{1735, 1}, {9022, 8}, {9075, 8}, {9021, 8}, {17105, 20}},
     };
 
     UInt32 charmPoint = GetVar(VAR_SEEKING_HER_CHARM_POINT);
