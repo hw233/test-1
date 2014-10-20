@@ -1,14 +1,20 @@
 --代码描述:此脚本仅处理天书奇缘的积分bug导致的情况 (被加载的地方似乎不合适，会被加载三次，影响效率)
 print("XXX")
---os.execute("zcat log/DB/TRACE20140621.gz |grep var|grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[00:[0,1,2,3,4][0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
-os.execute("cat log/DBLog/TRACE20140911 |grep consume_gold |grep \",27,\"  > test1.txt")  --需要修改cat语句已限制时间段
+--os.execute("cat log/DB/TRACE20141007 |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[00:[0,1,2,3,4,5][0-9]:\" > test1007.txt")  --需要修改cat语句已限制时间段
+--os.execute("cat log/DB/TRACE20141007 |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[01:[0,1,2,3][0-9]:\" >> test1007.txt")  --需要修改cat语句已限制时间段
+
+--os.execute("cat log/DB/TRACE20141007bak |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[00:[0,1,2,3,4,5][0-9]:\" > test1007.txt")  --需要修改cat语句已限制时间段
+--os.execute("cat log/DB/TRACE20141007bak |grep var|grep REPLACE |grep [^0-9]873[^0-9] |grep \"\\[01:[0,1,2,3][0-9]:\" >> test1007.txt")  --需要修改cat语句已限制时间段
+
+--os.execute("cat log/DBLog/TRACE20140911 |grep consume_gold |grep \",27,\"  > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/INFO20140707 |grep snow |grep REPLACE |grep \"\\[0[0-9]:\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 --os.execute("awk '{print $11,$12,$13,$14}' test1.txt > test2.txt ")  --产生文件的格式为(XXXX, XXXX, XXXX)]
-reg = "values%((%d*),(%d*),(%d*),(%d*),(%d*),(%d*),(%d*)%)"
+--reg = "values%((%d*),(%d*),(%d*),(%d*),(%d*),(%d*),(%d*)%)"
+reg = "VALUES %((%d*), (%d*), (%d*), (%d*)%)"
 
-file = io.open("test1.txt","r")
+file = io.open("test1007.txt","r")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep [^0-9]599[^0-9] > test1.txt")
 --os.execute("cat log/DB/TRACE20140622 |grep var |grep REPLACE |grep [^0-9]599[^0-9] |grep \"\\[1[0-9]\" > test1.txt")  --需要修改cat语句已限制时间段
 
@@ -54,16 +60,18 @@ function getTheResult()
 end
 function getTheResultInSnow2()
     for i in file:lines() do 
-        x,y,a,b,c,d,e,f,g = string.find(i,reg)
-        print(x,y,a,b,c,d,e,f,g)
-        if c != 27 then
-            return ;
-        end
-        if result[b] == nil then
-            result[b] = 0;
-        else
-        result[b]= result[b] + tonumber(f)    --结果增量设置为0
-        print(result[b])
+        x,y,a,b,c,d = string.find(i,reg)
+        --print(x,y,a,b,c,d)
+        if tonumber(b) == 873 then
+            if result[a] == nil then
+                result[a] = 0;
+            else
+                if tonumber(c) > res[a] then
+                    result[a]= result[a] + tonumber(c) - res[a]   --结果增量设置为0
+                    print(result[a])
+                end
+            end
+            res[a] = tonumber(c)   --记录上一个值
         end
     end
     file:close()
@@ -96,14 +104,17 @@ function getTheResultInSnow()
     end
     file:close()
 end
+
 getTheResultInSnow2()
 
 --写入sql语句完成数据还原
-fileOpen = io.open("sql/updates/Object_0911.sql","w")
+fileOpen = io.open("sql/updates/Object_20141007.txt","w")
+--fileOpen = io.open("sql/updates/Object_0911.sql","w")
 
 for key,value in pairs(result) do
     --local strs = string.format("UPDATE snow set score = score + %s where playerId = %s;",result[key],key)   --只影响总积分 
-    local strs = string.format("UPDATE var set data = data - %s where playerId = %s and id = 845 and data >= %s;",result[key],key,result[key])   --只影响总积分 
+    --local strs = string.format("UPDATE var set data = data + %s where playerId = %s and id = 873;",result[key],key)   --只影响总积分 
+    local strs = string.format("%s,%d",key,tonumber(result[key]))   --只影响总积分 
     print(strs)   --用于查看sql语句
     fileOpen:write(strs);
     fileOpen:write("\n")

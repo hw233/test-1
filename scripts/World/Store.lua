@@ -196,7 +196,8 @@ function loadStore()
     end
 
     if getHappyFireTime(300) then
-        store:add(2, 16048, 20)
+        --store:add(2, 16048, 20)
+        store:add(2, 16059, 20)
     end
 
     if getCollectCardAct() then

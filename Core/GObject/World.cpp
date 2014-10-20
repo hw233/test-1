@@ -538,6 +538,14 @@ bool enum_midnight(void * ptr, void* next)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
 
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 18)
+
          || (cfg.rpServer && (TimeUtil::SharpDay(0, nextday) <= World::getOpenTime()+7*86400))
          ))
     {
@@ -569,6 +577,7 @@ bool enum_midnight(void * ptr, void* next)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  20)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 9,  27)
         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  4)
+        || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
         ))
     {
 #if 0
@@ -1548,6 +1557,14 @@ void World::World_Midnight_Check( World * world )
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10,  9)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 10)
          || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 11)
+
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 12)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 13)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 14)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 15)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 16)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 17)
+         || TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2014, 10, 18)
 
          )
         bRechargeEnd = true;
@@ -5167,10 +5184,10 @@ void World::SendHappyFireAward()
 {
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{9457,50},{9498,50},{509,40},{515,30},{9022,40}},
-        {{9457,30},{9498,30},{509,30},{515,25},{0,0}},
-        {{9457,20},{9498,20},{509,20},{515,15},{0,0}},
-        {{9457,10},{9498,10},{509,10},{515,10},{0,0}},
+        {{9457,50},{9600,50},{556,40},{17107,30},{17105,40}},
+        {{9457,30},{9600,30},{556,30},{17107,20},{0,0}},
+        {{9457,20},{9600,20},{556,20},{17107,15},{0,0}},
+        {{9457,10},{9600,10},{556,10},{17107,10},{0,0}},
     };
     //static MailPackage::MailItem card = {9929,1};   //暂无白马王子
     UInt8 mark = 0;
