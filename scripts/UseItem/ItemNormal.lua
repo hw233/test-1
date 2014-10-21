@@ -10044,9 +10044,33 @@ function ItemNormal_00010277(iid, num, bind, param)
     --package:Add(5067, num*1, true, false, 2);
     local isz = #items
     for i = 1, num do
-        local r = math.random(1,isz)
-        local item = items[r]
-        package:Add(item[1], item[2], true, 0, 2);
+        --local r = math.random(1,isz)
+        --local r1 = math.random(1,isz)
+        --local r2 = math.random(1,isz)
+        --local item = items[r]
+        --package:Add(item[1], item[2], true, 0, 2);
+
+        local first_index = 0
+        local second_index = 0
+        local third_index = 0
+        first_index = math.random(1, isz)
+        while true do
+            second_index = math.random(1, isz)
+            if second_index ~= first_index then
+                break
+            end
+        end
+
+        while true do
+            third_index = math.random(1, isz)
+            if third_index ~= second_index and third_index ~= first_index then
+                break
+            end
+        end   
+
+        package:Add(items[first_index][1], items[first_index][2], true, false, 2);
+        package:Add(items[second_index][1], items[second_index][2], true, false, 2);
+        package:Add(items[third_index][1], items[third_index][2], true, false, 2);
     end
 
     package:DelItemSendMsg(iid, player);

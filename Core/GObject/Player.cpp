@@ -35449,11 +35449,13 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     }
     GetPackage()->DelItemAny(beanPoint[beanType][2], count);
 
+#if 0
     if(0 == beanType)
     {
         SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
     }
-    else if(1 == beanType)
+#endif
+    if(1 == beanType)
     {
         SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
         SYSMSGV(title, 5209, count);
@@ -35576,8 +35578,12 @@ void Player::seekingHer_GetSendBeanLog()
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x12);
     st << static_cast<UInt8>(0x13);
+    UInt32 size = _seekingHerSendBeanLog.size();
+    if(size > 200)
+        size = 200;
     st << static_cast<UInt32>(_seekingHerSendBeanLog.size());
-    for(std::vector<SeekingHerSendBeanLog *>::iterator i = _seekingHerSendBeanLog.begin(), e = _seekingHerSendBeanLog.end(); i!=e ; ++i)
+    UInt32 cnt = 0;
+    for(std::vector<SeekingHerSendBeanLog *>::reverse_iterator i = _seekingHerSendBeanLog.rbegin(), e = _seekingHerSendBeanLog.rend(); i!=e && cnt < size; ++i, ++cnt)
     {
         st << (*i)->date;
         st << globalPlayers[(*i)->senderId]->getName();
