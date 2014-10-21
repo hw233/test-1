@@ -20,7 +20,7 @@ struct AttrExtra
     attackP(0), magatkP(0), defendP(0), magdefP(0), hpP(0), toughP(0),
     actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0),
     hitrlvl(0), evdlvl(0), crilvl(0), pirlvl(0), counterlvl(0), mreslvl(0), toughlvl(0), criticaldmgimmune(0),
-    fairyAck(0),fairyDef(0)
+    fairyAck(0),fairyDef(0),criticaldef(0),piercedef(0),counterdef(0),attackpierce(0)
 	{}
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
@@ -83,6 +83,11 @@ struct AttrExtra
         criticaldmgimmune += other.criticaldmgimmune;
         fairyAck += other.fairyAck;
         fairyDef += other.fairyDef;
+        criticaldef += other.criticaldef;
+        piercedef += other.piercedef;
+        counterdef += other.counterdef;
+        attackpierce += other.attackpierce;
+
 
 		return *this;
 	}
@@ -203,6 +208,10 @@ struct AttrExtra
 
         fairyAck += other.fairyAck;
         fairyDef += other.fairyDef;
+        criticaldef += other.criticaldef;
+        piercedef += other.piercedef;
+        counterdef += other.counterdef;
+        attackpierce += other.attackpierce;
 
 		return *this;
 	}
@@ -259,6 +268,10 @@ struct AttrExtra
         aet.criticaldmgimmune *= rate;
         aet.fairyAck *= rate;
         aet.fairyDef *= rate;
+        aet.criticaldef *= rate;
+        aet.piercedef *= rate;
+        aet.counterdef *= rate;
+        aet.attackpierce *= rate;
         return aet;
 	}
 
@@ -315,6 +328,10 @@ struct AttrExtra
         aet.criticaldmgimmune *= rate;
         aet.fairyAck *= rate;
         aet.fairyDef *= rate;
+        aet.criticaldef *= rate;
+        aet.piercedef *= rate;
+        aet.counterdef *= rate;
+        aet.attackpierce *= rate;
         return aet;
 	}
     inline AttrExtra getFairyEquipInfo(const AttrExtra& other)
@@ -380,6 +397,10 @@ struct AttrExtra
 
         fairyAck += other.magatk;
         fairyDef += other.magdef;
+        criticaldef += other.criticaldef;
+        piercedef += other.piercedef;
+        counterdef += other.counterdef;
+        attackpierce += other.attackpierce;
 
 		return *this;
     }
@@ -446,6 +467,11 @@ struct AttrExtra
         fairyAck += other.magatk;
         fairyDef += other.magdef;
 
+        criticaldef += other.criticaldef;
+        piercedef += other.piercedef;
+        counterdef += other.counterdef;
+        attackpierce += other.attackpierce;
+
 		return *this;
     }
 	inline void reset()
@@ -506,6 +532,10 @@ struct AttrExtra
         criticaldmgimmune = 0;
         fairyAck = 0;
         fairyDef = 0;
+        criticaldef = 0;
+        piercedef = 0;
+        counterdef = 0;
+        attackpierce = 0;
     }
 
 	float strength;
@@ -566,6 +596,10 @@ struct AttrExtra
     float fairyAck;
     float fairyDef;
 
+    UInt32 criticaldef;
+    UInt32 piercedef;
+    UInt32 counterdef;
+    UInt32 attackpierce;
     std::vector<const SkillBase*> skills;
 };
 

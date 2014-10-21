@@ -1984,6 +1984,11 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
     ae.magatk += 1.0f;
     ae.hp     += 1.0f;
     ae.action += 1.0f;
+
+    /* ****************** */
+    /* *****魂器加成***** */
+    /* ****************** */
+
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
 	addAttrExtra(_attrExtraEquip, &ae);
 }
@@ -2367,6 +2372,16 @@ void Fighter::rebuildEquipAttr()
                     addAttrExtra(_attrExtraEquip, (*formation)[i].attrExtra);
                 }
             }
+        } 
+    } 
+    if(_owner)
+    { 
+        for(UInt8 i = 0; i < 4; ++i)    
+        { 
+            _attrExtraEquip.criticaldef = getHorcrux()->getHorcruxEquipmentTotalAttr(0);
+            _attrExtraEquip.piercedef = getHorcrux()->getHorcruxEquipmentTotalAttr(1);
+            _attrExtraEquip.counterdef = getHorcrux()->getHorcruxEquipmentTotalAttr(2);
+            _attrExtraEquip.attackpierce = getHorcrux()->getHorcruxEquipmentTotalAttr(3);
         } 
     } 
     _maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -6863,6 +6878,24 @@ void Fighter::loadEvolutionEquip(std::string& ee)
             t = GObjectManager::fetchEquipment(lb);
             //setLingbao(i, t, false);
             getEvolution()->SetEvolutionEquip(i,t,1);
+        }
+    }
+}
+void Fighter::loadHorcruxEquip(std::string& ee)
+{
+    if (!ee.length())
+        return;
+
+    StringTokenizer tk(ee, ",");
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < 4; ++i)
+    {
+        UInt32 lb = ::atoi(tk[i].c_str());
+        if (lb)
+        {
+            ItemEquip* t = 0;
+            t = GObjectManager::fetchEquipment(lb);
+            //setLingbao(i, t, false);
+            getHorcrux()->SetHorcruxEquip(i,static_cast<ItemHorcrux*>(t),1);
         }
     }
 }

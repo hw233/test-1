@@ -84,6 +84,7 @@
 #include "GObject/Evolution.h"
 #include "GObject/ClanRankBattle.h"
 #include "GObject/QuestionPaper.h"
+#include "GObject/Horcrux.h"
 
 namespace GObject
 {
@@ -340,6 +341,11 @@ namespace GObject
 		if(!loadHorcruxAttr())
         {
             fprintf(stderr, "loadHorcruxAttr error!\n");
+            std::abort();
+        }
+		if(!loadHorcruxHold())
+        {
+            fprintf(stderr, "loadHorcruxHold error!\n");
             std::abort();
         }
         if(!loadFightersPCChance())
@@ -2318,7 +2324,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`hideFashion`,`fighter`.`incense`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`,`horcrux`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`hideFashion`,`fighter`.`incense`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -2448,6 +2454,7 @@ namespace GObject
             fgt2->setTrump(specfgtobj.trump, false);
             fgt2->loadLingbao(specfgtobj.lingbao);
             fgt2->loadEvolutionEquip(specfgtobj.evolution);
+            fgt2->loadHorcruxEquip(specfgtobj.horcrux);
             fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
@@ -5332,6 +5339,7 @@ namespace GObject
                 case Item_Evolution1:
                 case Item_Evolution2:
                 case Item_Evolution3:
+                case Item_Horcrux:
                 {
                     ItemEquipData ied;
                     ied.enchant = dbe.enchant;
@@ -5396,6 +5404,12 @@ namespace GObject
                             ItemLingbaoAttr lbattr;
                             equip = new ItemLingbao(dbe.id, itype, ied, lbattr);
                         }
+                        break;
+                    case Item_Horcrux:
+                        { 
+                            ItemHorcruxAttr horcruxAttr;
+                            equip = new ItemHorcrux(dbe.id, itype, ied, horcruxAttr);
+                        } 
                         break;
                     case Item_PetEquip:
                     case Item_PetEquip1:
@@ -5496,8 +5510,8 @@ namespace GObject
                             }
                         }
                     } 
-
 					equip->SetBindStatus(dbe.bindType > 0);
+                    //printf("add %u.\n", dbe.id);
 					equips[dbe.id] = equip;
 				}
 				break;
@@ -6016,6 +6030,7 @@ namespace GObject
 		std::map<UInt32, ItemEquip *>::iterator it = equips.begin();
 		for(; it != equips.end(); ++ it)
 		{
+            //printf("delete %u.\n", it->first);
 			if(it->second != NULL)
 			{
 				delete it->second;
@@ -8380,7 +8395,46 @@ namespace GObject
 
             ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(equip);
             ItemHorcruxAttr& attr = horcrux->getHorcruxAttr();
-            attr.SetAttr(adha.value1, adha.value2, adha.value3, adha.value4);
+            attr.setAttr(adha.value1, adha.value2, adha.value3, adha.value4);
+		}
+		lc.finalize();
+
+		return true;
+    }
+
+	bool GObjectManager::loadHorcruxHold()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading loadHorcruxHold:");
+        lc.reset(2000);
+        DBHorcruxHold adha;
+        Player* pl = NULL;
+        if(execu->Prepare("SELECT `fighterId`, `playerId`, `criticaldefExp`, `piercedefExp`, `counterdefExp` ,`attackpierceExp`,`lingshi_exp`  FROM `fighter_horcrux` ", adha) != DB::DB_OK)
+            return false;
+
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+        while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(adha.playerId != last_id)
+			{
+				last_id = adha.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(adha.fighterId);
+			if(fgt == NULL)
+            {
+                continue;
+            }
+            fgt->getHorcrux()->SetHorcruxHoldExp(0,adha.criticaldefExp);
+            fgt->getHorcrux()->SetHorcruxHoldExp(1,adha.piercedefExp);
+            fgt->getHorcrux()->SetHorcruxHoldExp(2,adha.counterdefExp);
+            fgt->getHorcrux()->SetHorcruxHoldExp(3,adha.attackpierceExp);
+            fgt->getHorcrux()->SetHorcruxHoldExp(4,adha.lingshi_exp);
 		}
 		lc.finalize();
 

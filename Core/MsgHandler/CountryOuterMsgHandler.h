@@ -1810,7 +1810,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             fgt->getHorcrux()->GetEquip(0), fgt->getHorcrux()->GetEquip(1), fgt->getHorcrux()->GetEquip(2), fgt->getHorcrux()->GetEquip(3)
 
         };
-		fgt->sendModification(23, p, e, false);  //XXX
+		fgt->sendModification(27, p, e, false);  //XXX
 		return;
 	}
 
@@ -10859,6 +10859,69 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             GLOBAL().PushMsg(hdr, (void*)data);
         }
             break;
+        case 0x06:
+            {
+            UInt8 index = 0;
+            br >> index;
+            switch(index)
+            {
+                case 0x01:
+                    {
+                        UInt16 fighterId = 0;
+                        br >> fighterId;
+                        GObject::Fighter * fgt = player->findFighter(fighterId);
+                        if(!fgt) 
+                            return ;
+                        fgt->getHorcrux()->sendHorcruxInfo();
+                    }
+                    break;
+                case 0x02:
+                    {
+                        UInt16 fighterId = 0;
+                        br >> fighterId;
+                        GObject::Fighter * fgt = player->findFighter(fighterId);
+                        if(!fgt) 
+                            return ;
+                        UInt8 count = 0;
+                        br >> count;
+                        for(UInt8 i = 0; i < count ; ++i)
+                        {
+                            UInt32 itemId = 0;
+                            br >> itemId;
+                            ItemBase * item = player->GetPackage()->FindItem(itemId);
+                            if(!item)
+                                item = player->GetPackage()->FindItem(itemId,true);
+                            if(!item)
+                                continue;
+                            if(!IsEquipTypeId(itemId))
+                                continue;
+                            if(item->getClass() != Item_Horcrux)
+                                return ;
+                            ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(item);
+                            fgt->getHorcrux()->EatHorcrux(horcrux);
+                        }
+                        fgt->getHorcrux()->sendHorcruxInfo();
+                    }
+                    break;
+                case 0x04:
+                    {
+                        UInt8 item = 0;
+                        UInt8 count = 0;
+                        br >> item >> count;
+                        Stream st(REP::EXTEND_PROTOCAOL);
+                        st << static_cast<UInt8>(0x06);
+                        st << static_cast<UInt8>(0x04);
+                        st << static_cast<UInt32>(count);
+                        for(UInt8 i = 0; i < count; ++i)
+                        {
+                            st <<  GameAction()->getHorcruxEquipment(player,item);
+                        }
+                        st << Stream::eos;
+                        player->send(st);
+                    }
+            }
+            break;
+            }
     }
 }
 

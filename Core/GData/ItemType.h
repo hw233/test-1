@@ -30,7 +30,6 @@
 #define LNORMAL1_ID     9000
 #define LMOUNT_ID       9500
 #define RMOUNT_ID       9899
-#define HORCRUX_ID      10100
 #define RNORMAL1_ID     10999
 #define LBMIN_ID        11500
 #define LBMAX_ID        11999
@@ -45,6 +44,8 @@
 #define LOTHER_ID       15500
 #define LNORMAL2_ID     16000
 #define RNORMAL2_ID     17999
+#define HORCRUX_ID      19000
+#define HORCRUX_ID_END  19015
 #define ROTHER_ID       65535
 
 #define COUPON_ID       499
@@ -195,7 +196,7 @@ inline bool IsLingShiItem(UInt32 id)
 
 inline bool IsHorcruxItem(UInt32 id)
 { 
-	return id >= HORCRUX_ID && id <= RNORMAL1_ID;
+	return id >= HORCRUX_ID && id <= HORCRUX_ID_END;
 } 
 
 /** 新增11,12级宝石 **/
@@ -248,7 +249,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3) && subClass == Item_Horcrux );
+	return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3)) || (subClass == static_cast<UInt8>(Item_Horcrux) );
 }
 
 inline bool IsZhenYuan(UInt8 subClass)

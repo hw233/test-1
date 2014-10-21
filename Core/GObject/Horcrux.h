@@ -8,25 +8,32 @@
 namespace GObject
 {
 #define HORCRUX_EQUIPMENT_MAX 4
-    class Player ;
+#define HORCRUX_HOLD_MAX 5
     class Fighter;
-    class ItemEquip;
-    class Package;
+    class ItemHorcrux;
     class Horcrux
     {
         public:
             Horcrux(Fighter *fgt)
             {
                 _fighter = fgt ;
-                //memset(&_horcrux,0,sizeof(_horcrux)) ;
-                for(UInt8 i = 0; i < HORCRUX_EQUIPMENT_MAX ; ++i)
-                    _horcrux[i] = NULL;
+                memset(&_horcrux,0,sizeof(_horcrux)) ;
+                memset(&_exp,0,sizeof(_exp)) ;
             }
-            ItemEquip * GetEquip(UInt8 cnt){if(cnt >= HORCRUX_EQUIPMENT_MAX)return NULL ; return _horcrux[cnt]; }
-            ItemEquip* SetHorcruxEquip(UInt8 pos ,ItemEquip * equip,UInt8 flag = 0);
+            ItemHorcrux * GetEquip(UInt8 cnt){if(cnt >= HORCRUX_EQUIPMENT_MAX)return NULL ; return _horcrux[cnt]; }
+            ItemHorcrux* SetHorcruxEquip(UInt8 pos ,ItemHorcrux * equip,UInt8 flag = 0);
+            void SetHorcruxHoldExp(UInt8 index ,UInt32 exp);
+            void AddHorcruxHoldExp(UInt8 index ,UInt32 exp);
+            UInt32 GetHorcruxHoldExp(UInt8 index);
+            void UpdateHorcurxHoldToDB();
+            void UpdateHorcruxEquipmentToDB();
+            void EatHorcrux(ItemHorcrux* item);
+            void sendHorcruxInfo();
+            UInt32 getHorcruxEquipmentTotalAttr(UInt8 index);
         private:
             Fighter * _fighter;
-            ItemEquip * _horcrux[HORCRUX_EQUIPMENT_MAX];
+            ItemHorcrux * _horcrux[HORCRUX_EQUIPMENT_MAX];
+            UInt32 _exp[HORCRUX_HOLD_MAX];
     };
 }
 #endif // HORCRUX_H_

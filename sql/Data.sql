@@ -1385,4 +1385,10 @@ CREATE TABLE `titlepaper` (
     PRIMARY KEY (`titleid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `horcruxHoldAttr`;
+CREATE TABLE `horcruxHoldAttr` (
+    `val` int(10) unsigned NOT NULL DEFAULT 0,
+    `up` float(10,2) unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY (`val`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 -- Dump completed
