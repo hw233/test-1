@@ -4505,7 +4505,7 @@ void World::Send11PlayerRankAward()
         {{17105,25},{556,25},{9600,30},{9022,20},{0,0}},
         {{17105,15},{556,15},{9600,15},{9022,10},{0,0}},
     };
-    static MailPackage::MailItem card = {17806,1};   //XXX可能会有问题
+    static MailPackage::MailItem card = {17815,1};   //XXX可能会有问题
     SYSMSG(title, 4950);
     for (RCSortType::iterator i = World::PlayerGradeSort.begin(), e = World::PlayerGradeSort.end(); i != e; ++i)
     {
