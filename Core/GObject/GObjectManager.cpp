@@ -3086,7 +3086,7 @@ namespace GObject
             last_id = 0xFFFFFFFFFFFFFFFFull;
             pl = NULL;
             DBSeekingHerSendBeanLog sthdata;
-            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY  `senderId`", sthdata) != DB::DB_OK)
+            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY `data`", sthdata) != DB::DB_OK)
                 return false;
             while(execu->Next() == DB::DB_OK)
             {
