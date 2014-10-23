@@ -648,6 +648,8 @@ CREATE TABLE `fighter` (
   `summoned` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `hideFashion` tinyint(4) DEFAULT '0',
   `incense` int(10) unsigned NOT NULL DEFAULT '0',
+  `potentialFail` int(10) unsigned NOT NULL DEFAULT '0',
+  `capacityFail` int(10) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
   KEY `playerId` (`playerId`),
   KEY `id` (`id`)

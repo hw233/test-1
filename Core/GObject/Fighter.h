@@ -1203,6 +1203,16 @@ public:
     void SGDeleteDB(UInt16 id);
     void getAllSGInfo(std::map<UInt16, Int32>& sg_info);
 
+private:
+    UInt32 _potentialFailTimes;
+    UInt32 _capacityFailTimes;
+
+public:
+    void setpotentialFail(UInt32 p, bool toDB);
+    void setcapacityFail(UInt32 c, bool toDB);
+    inline UInt32 getpotentialFail() { return _potentialFailTimes; };
+    inline UInt32 getcapacityFail() { return _capacityFailTimes; };
+
 };
 
 class GlobalFighters

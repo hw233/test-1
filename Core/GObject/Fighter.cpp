@@ -197,8 +197,10 @@ UInt8 Fighter::getColor2( float pot )
 		return 2;
 	if(pot < 1.799f)
 		return 3;
-	if(pot < 2.099f)
+	if(pot < 2.399f)
 		return 4;
+    if(pot < 2.999f)
+        return 5;
 	return 10;
 }
 
@@ -8392,6 +8394,24 @@ Evolution * Fighter::getEvolution()
 void Fighter::UpdateIncenseToDB()
 {
     DB2().PushUpdateData("UPDATE `fighter` SET `incense` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _incense, _id, _owner->getId());
+}
+
+void Fighter::setpotentialFail(UInt32 p, bool toDB)
+{
+    _potentialFailTimes = p;
+    if(toDB)
+    {
+        DB1().PushUpdateData("UPDATE `fighter` SET `potentialFail` = %u where `id` = %u and `playerId` = %" I64_FMT "u", _potentialFailTimes, getId(), _owner->getId());
+    }
+}
+
+void Fighter::setcapacityFail(UInt32 c, bool toDB)
+{
+    _capacityFailTimes = c;
+    if(toDB)
+    {
+        DB1().PushUpdateData("UPDATE `fighter` SET `capacityFail` = %u where `id` = %u and `playerId` = %" I64_FMT "u", _capacityFailTimes, getId(), _owner->getId());
+    }
 }
 
 /*

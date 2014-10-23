@@ -3702,6 +3702,8 @@ namespace GObject
             st << static_cast<UInt32>(fgt->getIncense()); 
             st << static_cast<UInt8>(fgt->getEvolution()->IsComplete());
 		}
+        st << fgt->getcapacityFail();
+        st << fgt->getpotentialFail();
 	}
 
 	bool Player::makeFighterInfo( Stream&st, UInt32 id )
@@ -9916,21 +9918,31 @@ namespace GObject
 
         bool isPotential = false;
         float p = 0;
-		UInt32 rate = 0;
+		UInt64 rate = 0;
         UInt32 itemId = ITEM_TRAIN_TYPE1 + type - 1;
+        UInt32 potentialFailTimes = fgt->getpotentialFail();
+        UInt32 capacityFailTimes = fgt->getcapacityFail();
 
         if(type == 1 || type == 2)
         {
 		    p = fgt->getCapacity();
             if(p > GObjectManager::getMaxCapacity()/100 - 0.001)
                 return 1;
-            std::vector<UInt32>& chance = GObjectManager::getCapacityChance();
+            std::vector<UInt64>& chance = GObjectManager::getCapacityChance();
+            std::vector<UInt32>& fail_times = GObjectManager::getCapacityFailTimes();
             size_t cnt = chance.size();
             for(UInt32 idx = 0; idx < cnt; idx ++)
             {
                 if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
                 {
-                    rate = CHANCEVALUE(chance[idx]);
+                    UInt64 point = CHANCECOND(chance[idx]);
+                    for(UInt32 i = idx; i < cnt ; i++)
+                    {
+                        if(CHANCECOND(chance[i]) != point)
+                            break;
+                        if(capacityFailTimes >= fail_times[i])
+                            rate = CHANCEVALUE(chance[i]);
+                    }
                     break;
                 }
             }
@@ -9941,13 +9953,21 @@ namespace GObject
 		    p = fgt->getPotential();
             if(p > GObjectManager::getMaxPotential()/100 - 0.001)
                 return 1;
-            std::vector<UInt32>& chance = GObjectManager::getPotentialChance();
+            std::vector<UInt64>& chance = GObjectManager::getPotentialChance();
+            std::vector<UInt32>& fail_times = GObjectManager::getPotentialFailTimes();
             size_t cnt = chance.size();
             for(UInt32 idx = 0; idx < cnt; idx ++)
             {
                 if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
                 {
-                    rate = CHANCEVALUE(chance[idx]);
+                    UInt64 point = CHANCECOND(chance[idx]);
+                    for(UInt32 i = idx; i < cnt ; i++)
+                    {
+                        if(CHANCECOND(chance[i]) != point)
+                            break;
+                        if(potentialFailTimes >= fail_times[i])
+                            rate = CHANCEVALUE(chance[i]);
+                    }
                     break;
                 }
             }
@@ -9969,7 +9989,7 @@ namespace GObject
             OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
 
         bool bMainFighter = isMainFighter( fgt->getId()) ;
-		if(uRand(1000) < rate)
+		if(uRand(100000) < rate)
 		{
             if(isPotential)
             {
@@ -10076,6 +10096,10 @@ namespace GObject
                     }
                 }
             }
+            if(type == 2)
+                fgt->setcapacityFail(0, true);
+            if(type == 4)
+                fgt->setpotentialFail(0, true);
 		}
 		else
 		{
@@ -10104,6 +10128,10 @@ namespace GObject
                     fgt->setCapacity(decp);
                 }
 			}
+            if(type == 4 && p)
+                fgt->setpotentialFail(++potentialFailTimes, true);
+            else if(type == 2)
+                fgt->setcapacityFail(++capacityFailTimes, true);
 			return 1;
 		}
 

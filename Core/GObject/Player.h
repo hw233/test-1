@@ -3831,7 +3831,6 @@ namespace GObject
         void setTotalItemCnt(UInt8 cnt) { _totalItemCnt = cnt; }
         UInt64 getTotalExp() { return _totalExp; }
         void setTotalExp(UInt64 exp) { _totalExp = exp; }
-
 	};
 
 
