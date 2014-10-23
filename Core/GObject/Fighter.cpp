@@ -6925,6 +6925,7 @@ void Fighter::setXingchenFromDB(DBXingchen& dbxc)
     m_xingchen.gems[3] = dbxc.gem4;
     m_xingchen.gems[4] = dbxc.gem5;
     m_xingchen.gems[5] = dbxc.gem6;
+    m_xingchen.gems[6] = dbxc.gem7;
     m_xingchen.xctCurVal = dbxc.xctCurVal;
     m_xingchen.xctMaxVal = dbxc.xctMaxVal;
 
@@ -6936,7 +6937,7 @@ bool Fighter::upgradeXingchen(UInt8 type)
 {
     if (isPet() || !_owner)
         return false;
-    if (m_xingchen.lvl >= 30)
+    if (m_xingchen.lvl >= 35)
         return false;
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if(!stxc || getLevel() < stxc->limitLev)
@@ -6969,7 +6970,7 @@ bool Fighter::quickUpGrade(UInt8 type)
     if(isPet() || !_owner)
         return false;
 
-    if(m_xingchen.lvl >= 30)
+    if(m_xingchen.lvl >= 35)
         return false;
 
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
@@ -7156,8 +7157,8 @@ void Fighter::GMSetXCTMaxVal(UInt16 value)
 void Fighter::updateDBxingchen()
 {
     DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal`)\
-            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
-            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
+            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
+            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.gems[6], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
 }
 
 void Fighter::sendXingchenInfo(UInt8 type)
@@ -7218,7 +7219,7 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
     if(NULL == item) 
         return;
 
-    if(pos < 1 || pos > 6)
+    if(pos < 1 || pos > sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]))
         return;
 
     UInt16 oldGemId = 0;
@@ -7252,10 +7253,10 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
 
 bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 {
-    if(pos < 1 || pos > 6)
+    if(pos < 1 || pos > sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]))
         return false;
 
-    for(UInt8 i=1; i<=6; i++)
+    for(UInt8 i=1; i<=sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); i++)
     {
         if(pos == i)
             continue;
@@ -7286,7 +7287,7 @@ void Fighter::dismantleGem(UInt8 pos, UInt8 type)
     if(getLevel() < stxc->limitLev)
         return;
 
-    if(pos < 1 || pos > 6)
+    if(pos < 1 || pos > sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]))
         return;
 
     if(m_xingchen.gems[pos-1] == 0)
