@@ -5086,6 +5086,25 @@ function sendRechargeMails(player, ototal, ntotal)
         sendRechargeMails_2013_05_24(player, ototal, ntotal)
     end
 
+    local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time() + 11
+
+    if n >= s and n < (s + 1*86400) then
+        sendRechargeMails_2013_05_18(player, ototal, ntotal)
+    elseif n >= (s + 1*86400) and n < (s + 2*86400) then
+        sendRechargeMails_2013_05_19(player, ototal, ntotal)
+    elseif n >= (s + 2*86400) and n < (s + 3*86400) then
+        sendRechargeMails_2013_05_20(player, ototal, ntotal)
+    elseif n >= (s + 3*86400) and n < (s + 4*86400) then
+        sendRechargeMails_2013_05_21(player, ototal, ntotal)
+    elseif n >= (s + 4*86400) and n < (s + 5*86400) then
+        sendRechargeMails_2013_05_22(player, ototal, ntotal)
+    elseif n >= (s + 5*86400) and n < (s + 6*86400) then
+        sendRechargeMails_2013_05_23(player, ototal, ntotal)
+    elseif n >= (s + 6*86400) and n < (s + 7*86400) then
+        sendRechargeMails_2013_05_24(player, ototal, ntotal)
+    end
 end
 
 function sendRCAward(player, pos, total, f7, item)
@@ -8388,6 +8407,26 @@ function sendRechargeRankAward(player, pos, total, f7)
         sendRechargeRankAward_2014_03_01(player, pos, total, f7)
     end
 
+    local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(t)
+    local n = os.time()
+
+    if n >= (s + 10 * 60) and n < (s + 86400 + 10*60) then
+        sendRechargeRankAward_2013_03_21(player, pos, total, f7)
+    elseif n >= (s + 86400 + 10*60) and n < (s + 2*86400 + 10*60) then
+        sendRechargeRankAward_2014_06_01(player, pos, total, f7)
+    elseif n >= (s + 2*86400 + 10*60) and n < (s + 3*86400 + 10*60) then
+        sendRechargeRankAward_2014_05_26(player, pos, total, f7)
+    elseif n >= (s + 3*86400 + 10*60) and n < (s + 4*86400 + 10*60) then
+        sendRechargeRankAward_2014_02_04(player, pos, total, f7)
+    elseif n >= (s + 4*86400 + 10*60) and n < (s + 5*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_18(player, pos, total, f7)
+    elseif n >= (s + 5*86400 + 10*60) and n < (s + 6*86400 + 10*60) then
+        sendRechargeRankAward_2013_04_19(player, pos, total, f7)
+    elseif n >= (s + 6*86400 + 10*60) and n < (s + 7*86400 + 10*60) then
+        sendRechargeRankAward_2013_03_27(player, pos, total, f7)
+    end
+
  end
 
 function sendConsumeRankAward_2012_10_19(player, pos)
@@ -11149,9 +11188,24 @@ function onAccRecharge_2014_10_18(player)
     sendAccRechargeAwards2(player, awards)
 end
 
+function onAccRecharge_2014_10_25(player)
+    local awards = {
+        [1] = { 0xA000,30,1, 9361,1,1},
+        [2] = { 0xA000,20,1, 500,2,1},
+        [3] = {516,1,1, 503,1,1, 0xA000,50,1},
+        [4] = {17103,1,1, 9498,2,1, 0xA000,50,1},
+        [5] = {134,1,1, 551,2,1, 9600,2,1, 0xA000,100,1},
+        [6] = {17105,1,1, 5035,1,1, 0xA000,100,1},
+        [7] = {5095,1,1, 9338,1,1, 9308,1,1, 9310,1,1},
+        [8] = {5026,1,1, 0xA000,500,1},
+    }
+    sendAccRechargeAwards2(player, awards)
+end
+
+
 -- ACCRECHARGE
 function onRecharge(player, r)
-    if getAccRecharge() == 1 then
+    if getAccRecharge() == 1 then -- 老天池
         local cond = 100
         if player:GetVar(172) >= cond and player:GetVar(173) == 0 then
             player:AddVar(174, 1);
@@ -11174,11 +11228,8 @@ function onRecharge(player, r)
         end
     end
     
-    if getAccRecharge() == 2 then
-        local cond1 = {10,20,40,80,140,180,230}
-        local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-        local s = os.time(t)
-        local n = os.time() + 11
+    if getAccRecharge() == 2 then -- 新天池
+        local cond1 = {10,20,40,80,140,180,230} -- 刻度
         local v = player:GetVar(174)
         if v >= 7 then
             return
@@ -11195,9 +11246,21 @@ function onRecharge(player, r)
                 player:SetVar(173, 1)
                 player:UdpAccRecharge(player:GetVar(174))
 
+                local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+                local s = os.time(t)
+                local n = os.time() + 11
                 if n >= s and n < (s + 7*86400) then
                     onAccRecharge_2014_10_18(player)
                 end
+
+                local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+                local s = os.time(t)
+                local n = os.time() + 11
+                if n >= s and n < (s + 7*86400) then
+                    onAccRecharge_2014_10_25(player)
+                end
+
+
                 v = v + 1
             end
             
@@ -11207,14 +11270,31 @@ function onRecharge(player, r)
                     return
                 end
                 vv = cond1[v] +  cond1[v-1]
-                if n >= (s + 6*86400) and n < (s + 7*86400)  and player:GetVar(172) >= vv then
-                    player:AddVar(174, 1);
-                    player:SetVar(173, 2)
-                    player:UdpAccRecharge(player:GetVar(174))
+                if player:GetVar(172) >= vv then
 
-                    onAccRecharge_2014_10_18(player)
+                    local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+                    local s = os.time(t)
+                    local n = os.time() + 11
+                    if n >= (s + 6*86400) and n < (s + 7*86400) then
+                        player:AddVar(174, 1);
+                        player:SetVar(173, 2)
+                        player:UdpAccRecharge(player:GetVar(174))
+
+                        onAccRecharge_2014_10_18(player)
+                    end
+
+                    local t = { ['year'] = 2014, ['month'] = 10, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+                    local s = os.time(t)
+                    local n = os.time() + 11
+                    if n >= (s + 6*86400) and n < (s + 7*86400) then
+                        player:AddVar(174, 1);
+                        player:SetVar(173, 2)
+                        player:UdpAccRecharge(player:GetVar(174))
+
+                        onAccRecharge_2014_10_25(player)
+                    end
+
                 end
-
             end
 
         end

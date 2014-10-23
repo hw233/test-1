@@ -10855,6 +10855,15 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             GLOBAL().PushMsg(hdr, (void*)data);
         }
             break;
+        case 7:
+        {
+            UInt32 itemid = 0;
+            UInt16 itemnum = 0;
+
+            br >> itemid >> itemnum;
+            player->GetPackage()->BindItem(itemid,itemnum);
+        }
+            break;
     }
 }
 

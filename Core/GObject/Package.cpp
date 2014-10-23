@@ -9375,5 +9375,73 @@ namespace GObject
             fgt->updateLingbaoFallToDB(type);
         return res;
     } 
+	
+    bool Package::BindItem(UInt32 id, UInt16 num)
+    {
+        if (IsEquipId(id))
+        {
+            ItemEquip * equip = GetEquip(id);
+            if(equip == NULL)
+                return false;
+            equip->DoEquipBind(true);
+            SendPackageItemInfor();       
+        }
+        else
+        {
+            ItemBase* item = GetItem(id, false);
+            if (item == NULL || item->Count() < num)
+                return false;
+		
+            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+            if(itemType == NULL) 
+                return false;
+
+            if(GetItemSubClass(id) == Item_Soul)
+            {
+                if(itemType->Size(num) > GetRestPackageSize(1))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return false;
+                }
+            }
+            else if(GetItemSubClass(id) == Item_Gem || GetItemSubClass(id) == Item_EvolutionGem)
+            {
+                if(itemType->Size(num) > GetRestPackageSize(3))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return false;
+                }
+            }
+            else if(GetItemSubClass(id) == Item_Formula)
+            {
+                if(itemType->Size(num) > GetRestPackageSize(4))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return false;
+                }
+            }
+            else if(GetItemSubClass(id) == Item_SL)
+            {
+                if(itemType->Size(num) > GetRestPackageSize(5))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return false;
+                }
+            }
+            else
+            {
+                if(itemType->Size(num) > GetRestPackageSize(0))
+                {
+                    m_Owner->sendMsgCode(0, 1011);
+                    return item;
+                }
+            } 
+            
+            if (!DelItem2(item, num))
+                return false;
+            AddItem2(id,num,false,true,0);
+        }
+        return true;
+    }
     
 }
