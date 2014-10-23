@@ -468,6 +468,15 @@ namespace GObject
 
         if(pos == e_xq_qi)
         {
+            if(_evolution[pos])
+            {
+                const GData::AttrExtra * ae = _evolution[pos]->getAttrExtra(); 
+                if(ae && ae->skills.size())
+                {
+                    std::string skills = Itoa(ae->skills[0]->getId());
+                    _fighter->delSkills(skills,false);
+                }
+            }
             if(equip1)
             {
                 const GData::AttrExtra * ae = equip1->getAttrExtra(); 
@@ -475,15 +484,6 @@ namespace GObject
                 {
                     std::string skills = Itoa(ae->skills[0]->getId());
                     _fighter->setSkills(skills,false);
-                }
-            }
-            else if(_evolution[pos])
-            {
-                const GData::AttrExtra * ae = _evolution[pos]->getAttrExtra(); 
-                if(ae && ae->skills.size())
-                {
-                    std::string skills = Itoa(ae->skills[0]->getId());
-                    _fighter->delSkills(skills,false);
                 }
             }
         }

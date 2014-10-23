@@ -3090,7 +3090,7 @@ namespace GObject
             last_id = 0xFFFFFFFFFFFFFFFFull;
             pl = NULL;
             DBSeekingHerSendBeanLog sthdata;
-            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY  `senderId`", sthdata) != DB::DB_OK)
+            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY `data`", sthdata) != DB::DB_OK)
                 return false;
             while(execu->Next() == DB::DB_OK)
             {
@@ -6274,7 +6274,7 @@ namespace GObject
 		lc.reset(20);
 		DBXingchen dbxc;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `gem7`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
 			return false;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -8226,7 +8226,7 @@ namespace GObject
 		    Player* pl = globalPlayers[dbk.playerId];
 			if(pl == NULL)
 				continue;
-            if(dbk.num >= 12)
+            if(dbk.num >= 15)
                 continue;
             pl->getMonsterKettleMgr()->SetKettleHistory(dbk.num ,dbk.history);
             pl->getMonsterKettleMgr()->SetKettleOccupy(dbk.num , dbk.occupy);

@@ -397,6 +397,7 @@ namespace GObject
         void setLingshi(Fighter *, UInt32, UInt8);
         /**********灵侍end***********/
         UInt8 lingBaoUpLevel( UInt16 fighterId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed,UInt8& enLevel, UInt16& bless /*, bool protect*/ );
+        bool BindItem(UInt32 id, UInt16 num);
     protected:
 		typedef std::map<ItemKey, ItemBase *> ItemCont;
 		typedef ItemCont::iterator item_elem_iter;

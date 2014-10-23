@@ -87,7 +87,7 @@ struct Xingchenzhen
 
     UInt8 lvl;          // 星辰等级
     UInt32 curVal;      // 当前星辰值
-    UInt16 gems[6];     // 镶嵌的宝石id
+    UInt16 gems[7];     // 镶嵌的宝石id
     UInt16 xctCurVal;   // 星辰图当前值
     UInt16 xctMaxVal;   // 星辰图最大值
 };
