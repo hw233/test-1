@@ -28,9 +28,9 @@ function kettleNpc()
             print "INSERT INTO `kettleNpc` VALUES";
         } {
             printf("(%d,%.02f,%.02f,%.02f,%.02f,%d)",$1,$3,$4,$5,$6,$8);
-            if (NR <= ENVIRON["lines"])
+            if (NR < ENVIRON["lines"])
                 printf(",");
-            else if (NR > ENVIRON["lines"])
+            else if (NR >= ENVIRON["lines"])
                 printf(";");
             printf("\n");
         }
