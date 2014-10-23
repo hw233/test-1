@@ -7158,7 +7158,7 @@ void Fighter::GMSetXCTMaxVal(UInt16 value)
 
 void Fighter::updateDBxingchen()
 {
-    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal`)\
+    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`,`gem7`, `xctCurVal`, `xctMaxVal`)\
             VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
             m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.gems[6], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
 }
