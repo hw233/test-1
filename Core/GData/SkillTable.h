@@ -158,6 +158,7 @@ enum
     e_eft_evolution3 = 67,       //仙器技能回复自身血量
     e_eft_evolution4 = 68,      //仙器技能对对方血量最少3次伤害
     e_eft_evolution5 = 69,      //伤害技能参数填充
+    e_eft_bimutianluo = 70,    //碧目天罗
     e_eft_max
 };
 

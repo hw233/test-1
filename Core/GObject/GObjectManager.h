@@ -17,13 +17,13 @@ namespace GObject
 	class ItemArmor;
     class ItemLingbao;
 #ifndef CHANCECOND
-#define CHANCECOND(a) ((0xFFFF0000 & a) >> 16)
+#define CHANCECOND(a) ((0xFFFFFFFF00000000 & a) >> 32)
 #endif
 #ifndef CHANCEVALUE
-#define CHANCEVALUE(b) (0x0000FFFF & b)
+#define CHANCEVALUE(b) (0x00000000FFFFFFFF & b)
 #endif
 #ifndef MAKECHANCE
-#define MAKECHANCE(a,b) (((0x0000FFFF & a) << 16) | (0x0000FFFF & b))
+#define MAKECHANCE(a,b) (((0x00000000FFFFFFFF & a) << 32) | (0x00000000FFFFFFFF & b))
 #endif
     struct YDItem
     {
@@ -606,8 +606,10 @@ namespace GObject
         static UInt32 getMaxPotential() { return _max_potential; }
         static UInt32 getMinCapacity() { return _min_capacity; }
         static UInt32 getMaxCapacity() { return _max_capacity; }
-        static std::vector<UInt32>& getPotentialChance() { return _potential_chance; }
-        static std::vector<UInt32>& getCapacityChance() { return _capacity_chance; }
+        static std::vector<UInt64>& getPotentialChance() { return _potential_chance; }
+        static std::vector<UInt32>& getPotentialFailTimes() { return _potential_fail_times; }
+        static std::vector<UInt64>& getCapacityChance() { return _capacity_chance; }
+        static std::vector<UInt32>& getCapacityFailTimes() { return _capacity_fail_times; }
         static UInt8 getEvadeFactor() { return _evade_factor; }
         static UInt8 getHitrateFactor() { return _hitrate_factor; }
         static UInt8 getCriticalFactor() { return _critcal_factor; }
@@ -838,8 +840,10 @@ namespace GObject
         static UInt32 _max_potential;
         static UInt32 _min_capacity;
         static UInt32 _max_capacity;
-        static std::vector<UInt32> _potential_chance;
-        static std::vector<UInt32> _capacity_chance;
+        static std::vector<UInt64> _potential_chance;
+        static std::vector<UInt64> _capacity_chance;
+        static std::vector<UInt32> _potential_fail_times;
+        static std::vector<UInt32> _capacity_fail_times;
         static UInt8 _evade_factor;
         static UInt8 _hitrate_factor;
         static UInt8 _critcal_factor;

@@ -307,6 +307,7 @@ namespace GObject
         SANGBA       = 23,   //桑巴荣耀
         PUDU        = 24,   //普渡众生
         QTDS        = 25,   //齐天大圣
+        BMTL        = 26,   //碧目天罗
 
         DRAGONKING_MAX,
     };
@@ -3830,7 +3831,6 @@ namespace GObject
         void setTotalItemCnt(UInt8 cnt) { _totalItemCnt = cnt; }
         UInt64 getTotalExp() { return _totalExp; }
         void setTotalExp(UInt64 exp) { _totalExp = exp; }
-
 	};
 
 

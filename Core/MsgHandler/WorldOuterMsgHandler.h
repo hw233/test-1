@@ -2772,6 +2772,7 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
         case 0x3E:
         case 0x3F:
         case 0x50:
+        case 0x51:
         {
             brd >> op;
             switch(op)
@@ -3483,23 +3484,25 @@ void OnQixiReq(GameMsgHdr& hdr, const void * data)
        }
        case 0x70:
        { 
-            UInt8 opt = 0;
-            brd >> opt;
-            switch(opt)
-            {
-                case 1:
-                    break;
-                case 2:
-                    {
-                        GameMsgHdr hdr(0x15B, WORKER_THREAD_WORLD, player, 0);
-                        GLOBAL().PushMsg(hdr, NULL);
-                        break;
-                    }
-                case 3:
-                    WORLD().FindRoseDemon(player);
-                    break;
-            }
-            player->sendRoseDemonInfo();
+           if(!World::getRoseDemonTime())
+               break;
+           UInt8 opt = 0;
+           brd >> opt;
+           switch(opt)
+           {
+               case 1:
+                   break;
+               case 2:
+                   {
+                       GameMsgHdr hdr(0x15B, WORKER_THREAD_WORLD, player, 0);
+                       GLOBAL().PushMsg(hdr, NULL);
+                       break;
+                   }
+               case 3:
+                   WORLD().FindRoseDemon(player);
+                   break;
+           }
+           player->sendRoseDemonInfo();
        } 
        break;
        default:

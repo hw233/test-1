@@ -415,6 +415,11 @@ namespace GObject
             GData::KettleAttr( 51, 58.65, 136, 5.95),
             // GData::KettleAttr(72.9,72.9,594.0,0.0 ),
             // GData::KettleAttr(63.0,63.0,150.0,33.3 )
+            GData::KettleAttr(58.65,51.00 ,136.00 , 5.95 ),
+            GData::KettleAttr( 51, 58.65, 136, 5.95),
+            GData::KettleAttr(35.70,35.70,306.00,5.95 ),
+            GData::KettleAttr(58.65,51, 136, 5.95),
+            GData::KettleAttr(51,58.65, 136, 5.95),
         };
         //std::cout << "改变前:";
         //std::cout << ae.attack <<" "  << ae.magatk << "  ";
