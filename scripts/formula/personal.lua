@@ -90,9 +90,9 @@ bp_factor_crtdmg   = 8000     -- 暴击伤害
 bp_factor_tough    = 14000    -- 坚韧
 bp_factor_hitr     = 16000     -- 命中
 bp_factor_evad     = 16000    -- 闪避
-bp_factor_crt      = 14000    -- 暴击
-bp_factor_pir      = 14000    -- 破击
-bp_factor_counter  = 12000    -- 反击
+bp_factor_crt      = 14000    -- 暴击  (暴击抗性)
+bp_factor_pir      = 14000    -- 破击  (破击抗性)
+bp_factor_counter  = 12000    -- 反击  (反击抗性)
 bp_factor_magres   = 12000    -- 法术抵抗
 bp_factor_crtdmgimm   = 14000     -- 暴击减免
 
@@ -621,6 +621,18 @@ function calcBattlePoint(fgt)
 
     bp = bp + fgt:getExtraFairyAtk() * bp_factor_fairyatk
     bp = bp + fgt:getExtraFairyDef() * bp_factor_fairydef
+
+    print("BattlePointBefore:" .. bp)
+    bp = bp + fgt:getExtraCriticalDef()/100 * bp_factor_crtdmg
+    bp = bp + fgt:getExtraPierceDef()/100 * bp_factor_pir
+    bp = bp + fgt:getExtraCounterDef()/100 * bp_factor_counter
+    bp = bp + fgt:getExtraAttackPierce() * bp_factor_def *2
+    print(fgt:getExtraCriticalDef())
+    print(fgt:getExtraPierceDef())
+    print(fgt:getExtraCounterDef())
+    print(fgt:getExtraAttackPierce())
+    print("BattlePointAfter:" .. bp)
+
     --if fgt:getExtraFairyAtk() ~= 0 then
     --    print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
     --    print("攻系数："..bp_factor_atk)

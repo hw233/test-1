@@ -369,6 +369,9 @@ private:
         e_evolution = 139,    // 仙火
         e_unEvolution = 140,    // 仙火消失
 
+        e_bimutianluo = 141,    //无常印记
+        e_unBimutianluo = 142,    //无常印记消失
+
         e_MAX_STATE,
     };
 
@@ -629,6 +632,7 @@ private:
     bool doDarkVigorAttack(BattleFighter* bf, float darkVigor);
     void doSkillEffectExtraCounter(BattleFighter* bf, BattleFighter* bo, const GData::SkillBase* skill);
     void doPassiveSkillOnCounter(BattleFighter* bf, BattleFighter* bo);
+    void calcBMTLCnt(BattleFighter* bf);
 
     void calcAbnormalTypeCnt(BattleObject* bo);
     void calcBleedTypeCnt(BattleObject* bo);
@@ -821,6 +825,7 @@ private:
     void onDeadLingshi(BattleFighter* bf);
     void doControlBall(BattleFighter* bf);
     void doEvolution(BattleFighter* bf);
+    void doBMTLDispearAttack(BattleFighter* bf);
 };
 
 }

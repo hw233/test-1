@@ -120,8 +120,10 @@ namespace GObject
     UInt32 GObjectManager::_max_potential;
     UInt32 GObjectManager::_min_capacity;
     UInt32 GObjectManager::_max_capacity;
-    std::vector<UInt32> GObjectManager::_potential_chance;
-    std::vector<UInt32> GObjectManager::_capacity_chance;
+    std::vector<UInt64> GObjectManager::_potential_chance;
+    std::vector<UInt64> GObjectManager::_capacity_chance;
+    std::vector<UInt32> GObjectManager::_potential_fail_times;
+    std::vector<UInt32> GObjectManager::_capacity_fail_times;
 
     std::vector<UInt32> GObjectManager::_FFTypeChance;
     std::vector<UInt32> GObjectManager::_FFAttrChance;
@@ -343,11 +345,6 @@ namespace GObject
             fprintf(stderr, "loadHorcruxAttr error!\n");
             std::abort();
         }
-		if(!loadHorcruxHold())
-        {
-            fprintf(stderr, "loadHorcruxHold error!\n");
-            std::abort();
-        }
         if(!loadFightersPCChance())
         {
             fprintf(stderr, "loadFightersPCChance error!\n");
@@ -407,6 +404,11 @@ namespace GObject
 		if(!loadFighterXinMo())
         {
             fprintf(stderr, "load Fighter xinmo error!\n");
+            std::abort();
+        }
+		if(!loadHorcruxHold())
+        {
+            fprintf(stderr, "loadHorcruxHold error!\n");
             std::abort();
         }
 		if(!loadGCollectCnt())
@@ -2324,7 +2326,7 @@ namespace GObject
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
         //if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`, `fighter`.`hideFashion` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`,`horcrux`, `acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`hideFashion`,`fighter`.`incense`, `innateTrump` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `halo`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `lingbao`,`evolution`,`horcrux`,`acupoints`, `acupointsgold`,`skill`, `citta`, `fighter`.`skills`, `cittas`, `lingshi`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action`,`hideFashion`,`fighter`.`incense`, `innateTrump`, `potentialFail`, `capacityFail` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -2471,6 +2473,8 @@ namespace GObject
             fgt2->setAttrValue3(specfgtobj.attrValue3);
             fgt2->setHideFashion(specfgtobj.hideFashion,false);
             fgt2->setIncense(specfgtobj.incense);
+            fgt2->setpotentialFail(specfgtobj.potentialFail, false);
+            fgt2->setcapacityFail(specfgtobj.capacityFail, false);
             if(fgt2->isPet())
                 pl->addFairyPet(static_cast<FairyPet *>(fgt2), false);
             else
@@ -3098,7 +3102,7 @@ namespace GObject
             last_id = 0xFFFFFFFFFFFFFFFFull;
             pl = NULL;
             DBSeekingHerSendBeanLog sthdata;
-            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY  `senderId`", sthdata) != DB::DB_OK)
+            if(execu->Prepare("SELECT `senderId`, `receiverId`, `data`, `count`, `beantype` FROM `sendbeans_log` ORDER BY `data`", sthdata) != DB::DB_OK)
                 return false;
             while(execu->Next() == DB::DB_OK)
             {
@@ -5099,19 +5103,22 @@ namespace GObject
             {
                 lua_tinker::table tempTable = potentialTable.get<lua_tinker::table>(i + 1);
                 size_t tempSize = tempTable.size();
-                UInt32 chance = 0;
-                UInt32 a = 0;
-                UInt32 b = 0;
-                if(tempSize >= 2)
+                UInt64 chance = 0;
+                UInt64 a = 0;
+                UInt64 b = 0;
+                UInt32 c = 0;
+                if(tempSize >= 3)
                 {
-                    a = tempTable.get<UInt32>(1);
-                    b = tempTable.get<UInt32>(2);
+                    a = tempTable.get<UInt64>(1);
+                    b = tempTable.get<UInt64>(3);
+                    c = tempTable.get<UInt32>(2);
                 }
                 else if(tempSize == 1)
-                    a = tempTable.get<UInt32>(1);
+                    a = tempTable.get<UInt64>(1);
 
                 chance = MAKECHANCE(a, b);
                 _potential_chance.push_back(chance);
+                _potential_fail_times.push_back(c);
             }
 
             lua_tinker::table capacityTable = lua_tinker::call<lua_tinker::table>(L, "getCapacityChance");
@@ -5120,19 +5127,22 @@ namespace GObject
             {
                 lua_tinker::table tempTable = capacityTable.get<lua_tinker::table>(j + 1);
                 size_t tempSize = tempTable.size();
-                UInt32 chance = 0;
-                UInt32 a = 0;
-                UInt32 b = 0;
-                if(tempSize >= 2)
+                UInt64 chance = 0;
+                UInt64 a = 0;
+                UInt64 b = 0;
+                UInt32 c = 0;
+                if(tempSize >= 3)
                 {
-                    a = tempTable.get<UInt32>(1);
-                    b = tempTable.get<UInt32>(2);
+                    a = tempTable.get<UInt64>(1);
+                    b = tempTable.get<UInt64>(3);
+                    c = tempTable.get<UInt32>(2);
                 }
                 else if(tempSize == 1)
-                    a = tempTable.get<UInt32>(1);
+                    a = tempTable.get<UInt64>(1);
 
                 chance = MAKECHANCE(a, b);
                 _capacity_chance.push_back(chance);
+                _capacity_fail_times.push_back(c);
             }
 
             {
@@ -6284,7 +6294,7 @@ namespace GObject
 		lc.reset(20);
 		DBXingchen dbxc;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `gem7`, `xctCurVal`, `xctMaxVal` FROM `fighter_xingchen`", dbxc) != DB::DB_OK)
 			return false;
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		while(execu->Next() == DB::DB_OK)
@@ -8236,7 +8246,7 @@ namespace GObject
 		    Player* pl = globalPlayers[dbk.playerId];
 			if(pl == NULL)
 				continue;
-            if(dbk.num >= 12)
+            if(dbk.num >= 15)
                 continue;
             pl->getMonsterKettleMgr()->SetKettleHistory(dbk.num ,dbk.history);
             pl->getMonsterKettleMgr()->SetKettleOccupy(dbk.num , dbk.occupy);

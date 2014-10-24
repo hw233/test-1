@@ -7,7 +7,7 @@
 #include "GData/AttrExtra.h"
 
 #define INSIDE_KETTLE_MAX 3
-#define KETTLE_COUNT 10    //壶中界数
+#define KETTLE_COUNT 15    //壶中界数
 #define MONSTER_TYPE 7   //每层的怪物数量
 #define MONSTER_KING 5   //每层的怪物星数
 namespace GObject

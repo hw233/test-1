@@ -10893,13 +10893,12 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                                 item = player->GetPackage()->FindItem(itemId,true);
                             if(!item)
                                 continue;
-                            if(!IsEquipTypeId(itemId))
-                                continue;
                             if(item->getClass() != Item_Horcrux)
                                 return ;
                             ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(item);
                             fgt->getHorcrux()->EatHorcrux(horcrux);
                         }
+                        fgt->getHorcrux()->UpdateHorcurxHoldToDB();
                         fgt->getHorcrux()->sendHorcruxInfo();
                     }
                     break;
@@ -10922,6 +10921,15 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             }
             break;
             }
+        case 7:
+        {
+            UInt32 itemid = 0;
+            UInt16 itemnum = 0;
+
+            br >> itemid >> itemnum;
+            player->GetPackage()->BindItem(itemid,itemnum);
+        }
+            break;
     }
 }
 

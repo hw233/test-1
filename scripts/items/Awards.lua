@@ -704,12 +704,12 @@ function RunQZoneRechargeAward(player, cts)
     };--]]
 
     local item = {
-        [1] = {{500, 2}},
-        [2] = {{551, 2}},
-        [3] = {{9414, 3},{9497, 3}},
-        [4] = {{549, 1},{501, 4}},
-        [5] = {{9498, 3},{9600, 3}},
-        [6] = {{134, 5},{517, 7}},
+        [1] = {{499, 15}},
+        [2] = {{556, 2}},
+        [3] = {{554, 5}},
+        [4] = {{549, 1},{503, 3}},
+        [5] = {{9310, 2},{9338, 2}},
+        [6] = {{5005, 1},{5025, 1}},
     };
 
     local package = player:GetPackage();
@@ -2369,7 +2369,6 @@ function getHorcruxEquipment(player,opt)
         [1] ={ 4800,9600,9800,10000},
         [2] ={ 3500,7000,9000,10000}
     }
-    print(opt)
     if opt > 2 then
         return 0
     end
@@ -2381,7 +2380,6 @@ function getHorcruxEquipment(player,opt)
     package:DelItemAny2(557 + opt - 1,1)
     local itemId = 0
     local g = math.random(1,10000)
-    print("chance:"..g)
     local index = 1;
     for i =1,#chance[opt] do
         if g < chance[opt][i] then
@@ -2389,8 +2387,8 @@ function getHorcruxEquipment(player,opt)
             break
         end
     end
-    local r = math.random(1,9999)/2500;
+    local r = math.random(0,3);
     itemId = 19000 + r*4 + index - 1;
-    package:AddEquip(itemId , true, 0, 39);
+    package:AddEquip(itemId , true, 1, 39);
     return itemId;
 end

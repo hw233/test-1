@@ -93,6 +93,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
    ,_yehuoLevel(0), _yehuo_ss_dmgRate(0), _yehuo_ss_upRate(0), _jiuziDmgCnt(0), _changeStatus(0), _newModeLast(0), _counterCnt(0), _criticalCnt(0), _preAtk(false), _friendDeadCnt(0), _enemyDeadCnt(0), _mojianCnt(0xFF)
    ,_tyslSSCnt(0), _tyslSSFactor(0),_tyslSSAddCnt(true), _tyslSSCnt2(0)
    ,_controlBallCnt(0), _controlBallCnt2(0), _skillControlBall(NULL),_evolutionCnt(0),_skillEvolution(NULL)
+   ,_skillBMTL(NULL), _skillBMTL2(NULL),_BMTLCnt(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -263,6 +264,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     {
         if(passiveSkill && passiveSkill->effect && passiveSkill->effect->eft[0] == GData::e_eft_control_ball)
             setSkillControlBall(passiveSkill);
+        else if(passiveSkill && passiveSkill->effect && passiveSkill->effect->eft[0] == GData::e_eft_bimutianluo)
+            setSkillBMTL(passiveSkill);
     }
 
     idx = 0;
@@ -1051,14 +1054,6 @@ void BattleFighter::postInit()
 const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy, bool noPossibleTarget)
 {
     GData::SkillItem* resSkillItem = NULL;
-    if(0 && NULL!= getSkillEvolution())   //ÏÉ½ç¼¼ÄÜ
-    {
-        if(getEvolutionCnt() >=2)       
-        {
-            std::cout<< "EvolutionSkill"<< std::endl;
-            return getSkillEvolution();
-        }
-    }
     if(NULL != _peerlessSkill.base)
     {
         bool isValid = false;
@@ -2581,11 +2576,34 @@ BattleFighter* BattleFighter::summonSelf(float factor, UInt8 last)
     bf->setSneakAtk(_sneak_atk, _sneak_atk_status, _sneak_atk_last);
     bf->setRecoverSnakeAtk(_sneak_atk_recover_rate);
 
-    bf->setSummonFactor(aura, factor, last);
+    bf->setSummonFactor(aura, factor, last, 49509);
     setSelfSummon(bf);
     bf->setXiangMoChanZhangSkill(NULL);
     bf->setBiLanTianYiSkill(NULL);
     bf->setSkillControlBall(NULL);
+    bf->setSkillBMTL2(bf->getSkillBMTL());
+    bf->setSkillBMTL(NULL);
+    return bf;
+}
+
+BattleFighter* BattleFighter::summonSelf2(float factor, UInt8 last)
+{
+    if(last == 0)
+        return NULL;
+
+    BattleFighter * bf = new(std::nothrow) BattleFighter(_formula, _fighter);
+    if(!bf)
+        return NULL;
+
+    bf->initStats(false);
+    bf->clearSkill();
+
+    bf->setSummonFactor(100, factor, last, 28309);
+    bf->setXiangMoChanZhangSkill(NULL);
+    bf->setBiLanTianYiSkill(NULL);
+    bf->setSkillControlBall(NULL);
+    bf->setSkillBMTL2(bf->getSkillBMTL());
+    bf->setSkillBMTL(NULL);
     return bf;
 }
 
@@ -2659,7 +2677,7 @@ void BattleFighter::clearSkill()
     _sg_v.clear();
 }
 
-void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last)
+void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last, UInt16 skillId)
 {
     if(last == 0)
         return; 
@@ -2670,7 +2688,7 @@ void BattleFighter::setSummonFactor(UInt32 aura, float factor, UInt8 last)
 
     _aura = aura;
 
-    _peerlessSkill.base = GData::skillManager[49509];
+    _peerlessSkill.base = GData::skillManager[skillId];
 
     _summon = true;
     _summonLast = last;

@@ -87,7 +87,7 @@ struct Xingchenzhen
 
     UInt8 lvl;          // 星辰等级
     UInt32 curVal;      // 当前星辰值
-    UInt16 gems[6];     // 镶嵌的宝石id
+    UInt16 gems[7];     // 镶嵌的宝石id
     UInt16 xctCurVal;   // 星辰图当前值
     UInt16 xctMaxVal;   // 星辰图最大值
 };
@@ -724,6 +724,11 @@ public:
     inline float getExtraFairyAtk(){ checkDirty(); return _attrExtraEquip.fairyAck;}
     inline float getExtraFairyDef(){ checkDirty(); return _attrExtraEquip.fairyDef;}
 
+    inline float getExtraCriticalDef() { checkDirty(); return _attrExtraEquip.criticaldef; } //暴击抗性
+    inline float getExtraPierceDef() { checkDirty(); return _attrExtraEquip.piercedef; } //破击抗性
+    inline float getExtraCounterDef() { checkDirty(); return _attrExtraEquip.counterdef; } //反击抗性
+    inline float getExtraAttackPierce() { checkDirty(); return _attrExtraEquip.attackpierce; } //攻击穿透
+
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
@@ -1213,6 +1218,16 @@ public:
     void SGDismissAll(bool isDel);
     void SGDeleteDB(UInt16 id);
     void getAllSGInfo(std::map<UInt16, Int32>& sg_info);
+
+private:
+    UInt32 _potentialFailTimes;
+    UInt32 _capacityFailTimes;
+
+public:
+    void setpotentialFail(UInt32 p, bool toDB);
+    void setcapacityFail(UInt32 c, bool toDB);
+    inline UInt32 getpotentialFail() { return _potentialFailTimes; };
+    inline UInt32 getcapacityFail() { return _capacityFailTimes; };
 
 };
 

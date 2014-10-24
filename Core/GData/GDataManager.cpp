@@ -55,6 +55,7 @@
 #include "KettleNpc.h"
 #include "lingbaoLevel.h"
 #include "GObject/QuestionPaper.h"
+#include "HorcruxHoldAttr.h"
 
 namespace GData
 {
@@ -381,6 +382,16 @@ namespace GData
         if (!LoadDrinkAttrConfig())
         {
             fprintf (stderr, "Load LoadDrinkAttrConfig Error !\n");
+            std::abort();
+        }
+        if (!LoadHorcruxHoldAttr1Config())
+        {
+            fprintf (stderr, "Load LoadHorcruxHoldAttr1Config Error !\n");
+            std::abort();
+        }
+        if (!LoadHorcruxHoldAttr2Config())
+        {
+            fprintf (stderr, "Load LoadHorcruxHoldAttr2Config Error !\n");
             std::abort();
         }
 
@@ -3433,6 +3444,36 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
             GObject::QuestionPaper::Instance().loadTitlePaper(dbpn); 
 		return true;
+    }
+    bool GDataManager::LoadHorcruxHoldAttr1Config()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBHorcruxHoldAttr1Config dbda;
+		if(execu->Prepare("SELECT `val`, `up`  FROM `horcruxHoldAttr1`", dbda) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            horcruxHoldAttr.setHorcruxHoldAttr1(dbda.exp , dbda.val);
+        }
+        return true;
+    }
+    bool GDataManager::LoadHorcruxHoldAttr2Config()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        DBHorcruxHoldAttr2Config dbda;
+		if(execu->Prepare("SELECT `val`, `up`  FROM `horcruxHoldAttr2`", dbda) != DB::DB_OK)
+			return false;
+
+		while(execu->Next() == DB::DB_OK)
+		{
+            horcruxHoldAttr.setHorcruxHoldAttr2(dbda.exp , dbda.val);
+        }
+        return true;
     }
 }
 

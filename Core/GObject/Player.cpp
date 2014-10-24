@@ -3710,6 +3710,8 @@ namespace GObject
             st << static_cast<UInt32>(fgt->getIncense()); 
             st << static_cast<UInt8>(fgt->getEvolution()->IsComplete());
 		}
+        st << fgt->getcapacityFail();
+        st << fgt->getpotentialFail();
 	}
 
 	bool Player::makeFighterInfo( Stream&st, UInt32 id )
@@ -9924,21 +9926,31 @@ namespace GObject
 
         bool isPotential = false;
         float p = 0;
-		UInt32 rate = 0;
+		UInt64 rate = 0;
         UInt32 itemId = ITEM_TRAIN_TYPE1 + type - 1;
+        UInt32 potentialFailTimes = fgt->getpotentialFail();
+        UInt32 capacityFailTimes = fgt->getcapacityFail();
 
         if(type == 1 || type == 2)
         {
 		    p = fgt->getCapacity();
             if(p > GObjectManager::getMaxCapacity()/100 - 0.001)
                 return 1;
-            std::vector<UInt32>& chance = GObjectManager::getCapacityChance();
+            std::vector<UInt64>& chance = GObjectManager::getCapacityChance();
+            std::vector<UInt32>& fail_times = GObjectManager::getCapacityFailTimes();
             size_t cnt = chance.size();
             for(UInt32 idx = 0; idx < cnt; idx ++)
             {
                 if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
                 {
-                    rate = CHANCEVALUE(chance[idx]);
+                    UInt64 point = CHANCECOND(chance[idx]);
+                    for(UInt32 i = idx; i < cnt ; i++)
+                    {
+                        if(CHANCECOND(chance[i]) != point)
+                            break;
+                        if(capacityFailTimes >= fail_times[i])
+                            rate = CHANCEVALUE(chance[i]);
+                    }
                     break;
                 }
             }
@@ -9949,13 +9961,21 @@ namespace GObject
 		    p = fgt->getPotential();
             if(p > GObjectManager::getMaxPotential()/100 - 0.001)
                 return 1;
-            std::vector<UInt32>& chance = GObjectManager::getPotentialChance();
+            std::vector<UInt64>& chance = GObjectManager::getPotentialChance();
+            std::vector<UInt32>& fail_times = GObjectManager::getPotentialFailTimes();
             size_t cnt = chance.size();
             for(UInt32 idx = 0; idx < cnt; idx ++)
             {
                 if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
                 {
-                    rate = CHANCEVALUE(chance[idx]);
+                    UInt64 point = CHANCECOND(chance[idx]);
+                    for(UInt32 i = idx; i < cnt ; i++)
+                    {
+                        if(CHANCECOND(chance[i]) != point)
+                            break;
+                        if(potentialFailTimes >= fail_times[i])
+                            rate = CHANCEVALUE(chance[i]);
+                    }
                     break;
                 }
             }
@@ -9977,7 +9997,7 @@ namespace GObject
             OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
 
         bool bMainFighter = isMainFighter( fgt->getId()) ;
-		if(uRand(1000) < rate)
+		if(uRand(100000) < rate)
 		{
             if(isPotential)
             {
@@ -10084,6 +10104,10 @@ namespace GObject
                     }
                 }
             }
+            if(type == 2)
+                fgt->setcapacityFail(0, true);
+            if(type == 4)
+                fgt->setpotentialFail(0, true);
 		}
 		else
 		{
@@ -10112,6 +10136,10 @@ namespace GObject
                     fgt->setCapacity(decp);
                 }
 			}
+            if(type == 4)
+                fgt->setpotentialFail(++potentialFailTimes, true);
+            else if(type == 2)
+                fgt->setcapacityFail(++capacityFailTimes, true);
 			return 1;
 		}
 
@@ -19421,7 +19449,8 @@ void EventTlzAuto::notify(bool isBeginAuto)
             {1541, 1541},
             {1542, 1542},
             {1544, 1544},
-            {1670, 1670}
+            {1670, 1670},
+            {1673, 1673}
         };
 
         if ((innateTrumpid >= 1529 && innateTrumpid <= 1534) ||
@@ -19429,6 +19458,7 @@ void EventTlzAuto::notify(bool isBeginAuto)
          || (innateTrumpid >= 1541 && innateTrumpid <= 1542)
          || (innateTrumpid >= 1544 && innateTrumpid <= 1544)
          || (innateTrumpid >= 1670 && innateTrumpid <= 1670)
+         || (innateTrumpid >= 1673 && innateTrumpid <= 1673)
          )
         {
             size_t i = 0;
@@ -21085,7 +21115,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9082, 2, 9371, 2, 503, 2, 9498, 2, 9457, 2, 9418, 2};
+        static UInt32 itemId[] = {517, 2, 9414, 2, 503, 2, 17109, 2, 17103, 2, 551, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -21102,7 +21132,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = { 30, 2, 9427, 2, 9600, 2, 9310, 2, 9438, 2, 9141, 2 };
+        static UInt32 itemId[] = { 134, 2, 17107, 2, 9600, 2, 9360, 2, 9388, 1, 9418, 2 };
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -21807,10 +21837,10 @@ void Player::calcNewYearQzoneContinueDay(UInt32 now)
  *2:大闹龙宫之金蛇起舞
  *3:大闹龙宫之天芒神梭
 */
-static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F, 0x50};
-static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016, 17031};
+static UInt8 Dragon_type[]  = { 0xFF, 0x06, 0x0A, 0x0B, 0x0D, 0x0F, 0x11, 0x14, 0x15, 0x16, 0xFF, 0x17, 0x18, 0x19, 0x21, 0x24, 0x25, 0x27, 0x29, 0x3A, 0x3B, 0x3C ,0x3D,0x3E,0x3F, 0x50, 0x51};
+static UInt32 Dragon_Ling[] = { 0xFFFFFFFF, 9337, 9354, 9358, 9364, 9372, 9379, 9385, 9402, 9405, 0xFFFFFFFF, 9412, 9417, 9426, 9429, 9434, 9441, 9447, 9452, 9454, 9455, 9456 ,17001 ,17006,17016, 17031, 17112};
 //6134:龙神秘典残页 6135:金蛇宝鉴残页 136:天芒神梭碎片 6136:混元剑诀残页 317:太乙神雷 318:桑巴荣耀
-static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253, 17032};
+static UInt32 Dragon_Broadcast[] = { 0xFFFFFFFF, 6134, 6135, 136, 6136, 1357, 137, 1362, 139, 8520, 0xFFFFFFFF, 140, 6193, 141, 6194, 312, 8550, 6210, 313, 6220, 314, 315 ,317,318 ,6253, 17032, 319};
 void Player::getDragonKingInfo()
 {
     if(TimeUtil::Now() > GVAR.GetVar(GVAR_DRAGONKING_END)
@@ -26739,19 +26769,19 @@ void Player::Send11GradeAward(UInt8 type)
 
     static MailPackage::MailItem s_item[][6] = {
         {{9424,1}, {503,1}},
-        {{500,2},{517,2},{501,2}},
-        {{513,3},{9414,2}},
+        {{500,2},{517,2},{17103,2}},
+        {{513,3},{17110,2}},
         {{516,2},{16001,2},{555,3}},
         {{547,3},{503,5}},
-        {{1126,5},{556,3},{551,5}},
-        {{9457,3},{9498,2},{1325,2},{515,2},{9438,2}},
-        {{1727,1},{9076,4}},
-        {{554,25},{9418,25},{13075,1}},
-        {{13097,1},{556,30},{9021,15}},
-        {{9019,15},{9075,15},{1734,1},{13138,1}},
-        {{9022,20},{9068,20},{1735,1},{13019,1}},
+        {{17103,5},{556,3},{551,5}},
+        {{9457,3},{17111,3},{17107,3},{515,2},{9438,2}},
+        {{1726,1},{9076,4},{8555,4}},
+        {{9600,25},{17107,20},{20067,1}},
+        {{13137,1},{17105,25},{9017,15}},
+        {{9019,15},{9075,15},{1742,1},{20008,1},{20028,1}},
+        {{9022,20},{1741,1},{13119,1},{20068,1}},
     };
-    static UInt32 count[] = {2,3,2,3,2,3,5,2,3,3,4,4};
+    static UInt32 count[] = {2,3,2,3,2,3,5,3,3,3,5,4};
     SYSMSG(title, 4954);
     if(type)
     {
@@ -30066,6 +30096,8 @@ void Player::handleJiqirenAct_copy()
     int copy = GetVar(VAR_JIQIREN_COPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    int goldDefault = PlayerCopy::getGoldCount(getVipLevel());
+    int freeDefault = PlayerCopy::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30082,21 +30114,41 @@ void Player::handleJiqirenAct_copy()
     UInt8 gcnt3 = GET_BIT_8(copy, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     copy = SET_BIT_8(copy, 0, fcnt);
     copy = SET_BIT_8(copy, 1, gcnt1);
     copy = SET_BIT_8(copy, 2, gcnt2);
@@ -30111,6 +30163,8 @@ void Player::handleJiqirenAct_frontMap()
     int front = GetVar(VAR_JIQIREN_FRONTMAP);
     int goldCnt = FrontMap::getGoldCount(getVipLevel()) - PLAYER_DATA(this, frontGoldCnt);
     int freeCnt = FrontMap::getFreeCount() - PLAYER_DATA(this, frontFreeCnt);
+    int goldDefault = FrontMap::getGoldCount(getVipLevel());
+    int freeDefault = FrontMap::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, frontUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, frontUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30127,21 +30181,41 @@ void Player::handleJiqirenAct_frontMap()
     UInt8 gcnt3 = GET_BIT_8(front, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     front = SET_BIT_8(front, 0, fcnt);
     front = SET_BIT_8(front, 1, gcnt1);
     front = SET_BIT_8(front, 2, gcnt2);
@@ -30221,6 +30295,8 @@ void Player::handleJiqirenAct_xjfrontMap()
     int front = GetVar(VAR_JIQIREN_XJFRONTMAP);
     int goldCnt = XJFrontMap::getGoldCount(PLAYER_DATA(this, xjfrontGoldCnt));
     int freeCnt = XJFrontMap::getFreeCount() - PLAYER_DATA(this, xjfrontFreeCnt);
+    int goldDefault = XJFrontMap::getGoldCount();
+    int freeDefault = XJFrontMap::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, xjfrontUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, xjfrontUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30233,21 +30309,41 @@ void Player::handleJiqirenAct_xjfrontMap()
     UInt8 gcnt3 = GET_BIT_8(front, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     front = SET_BIT_8(front, 0, fcnt);
     front = SET_BIT_8(front, 1, gcnt1);
     front = SET_BIT_8(front, 2, gcnt2);
@@ -30262,6 +30358,8 @@ void Player::handleJiqirenAct_fairycopy()
     int copy = GetVar(VAR_JIQIREN_FAIRYCOPY);
     int goldCnt = PlayerCopy::getGoldCount(getVipLevel()) - PLAYER_DATA(this, copyGoldCnt);
     int freeCnt = PlayerCopy::getFreeCount() - PLAYER_DATA(this, copyFreeCnt);
+    int goldDefault = PlayerCopy::getGoldCount(getVipLevel());
+    int freeDefault = PlayerCopy::getFreeCount();
     UInt8 times = 1;
     UInt32 updatetime = TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) > TimeUtil::MkTime(2014, 9, 29) ? TimeUtil::SharpDay(0,PLAYER_DATA(this, copyUpdate)) : TimeUtil::MkTime(2014, 9, 29);  
     if(TimeUtil::SharpDay() > updatetime)
@@ -30278,21 +30376,41 @@ void Player::handleJiqirenAct_fairycopy()
     UInt8 gcnt3 = GET_BIT_8(copy, 3);
     if(goldCnt == 3)
     {
-        gcnt1 += 1 * times;
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt1 += 1;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 2)
     {
-        gcnt2 += 1 * times;
-        gcnt3 += 1 * times;
+        gcnt2 += 1;
+        gcnt3 += 1;
     }
     else if(goldCnt == 1)
     {
-        gcnt3 += 1 * times;
+        gcnt3 += 1;
     }
+    if(times > 1)
+    {
+        if(goldDefault == 3)
+        {
+            gcnt1 += 1 * (times - 1);
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 2)
+        {
+            gcnt2 += 1 * (times - 1);
+            gcnt3 += 1 * (times - 1);
+        }
+        else if(goldDefault == 1)
+        {
+            gcnt3 += 1 * (times - 1);
+        }   
+        fcnt += freeDefault * (times - 1);
+    }
+
     if(freeCnt > 0)
-        fcnt += freeCnt * times;
+        fcnt += freeCnt;
     copy = SET_BIT_8(copy, 0, fcnt);
     copy = SET_BIT_8(copy, 1, gcnt1);
     copy = SET_BIT_8(copy, 2, gcnt2);
@@ -35367,11 +35485,13 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     }
     GetPackage()->DelItemAny(beanPoint[beanType][2], count);
 
+#if 0
     if(0 == beanType)
     {
         SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
     }
-    else if(1 == beanType)
+#endif
+    if(1 == beanType)
     {
         SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
         SYSMSGV(title, 5209, count);
@@ -35494,8 +35614,12 @@ void Player::seekingHer_GetSendBeanLog()
     Stream st(REP::COUNTRY_ACT);
     st << static_cast<UInt8>(0x12);
     st << static_cast<UInt8>(0x13);
+    UInt32 size = _seekingHerSendBeanLog.size();
+    if(size > 200)
+        size = 200;
     st << static_cast<UInt32>(_seekingHerSendBeanLog.size());
-    for(std::vector<SeekingHerSendBeanLog *>::iterator i = _seekingHerSendBeanLog.begin(), e = _seekingHerSendBeanLog.end(); i!=e ; ++i)
+    UInt32 cnt = 0;
+    for(std::vector<SeekingHerSendBeanLog *>::reverse_iterator i = _seekingHerSendBeanLog.rbegin(), e = _seekingHerSendBeanLog.rend(); i!=e && cnt < size; ++i, ++cnt)
     {
         st << (*i)->date;
         st << globalPlayers[(*i)->senderId]->getName();

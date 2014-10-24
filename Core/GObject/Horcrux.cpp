@@ -4,10 +4,14 @@
 #include "Common/Itoa.h"
 #include "Package.h"
 #include "MsgID.h"
+#include "GData/HorcruxHoldAttr.h"
 namespace GObject
 {
+    float Horcrux::limit[3]={1.3,1.5,1.8};
     ItemHorcrux* Horcrux::SetHorcruxEquip(UInt8 pos ,ItemHorcrux * equip1,UInt8 flag)
     {
+        if(pos > 0 && _fighter->getPotential() < limit[pos -1])
+            return NULL;
         ItemHorcrux * old = _horcrux[pos];
         if( pos > 4)
             return NULL;
@@ -48,7 +52,7 @@ namespace GObject
     {
         if(!_fighter->getOwner())
             return ;
-        DB1().PushUpdateData("replace into `fighter_evolution`(fighterId, playerId, criticaldefExp,piercedefExp,counterdefExp, attackpierceExp ,lingshi_attackExp , lingshi_defendExp ,lingshi_hpExp) values(%u, %" I64_FMT "u, %u,%u, %u, %u , %u ,%u,%u)", _fighter->getId(), _fighter->getOwner()->getId(), GetHorcruxHoldExp(0),GetHorcruxHoldExp(1), GetHorcruxHoldExp(2), GetHorcruxHoldExp(3),GetHorcruxHoldExp(4),GetHorcruxHoldExp(5),GetHorcruxHoldExp(6),GetHorcruxHoldExp(7),GetHorcruxHoldExp(8));
+        DB1().PushUpdateData("replace into `fighter_horcrux`(fighterId, playerId, criticaldefExp,piercedefExp,counterdefExp, attackpierceExp ,lingshi_exp) values(%u, %" I64_FMT "u, %u,%u, %u, %u , %u)", _fighter->getId(), _fighter->getOwner()->getId(), GetHorcruxHoldExp(0),GetHorcruxHoldExp(1), GetHorcruxHoldExp(2), GetHorcruxHoldExp(3),GetHorcruxHoldExp(4));
 
     }
     void Horcrux::UpdateHorcruxEquipmentToDB()
@@ -63,7 +67,7 @@ namespace GObject
             if( i < 3)
                 equipStr +=",";
         }
-        DB1().PushUpdateData("update fighter set horcurx = '%s' where id = %u and playerId = %" I64_FMT "u ", equipStr.c_str(),_fighter->getId(), _fighter->getOwner()->getId());
+        DB1().PushUpdateData("update fighter set horcrux = '%s' where id = %u and playerId = %" I64_FMT "u ", equipStr.c_str(),_fighter->getId(), _fighter->getOwner()->getId());
     }
     void Horcrux::EatHorcrux(ItemHorcrux * horcrux)
     { 
@@ -73,12 +77,15 @@ namespace GObject
         //if(iter == m_Items.end())
         //    return ;
         //ItemBase * item = iter->second;
+        static UInt32 exps[] = {8,15,40,80};
         if(!horcrux)
             return ;
         ItemHorcruxAttr horcruxAttr = horcrux->getHorcruxAttr();
         UInt8 color = horcrux->getQuality();
+        if(color < 2 || color > 5)
+            return ;
 
-        UInt32 exp = color *20;   //经验值，计算公式待定 LIBO
+        UInt32 exp = exps[color-2];   //经验值，计算公式待定 LIBO
 
         for( UInt8 i = 0 ; i < 4; ++i)
         {
@@ -87,7 +94,8 @@ namespace GObject
                 AddHorcruxHoldExp(i,exp);
             } 
         }
-        AddHorcruxHoldExp(4 , exp);  
+        if(color > 3)
+            AddHorcruxHoldExp(4 , exp);  
 
         Package* m_package = _fighter->getOwner()->GetPackage();
         m_package->DelEquip2(horcrux,ToHorcruxHold);
@@ -97,7 +105,7 @@ namespace GObject
         Stream st(REP::EXTEND_PROTOCAOL);
         st << static_cast<UInt8>(0x06);
         st << static_cast<UInt8>(0x01);
-        st << _fighter->getId();
+        st << static_cast<UInt16>(_fighter->getId());
         for(UInt8 i = 0; i < HORCRUX_HOLD_MAX; ++i)
         { 
             st << _exp[i]; 
@@ -115,6 +123,6 @@ namespace GObject
             if(_horcrux[i])
                 sum += _horcrux[i]->getHorcruxAttr().getAttr(index);
         } 
-        return sum;
+        return sum + GData::horcruxHoldAttr.getHorcruxHoldAttr1(_exp[index]);
     } 
 }

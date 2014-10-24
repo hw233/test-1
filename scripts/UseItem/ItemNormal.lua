@@ -10010,6 +10010,73 @@ function ItemNormal_00010276(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010277(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {
+        {9456,3},
+        {9337,3},
+        {9354,3},
+        {9455,3},
+        {17001,3},
+        {9426,3},
+        {9447,3},
+        {9441,3},
+        {9372,3},
+        {9379,3},
+        {9364,3},
+        {9412,3},
+        {9454,3},
+        {17006,3},
+        {9429,3},
+        {9434,3},
+        {9358,3},
+        {9385,3},
+        {9405,3},
+        {9452,3},
+    }
+
+    if package:GetRestPackageSize(3) < (1+(1*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    --package:Add(5067, num*1, true, false, 2);
+    local isz = #items
+    for i = 1, num do
+        --local r = math.random(1,isz)
+        --local r1 = math.random(1,isz)
+        --local r2 = math.random(1,isz)
+        --local item = items[r]
+        --package:Add(item[1], item[2], true, 0, 2);
+
+        local first_index = 0
+        local second_index = 0
+        local third_index = 0
+        first_index = math.random(1, isz)
+        while true do
+            second_index = math.random(1, isz)
+            if second_index ~= first_index then
+                break
+            end
+        end
+
+        while true do
+            third_index = math.random(1, isz)
+            if third_index ~= second_index and third_index ~= first_index then
+                break
+            end
+        end   
+
+        package:Add(items[first_index][1], items[first_index][2], true, false, 2);
+        package:Add(items[second_index][1], items[second_index][2], true, false, 2);
+        package:Add(items[third_index][1], items[third_index][2], true, false, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00016000(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 75 then
@@ -11595,6 +11662,65 @@ function ItemNormal_00009495(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00016060(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < (1+(1*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    local items = {
+        [16061] = { {17109, 1}, {17103, 1}, {17102, 1}, {499, 20}, {17107, 1},{503, 1}, {500, 1}, {511, 1}, {512, 1}, {505, 1}, {9371, 1}, {134, 1} },
+        [16060] = { {499, 20}, {503, 1}, {500, 1}, {511, 1}, {512, 1}, {505, 1}, {9371, 1}, {134, 1} },
+    }
+    local chance = { 1000, 2500, 3500, 4500, 5300, 6200, 7200, 7700, 8200, 8700, 9500, 10000}
+    local chance1 = { 1000, 3000, 4500, 6000, 7500, 8000, 9000, 10000 }
+    
+    if iid == 16061 then 
+        for i = 1, num do
+            for i = 1, 2 do
+                local rnd = math.random(1, 10000)
+                local itemId = 0
+                local count = 0
+                for k = 1, #chance do
+                    if rnd <= chance[k] then
+                        itemId = items[iid][k][1]
+                        count = items[iid][k][2]
+                        break
+                    end
+                end
+                if itemId == 499 then
+                    player:getCoupon(count)
+                else
+                    package:Add(itemId, count, true, false, 2)
+                end
+            end
+        end
+    else
+        for i = 1, num do
+            for i = 1, 2 do
+                local rnd = math.random(1, 10000)
+                local itemId = 0
+                local count = 0
+                for k = 1, #chance1 do
+                    if rnd <= chance1[k] then
+                        itemId = items[iid][k][1]
+                        count = items[iid][k][2]
+                        break
+                    end
+                end
+                if itemId == 499 then
+                    player:getCoupon(count)
+                else
+                    package:Add(itemId, count, true, false, 2)
+                end
+            end
+        end
+    end
+
+    package:DelItemSendMsg(iid, player)
+    return num;
+end
 
 function ItemNormal_jgsexp(iid, num, bind, param)
     local player = GetPlayer()
@@ -14583,6 +14709,7 @@ local ItemNormal_Table = {
     [10274] = ItemNormal_00010274,
     [10275] = ItemNormal_00010275,
     [10276] = ItemNormal_00010276,
+    [10277] = ItemNormal_00010277,
 
     [16000] = ItemNormal_00016000,
     [16001] = ItemNormal_00016000,
@@ -14592,6 +14719,8 @@ local ItemNormal_Table = {
     [16010] = ItemNormal_00009382,
     [16047] = ItemNormal_00016047,
     [16050] = ItemNormal_00009382,
+    [16060] = ItemNormal_00016060,
+    [16061] = ItemNormal_00016060,
 
     [9494] = ItemNormal_00009494,
     [9480] = ItemNormal_0009480,

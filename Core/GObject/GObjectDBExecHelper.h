@@ -567,6 +567,8 @@ struct DBFighter2
     UInt8 hideFashion;
     UInt32 incense;
     UInt32 innateTrump;     //先天法宝
+    UInt32 potentialFail;
+    UInt32 capacityFail;
     UInt32 summoned;
 };
 
@@ -1444,6 +1446,7 @@ struct DBXingchen
     UInt16 gem4;
     UInt16 gem5;
     UInt16 gem6;
+    UInt16 gem7;
     UInt16 xctCurVal;
     UInt16 xctMaxVal;
 };
@@ -2323,7 +2326,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(63)
+SPECIALDEF(65)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2387,6 +2390,8 @@ SPECIALDEF(63)
     UInt8, hideFashion,
     UInt32, incense,
     UInt32, innateTrump,
+    UInt32, potentialFail,
+    UInt32, capacityFail,
     UInt32, summoned
 	)
 SPECIALEND()
@@ -3600,7 +3605,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBXingchen)
-SPECIALDEF(12)
+SPECIALDEF(13)
 (
 	UInt32, fighterId,
 	UInt64, playerId,
@@ -3612,6 +3617,7 @@ SPECIALDEF(12)
     UInt16, gem4,
     UInt16, gem5,
     UInt16, gem6,
+    UInt16, gem7,
     UInt16, xctCurVal,
     UInt16, xctMaxVal
 )

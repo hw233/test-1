@@ -40,6 +40,7 @@
 #include "GObject/Married.h"
 #include "Evolution.h"
 #include "Horcrux.h"
+#include "GData/HorcruxHoldAttr.h"
 
 namespace GObject
 {
@@ -198,8 +199,10 @@ UInt8 Fighter::getColor2( float pot )
 		return 2;
 	if(pot < 1.799f)
 		return 3;
-	if(pot < 2.099f)
+	if(pot < 2.399f)
 		return 4;
+    if(pot < 3.001f)
+        return 5;
 	return 10;
 }
 
@@ -1988,7 +1991,10 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
     /* ****************** */
     /* *****魂器加成***** */
     /* ****************** */
-
+    float up = GData::horcruxHoldAttr.getHorcruxHoldAttr2(getHorcrux()->GetHorcruxHoldExp(4))/100+1;
+    {
+        ae = ae * up;
+    }  
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
 	addAttrExtra(_attrExtraEquip, &ae);
 }
@@ -6793,6 +6799,10 @@ UInt16 Fighter::getPortrait()
             portrait = 1108;
         else if(getFashionTypeId() == 1735)
             portrait = 1109;
+        else if(getFashionTypeId() == 1741)
+            portrait = 1110;
+        else if(getFashionTypeId() == 1742)
+            portrait = 1111;
  
     }
 
@@ -6967,6 +6977,7 @@ void Fighter::setXingchenFromDB(DBXingchen& dbxc)
     m_xingchen.gems[3] = dbxc.gem4;
     m_xingchen.gems[4] = dbxc.gem5;
     m_xingchen.gems[5] = dbxc.gem6;
+    m_xingchen.gems[6] = dbxc.gem7;
     m_xingchen.xctCurVal = dbxc.xctCurVal;
     m_xingchen.xctMaxVal = dbxc.xctMaxVal;
 
@@ -6978,7 +6989,7 @@ bool Fighter::upgradeXingchen(UInt8 type)
 {
     if (isPet() || !_owner)
         return false;
-    if (m_xingchen.lvl >= 30)
+    if (m_xingchen.lvl >= 35)
         return false;
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
     if(!stxc || getLevel() < stxc->limitLev)
@@ -7011,7 +7022,7 @@ bool Fighter::quickUpGrade(UInt8 type)
     if(isPet() || !_owner)
         return false;
 
-    if(m_xingchen.lvl >= 30)
+    if(m_xingchen.lvl >= 35)
         return false;
 
     GData::XingchenData::stXingchen * stxc = GData::xingchenData.getXingchenTable(m_xingchen.lvl+1);
@@ -7197,9 +7208,9 @@ void Fighter::GMSetXCTMaxVal(UInt16 value)
 
 void Fighter::updateDBxingchen()
 {
-    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal`)\
-            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
-            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
+    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`,`gem7`, `xctCurVal`, `xctMaxVal`)\
+            VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
+            m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.gems[6], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
 }
 
 void Fighter::sendXingchenInfo(UInt8 type)
@@ -7260,7 +7271,7 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
     if(NULL == item) 
         return;
 
-    if(pos < 1 || pos > 6)
+    if(pos < 1 || pos > sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]))
         return;
 
     UInt16 oldGemId = 0;
@@ -7294,10 +7305,10 @@ void Fighter::setGem(UInt16 gemId, UInt8 bind, UInt8 pos, UInt8 type)
 
 bool Fighter::IsCanSetGem(ItemBase * item, UInt8 pos)
 {
-    if(pos < 1 || pos > 6)
+    if(pos < 1 || pos > sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]))
         return false;
 
-    for(UInt8 i=1; i<=6; i++)
+    for(UInt8 i=1; i<=sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]); i++)
     {
         if(pos == i)
             continue;
@@ -7328,7 +7339,7 @@ void Fighter::dismantleGem(UInt8 pos, UInt8 type)
     if(getLevel() < stxc->limitLev)
         return;
 
-    if(pos < 1 || pos > 6)
+    if(pos < 1 || pos > sizeof(m_xingchen.gems)/sizeof(m_xingchen.gems[0]))
         return;
 
     if(m_xingchen.gems[pos-1] == 0)
@@ -8440,6 +8451,24 @@ Horcrux* Fighter::getHorcrux()
     if(!_hor) 
         _hor = new Horcrux(this);
     return _hor;
+}
+
+void Fighter::setpotentialFail(UInt32 p, bool toDB)
+{
+    _potentialFailTimes = p;
+    if(toDB)
+    {
+        DB1().PushUpdateData("UPDATE `fighter` SET `potentialFail` = %u where `id` = %u and `playerId` = %" I64_FMT "u", _potentialFailTimes, getId(), _owner->getId());
+    }
+}
+
+void Fighter::setcapacityFail(UInt32 c, bool toDB)
+{
+    _capacityFailTimes = c;
+    if(toDB)
+    {
+        DB1().PushUpdateData("UPDATE `fighter` SET `capacityFail` = %u where `id` = %u and `playerId` = %" I64_FMT "u", _capacityFailTimes, getId(), _owner->getId());
+    }
 }
 
 /*
