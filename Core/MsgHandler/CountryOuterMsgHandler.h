@@ -10859,7 +10859,6 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             GLOBAL().PushMsg(hdr, (void*)data);
         }
             break;
-<<<<<<< HEAD
         case 0x06:
             {
             UInt8 index = 0;
@@ -10922,7 +10921,6 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             }
             break;
             }
-=======
         case 7:
         {
             UInt32 itemid = 0;
@@ -10932,7 +10930,6 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             player->GetPackage()->BindItem(itemid,itemnum);
         }
             break;
->>>>>>> 09679eb63eb3a56a9722023cca61da89e0387805
     }
 }
 

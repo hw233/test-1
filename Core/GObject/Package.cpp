@@ -9498,7 +9498,6 @@ namespace GObject
             fgt->updateLingbaoFallToDB(type);
         return res;
     } 
-<<<<<<< HEAD
  
 
     /* ****************** */
@@ -9515,7 +9514,6 @@ namespace GObject
     //        st << horcruxAttr.getAttr(i);
 	//}
    
-=======
 	
     bool Package::BindItem(UInt32 id, UInt16 num)
     {
@@ -9585,5 +9583,4 @@ namespace GObject
         return true;
     }
     
->>>>>>> 09679eb63eb3a56a9722023cca61da89e0387805
 }
