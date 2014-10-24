@@ -10010,6 +10010,47 @@ function ItemNormal_00010276(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00010277(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {
+        {9456,3},
+        {9337,3},
+        {9354,3},
+        {9455,3},
+        {17001,3},
+        {9426,3},
+        {9447,3},
+        {9441,3},
+        {9372,3},
+        {9379,3},
+        {9364,3},
+        {9412,3},
+        {9454,3},
+        {17006,3},
+        {9429,3},
+        {9434,3},
+        {9358,3},
+        {9385,3},
+        {9405,3},
+        {9452,3},
+    }
+
+    if package:GetRestPackageSize(3) < (1+(1*num*1)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    --package:Add(5067, num*1, true, false, 2);
+    local isz = #items
+    local r = math.random(1,isz)
+    local item = items[r]
+    package:Add(item[1], item[2], true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_00016000(iid, num, bind, param)
     local player = GetPlayer()
     if player:GetLev() < 75 then
@@ -14583,6 +14624,7 @@ local ItemNormal_Table = {
     [10274] = ItemNormal_00010274,
     [10275] = ItemNormal_00010275,
     [10276] = ItemNormal_00010276,
+    [10277] = ItemNormal_00010277,
 
     [16000] = ItemNormal_00016000,
     [16001] = ItemNormal_00016000,
