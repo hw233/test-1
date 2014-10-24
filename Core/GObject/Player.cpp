@@ -35449,11 +35449,13 @@ void Player::seekingHer_SendBeans(UInt64 userId, UInt8 beanType, UInt32 count, s
     }
     GetPackage()->DelItemAny(beanPoint[beanType][2], count);
 
+#if 0
     if(0 == beanType)
     {
         SYSMSG_BROADCASTV(5222, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
     }
-    else if(1 == beanType)
+#endif
+    if(1 == beanType)
     {
         SYSMSG_BROADCASTV(5223, getCountry(), getName().c_str(), receiver->getCountry(), receiver->getName().c_str(), count);
         SYSMSGV(title, 5209, count);
