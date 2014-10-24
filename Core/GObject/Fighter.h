@@ -719,6 +719,11 @@ public:
     inline float getExtraFairyAtk(){ checkDirty(); return _attrExtraEquip.fairyAck;}
     inline float getExtraFairyDef(){ checkDirty(); return _attrExtraEquip.fairyDef;}
 
+    inline float getExtraCriticalDef() { checkDirty(); return _attrExtraEquip.criticaldef; } //暴击抗性
+    inline float getExtraPierceDef() { checkDirty(); return _attrExtraEquip.piercedef; } //破击抗性
+    inline float getExtraCounterDef() { checkDirty(); return _attrExtraEquip.counterdef; } //反击抗性
+    inline float getExtraAttackPierce() { checkDirty(); return _attrExtraEquip.attackpierce; } //攻击穿透
+
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
 	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }

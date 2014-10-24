@@ -617,6 +617,16 @@ struct DBDrinkAttrConfig
     UInt32 value;
     UInt32 hp;
 };
+struct DBHorcruxHoldAttr1Config
+{
+    UInt32 exp;
+    UInt32 val;
+};
+struct DBHorcruxHoldAttr2Config
+{
+    UInt32 exp;
+    float val;
+};
 struct DBIncenseAttrConfig
 {
     UInt32 val;
@@ -2100,6 +2110,21 @@ SPECIALDEF(4)
     UInt8, type,
     UInt8, option_num
 	)
-SPECIALEND()}
+SPECIALEND()
+SPECIALBEGIN(GData::DBHorcruxHoldAttr1Config)
+SPECIALDEF(2)
+(
+    UInt32 , exp,
+    UInt32 , val
+)
+SPECIALEND()
+SPECIALBEGIN(GData::DBHorcruxHoldAttr2Config)
+SPECIALDEF(2)
+(
+    UInt32 , exp,
+    float , val
+)
+SPECIALEND()
+}
 
 #endif // _GDATADBEXECHELPER_H_

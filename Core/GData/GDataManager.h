@@ -110,6 +110,8 @@ namespace GData
         static void addUdpItem(UInt32 id);
         static bool isInUdpItem(UInt32 id);
         static bool LoadClanShopInfo();
+        static bool LoadHorcruxHoldAttr1Config();
+        static bool LoadHorcruxHoldAttr2Config();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);

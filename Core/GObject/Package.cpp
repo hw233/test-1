@@ -552,18 +552,24 @@ namespace GObject
     {
         if(!IsHorcruxItem(ItemId))
             return ;
+        if(color < 2 || color >5)
+            return ;
+        static UInt32 attrValue[] = {20,31,45,64};
         UInt8 index = (ItemId - HORCRUX_ID )/4;
         UInt32 values[4] = {0,0,0,0};
-        UInt32 number = color * 40;
         UInt32 max = 0;
         UInt8 idx = 0;
         for(UInt8 i = 0; i < 4; ++i)
         {
-            UInt32 value = number + uRand(40);   //待定
+            UInt32 value =  attrValue[color - 2] + uRand(20);   //待定
             if(value > max)
             {
                 idx = i;
                 max = value;
+            }
+            else if( value == max)
+            {
+                value -= 1;
             }
             values[i] = value ;
         }
@@ -589,7 +595,12 @@ namespace GObject
                     UInt8 num = uRand(3);
                     for(UInt8 i = 0; i < 4; ++i)
                     {
-                        if(i == index || i == num)
+                        if(i == index)
+                        {
+                            ++num;
+                            continue;
+                        }
+                        if(i == num)
                             continue ;
                         values[i] = 0;
                     }
@@ -600,7 +611,12 @@ namespace GObject
                     UInt8 num = uRand(3);
                     for(UInt8 i = 0; i < 4; ++i)
                     {
-                        if(i == index || i != num)
+                        if(i == index)
+                        {
+                           ++num;
+                           continue; 
+                        }
+                        if(i != num)
                             continue ;
                         values[i] = 0;
                     }
@@ -1891,6 +1907,10 @@ namespace GObject
         {
             DB4().PushUpdateData("DELETE FROM `zhenyuanAttr` WHERE `id`=%u", item->getId());
         }
+        else if(item->getClass() == Item_Horcrux)
+        { 
+            DB4().PushUpdateData("DELETE FROM `horcruxAttr` WHERE `id`=%u", item->getId());
+        } 
 
 		SendDelEquipData(static_cast<ItemEquip *>(item));
 		SAFE_DELETE(item);
@@ -1922,6 +1942,11 @@ namespace GObject
         {
             DB4().PushUpdateData("DELETE FROM `zhenyuanAttr` WHERE `id`=%u", equip->getId());
         }
+        else if(equip->getClass() == Item_Horcrux)
+        { 
+            DB4().PushUpdateData("DELETE FROM `horcruxAttr` WHERE `id`=%u", equip->getId());
+        } 
+        
 		//SendDelEquipData(equip);
 		SAFE_DELETE(equip);
 		return true;
@@ -2192,6 +2217,7 @@ namespace GObject
             case 0x73:
             case 0x74:
                 old = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 , NULL);
+                break;
             default:
                 return false;
                 break;

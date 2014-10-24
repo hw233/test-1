@@ -10893,13 +10893,12 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
                                 item = player->GetPackage()->FindItem(itemId,true);
                             if(!item)
                                 continue;
-                            if(!IsEquipTypeId(itemId))
-                                continue;
                             if(item->getClass() != Item_Horcrux)
                                 return ;
                             ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(item);
                             fgt->getHorcrux()->EatHorcrux(horcrux);
                         }
+                        fgt->getHorcrux()->UpdateHorcurxHoldToDB();
                         fgt->getHorcrux()->sendHorcruxInfo();
                     }
                     break;

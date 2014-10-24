@@ -343,11 +343,6 @@ namespace GObject
             fprintf(stderr, "loadHorcruxAttr error!\n");
             std::abort();
         }
-		if(!loadHorcruxHold())
-        {
-            fprintf(stderr, "loadHorcruxHold error!\n");
-            std::abort();
-        }
         if(!loadFightersPCChance())
         {
             fprintf(stderr, "loadFightersPCChance error!\n");
@@ -407,6 +402,11 @@ namespace GObject
 		if(!loadFighterXinMo())
         {
             fprintf(stderr, "load Fighter xinmo error!\n");
+            std::abort();
+        }
+		if(!loadHorcruxHold())
+        {
+            fprintf(stderr, "loadHorcruxHold error!\n");
             std::abort();
         }
 		if(!loadGCollectCnt())

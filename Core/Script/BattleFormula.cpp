@@ -119,6 +119,11 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getSoulPracticeFactor", &GObject::Fighter::getSoulPracticeFactor);
 	class_def<GObject::Fighter>("getExtraCriticalDmgImmune", &GObject::Fighter::getExtraCriticalDmgImmune);
 
+	class_def<GObject::Fighter>("getExtraCriticalDef", &GObject::Fighter::getExtraCriticalDef);
+	class_def<GObject::Fighter>("getExtraPierceDef", &GObject::Fighter::getExtraPierceDef);
+	class_def<GObject::Fighter>("getExtraCounterDef", &GObject::Fighter::getExtraCounterDef);
+	class_def<GObject::Fighter>("getExtraAttackPierce", &GObject::Fighter::getExtraAttackPierce);
+
 	class_def<GObject::Fighter>("getExtraFairyAtk", &GObject::Fighter::getExtraFairyAtk);
 	class_def<GObject::Fighter>("getExtraFairyDef", &GObject::Fighter::getExtraFairyDef);
 

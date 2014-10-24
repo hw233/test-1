@@ -40,6 +40,7 @@
 #include "GObject/Married.h"
 #include "Evolution.h"
 #include "Horcrux.h"
+#include "GData/HorcruxHoldAttr.h"
 
 namespace GObject
 {
@@ -1988,7 +1989,10 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
     /* ****************** */
     /* *****魂器加成***** */
     /* ****************** */
-
+    float up = GData::horcruxHoldAttr.getHorcruxHoldAttr2(getHorcrux()->GetHorcruxHoldExp(4))/100+1;
+    {
+        ae = ae * up;
+    }  
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
 	addAttrExtra(_attrExtraEquip, &ae);
 }

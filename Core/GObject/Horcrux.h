@@ -34,6 +34,7 @@ namespace GObject
             Fighter * _fighter;
             ItemHorcrux * _horcrux[HORCRUX_EQUIPMENT_MAX];
             UInt32 _exp[HORCRUX_HOLD_MAX];
+            static float limit[3];
     };
 }
 #endif // HORCRUX_H_
