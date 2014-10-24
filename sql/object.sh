@@ -178,7 +178,9 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_deletevar871-873.sql  #藏宝阁
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearSeekingHer.sql     #清除众里寻她
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141017_cHorcrux.sql     #清除众里寻她
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141017_cHorcrux.sql     #创建魂器属性表
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141020_cHorcruxHold.sql     #创建器灵
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141021_addHorcrux.sql      #添加魂器装备字段
 }
 
 #sh player_jiguan.sh

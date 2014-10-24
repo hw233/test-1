@@ -552,6 +552,7 @@ namespace GObject
         static	bool loadQuestionPaper();
         static bool loadFighterEvolution();
         static bool loadHorcruxAttr();
+        static bool loadHorcruxHold();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

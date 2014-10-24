@@ -548,6 +548,69 @@ namespace GObject
             }
         }
     }
+    static void getRandomHorcruxAttr(UInt32 ItemId, UInt8 color, ItemHorcruxAttr& lbattr)
+    {
+        if(!IsHorcruxItem(ItemId))
+            return ;
+        UInt8 index = (ItemId - HORCRUX_ID )/4;
+        UInt32 values[4] = {0,0,0,0};
+        UInt32 number = color * 40;
+        UInt32 max = 0;
+        UInt8 idx = 0;
+        for(UInt8 i = 0; i < 4; ++i)
+        {
+            UInt32 value = number + uRand(40);   //待定
+            if(value > max)
+            {
+                idx = i;
+                max = value;
+            }
+            values[i] = value ;
+        }
+        if(idx != index )
+        {
+            UInt32 value = values[index];
+            values[index] = values[idx];
+            values[idx] = value;
+        }
+        switch(color-1)
+        {
+            case 1:
+                {
+                    for(UInt8 i = 0; i < 4; ++i)
+                    {
+                        if( i != index )
+                            values[i] = 0;
+                    }
+                }
+                break;
+            case 2:
+                {
+                    UInt8 num = uRand(3);
+                    for(UInt8 i = 0; i < 4; ++i)
+                    {
+                        if(i == index || i == num)
+                            continue ;
+                        values[i] = 0;
+                    }
+                }
+                break;
+            case 3:
+                {
+                    UInt8 num = uRand(3);
+                    for(UInt8 i = 0; i < 4; ++i)
+                    {
+                        if(i == index || i != num)
+                            continue ;
+                        values[i] = 0;
+                    }
+                }
+                break;
+            case 4:
+                break;
+        }
+        lbattr.setAttr(values[0],values[1],values[2],values[3]);
+    }
 
 	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), m_SizeLS(0), m_SizeGem(0), m_SizeFormula(0), m_SizeZY(0), m_SizeSL(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
@@ -1184,6 +1247,7 @@ namespace GObject
         case Item_Evolution1:
         case Item_Evolution2:
         case Item_Evolution3:
+        case Item_Horcrux:
 			{
 				ItemEquip * equip;
 				ItemEquipData edata;
@@ -1201,6 +1265,7 @@ namespace GObject
                 case Item_LBwu:
                 case Item_LBxin:
                 case Item_Evolution3:
+                case Item_Horcrux:
                     break;
                 default:
                     if(itype->quality > 2)
@@ -1338,13 +1403,14 @@ namespace GObject
                 case Item_Horcrux:
                     {
                         ItemHorcruxAttr horcruxAttr;
-                        //getRandomHorcruxAttr(lv, itype->subClass, itype->quality, horcruxAttr);
+                        getRandomHorcruxAttr( typeId, itype->quality, horcruxAttr);
                         equip = new ItemHorcrux(id, itype, edata, horcruxAttr);
+                        DB1().PushUpdateData("INSERT INTO `horcruxAttr`(`id`, `itemId`, `value1`, `value2`,`value3`,`value4`) VALUES(%u, %u , %u,%u,%u,%u)",id,typeId ,horcruxAttr.getAttr(0),horcruxAttr.getAttr(1),horcruxAttr.getAttr(2),horcruxAttr.getAttr(3));
                     }
                     break;
-				default:
-					equip = new ItemEquip(id, itype, edata);
-					break;
+                default:
+                    equip = new ItemEquip(id, itype, edata);
+                    break;
 				}
 				if(equip == NULL)
 					return NULL;
@@ -1364,7 +1430,7 @@ namespace GObject
 					++ m_Size;
 				e = equip;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
-				DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
+                DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
                 GenSpirit(equip);
 
 				SendSingleEquipData(equip);
@@ -2052,10 +2118,13 @@ namespace GObject
             case 0x72:
             case 0x73:
             case 0x74:
-                if(item->getClass() != Item_Horcrux)
-                    return false;
-                old  = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 ,static_cast<GObject::ItemEquip *>(item));
-                break;
+                {
+                    if(item->getClass() != Item_Horcrux)
+                        return false;
+                    ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(item);
+                    old  = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 ,horcrux);
+                    break;
+                }
             default:
                 return false;
 			}
@@ -2818,11 +2887,12 @@ namespace GObject
 
 	void Package::AppendEquipData( Stream& st, ItemEquip * equip, bool hascount )
 	{
-        //UInt32 itemId = equip->getId();
+        UInt32 itemId = equip->getId();
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
 		if(hascount)
 			st << equip->Count();
-		st << static_cast<UInt16>(equip->GetItemType().getId()) << equip->getItemEquipData().enchant;
+		st << static_cast<UInt16>(equip->GetItemType().getId());
+        st << equip->getItemEquipData().enchant;
 		ItemEquipData& ied = equip->getItemEquipData();
 		st << ied.sockets;
 		for(UInt8 z = 0; z < ied.sockets; ++ z)

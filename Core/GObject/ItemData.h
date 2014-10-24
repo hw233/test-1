@@ -277,7 +277,7 @@ namespace GObject
          {
             memset(attr,0,sizeof(attr));
          }//: attr_DefBao(0), attr_DefPo(0),attr_DefFan(0),attr_DefFang(0) {}
-         void SetAttr(UInt32 value0 ,UInt32 value1, UInt32 value2, UInt32 value3)
+         void setAttr(UInt32 value0 ,UInt32 value1, UInt32 value2, UInt32 value3)
          { 
              attr[0] = value0;
              attr[1] = value1;

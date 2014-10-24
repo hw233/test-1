@@ -448,7 +448,7 @@ namespace GObject
     } 
     bool MonsterKettleManager::CheckKettleRight(UInt8 idx)
     { 
-        static UInt32 limit[] = {0,0,0,0,560,700,840,980,1120,1260,1750,1925};
+        static UInt32 limit[] = {0,0,0,0,560,700,840,980,1120,1260,1400,1540,1680,1820,1960};
         if( idx >= KETTLE_COUNT)
             return false;
         UInt32 kettleCnt = m_player->GetVar(VAR_KETTLE_COUNT);

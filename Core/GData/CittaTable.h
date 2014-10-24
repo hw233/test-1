@@ -19,7 +19,7 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
     agilityP(0), intelligenceP(0), willP(0), soulP(0), auraP(0), auraMaxP(0),
     attackP(0), magatkP(0), defendP(0), magdefP(0), hpP(0), toughP(0),
     actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0),
-    fairyAck(0),fairyDef(0)
+    fairyAck(0),fairyDef(0),criticaldef(0),piercedef(0),counterdef(0),attackpierce(0)
     {}
     ~CittaEffect() { skill.clear(); }
 
@@ -72,6 +72,11 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
 
     float fairyAck;
     float fairyDef;
+    
+    UInt32 criticaldef;
+    UInt32 piercedef;
+    UInt32 counterdef;
+    UInt32 attackpierce;
 
     float hitrlvl;
     float evdlvl;
