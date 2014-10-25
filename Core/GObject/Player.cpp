@@ -21107,7 +21107,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(48, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {500, 2, 501, 2, 513, 2, 9082, 2, 548, 2, 503, 2};
-        static UInt32 itemId[] = {9082, 2, 9371, 2, 503, 2, 9498, 2, 9457, 2, 9418, 2};
+        static UInt32 itemId[] = {517, 2, 9414, 2, 503, 2, 17109, 2, 17103, 2, 551, 2};
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
@@ -21124,7 +21124,7 @@ void Player::get3366GiftAward(UInt8 type)
         useGold(88, &ci);
         AddVar(VAR_3366GIFT, 1);
         //static UInt32 itemId[] = {30, 517, 551, 549, 9082, 9141};
-        static UInt32 itemId[] = { 30, 2, 9427, 2, 9600, 2, 9310, 2, 9438, 2, 9141, 2 };
+        static UInt32 itemId[] = { 134, 2, 17107, 2, 9600, 2, 9360, 2, 9388, 1, 9418, 2 };
         for(UInt8 i = 0; i < sizeof(itemId) / sizeof(UInt32); i += 2)
         {
             GetPackage()->Add(itemId[i], itemId[i+1], true);
