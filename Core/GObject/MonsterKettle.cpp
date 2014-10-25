@@ -415,6 +415,11 @@ namespace GObject
             GData::KettleAttr( 51, 58.65, 136, 5.95),
             // GData::KettleAttr(72.9,72.9,594.0,0.0 ),
             // GData::KettleAttr(63.0,63.0,150.0,33.3 )
+            GData::KettleAttr(58.65,51.00 ,136.00 , 5.95 ),
+            GData::KettleAttr( 51, 58.65, 136, 5.95),
+            GData::KettleAttr(35.70,35.70,306.00,5.95 ),
+            GData::KettleAttr(58.65,51, 136, 5.95),
+            GData::KettleAttr(51,58.65, 136, 5.95),
         };
         //std::cout << "改变前:";
         //std::cout << ae.attack <<" "  << ae.magatk << "  ";
@@ -448,7 +453,7 @@ namespace GObject
     } 
     bool MonsterKettleManager::CheckKettleRight(UInt8 idx)
     { 
-        static UInt32 limit[] = {0,0,0,0,560,700,840,980,1120,1260,1750,1925};
+        static UInt32 limit[] = {0,0,0,0,560,700,840,980,1120,1260,1400,1540,1680,1820,1960};
         if( idx >= KETTLE_COUNT)
             return false;
         UInt32 kettleCnt = m_player->GetVar(VAR_KETTLE_COUNT);
