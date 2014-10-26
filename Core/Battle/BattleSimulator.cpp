@@ -14091,7 +14091,10 @@ UInt32 BattleSimulator::upPetObject(UInt8 side, bool isReplace /* = true */)
     int pos = _backupTargetPos[side];
     BattleFighter* bo = static_cast<BattleFighter*>(getObject(side, pos));
     if(bo != NULL && bo->getHP() > 0)
+    {
+        bo->setHP(0);
         removeFighterStatus(bo);
+    }
 
     _backupObjs[side]->setPos(_backupTargetPos[side]);
     setObject(side, pos, _backupObjs[side]);
