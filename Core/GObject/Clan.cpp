@@ -6279,7 +6279,7 @@ void Clan::getFireGodBag()
     {
             bagType = 3;
     }
-    else if(fireValue >= 600 && fireValue <= 900)
+    else if(fireValue >= 600)
     {
             bagType = 4;
     }
