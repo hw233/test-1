@@ -566,9 +566,9 @@ struct DBFighter2
     UInt8 hideFashion;
     UInt32 incense;
     UInt32 innateTrump;     //先天法宝
-    UInt32 summoned;
     UInt32 potentialFail;
     UInt32 capacityFail;
+    UInt32 summoned;
 };
 
 
@@ -2369,9 +2369,9 @@ SPECIALDEF(64)
     UInt8, hideFashion,
     UInt32, incense,
     UInt32, innateTrump,
-    UInt32, summoned,
     UInt32, potentialFail,
-    UInt32, capacityFail
+    UInt32, capacityFail,
+    UInt32, summoned
 	)
 SPECIALEND()
 

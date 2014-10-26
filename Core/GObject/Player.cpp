@@ -10128,7 +10128,7 @@ namespace GObject
                     fgt->setCapacity(decp);
                 }
 			}
-            if(type == 4 && p)
+            if(type == 4)
                 fgt->setpotentialFail(++potentialFailTimes, true);
             else if(type == 2)
                 fgt->setcapacityFail(++capacityFailTimes, true);
