@@ -494,14 +494,14 @@ void WBoss::reward(Player* player)
         (*i).player->wBossUdpLog(1096 + m_idx);
         if (j < AWARD_AREA1)
         {
-            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4 * nationalDayF},{(*i).player->GetLev() >= 80 ? 16061 :16060,3},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4 * nationalDayF},{static_cast<UInt16>((*i).player->GetLev() >= 80 ? 16061 :16060),3},};
             (*i).player->sendMailItem(564, 565, item1, 2, false);
             SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 4 * nationalDayF,(*i).player->GetLev() >= 80 ? 16061 :16060,3);
         }
 
         if (j >= AWARD_AREA1 && j < AWARD_AREA2)
         {
-            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2 * nationalDayF},{(*i).player->GetLev() >= 80 ? 16061 :16060,2},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2 * nationalDayF},{static_cast<UInt16>((*i).player->GetLev() >= 80 ? 16061 :16060),2},};
             (*i).player->sendMailItem(564, 565, item1, 2, false);
             if (!notify4_10)
             {
@@ -512,7 +512,7 @@ void WBoss::reward(Player* player)
 
         if (j >= AWARD_AREA2 && j < AWARD_MAN)
         {
-            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1 * nationalDayF},{(*i).player->GetLev() >= 80 ? 16061 :16060,1},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1 * nationalDayF},{static_cast<UInt16>((*i).player->GetLev() >= 80 ? 16061 :16060),1},};
             (*i).player->sendMailItem(564, 565, item1, 2, false);
             if (!notify11_20)
             {
@@ -606,7 +606,7 @@ void WBoss::reward(Player* player)
 
         if (World::getOpenTest() && World::_wday != 7)
         {
-            MailPackage::MailItem item[] = {{133,1},{MailPackage::Tael,1000},{9091,1},{(*i).player->GetLev() >= 80 ? 16061 :16060,1}};
+            MailPackage::MailItem item[] = {{133,1},{MailPackage::Tael,1000},{9091,1},{static_cast<UInt16>((*i).player->GetLev() >= 80 ? 16061 :16060),1}};
             (*i).player->sendMailItem(568, 569, item, 4);
         }
         else
