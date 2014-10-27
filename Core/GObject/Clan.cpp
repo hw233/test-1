@@ -6381,7 +6381,7 @@ void Clan::sendImpeachMail(Player* player, Player* leader)
 }
 void Clan::sendXCTJWelfare(Player * pl)
 { 
-    MailPackage::MailItem mitem[5] = {{503,3}, {500,3},{509,2},{17103,3},{17109,3}};
+    MailPackage::MailItem mitem[5] = {{517,3}, {500,3},{509,3},{17103,3},{134,3}};
     SYSMSGV(title, 5241,pl->getCountry(), pl->getName().c_str());
     SYSMSGV(content, 5242,pl->getCountry(), pl->getName().c_str(),getName().c_str());
 	Members::iterator it = _members.begin();

@@ -36361,9 +36361,9 @@ UInt8 Player::HitEggInXCTJ(UInt8 type)
 
     GameAction()->getHitEggAward(this,nums[type]);
 
-    if(GetVar(VAR_XCTJ_COUNT)/3000 < (GetVar(VAR_XCTJ_COUNT)+nums[type]*10)/3000)
-    { 
-    } 
+    //if(GetVar(VAR_XCTJ_COUNT)/3000 < (GetVar(VAR_XCTJ_COUNT)+nums[type]*10)/3000)  //XXX 奇怪的代码
+    //{ 
+    //} 
     AddVar(VAR_XCTJ_COUNT,nums[type] * 10);
 
     UInt32 xctjCount = GetVar(VAR_XCTJ_COUNT);
@@ -36440,7 +36440,7 @@ void Player::getXCTJCountAward(UInt8 type)  //type 从0开始
         return ;
     if( count/3000 < repeat || (count - repeat * 3000) < countLimit[type])
         return ;
-    if(!GameAction()->getXCTJCountAward(this,type+1,(repeat%5)+1))
+    if(!GameAction()->getXCTJCountAward(this,type+1,(repeat%6)+1))
         return ;
     award |= (1<<type); 
     if(award == 0x3F)
