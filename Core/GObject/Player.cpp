@@ -9152,7 +9152,7 @@ namespace GObject
         }
         if(World::getBaiFuBagTime())
         { 
-            if(r >= 288 && GetVar(VAR_BAIFU_BAG_STATUE) == 0)
+            if(r >= 388 && GetVar(VAR_BAIFU_BAG_STATUE) == 0)
             {
                 SetVar(VAR_BAIFU_BAG_STATUE,1);
                 sendBaiFuBagInfo();
