@@ -417,6 +417,26 @@ bool enum_midnight(void * ptr, void* next)
         }
     }
 
+
+    if(World::getWinterEncounter(1))
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 11, 14);
+        UInt32 now = TimeUtil::Now();
+        now = now - 300;
+        UInt32 index = (now - begin)/86400;
+        if (index > 9)
+            index = 9;
+        if(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS))
+        {
+            if(GET_BIT(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), 0))
+                pl->sendJingjiAward(index);
+            if(GET_BIT(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), 1))
+                pl->sendChaoZhiAward(index);
+            if(GET_BIT(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), 2))
+                pl->sendHaoHuaAward(index);
+        }
+    }
+
     if (bValentineDayEnd)
     {
         UInt32 num = pl->GetVar(VAR_SHUSAN_LOVE);

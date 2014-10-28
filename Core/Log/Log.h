@@ -180,6 +180,7 @@ enum PurchaseType
     DARKDARGON                  = 1041, //黯龙王
     UNKNOWN                     = 1042, //不明确消费类型
     FLYROADGETAWARD             = 1043, //飞升之路礼包双倍
+    WINTER_ENCHOUNTER           = 1044, //相约在冬季
     //繁体私有占150～200
 };
 

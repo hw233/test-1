@@ -711,6 +711,28 @@ public:
         else
             return false;
     }
+
+    inline static bool getWinterEncounter(UInt8 type = 0)
+    {
+        UInt32 begin = 0;
+        UInt32 end = 0;
+        if(type)
+        {
+            begin = TimeUtil::MkTime(2014, 11, 14);
+            end = TimeUtil::MkTime(2014, 11, 24);
+        }
+        else
+        {
+            begin = TimeUtil::MkTime(2014, 11, 1);
+            end = TimeUtil::MkTime(2014, 11, 6);
+        }
+        UInt32 now = TimeUtil::Now();
+        if((now >= begin && now <= end))
+            return true;
+        else
+            return false;
+    }
+
     inline static bool getGratitudeGiving(UInt32 time = 0, UInt32 time1 = 0)
     {
         UInt32 begin = TimeUtil::MkTime(2014, 9, 11);
@@ -843,8 +865,8 @@ public:
     inline static bool getBaiFuBagTime()
     { 
         UInt32 now = TimeUtil::Now();
-        UInt32 Begin = TimeUtil::MkTime(2014, 10, 1);
-        UInt32 End = TimeUtil::MkTime(2014, 10,3);
+        UInt32 Begin = TimeUtil::MkTime(2014, 11, 1);
+        UInt32 End = TimeUtil::MkTime(2014, 11,3);
         if(now >= Begin && now <= End)
             return true;
         else

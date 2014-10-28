@@ -179,9 +179,10 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearSeekingHer.sql     #清除众里寻她
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141021_1.sql #为散仙增加资质和潜力祝福值字段
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_xingchen_gem7.sql #星辰gem7
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141021_1.sql #为散仙增加资质和潜力祝福值字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_xingchen_gem7.sql #星辰gem7
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar825_1.sql     #清除光棍月大礼盒
 }
 
 #sh player_jiguan.sh
