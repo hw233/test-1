@@ -535,7 +535,7 @@ function calcPierce( fgt, defgt )
 end
 
 function calcDamage( atk, def, atklvl, toughFactor, dmgreduce, attackpierce )
-    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100) + attackpierce
+    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100) - attackpierce
     if dmgP < 0.20 then
         dmgP = 0.20
     elseif dmgP > 1.0 then
