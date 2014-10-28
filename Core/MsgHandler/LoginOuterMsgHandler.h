@@ -314,6 +314,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         return;
     }
 
+    //Test
+    checkKey(0, ul._hashval, ul._userid);
     if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
     {
 		conn->pendClose();
@@ -1336,7 +1338,7 @@ bool getId(char buf[64], UInt8 type)
 
 bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid = 20110503ll)
 {
-    if (cfg.GMCheck)
+    //if (cfg.GMCheck)
     {
         SHA1Engine sha1;
         std::string key1, key2;
