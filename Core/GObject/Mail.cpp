@@ -471,6 +471,8 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 			}
 			break;
 		case 0x21:
+        case 0x29:
+        case 0x30:
 			{
 				UInt32 count = mail->additional >> 16;
 				if(count == 0xFFFE || count == 0xFFFD)
