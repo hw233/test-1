@@ -9338,7 +9338,12 @@ namespace GObject
         AddQZoneRecharge(r);
         if(World::getTYSSTime())
             AddLingGuo(r);//天元神兽
-        //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        if(World::getWinterEncounter(0))
+        {
+            AddVar(VAR_WINTER_ENCOUNTER_RECHARGE_TOTAL, r);
+            onWinterEncounterReturn();
+        }
+   //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -34506,14 +34511,14 @@ bool Player::buyClanShopItems(UInt8 offset)
     UInt32 proffer = getClanProffer();
     if(proffer >= price)
     {
-        ConsumeInfo ci(BuyClanShopItems, 0, 0);
-        useClanProffer(price, &ci);
-
         if(GetPackage()->GetRestPackageSize() < 1)
         {
             sendMsgCode(2, 1011);
             return 0;
         }
+
+        ConsumeInfo ci(BuyClanShopItems, 0, 0);
+        useClanProffer(price, &ci);
 
         GetPackage()->Add(it->second.itemid, 1 , true, false, FromClanShop);
         //设置状态为已购买
@@ -36619,6 +36624,113 @@ void Player::sendRoseDemonInfo()
     st << Stream::eos;
     send(st);
 }
+
+void Player::onWinterEncounterReturn()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x20);
+    st << GetVar(VAR_WINTER_ENCOUNTER_RECHARGE_TOTAL);
+    st << static_cast<UInt8>(GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::buyWinterEncounterPlan(UInt8 type)
+{
+    if(!World::getWinterEncounter(0) || !(type >= 1 && type <= 3))
+        return;
+    static UInt32 rechargeLevel[] = {200, 600, 2000};
+    static UInt32 needGold[] = {199, 599, 1999};
+    if(!GET_BIT(GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), (type - 1)))
+    {
+        if(GetVar(VAR_WINTER_ENCOUNTER_RECHARGE_TOTAL) < rechargeLevel[type - 1])
+        {
+            sendMsgCode(0, 3511);
+            return;
+        }
+        ConsumeInfo ci(WINTER_ENCHOUNTER,0,0);
+        if(!hasChecked())
+            return;
+        if (getGold() < needGold[type - 1])
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        useGold(needGold[type - 1], &ci);
+        SetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS, SET_BIT(GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), (type - 1)));
+        onWinterEncounterReturn();
+    }
+}
+
+void Player::sendJingjiAward(UInt32 type)
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{503, 4}, {500, 3}, {0xA000, 200} },
+        {{513, 3}, {17109, 2}, {0, 0} },
+        {{501, 3}, {16001, 2}, {0, 0} },
+        {{551, 2}, {0xA000, 50}, {0, 0} },
+        {{9414, 2}, {0xA000, 50}, {0, 0} },
+        {{13007,  1}, {0,  0}, {0,  0} },
+        {{13087,  1}, {0,  0}, {0,  0} },
+        {{13047,  1}, {0,  0}, {0,  0} },
+        {{13067,  1}, {0,  0}, {0,  0} },
+        {{13127,  1}, {0,  0}, {0,  0} },
+    };
+
+    SYSMSG(title, 5260);
+    SYSMSGV(content, 5261, type + 1, 9 - type);
+    MailItemsInfo itemsInfo(s_item[type], Activity, 3);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(mail)
+        mailPackageManager.push(mail->id, s_item[type], 3, true);
+}
+
+void Player::sendChaoZhiAward(UInt32 type)
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{17103, 5}, {9498, 5}, {0xA000, 400} },
+        {{17103, 2}, {17109, 2}, {0xA000, 150} },
+        {{9600, 5}, {9457, 5}, {0xA000, 150} },
+        {{16001, 5}, {503, 5}, {0xA000, 200} },
+        {{9425, 3}, {0xA000, 200}, {0, 0} },
+        {{13009,  1}, {0,  0}, {0,  0} },
+        {{13089,  1}, {0,  0}, {0,  0} },
+        {{13109,  1}, {0,  0}, {0,  0} },
+        {{13149,  1}, {0,  0}, {0,  0} },
+        {{13129,  1}, {0,  0}, {0,  0} },
+    };
+
+    SYSMSG(title, 5262);
+    SYSMSGV(content, 5263, type + 1, 9 - type);
+    MailItemsInfo itemsInfo(s_item[type], Activity, 3);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(mail)
+        mailPackageManager.push(mail->id, s_item[type], 3, true);
+}
+
+void Player::sendHaoHuaAward(UInt32 type)
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{17103, 10}, {134, 10}, {0xA000, 2000} },
+        {{17103, 5}, {1325, 5}, {0xA000, 300} },
+        {{9338, 5}, {134, 5}, {0xA000, 300} },
+        {{17105, 5}, {17109, 5}, {0xA000, 400} },
+        {{515, 5}, {17110, 5}, {0xA000, 400} },
+        {{13012,  1}, {0,  0}, {0,  0} },
+        {{13092,  1}, {0,  0}, {0,  0} },
+        {{13112,  1}, {0,  0}, {0,  0} },
+        {{13152,  1}, {0,  0}, {0,  0} },
+        {{13132,  1}, {0,  0}, {0,  0} },
+    };
+
+    SYSMSG(title, 5264);
+    SYSMSGV(content, 5265, type + 1, 9 - type);
+    MailItemsInfo itemsInfo(s_item[type], Activity, 3);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(mail)
+        mailPackageManager.push(mail->id, s_item[type], 3, true);
+}
+
 
 } // namespace GObject
 
