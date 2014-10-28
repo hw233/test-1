@@ -6391,7 +6391,7 @@ void Clan::sendXCTJWelfare(Player * pl)
         if( player == NULL )
             continue ; 
         MailItemsInfo itemsInfo(mitem, Activity, 5);
-        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        Mail * mail = player->GetMailBox()->newMail(pl, 0x29, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
             mailPackageManager.push(mail->id, mitem, 5, true);
         std::string strItems;

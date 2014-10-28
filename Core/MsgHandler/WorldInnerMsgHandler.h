@@ -3817,7 +3817,7 @@ bool enum_send_xctj_welfare(void * ptr, void * data )
     SYSMSGV(title, 5241,pl->getCountry(), pl->getName().c_str());
     SYSMSGV(content, 5243,pl->getCountry(), pl->getName().c_str());
     { 
-        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        Mail * mail = player->GetMailBox()->newMail(pl, 0x30, title, content, 0xFFFE0000);
         if(mail)
         {
             mailPackageManager.push(mail->id, mitem, 5, true);
