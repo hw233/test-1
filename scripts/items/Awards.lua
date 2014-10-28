@@ -2237,8 +2237,12 @@ function getFeiShengDanAward(player,opt)
     end
 end
 function getBaiFuBagAward(player)
-    local award = {{9425,5},{515,3},{549,2},{503,5},{134,5},{1325,5},{9388,1},{9360,5}}
+    local award = {{515,3},{9338,5},{1325,5},{549,1},{9498,5},{9425,8},{9388,2},{134,5}}
     local package = player:GetPackage();
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
     for i = 1,#award do
         package:AddItem(award[i][1], award[i][2], true, 0, 39);
     end
