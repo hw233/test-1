@@ -2267,6 +2267,11 @@ function getXCTJCountAward(player,opt,index)
         return 
     end
 
+    if package:GetRestPackageSize() < 6 then
+        player:sendMsgCode(2, 1011, 0)
+        return 
+    end
+
     if opt ~= 6 then
         for i = 1,#award[opt] do
             package:AddItem(award[opt][i][1], award[opt][i][2], true, 0, 39);
