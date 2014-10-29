@@ -131,6 +131,10 @@ public:
 	}
 
 	static BattleFormula * getCurrent();
+    float calcCriticalDef(Battle::BattleFighter* defgt);
+    float calcPierceDef(Battle::BattleFighter* defgt);
+    float calcCounterDef(Battle::BattleFighter* defgt);
+    float calcAttackPierce(Battle::BattleFighter* fgt);
 
 private:
 	SkillData _skillData[3][10][40];

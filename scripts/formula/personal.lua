@@ -535,7 +535,11 @@ function calcPierce( fgt, defgt )
 end
 
 function calcDamage( atk, def, atklvl, toughFactor, dmgreduce, attackpierce )
-    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100) - attackpierce
+    def = def - attackpierce
+    if def < 0 then
+        def = 0
+    end
+    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100 + attackpierce / 100)
     if dmgP < 0.20 then
         dmgP = 0.20
     elseif dmgP > 1.0 then
@@ -817,5 +821,48 @@ function calcAutoBattle( mybp, theirbp )
     return (theirbp + (autobattle_A - 1) * mybp) / (autobattle_A * mybp)
   end
   return 1 + autobattle_tweak - autobattle_tweak * mybp / theirbp
+end
+
+function calcCriticalDefLevel( fgt )
+  if fgt == nil then
+    return 0
+  end
+  return fgt:getExtraCriticalLevel()
+end
+
+function calcCriticalDef(defgt)
+  if defgt == nil then
+    return 0
+  end
+  local deflev = defgt:getLevel();
+  local criticaldeflvl = defgt:getExtraCriticalDef()
+  return criticaldeflvl/(criticaldeflvl + criticaldeflvl_factor*deflev + criticaldeflvl_addon_factor)*100
+end
+
+function calcPierceDef(defgt)
+  if defgt == nil then
+    return 0
+  end
+  local deflev = defgt:getLevel();
+  local piercedeflvl = defgt:getExtraPierceDef()
+  return piercedeflvl/(piercedeflvl + piercedeflvl_factor*deflev + piercedeflvl_addon_factor)*100
+end
+
+function calcCounterDef(defgt)
+  if defgt == nil then
+    return 0
+  end
+  local deflev = defgt:getLevel();
+  local counterdeflvl = defgt:getExtraCounterDef()
+  return counterdeflvl/(counterdeflvl + counterdeflvl_factor*deflev + counterdeflvl_addon_factor)*100
+end
+
+function calcAttackPierce(fgt)
+  if fgt == nil then
+    return 0
+  end
+  local deflev = fgt:getLevel();
+  local attackpiercelvl = fgt:getExtraAttackPierce()
+  return attackpiercelvl/(attackpiercelvl + attackpiercelvl_factor*deflev + attackpiercelvl_addon_factor)*100
 end
 

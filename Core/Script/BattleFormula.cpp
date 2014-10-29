@@ -630,5 +630,25 @@ BattleFormula * BattleFormula::getCurrent()
 	return NULL;
 }
 
+float BattleFormula::calcCriticalDef(Battle::BattleFighter* defgt)
+{
+	return call<float>("calcCriticalDef", defgt);
+}
+
+float BattleFormula::calcPierceDef(Battle::BattleFighter* defgt)
+{
+	return call<float>("calcPierceDef", defgt);
+}
+
+float BattleFormula::calcCounterDef(Battle::BattleFighter* defgt)
+{
+	return call<float>("calcCounterDef", defgt);
+}
+
+float BattleFormula::calcAttackPierce(Battle::BattleFighter* fgt)
+{
+	return call<float>("calcAttackPierce", fgt);
+}
+
 }
 
