@@ -890,8 +890,8 @@ public:
     inline static bool getTreasureTime(UInt32 time = 0 )
     {
         UInt32 now = TimeUtil::Now();
-        UInt32 begin = TimeUtil::MkTime(2014, 10, 7);
-        UInt32 end = TimeUtil::MkTime(2014, 10, 12);
+        UInt32 begin = TimeUtil::MkTime(2014, 11, 6);
+        UInt32 end = TimeUtil::MkTime(2014, 11, 11);
 
         if( now >= begin && now <= end)
             return true;

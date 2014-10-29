@@ -183,6 +183,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_xingchen_gem7.sql #星辰gem7
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar825_1.sql     #清除光棍月大礼盒
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141029_clearXCTJ.sql     #清除光棍月大礼盒
 }
 
 #sh player_jiguan.sh

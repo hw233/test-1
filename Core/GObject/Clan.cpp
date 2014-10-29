@@ -5717,11 +5717,11 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8 a
         {{9076,3},{509,3},{549,1},{515,3},{9418,3}},
     };
     static MailPackage::MailItem s_item1[][5] = {
-        {{57,3},{555,3},{56,3},{0,0},{0,0}},
+        {{9360,3},{500,3},{512,3},{505,3},{0,0}},
         {{503,3},{9424,3},{9418,3},{0,0},{0,0}},
         {{9600,3},{554,3},{9414,5},{0,0},{0,0}},
         {{556,5},{9338,5},{9457,5},{9371,10},{0,0}},
-        {{5005,2},{5025,2},{5055,2},{5035,2},{0,0}},
+        {{5056,1},{5036,1},{0,0},{0,0},{0,0}},
     };
     MailPackage::MailItem *items;
     if(actType == 1)
@@ -5850,7 +5850,7 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
         if(actType == 1)
             addClanTitle(1, 0);
         else
-            addClanTitle(7, 0);
+            addClanTitle(8, 0);
     }
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
