@@ -206,6 +206,11 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraToughLevel", &Battle::BattleFighter::getExtraToughLevel);
 	class_def<Battle::BattleFighter>("getExtraMagResLevel", &Battle::BattleFighter::getExtraMagResLevel);
 
+	class_def<Battle::BattleFighter>("getExtraCriticalDef", &Battle::BattleFighter::getExtraCriticalDef);
+	class_def<Battle::BattleFighter>("getExtraPierceDef", &Battle::BattleFighter::getExtraPierceDef);
+	class_def<Battle::BattleFighter>("getExtraCounterDef", &Battle::BattleFighter::getExtraCounterDef);
+	class_def<Battle::BattleFighter>("getExtraAttackPierce", &Battle::BattleFighter::getExtraAttackPierce);
+
 	class_add<GObject::SecondSoul>("SecondSoul");
 	class_def<GObject::SecondSoul>("getClass", &GObject::SecondSoul::getClass);
 	class_def<GObject::SecondSoul>("getPracticeLevel", &GObject::SecondSoul::getPracticeLevel);
