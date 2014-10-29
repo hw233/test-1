@@ -1276,6 +1276,7 @@ namespace GObject
         void SendWCGradeAward2(UInt8 type);
         UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
         void sendMyWorldCupInfo();
+        void sendFighterHorcruxInfo();
         void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)
         {
             if(num >= WC_MAX_COUNT) 

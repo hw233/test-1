@@ -8402,6 +8402,8 @@ namespace GObject
             ItemEquip * equip = it->second;
             if(equip == NULL)
                 continue;
+            if(equip->getClass() != Item_Horcrux)
+                continue;
 
             ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(equip);
             ItemHorcruxAttr& attr = horcrux->getHorcruxAttr();

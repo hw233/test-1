@@ -2360,6 +2360,9 @@ function getHitEggAward(player,num)
             count = item_count
         end
     end
+    if itemId == 0 then
+        return true
+    end
     player:AddXCTJAward(num,itemId,count);
     return true
 end
@@ -2382,7 +2385,7 @@ function getHorcruxEquipment(player,opt)
     local g = math.random(1,10000)
     local index = 1;
     for i =1,#chance[opt] do
-        if g < chance[opt][i] then
+        if g <= chance[opt][i] then
             index = i
             break
         end

@@ -95,10 +95,11 @@ namespace GObject
             } 
         }
         if(color > 3)
-            AddHorcruxHoldExp(4 , exp);  
+            AddHorcruxHoldExp(4 , (color - 3)*20);  
 
         Package* m_package = _fighter->getOwner()->GetPackage();
         m_package->DelEquip2(horcrux,ToHorcruxHold);
+        _fighter->setDirty(true);
     }
     void Horcrux::sendHorcruxInfo()
     { 

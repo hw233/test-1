@@ -3634,7 +3634,10 @@ namespace GObject
 		st.init(REP::FIGHTER_INFO);
 		st << static_cast<UInt8>(c);
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+    //      it->second->getHorcrux()->sendHorcruxInfo();
 			makeFighterInfo(st, it->second);
+        }
 		st << Stream::eos;
 	}
 
@@ -36626,6 +36629,17 @@ void Player::sendRoseDemonInfo()
         st << static_cast<UInt32>( time > begin ? 0 :(begin-time));
     st << Stream::eos;
     send(st);
+}
+void Player::sendFighterHorcruxInfo()
+{
+
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if(it->second)
+        {
+            it->second->getHorcrux()->sendHorcruxInfo();
+        }
+    }
 }
 
 } // namespace GObject
