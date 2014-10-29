@@ -554,14 +554,14 @@ namespace GObject
             return ;
         if(color < 2 || color >5)
             return ;
-        static UInt32 attrValue[] = {20,31,45,64};
+        static UInt32 attrValue[] = {20,31,45,64};   //基础值
         UInt8 index = (ItemId - HORCRUX_ID )/4;
         UInt32 values[4] = {0,0,0,0};
         UInt32 max = 0;
         UInt8 idx = 0;
         for(UInt8 i = 0; i < 4; ++i)
         {
-            UInt32 value =  attrValue[color - 2] + uRand(20);   //待定
+            UInt32 value =  attrValue[color - 2] + uRand(20);   //基础值+ uRand(20)
             if(value > max)
             {
                 idx = i;
