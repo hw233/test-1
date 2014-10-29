@@ -5717,11 +5717,11 @@ void Clan::SendClanMemberAward(UInt32 score, UInt8 flag ,std::string str,UInt8 a
         {{9076,3},{509,3},{549,1},{515,3},{9418,3}},
     };
     static MailPackage::MailItem s_item1[][5] = {
-        {{57,3},{555,3},{56,3},{0,0},{0,0}},
+        {{9360,3},{500,3},{512,3},{505,3},{0,0}},
         {{503,3},{9424,3},{9418,3},{0,0},{0,0}},
         {{9600,3},{554,3},{9414,5},{0,0},{0,0}},
         {{556,5},{9338,5},{9457,5},{9371,10},{0,0}},
-        {{5005,2},{5025,2},{5055,2},{5035,2},{0,0}},
+        {{5056,1},{5036,1},{0,0},{0,0},{0,0}},
     };
     MailPackage::MailItem *items;
     if(actType == 1)
@@ -5850,7 +5850,7 @@ void Clan::sendMemberBuf(UInt8 pos,UInt8 actType)
         if(actType == 1)
             addClanTitle(1, 0);
         else
-            addClanTitle(7, 0);
+            addClanTitle(8, 0);
     }
 	Mutex::ScopedLock lk(_mutex);
     UInt32 endTime = TimeUtil::Now() + 86400 * 14;
@@ -6381,7 +6381,7 @@ void Clan::sendImpeachMail(Player* player, Player* leader)
 }
 void Clan::sendXCTJWelfare(Player * pl)
 { 
-    MailPackage::MailItem mitem[5] = {{503,3}, {500,3},{509,2},{17103,3},{17109,3}};
+    MailPackage::MailItem mitem[5] = {{517,3}, {500,3},{509,3},{17103,3},{134,3}};
     SYSMSGV(title, 5241,pl->getCountry(), pl->getName().c_str());
     SYSMSGV(content, 5242,pl->getCountry(), pl->getName().c_str(),getName().c_str());
 	Members::iterator it = _members.begin();
@@ -6391,7 +6391,7 @@ void Clan::sendXCTJWelfare(Player * pl)
         if( player == NULL )
             continue ; 
         MailItemsInfo itemsInfo(mitem, Activity, 5);
-        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+        Mail * mail = player->GetMailBox()->newMail(pl, 0x29, title, content, 0xFFFE0000, true, &itemsInfo);
         if(mail)
             mailPackageManager.push(mail->id, mitem, 5, true);
         std::string strItems;
