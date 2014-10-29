@@ -717,19 +717,6 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 	{
     case 0x29:
     case 0x30:
-        {
-            Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
-            if(pl == NULL || _owner == NULL)
-                return ;
-            if( (mail->flag & 0x7F) == 0x29 && pl->getClan())
-            {
-                SYSMSG_BROADCASTV(5246,_owner->getCountry(),_owner->getName().c_str(),pl->getClan()->getName().c_str(),pl->getCountry(),pl->getName().c_str());
-            }
-            else if( (mail->flag & 0x7F) == 0x30 )
-            {
-                SYSMSG_BROADCASTV(5247,_owner->getCountry(),_owner->getName().c_str(),pl->getCountry(),pl->getName().c_str());
-            }
-        }
 	case 0x21:      //AWARDS
 		{
 			UInt32 count = mail->additional >> 16;
@@ -782,80 +769,93 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				if(pkg->takeIt(_owner))
 				{
 					mailPackageManager.remove(id);
-				}
-				else
-				{
-					_owner->sendMsgCode(0, 1011);
-					return;
-				}
-			}
-			else if(count == 0xFFFD)
-			{
-				MailPackage * pkg = mailPackageManager[id];
-				if(pkg == NULL)
-				{
-					delIt = true;
-					DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
-					break;
-				}
-				if(pkg->takeIt(_owner, true))
-				{
-					mailPackageManager.remove(id);
-				}
-				else
-				{
-					_owner->sendMsgCode(0, 1011);
-					return;
-				}
-			}
-			else
-			{
-				if(count > 0 && _owner->GetPackage()->AddItem(mail->additional & 0xFFFF, count, true, false, FromMail) == NULL)
-				{
-					_owner->sendMsgCode(0, 1011);
-					return;
-				}
-			}
-			DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
-			delIt = true;
-		}
-		break;
-	case 0x31:  //系统定时斗剑场额外奖励
-		{
-			UInt32 EquipId = mail->additional & 0xFFFF;
-			UInt8 rank =  static_cast<UInt8>(mail->additional >> 16);
-			if(_owner->GetAthletics()->addAthleticsExtraAward(EquipId, rank))
-			{
-				delIt = true;
-				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
-			}
-		}
-		break;
+                    {
+                        Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+                        if(pl == NULL || _owner == NULL)
+                            return ;
+                        if( (mail->flag & 0x7F) == 0x29 && pl->getClan())
+                        {
+                            SYSMSG_BROADCASTV(5246,_owner->getCountry(),_owner->getName().c_str(),pl->getClan()->getName().c_str(),pl->getCountry(),pl->getName().c_str());
+                        }
+                        else if( (mail->flag & 0x7F) == 0x30 )
+                        {
+                            SYSMSG_BROADCASTV(5247,_owner->getCountry(),_owner->getName().c_str(),pl->getCountry(),pl->getName().c_str());
+                        }
+                    }
+                }
+                else
+                {
+                    _owner->sendMsgCode(0, 1011);
+                    return;
+                }
+            }
+            else if(count == 0xFFFD)
+            {
+                MailPackage * pkg = mailPackageManager[id];
+                if(pkg == NULL)
+                {
+                    delIt = true;
+                    DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+                    break;
+                }
+                if(pkg->takeIt(_owner, true))
+                {
+                    mailPackageManager.remove(id);
+                }
+                else
+                {
+                    _owner->sendMsgCode(0, 1011);
+                    return;
+                }
+            }
+            else
+            {
+                if(count > 0 && _owner->GetPackage()->AddItem(mail->additional & 0xFFFF, count, true, false, FromMail) == NULL)
+                {
+                    _owner->sendMsgCode(0, 1011);
+                    return;
+                }
+            }
+            DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+            delIt = true;
+        }
+        break;
+    case 0x31:  //系统定时斗剑场额外奖励
+        {
+            UInt32 EquipId = mail->additional & 0xFFFF;
+            UInt8 rank =  static_cast<UInt8>(mail->additional >> 16);
+            if(_owner->GetAthletics()->addAthleticsExtraAward(EquipId, rank))
+            {
+                delIt = true;
+                DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+            }
+        }
+        break;
 
-	case 0x13:  //FRIEND 好友
-		{
-			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
-			if(pl == NULL)
-				return;
-			mail->flag = 0x83;
-			if(action == 0)
-			{
-				_owner->addFriend(pl);
-				SYSMSG(content, 212);
-				mail->content = content;
-			}
-			else
-			{
-				SYSMSG(content, 213);
-				mail->content = content;
-			}
-			updateMail(mail);
-		}
-		break;
-	case 0x14:  //组队跨服战 成员邀请
-		{
-			Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
-			if(pl == NULL)
+    case 0x13:  //FRIEND 好友
+        {
+            Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+            if(pl == NULL)
+                return;
+            mail->flag = 0x83;
+            if(action == 0)
+            {
+                _owner->addFriend(pl);
+                SYSMSG(content, 212);
+                mail->content = content;
+            }
+            else
+            {
+                SYSMSG(content, 213);
+                mail->content = content;
+            }
+            updateMail(mail);
+        }
+        break;
+    case 0x14:  //组队跨服战 成员邀请
+        {
+            Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
+            if(pl == NULL)
 				return;
 			mail->flag = 0x84;
 			if(action == 0)

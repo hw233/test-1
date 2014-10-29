@@ -2381,6 +2381,9 @@ function getHitEggAward(player,num)
             count = item_count
         end
     end
+    if itemId == 0 then
+        return true
+    end
     player:AddXCTJAward(num,itemId,count);
     return true
 end
