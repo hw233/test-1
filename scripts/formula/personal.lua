@@ -535,7 +535,7 @@ function calcPierce( fgt, defgt )
 end
 
 function calcDamage( atk, def, atklvl, toughFactor, dmgreduce, attackpierce )
-    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100 + attackpierce / 100)
+    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * (1 - attackpierce / 100) * toughFactor - dmgreduce/100)
     if dmgP < 0.20 then
         dmgP = 0.20
     elseif dmgP > 1.0 then
@@ -832,6 +832,7 @@ function calcCriticalDef(defgt)
   end
   local deflev = defgt:getLevel();
   local criticaldeflvl = defgt:getExtraCriticalDef()
+  print("criticaldeflvl: "..criticaldeflvl)
   return criticaldeflvl/(criticaldeflvl + criticaldeflvl_factor*deflev + criticaldeflvl_addon_factor)*100
 end
 
@@ -841,6 +842,7 @@ function calcPierceDef(defgt)
   end
   local deflev = defgt:getLevel();
   local piercedeflvl = defgt:getExtraPierceDef()
+  print("piercedeflvl: "..piercedeflvl)
   return piercedeflvl/(piercedeflvl + piercedeflvl_factor*deflev + piercedeflvl_addon_factor)*100
 end
 
