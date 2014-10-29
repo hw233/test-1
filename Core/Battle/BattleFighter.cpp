@@ -1729,7 +1729,7 @@ float BattleFighter::getCritical(BattleFighter* defgt)
     if(defgt == NULL)
         critical = _critical + _criticalAdd + _criticalAdd2;
     else
-        critical = _formula->calcCritical(this, defgt) + _criticalAdd + _criticalAdd2 - defgt->getExtraCriticalDef();
+        critical = _formula->calcCritical(this, defgt) + _criticalAdd + _criticalAdd2 - _formula->calcCriticalDef(defgt);
 
     if(critical > GObject::GObjectManager::getCriticalMax() && !isNpc())
         critical = GObject::GObjectManager::getCriticalMax();
@@ -1746,7 +1746,7 @@ float BattleFighter::getPierce(BattleFighter* defgt)
     if(defgt == NULL)
         pierce = _pierce + _pierceAdd + _pierceAdd2;
     else
-        pierce = _formula->calcPierce(this, defgt) + _pierceAdd + _pierceAdd2 - defgt->getExtraPierceDef();
+        pierce = _formula->calcPierce(this, defgt) + _pierceAdd + _pierceAdd2 - _formula->calcPierceDef(defgt);
 
     if(pierce > GObject::GObjectManager::getPierceMax() && !isNpc())
         pierce = GObject::GObjectManager::getPierceMax();
@@ -1763,7 +1763,7 @@ float BattleFighter::getCounter(BattleFighter* defgt, const GData::SkillBase* sk
     if(defgt == NULL)
         counter = _counter + _counterAdd + _counterAdd2 + _counterChangeByPeerless;
     else
-        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless - defgt->getExtraCounterDef();
+        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2 + _counterChangeByPeerless - _formula->calcCounterDef(defgt);
 
     if(getImmune3() > 0)
         counter += 100.0f;
