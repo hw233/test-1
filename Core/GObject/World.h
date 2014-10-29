@@ -865,8 +865,8 @@ public:
     inline static bool getBaiFuBagTime()
     { 
         UInt32 now = TimeUtil::Now();
-        UInt32 Begin = TimeUtil::MkTime(2014, 10, 1);
-        UInt32 End = TimeUtil::MkTime(2014, 10,3);
+        UInt32 Begin = TimeUtil::MkTime(2014, 11, 1);
+        UInt32 End = TimeUtil::MkTime(2014, 11,3);
         if(now >= Begin && now <= End)
             return true;
         else

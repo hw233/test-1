@@ -9152,7 +9152,7 @@ namespace GObject
         }
         if(World::getBaiFuBagTime())
         { 
-            if(r >= 288 && GetVar(VAR_BAIFU_BAG_STATUE) == 0)
+            if(r >= 388 && GetVar(VAR_BAIFU_BAG_STATUE) == 0)
             {
                 SetVar(VAR_BAIFU_BAG_STATUE,1);
                 sendBaiFuBagInfo();
@@ -34511,14 +34511,14 @@ bool Player::buyClanShopItems(UInt8 offset)
     UInt32 proffer = getClanProffer();
     if(proffer >= price)
     {
-        ConsumeInfo ci(BuyClanShopItems, 0, 0);
-        useClanProffer(price, &ci);
-
         if(GetPackage()->GetRestPackageSize() < 1)
         {
             sendMsgCode(2, 1011);
             return 0;
         }
+
+        ConsumeInfo ci(BuyClanShopItems, 0, 0);
+        useClanProffer(price, &ci);
 
         GetPackage()->Add(it->second.itemid, 1 , true, false, FromClanShop);
         //设置状态为已购买
