@@ -723,7 +723,7 @@ public:
         }
         else
         {
-            begin = TimeUtil::MkTime(2014, 11, 1);
+            begin = TimeUtil::MkTime(2014, 11, 2);
             end = TimeUtil::MkTime(2014, 11, 6);
         }
         UInt32 now = TimeUtil::Now();
