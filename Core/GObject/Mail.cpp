@@ -771,15 +771,16 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 					mailPackageManager.remove(id);
                     {
                         Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
-                        if(pl == NULL || _owner == NULL)
-                            break;
-                        if( (mail->flag & 0x7F) == 0x29 && pl->getClan())
+                        if(pl != NULL && _owner != NULL)
                         {
-                            SYSMSG_BROADCASTV(5246,_owner->getCountry(),_owner->getName().c_str(),pl->getClan()->getName().c_str(),pl->getCountry(),pl->getName().c_str());
-                        }
-                        else if( (mail->flag & 0x7F) == 0x30 )
-                        {
-                            SYSMSG_BROADCASTV(5247,_owner->getCountry(),_owner->getName().c_str(),pl->getCountry(),pl->getName().c_str());
+                            if( (mail->flag & 0x7F) == 0x29 && pl->getClan())
+                            {
+                                SYSMSG_BROADCASTV(5246,_owner->getCountry(),_owner->getName().c_str(),pl->getClan()->getName().c_str(),pl->getCountry(),pl->getName().c_str());
+                            }
+                            else if( (mail->flag & 0x7F) == 0x30 )
+                            {
+                                SYSMSG_BROADCASTV(5247,_owner->getCountry(),_owner->getName().c_str(),pl->getCountry(),pl->getName().c_str());
+                            }
                         }
                     }
                 }
