@@ -2739,7 +2739,7 @@ CREATE TABLE IF NOT EXISTS `exchange_treasure_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `horcruxAttr`;
-CREATE TABLE `horcruxAttr` (                       
+CREATE TABLE  IF NOT EXISTS `horcruxAttr` (                       
     `id` int(10) unsigned NOT NULL DEFAULT '0',        
     `itemId` int(10) unsigned NOT NULL DEFAULT '0',
     `value1` int(10) unsigned NOT NULL DEFAULT '0',        
