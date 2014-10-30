@@ -716,15 +716,20 @@ public:
     {
         UInt32 begin = 0;
         UInt32 end = 0;
-        if(type)
+        if(type == 1)
         {
             begin = TimeUtil::MkTime(2014, 11, 14);
             end = TimeUtil::MkTime(2014, 11, 24);
         }
-        else
+        else if( type == 0)
         {
             begin = TimeUtil::MkTime(2014, 11, 2);
             end = TimeUtil::MkTime(2014, 11, 6);
+        }
+        else
+        {
+            begin = TimeUtil::MkTime(2014, 11, 6);
+            end = TimeUtil::MkTime(2014, 11, 14);
         }
         UInt32 now = TimeUtil::Now();
         if((now >= begin && now <= end))
@@ -866,7 +871,7 @@ public:
     { 
         UInt32 now = TimeUtil::Now();
         UInt32 Begin = TimeUtil::MkTime(2014, 11, 1);
-        UInt32 End = TimeUtil::MkTime(2014, 11,3);
+        UInt32 End = TimeUtil::MkTime(2014, 11,4);
         if(now >= Begin && now <= End)
             return true;
         else

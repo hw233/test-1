@@ -1493,7 +1493,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     if(pl->GetVar(VAR_FLY_ROAD_GIFT_GOT_NUM) < 10 && pl->GetLev() >= 80)
         pl->SendFlyRoadGiftInfo();
 
-    if(World::getWinterEncounter(1) && pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS))
+    if((World::getWinterEncounter(1) || World::getWinterEncounter(2)) && pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS))
         pl->onWinterEncounterReturn();
 
     {
