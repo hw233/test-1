@@ -3301,6 +3301,18 @@ namespace GObject
                 if(lingshi)
                     m_Package->AddExistEquip(lingshi);
             }
+            for(UInt8 t = 0;t < 3; ++t)
+            { 
+                ItemEquip * equip = fgt->getEvolution()->SetEvolutionEquip(t, NULL);
+                if(equip)
+                     m_Package->AddExistEquip(equip);
+            } 
+            for(UInt8 t = 0;t < 4; ++t)
+            { 
+                ItemHorcrux * equip = fgt->getHorcrux()->SetHorcruxEquip(t, NULL);
+                if(equip)
+                     m_Package->AddExistEquip(equip);
+            } 
 		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
