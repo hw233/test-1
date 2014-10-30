@@ -825,7 +825,7 @@ function calcCriticalDef(defgt)
   end
   local deflev = defgt:getLevel();
   local criticaldeflvl = defgt:getExtraCriticalDef()
-  print("criticaldeflvl: "..criticaldeflvl)
+  --print("criticaldeflvl: "..criticaldeflvl)
   return criticaldeflvl/(criticaldeflvl + criticaldeflvl_factor*deflev + criticaldeflvl_addon_factor)*100
 end
 
@@ -835,7 +835,7 @@ function calcPierceDef(defgt)
   end
   local deflev = defgt:getLevel();
   local piercedeflvl = defgt:getExtraPierceDef()
-  print("piercedeflvl: "..piercedeflvl)
+  --print("piercedeflvl: "..piercedeflvl)
   return piercedeflvl/(piercedeflvl + piercedeflvl_factor*deflev + piercedeflvl_addon_factor)*100
 end
 
