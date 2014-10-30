@@ -819,13 +819,6 @@ function calcAutoBattle( mybp, theirbp )
   return 1 + autobattle_tweak - autobattle_tweak * mybp / theirbp
 end
 
-function calcCriticalDefLevel( fgt )
-  if fgt == nil then
-    return 0
-  end
-  return fgt:getExtraCriticalLevel()
-end
-
 function calcCriticalDef(defgt)
   if defgt == nil then
     return 0
