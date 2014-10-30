@@ -3801,7 +3801,7 @@ bool enum_send_xctj_welfare(void * ptr, void * data )
 {
     //static UInt32 welfare[] = {503,500,509,17103,17109};
     //static UInt8 welfareNum[] = {4,4,3,3,3};
-    static MailPackage::MailItem mitem[5] = {{503,2}, {500,2},{509,1},{17103,2},{17109,2}};
+    static MailPackage::MailItem mitem[5] = {{517,2}, {500,2},{509,2},{17103,2},{134,2}};
     GObject::Player* player = static_cast<GObject::Player*>(ptr);
     GObject::Player* pl = static_cast<GObject::Player*>(data);
     UInt32 now = TimeUtil::Now();
@@ -3817,7 +3817,7 @@ bool enum_send_xctj_welfare(void * ptr, void * data )
     SYSMSGV(title, 5241,pl->getCountry(), pl->getName().c_str());
     SYSMSGV(content, 5243,pl->getCountry(), pl->getName().c_str());
     { 
-        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        Mail * mail = player->GetMailBox()->newMail(pl, 0x30, title, content, 0xFFFE0000);
         if(mail)
         {
             mailPackageManager.push(mail->id, mitem, 5, true);
