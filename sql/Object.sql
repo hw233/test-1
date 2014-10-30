@@ -2758,5 +2758,7 @@ CREATE TABLE IF NOT EXISTS `fighter_horcrux` (
     `counterdefExp` int(10) unsigned NOT NULL DEFAULT 0,
     `attackpierceExp` int(10) unsigned NOT NULL DEFAULT 0,
     `lingshi_exp` int(10) unsigned NOT NULL DEFAULT 0,
+    `lingshi_exp2` int(10) unsigned NOT NULL DEFAULT 0,
+    `lingshi_exp3` int(10) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(`fighterId`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

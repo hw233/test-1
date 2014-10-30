@@ -8423,7 +8423,7 @@ namespace GObject
         lc.reset(2000);
         DBHorcruxHold adha;
         Player* pl = NULL;
-        if(execu->Prepare("SELECT `fighterId`, `playerId`, `criticaldefExp`, `piercedefExp`, `counterdefExp` ,`attackpierceExp`,`lingshi_exp`  FROM `fighter_horcrux` ", adha) != DB::DB_OK)
+        if(execu->Prepare("SELECT `fighterId`, `playerId`, `criticaldefExp`, `piercedefExp`, `counterdefExp` ,`attackpierceExp`,`lingshi_exp`,`lingshi_exp2`,`lingshi_exp3`  FROM `fighter_horcrux` ", adha) != DB::DB_OK)
             return false;
 
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -8447,6 +8447,8 @@ namespace GObject
             fgt->getHorcrux()->SetHorcruxHoldExp(2,adha.counterdefExp);
             fgt->getHorcrux()->SetHorcruxHoldExp(3,adha.attackpierceExp);
             fgt->getHorcrux()->SetHorcruxHoldExp(4,adha.lingshi_exp);
+            fgt->getHorcrux()->SetHorcruxHoldExp(5,adha.lingshi_exp2);
+            fgt->getHorcrux()->SetHorcruxHoldExp(6,adha.lingshi_exp3);
 		}
 		lc.finalize();
 

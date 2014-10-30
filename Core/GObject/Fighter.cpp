@@ -1991,10 +1991,15 @@ void Fighter::addLingshiAttr( ItemEquip* lingshi )
     /* ****************** */
     /* *****魂器加成***** */
     /* ****************** */
-    float up = GData::horcruxHoldAttr.getHorcruxHoldAttr2(getHorcrux()->GetHorcruxHoldExp(4))/100+1;
     {
-        ae = ae * up;
-    }  
+        float up = GData::horcruxHoldAttr.getHorcruxHoldAttr2(getHorcrux()->GetHorcruxHoldExp(4))/100+1;
+        ae.attack = ae.attack * up;
+        ae.magatk = ae.magatk * up;
+        float up1 = GData::horcruxHoldAttr.getHorcruxHoldAttr2(getHorcrux()->GetHorcruxHoldExp(5))/100+1;
+        ae.hp = ae.hp * up1;
+        float up2 = GData::horcruxHoldAttr.getHorcruxHoldAttr2(getHorcrux()->GetHorcruxHoldExp(6))/100+1;
+        ae.action = ae.action * up2;
+    }
 	addAttrExtra(_attrExtraEquip, igt->attrExtra);
 	addAttrExtra(_attrExtraEquip, &ae);
 }

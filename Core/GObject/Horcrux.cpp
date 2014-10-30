@@ -52,7 +52,7 @@ namespace GObject
     {
         if(!_fighter->getOwner())
             return ;
-        DB1().PushUpdateData("replace into `fighter_horcrux`(fighterId, playerId, criticaldefExp,piercedefExp,counterdefExp, attackpierceExp ,lingshi_exp) values(%u, %" I64_FMT "u, %u,%u, %u, %u , %u)", _fighter->getId(), _fighter->getOwner()->getId(), GetHorcruxHoldExp(0),GetHorcruxHoldExp(1), GetHorcruxHoldExp(2), GetHorcruxHoldExp(3),GetHorcruxHoldExp(4));
+        DB1().PushUpdateData("replace into `fighter_horcrux`(fighterId, playerId, criticaldefExp,piercedefExp,counterdefExp, attackpierceExp ,lingshi_exp,lingshi_exp2,lingshi_exp3) values(%u, %" I64_FMT "u, %u,%u, %u, %u , %u,%u,%u)", _fighter->getId(), _fighter->getOwner()->getId(), GetHorcruxHoldExp(0),GetHorcruxHoldExp(1), GetHorcruxHoldExp(2), GetHorcruxHoldExp(3),GetHorcruxHoldExp(4),GetHorcruxHoldExp(5),GetHorcruxHoldExp(6));
 
     }
     void Horcrux::UpdateHorcruxEquipmentToDB()
@@ -95,8 +95,15 @@ namespace GObject
             } 
         }
         if(color > 3)
-            AddHorcruxHoldExp(4 , (color - 3)*20);  
-
+        {
+            UInt8 index = uRand(100)%3;
+            for(UInt8 i = 0; i < 3; ++i)
+            {
+                if(i == index && color == 4 )
+                    continue;
+                AddHorcruxHoldExp(4 + i , (color - 3)*20);  
+            }
+        }
         Package* m_package = _fighter->getOwner()->GetPackage();
         m_package->DelEquip2(horcrux,ToHorcruxHold);
         _fighter->setDirty(true);

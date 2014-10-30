@@ -1795,6 +1795,8 @@ struct DBHorcruxHold
     UInt32 counterdefExp;
     UInt32 attackpierceExp;
     UInt32 lingshi_exp;
+    UInt32 lingshi_exp2;
+    UInt32 lingshi_exp3;
 };
 
 }
@@ -4054,7 +4056,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBHorcruxHold)
-SPECIALDEF(7)
+SPECIALDEF(9)
 (
 	UInt32, fighterId,
     UInt64, playerId,
@@ -4062,7 +4064,9 @@ SPECIALDEF(7)
     UInt32, piercedefExp,
     UInt32, counterdefExp,
     UInt32, attackpierceExp,
-    UInt32, lingshi_exp
+    UInt32, lingshi_exp,
+    UInt32, lingshi_exp2,
+    UInt32, lingshi_exp3
 )
 SPECIALEND()
 }

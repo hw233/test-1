@@ -8,7 +8,7 @@
 namespace GObject
 {
 #define HORCRUX_EQUIPMENT_MAX 4
-#define HORCRUX_HOLD_MAX 5
+#define HORCRUX_HOLD_MAX 7
     class Fighter;
     class ItemHorcrux;
     class Horcrux
