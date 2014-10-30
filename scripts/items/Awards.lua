@@ -2237,8 +2237,12 @@ function getFeiShengDanAward(player,opt)
     end
 end
 function getBaiFuBagAward(player)
-    local award = {{9425,5},{515,3},{549,2},{503,5},{134,5},{1325,5},{9388,1},{9360,5}}
+    local award = {{515,3},{9338,5},{1325,5},{549,1},{9498,5},{9425,8},{9388,2},{134,5}}
     local package = player:GetPackage();
+    if package:GetRestPackageSize() < #award then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
     for i = 1,#award do
         package:AddItem(award[i][1], award[i][2], true, 0, 39);
     end
@@ -2247,12 +2251,12 @@ end
 
 function getXCTJCountAward(player,opt,index)
     local award = {
-        [1] = {{503 ,2},{500 ,2},{56  ,2},{57  ,2}},
-        [2] = {{501 ,3},{9498,3},{516 ,3},{547 ,3}},
-        [3] = {{9600,4},{16001,4},{9414,4},{9424,4}},
-        [4] = {{9457,6},{1126,6},{134,6},{1325,6}},
-        [5] = {{9600,7},{9076,5},{515,6},{517,8}},
-        [6] = {{13017,1},{13137,1},{13117,1},{13157,1},{13197,1}},
+        [1] = {{17103 ,2},{500 ,2},{56  ,2},{57  ,2}},
+        [2] = {{17110 ,3},{9498,3},{516 ,3},{547 ,3}},
+        [3] = {{9600,4},{9457,4},{9414,4},{9424,4}},
+        [4] = {{9457,6},{1126,6},{17107,6},{1325,6}},
+        [5] = {{9600,7},{9076,5},{17105,6},{517,8}},
+        [6] = {{5068,1},{5138,1},{5098,1},{5108,1},{5128,1},{5118,1}},
     }
     if opt > 6 or opt == 0 then
         return ;
@@ -2260,6 +2264,11 @@ function getXCTJCountAward(player,opt,index)
 
     local package = player:GetPackage();
     if package == nil then
+        return 
+    end
+
+    if package:GetRestPackageSize() < 6 then
+        player:sendMsgCode(2, 1011, 0)
         return 
     end
 
@@ -2278,28 +2287,31 @@ end
 
 local chance_egg = {1100 ,2080 ,2980 ,3780 ,4580 ,5280 ,5960 ,6560 ,7160 ,7760 ,8360 ,8810 ,9110 ,9410 ,9710 ,9810 ,9910 ,9960 ,9990 ,10000 }
 local awardEgg = {
-    [1] ={{503,1}},
-    [2] ={{500,1}},
-    [3] ={{501,1}},
+    [1] ={{17103,1}},
+    [2] ={{500,3}},
+    [3] ={{501,2}},
     [4] ={{554,1}},
     [5] ={{16001,1}},
     [6] ={{9498,1}},
     [7] ={{9457,1}},
     [8] ={{9600,1}},
     [9] ={{509,1}},
-    [10] ={{134,1}},
+    [10] ={{17107,1}},
     [11] ={{1325,1}},
     [12] ={{556,1}},
-    [13] ={{7420,5},{7720,5},{7620,5},{7220,5},{7320,5},{7020,5},{7120,5},{7520,5}},
-    [14] ={{515,1}},
+    [13] ={{7421,5},{7721,5},{7621,5},{7221,5},{7321,5},{7021,5},{7121,5},{7521,5}},
+    [14] ={{17105,1}},
     [15] ={{9076,1}},
-    [16] ={{13132,1},{13112,1},{13012,1},{13032,1},{13052,1},{13072,1},{13092,1},{13172,1},{13152,1},{13192,1}},
-    [17] ={{9022,1}},
-    [18] ={{9075,1}},
-    [20] ={{1733,1},{1732,1},{1734,1},{1735,1}},
+    [16] ={{9022,1}},
+    [17] ={{9075,1}},
+    [18] ={{13132,1},{13112,1},{13012,1},{13032,1},{13052,1},{13072,1},{13092,1},{13172,1},{13152,1},{13192,1}},
+    --[20] ={{1733,1},{1732,1},{1734,1},{1735,1}},
 }
 local chance_19 = { 1000 ,2000 ,3000 ,4000 ,5000 ,6000 ,6500 ,7000 ,7500 ,8000 ,8500 ,9100 ,9400 ,9700 ,10000 }
 local award_19 = {5058,5038,5028,5048,5008,5018,5148,5088,5128,5118,5108,5078,5068,5138,5098}
+
+local chance_20 = {1600 ,3200 ,4800 ,6400 ,7575 ,8575 ,9375 ,9575 ,9775 ,9875 ,9975 ,9995 ,10000 }
+local award_20 = {1717,1728,1700,1701,1727,1729,1726,1733,1732,1734,1735,1742,1741}
 
 function getHitEggAward(player,num)
     if player == nil then
@@ -2316,7 +2328,7 @@ function getHitEggAward(player,num)
         local g = math.random(1, 10000)
         local index = 0;
         local item_id = 0;
-        local item_count = 0;
+        local item_count = 1;
         for k = 1,#chance_egg do
             if g <= chance_egg[k] then
                 index = k
@@ -2339,6 +2351,17 @@ function getHitEggAward(player,num)
             end
             item_id = award_19[idx]
             item_count = 1;
+        elseif index == 20 then
+            local r = math.random(1, 10000)
+            local idx = 0;
+            for k = 1,#chance_20 do
+                if r <= chance_20[k] then
+                    idx = k
+                    break;
+                end
+            end
+            item_id = award_20[idx]
+            item_count = 1;
         elseif #awardEgg[index] == 1 then
             item_id = awardEgg[index][1][1];
             item_count =  awardEgg[index][1][2];
@@ -2347,14 +2370,12 @@ function getHitEggAward(player,num)
             item_id = awardEgg[index][idx][1];
             item_count =  awardEgg[index][idx][2];
         end
-        if index > 3 then
+        if index > 8 then
             Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]运气爆棚，砸金蛋竟然砸出个[4:"..item_id.."]x"..item_count.."，简直碉堡了！")
         end
-        if index == 20 then 
-            package:AddEquip(item_id , true, 0, 39);
-        else
-            package:AddItem(item_id, item_count, true, 0, 39);
-        end
+
+        package:Add(item_id, item_count, true, 0, 39); --修改
+
         if max == index then
             itemId = item_id
             count = item_count

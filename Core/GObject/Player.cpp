@@ -9163,7 +9163,7 @@ namespace GObject
         }
         if(World::getBaiFuBagTime())
         { 
-            if(r >= 288 && GetVar(VAR_BAIFU_BAG_STATUE) == 0)
+            if(r >= 388 && GetVar(VAR_BAIFU_BAG_STATUE) == 0)
             {
                 SetVar(VAR_BAIFU_BAG_STATUE,1);
                 sendBaiFuBagInfo();
@@ -9349,7 +9349,12 @@ namespace GObject
         AddQZoneRecharge(r);
         if(World::getTYSSTime())
             AddLingGuo(r);//天元神兽
-        //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
+        if(World::getWinterEncounter(0))
+        {
+            AddVar(VAR_WINTER_ENCOUNTER_RECHARGE_TOTAL, r);
+            onWinterEncounterReturn();
+        }
+   //SetVar(VAR_DROP_OUT_ITEM_MARK, 0);
     }
 
     void Player::addRechargeNextRet(UInt32 r)
@@ -28826,14 +28831,14 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
             static UInt32 awards1[10][4][2] = {
                 {{503,5},  {500,1}, {501,1}, {49,20}},
                 {{517,5},  {551,5}, {0,0}, {70,10}},
-                {{9418,5}, {9414,5}, {9424,5}, {100,10}},
+                {{554,5}, {9310,1}, {0,0}, {65,10}},
                 {{555,10}, {556,5}, {0,0}, {150,10}},
-                {{9338,5}, {554,5}, {0,0},{175,10}},
-                {{8000,5}, {33,5}, {0,0},{75,10}},
-                {{9498,10}, {9497,5}, {0,0},{175,10}},
                 {{9600,10}, {9500,5}, {0,0},{100,10}},
-                {{9019,5}, {9022,5}, {0,0},{1100,5}},
-                {{1735,1}, {0,0}, {0,0},{999,1}},
+                {{17103,5}, {17109,5}, {0,0},{105,10}},
+                {{17105,5}, {17104,5}, {0,0},{300,10}},
+                {{17107,5}, {17106,5}, {0,0},{175,10}},
+                {{9075,5}, {9022,5}, {0,0},{1100,5}},
+                {{1732,1}, {0,0}, {0,0},{999,1}},
             };
 
             UInt32 clan_contribute = GetVar(VAR_TYSS_CONTRIBUTE_CLAN);
@@ -29111,11 +29116,11 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                 { {1719, 1}, {1717, 1}, {1700, 1}, {1711, 1}, {1709, 1}, {1701, 1}, {1703, 1} },
             };
             static UInt32 everydayAward1[5][7][2] = {
-                { {15, 3}, {500, 3}, {501, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9424, 3}, {547, 3}, {57, 3}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {9371, 3}, {9600, 3}, {517, 3}, {0, 0}, {0, 0}, {0, 0}, {0 ,0} },
-                { {9457, 3}, {1325, 3}, {556, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-                { {13116, 1}, {13136, 1}, {13156, 1}, {13036, 1}, {13056, 1}, {0, 0}, {0, 0} },
+                { {17109, 3}, {500, 3}, {15, 5}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+                { {17103, 3}, {516, 3}, {503, 3}, {517, 3}, {0, 0}, {0, 0}, {0, 0} },
+                { {9600, 5}, {9457, 5}, {9414, 3}, {9498, 3}, {0, 0}, {0, 0}, {0 ,0} },
+                { {17107, 3}, {17105, 3}, {551, 3}, {1325, 3}, {0, 0}, {0, 0}, {0, 0} },
+                { {20067, 1}, {20007, 1}, {20057, 1}, {20037, 1}, {20027, 1}, {0, 0}, {0, 0} },
             };
  
             UInt8 totalPackageSize = 0;
@@ -29181,7 +29186,7 @@ void Player::OpTYSS(UInt8 type , UInt8 flag,UInt64 playerid)
                             return;
                         }
                         GetPackage()->Add(everydayAward1[flag - 1][dayChoice][0], everydayAward1[flag - 1][dayChoice][1] , true, false, FromTYSS);
-                        UInt8 op_color = 3;
+                        UInt8 op_color = 2;
                         switch(dayChoice)
                         {
                             case 0:
@@ -34522,14 +34527,14 @@ bool Player::buyClanShopItems(UInt8 offset)
     UInt32 proffer = getClanProffer();
     if(proffer >= price)
     {
-        ConsumeInfo ci(BuyClanShopItems, 0, 0);
-        useClanProffer(price, &ci);
-
         if(GetPackage()->GetRestPackageSize() < 1)
         {
             sendMsgCode(2, 1011);
             return 0;
         }
+
+        ConsumeInfo ci(BuyClanShopItems, 0, 0);
+        useClanProffer(price, &ci);
 
         GetPackage()->Add(it->second.itemid, 1 , true, false, FromClanShop);
         //设置状态为已购买
@@ -36377,9 +36382,9 @@ UInt8 Player::HitEggInXCTJ(UInt8 type)
 
     GameAction()->getHitEggAward(this,nums[type]);
 
-    if(GetVar(VAR_XCTJ_COUNT)/3000 < (GetVar(VAR_XCTJ_COUNT)+nums[type]*10)/3000)
-    { 
-    } 
+    //if(GetVar(VAR_XCTJ_COUNT)/3000 < (GetVar(VAR_XCTJ_COUNT)+nums[type]*10)/3000)  //XXX 奇怪的代码
+    //{ 
+    //} 
     AddVar(VAR_XCTJ_COUNT,nums[type] * 10);
 
     UInt32 xctjCount = GetVar(VAR_XCTJ_COUNT);
@@ -36456,7 +36461,7 @@ void Player::getXCTJCountAward(UInt8 type)  //type 从0开始
         return ;
     if( count/3000 < repeat || (count - repeat * 3000) < countLimit[type])
         return ;
-    if(!GameAction()->getXCTJCountAward(this,type+1,(repeat%5)+1))
+    if(!GameAction()->getXCTJCountAward(this,type+1,(repeat%6)+1))
         return ;
     award |= (1<<type); 
     if(award == 0x3F)
@@ -36646,6 +36651,113 @@ void Player::sendFighterHorcruxInfo()
         }
     }
 }
+
+void Player::onWinterEncounterReturn()
+{
+    Stream st(REP::COUNTRY_ACT);
+    st << static_cast<UInt8>(0x20);
+    st << GetVar(VAR_WINTER_ENCOUNTER_RECHARGE_TOTAL);
+    st << static_cast<UInt8>(GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS));
+    st << Stream::eos;
+    send(st);
+}
+
+void Player::buyWinterEncounterPlan(UInt8 type)
+{
+    if(!World::getWinterEncounter(0) || !(type >= 1 && type <= 3))
+        return;
+    static UInt32 rechargeLevel[] = {200, 600, 2000};
+    static UInt32 needGold[] = {199, 599, 1999};
+    if(!GET_BIT(GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), (type - 1)))
+    {
+        if(GetVar(VAR_WINTER_ENCOUNTER_RECHARGE_TOTAL) < rechargeLevel[type - 1])
+        {
+            sendMsgCode(0, 3511);
+            return;
+        }
+        ConsumeInfo ci(WINTER_ENCHOUNTER,0,0);
+        if(!hasChecked())
+            return;
+        if (getGold() < needGold[type - 1])
+        {
+            sendMsgCode(0, 1104);
+            return;
+        }
+        useGold(needGold[type - 1], &ci);
+        SetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS, SET_BIT(GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), (type - 1)));
+        onWinterEncounterReturn();
+    }
+}
+
+void Player::sendJingjiAward(UInt32 type)
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{503, 4}, {500, 3}, {0xA000, 200} },
+        {{513, 3}, {17109, 2}, {0, 0} },
+        {{501, 3}, {16001, 2}, {0, 0} },
+        {{551, 2}, {0xA000, 50}, {0, 0} },
+        {{9414, 2}, {0xA000, 50}, {0, 0} },
+        {{13007,  1}, {0,  0}, {0,  0} },
+        {{13087,  1}, {0,  0}, {0,  0} },
+        {{13047,  1}, {0,  0}, {0,  0} },
+        {{13067,  1}, {0,  0}, {0,  0} },
+        {{13127,  1}, {0,  0}, {0,  0} },
+    };
+
+    SYSMSG(title, 5260);
+    SYSMSGV(content, 5261, type + 1, 9 - type);
+    MailItemsInfo itemsInfo(s_item[type], Activity, 3);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(mail)
+        mailPackageManager.push(mail->id, s_item[type], 3, true);
+}
+
+void Player::sendChaoZhiAward(UInt32 type)
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{17103, 5}, {9498, 5}, {0xA000, 400} },
+        {{17103, 2}, {17109, 2}, {0xA000, 150} },
+        {{9600, 5}, {9457, 5}, {0xA000, 150} },
+        {{16001, 5}, {503, 5}, {0xA000, 200} },
+        {{9425, 3}, {0xA000, 200}, {0, 0} },
+        {{13009,  1}, {0,  0}, {0,  0} },
+        {{13089,  1}, {0,  0}, {0,  0} },
+        {{13109,  1}, {0,  0}, {0,  0} },
+        {{13149,  1}, {0,  0}, {0,  0} },
+        {{13129,  1}, {0,  0}, {0,  0} },
+    };
+
+    SYSMSG(title, 5262);
+    SYSMSGV(content, 5263, type + 1, 9 - type);
+    MailItemsInfo itemsInfo(s_item[type], Activity, 3);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(mail)
+        mailPackageManager.push(mail->id, s_item[type], 3, true);
+}
+
+void Player::sendHaoHuaAward(UInt32 type)
+{
+    static MailPackage::MailItem s_item[][3] = {
+        {{17103, 10}, {134, 10}, {0xA000, 2000} },
+        {{17103, 5}, {1325, 5}, {0xA000, 300} },
+        {{9338, 5}, {134, 5}, {0xA000, 300} },
+        {{17105, 5}, {17109, 5}, {0xA000, 400} },
+        {{515, 5}, {17110, 5}, {0xA000, 400} },
+        {{13012,  1}, {0,  0}, {0,  0} },
+        {{13092,  1}, {0,  0}, {0,  0} },
+        {{13112,  1}, {0,  0}, {0,  0} },
+        {{13152,  1}, {0,  0}, {0,  0} },
+        {{13132,  1}, {0,  0}, {0,  0} },
+    };
+
+    SYSMSG(title, 5264);
+    SYSMSGV(content, 5265, type + 1, 9 - type);
+    MailItemsInfo itemsInfo(s_item[type], Activity, 3);
+    Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    if(mail)
+        mailPackageManager.push(mail->id, s_item[type], 3, true);
+}
+
 
 } // namespace GObject
 

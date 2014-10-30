@@ -3710,6 +3710,13 @@ namespace GObject
         void firstPotOfGold(UInt32);
         void firstPotOfGoldReturn(UInt8);
 
+        void onWinterEncounterReturn();
+        void buyWinterEncounterPlan(UInt8);
+        void sendJingjiAward(UInt32);
+        void sendChaoZhiAward(UInt32);
+        void sendHaoHuaAward(UInt32);
+
+
         void giveCarnivalDailyAward(UInt32);
         void shakeMoneyBag();
 

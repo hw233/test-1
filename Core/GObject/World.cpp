@@ -417,6 +417,26 @@ bool enum_midnight(void * ptr, void* next)
         }
     }
 
+
+    if(World::getWinterEncounter(1))
+    {
+        UInt32 begin = TimeUtil::MkTime(2014, 11, 14);
+        UInt32 now = TimeUtil::Now();
+        now = now - 300;
+        UInt32 index = (now - begin)/86400;
+        if (index > 9)
+            index = 9;
+        if(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS))
+        {
+            if(GET_BIT(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), 0))
+                pl->sendJingjiAward(index);
+            if(GET_BIT(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), 1))
+                pl->sendChaoZhiAward(index);
+            if(GET_BIT(pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS), 2))
+                pl->sendHaoHuaAward(index);
+        }
+    }
+
     if (bValentineDayEnd)
     {
         UInt32 num = pl->GetVar(VAR_SHUSAN_LOVE);
@@ -5432,13 +5452,13 @@ void World::SendTYSSPlayerAward(UInt8 actType)
         {{134,15},{1325,15},{515,10},{9075,8}},
     };
     static MailPackage::MailItem s_item1[][4] = {
-        {{1325,30},{9600,25},{515,25},{9498,30}},
-        {{1325,25},{9600,20},{515,20},{9498,25}},
-        {{1325,20},{9600,15},{515,15},{9498,20}},
-        {{1325,15},{9600,10},{515,10},{9498,15}},
+        {{17105,50},{9600,80},{9498,50},{9068,40}},
+        {{17105,30},{9600,40},{9498,30},{9068,20}},
+        {{17105,15},{9600,20},{9498,15},{9068,10}},
+        {{17105,6},{9600,8},{9498,8},{9068,5}},
     };
     static MailPackage::MailItem s_item2[][4] = {
-        {{17810,1}},
+        {{17817,1}},
         {{0,0}},
         {{0,0}},
         {{0,0}},
@@ -5931,15 +5951,15 @@ void World::SendXCTJAward()
 { 
     World::initRCRank();
     static MailPackage::MailItem s_item[][5] = {
-        {{515,30},{9600,40},{503,50},{134,40},{1325,40}},
-        {{515,20},{9600,30},{503,40},{134,30},{1325,30}},
-        {{515,10},{9600,15},{503,25},{134,15},{1325,15}},
-        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
-        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
-        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
-        {{515,6},{9600,8},{503,15},{134,8} ,{1325,8}},
+        {{17105,60},{9600,80},{503,80},{17107,60},{9075,50}},
+        {{17105,40},{9600,50},{503,40},{17107,40},{9075,30}},
+        {{17105,20},{9600,20},{503,20},{17107,20},{9075,10}},
+        {{17105,6},{9600,8},{503,15},{17107,8} ,{1325,8}},
+        {{17105,6},{9600,8},{503,15},{17107,8} ,{1325,8}},
+        {{17105,6},{9600,8},{503,15},{17107,8} ,{1325,8}},
+        {{17105,6},{9600,8},{503,15},{17107,8} ,{1325,8}},
     };
-    static MailPackage::MailItem card = {17807,1};   //暂无白马王子
+    static MailPackage::MailItem card = {17816,1};   //暂无白马王子
 
     SYSMSG(title, 5244);
     int pos = 0;

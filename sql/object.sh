@@ -177,18 +177,15 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_updatevar685.sql  #修改累计加速次数
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_deletevar871-873.sql  #藏宝阁
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clear651.sql     #清空VAR(大转盘)
-<<<<<<< HEAD
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearSeekingHer.sql     #清除众里寻她
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearSeekingHer.sql     #清除众里寻她
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141021_1.sql #为散仙增加资质和潜力祝福值字段
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_xingchen_gem7.sql #星辰gem7
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearvar825_1.sql     #清除光棍月大礼盒
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141029_clearXCTJ.sql     #清除光棍月大礼盒
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141017_cHorcrux.sql     #创建魂器属性表
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141020_cHorcruxHold.sql     #创建器灵
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141021_addHorcrux.sql      #添加魂器装备字段
-=======
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_clearSeekingHer.sql     #清除众里寻她
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/clearxyx.sql #清除幸运星购买次数，开启幸运星活动时开启(Q点直购)
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20141021_1.sql #为散仙增加资质和潜力祝福值字段
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_xingchen_gem7.sql #星辰gem7
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_AriBook_1121.sql     #天书奇缘清空
->>>>>>> 09679eb63eb3a56a9722023cca61da89e0387805
 }
 
 #sh player_jiguan.sh

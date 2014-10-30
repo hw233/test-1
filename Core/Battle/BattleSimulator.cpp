@@ -1150,6 +1150,8 @@ UInt32 BattleSimulator::doSpiritAttack(BattleFighter * bf, BattleFighter* bo, fl
             dmg = dmg > 0 ? dmg : 1;
             if(cs2)
                 doControlBall(bf);
+            if(pr2)
+                calcBMTLCnt(bf);
         }
 
         doShieldHPAttack(bo, dmg);
@@ -1278,6 +1280,8 @@ UInt32 BattleSimulator::doOtherConfuseForgetAttackOnce(BattleFighter * bf, Battl
             dmg = dmg > 0 ? dmg : 1;
             if(cs2)
                 doControlBall(bf);
+            if(pr2)
+                calcBMTLCnt(bf);
         }
 
         doShieldHPAttack(bo, dmg);
@@ -1351,6 +1355,8 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo)
 
             doControlBall(bf);
         }
+        if(pr)
+            calcBMTLCnt(bf);
 
         float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
         float def = getBFDefend(area_target);
@@ -1726,6 +1732,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                 }
                 if(cs2)
                     doControlBall(bf);
+                if(pr2)
+                    calcBMTLCnt(bf);
             }
 
             if(area_target->getMagAtkReduce3Last() > 0)
@@ -2034,6 +2042,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                     }
                     float def = getBFDefend(bf);
                     bool pr2 = target_fighter->calcPierce(bf);
+                    if(pr2)
+                        calcBMTLCnt(target_fighter);
                     float toughFactor = pr2 ? bf->getTough(target_fighter) : 1.0f;
                     float atkreduce = getBFAtkReduce(bf);
                     float factor = 1 + bf->getDarkVigorFactor();
@@ -2066,7 +2076,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
                         UInt32 value = static_cast<UInt32>(bf->getAtkReduce()*100);
                         appendStatusChange(e_stAtkReduce, value, 0, bf);
                     }
-                    calcBMTLCnt(target_fighter);
+                    //calcBMTLCnt(target_fighter);
                 }
 #if 0
                 else
@@ -2088,6 +2098,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& first, bool& cs, bo
         //printf("%u:%u %s ground object, made %u damage, hp left: %u\n", 1-side, from_pos, cs2 ? "CRITICALs" : "hits", dmg, area_target_obj->getHP());
         if(cs2)
             doControlBall(bf);
+        if(pr2)
+            calcBMTLCnt(bf);
     }
 
     if(first)
@@ -10395,6 +10407,8 @@ UInt32 BattleSimulator::CalcNormalAttackDamage(BattleFighter * bf, BattleObject*
 
             doControlBall(bf);
         }
+        if(pr)
+            calcBMTLCnt(bf);
 
         float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
         float def = getBFDefend(area_target);
@@ -14356,6 +14370,8 @@ void BattleSimulator::doSneakAttack(BattleFighter* bf, BattleFighter* bo, bool& 
 
             doControlBall(bf);
         }
+        if(pr)
+            calcBMTLCnt(bf);
 
         float toughFactor = pr ? bo->getTough(bf) : 1.0f;
         float def = getBFDefend(bo);
@@ -14551,6 +14567,8 @@ void BattleSimulator::doSkillEffectExtra_AbnormalTypeDmg(BattleFighter* bf, cons
                     }
                     if(cs2)
                         doControlBall(bf);
+                    if(pr2)
+                        calcBMTLCnt(bf);
 
                     float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
                     float factor = atklist[j].factor;
@@ -15551,6 +15569,8 @@ void BattleSimulator::doSkillAttackByCareer(BattleFighter *bf, const GData::Skil
                     }
                     if(cs2)
                         doControlBall(bf);
+                    if(pr2)
+                        calcBMTLCnt(bf);
 
                     float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
                     float factor = atklist[j].factor;
@@ -16253,6 +16273,8 @@ void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::S
                     }
                     if(cs2)
                         doControlBall(bf);
+                    if(pr2)
+                        calcBMTLCnt(bf);
 
                     float toughFactor = pr2 ? target->getTough(bf) : 1.0f;
                     float factor = atklist[j].factor;
@@ -16359,6 +16381,8 @@ void BattleSimulator::doSkillAttackByEvolution(BattleFighter *bf, const GData::S
                         float def = getBFEvolutionDefend(bo);
                         if(cs2)
                             doControlBall(bf);
+                        if(pr2)
+                            calcBMTLCnt(bf);
 
                         float toughFactor = pr2 ? bo->getTough(bf) : 1.0f;
                         float factor = 1;
@@ -16419,21 +16443,15 @@ void BattleSimulator::doBMTLDispearAttack(BattleFighter* bf)
         return;
     appendDefStatus(e_skill, skill->getId(), bf);
     UInt8 target_side = 1 - bf->getSide();
-    UInt8 excepts[25] = {0};
-    UInt8 exceptCnt = 0;
     for(int i = 0; i < 25; i++)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, i));
         if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
             continue;
         if(bo->isSoulOut() || bo->isLingQu())
-        {
-            excepts[exceptCnt] = bo->getPos();
-            ++exceptCnt;
-        }
+            continue;
+        doSSMakeDamage(bf, bo, 0.3);
     }
-    BattleFighter* rnd_bf = getRandomFighter(target_side, excepts, exceptCnt);
-    doSSMakeDamage(bf, rnd_bf, 0.3);
 }
 
 } // namespace Battle
