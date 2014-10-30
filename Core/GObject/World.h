@@ -866,7 +866,7 @@ public:
     { 
         UInt32 now = TimeUtil::Now();
         UInt32 Begin = TimeUtil::MkTime(2014, 11, 1);
-        UInt32 End = TimeUtil::MkTime(2014, 11,3);
+        UInt32 End = TimeUtil::MkTime(2014, 11,4);
         if(now >= Begin && now <= End)
             return true;
         else

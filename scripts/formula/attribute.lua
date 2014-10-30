@@ -18,16 +18,16 @@ deflvl_addon_factor = 1500
 
 --暴击抗性
 criticaldeflvl_factor = 30
-criticaldeflvl_addon_factor = 950
+criticaldeflvl_addon_factor = 9500
 --破击抗性
 piercedeflvl_factor = 30
-piercedeflvl_addon_factor = 950
+piercedeflvl_addon_factor = 9500
 --反击抗性
 counterdeflvl_factor = 30
-counterdeflvl_addon_factor = 950
+counterdeflvl_addon_factor = 9500
 --攻击穿透
 attackpiercelvl_factor = 30
-attackpiercelvl_addon_factor = 950
+attackpiercelvl_addon_factor = 9500
 
 hitrate_max = 160
 evade_max = 65
