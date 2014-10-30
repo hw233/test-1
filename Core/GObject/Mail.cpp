@@ -772,7 +772,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
                     {
                         Player * pl = globalNamedPlayers[_owner->fixName(mail->sender)];
                         if(pl == NULL || _owner == NULL)
-                            return ;
+                            break;
                         if( (mail->flag & 0x7F) == 0x29 && pl->getClan())
                         {
                             SYSMSG_BROADCASTV(5246,_owner->getCountry(),_owner->getName().c_str(),pl->getClan()->getName().c_str(),pl->getCountry(),pl->getName().c_str());
