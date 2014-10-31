@@ -2031,6 +2031,7 @@ CREATE TABLE IF NOT EXISTS `fighter_xingchen` (
     `gem4` smallint(6) unsigned NOT NULL DEFAULT 0,
     `gem5` smallint(6) unsigned NOT NULL DEFAULT 0,
     `gem6` smallint(6) unsigned NOT NULL DEFAULT 0,
+    `gem7` smallint(6) unsigned NOT NULL DEFAULT 0,
     `xctCurVal` smallint(6) unsigned NOT NULL DEFAULT 0,
     `xctMaxVal` smallint(6) unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(`fighterId`, `playerId`)
