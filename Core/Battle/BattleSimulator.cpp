@@ -7271,10 +7271,46 @@ UInt32 BattleSimulator::doAttack( int pos )
             else
                 petPos = 0xFF;
 
+            UInt8 moPos[5] = {0};
+            UInt8 moCnt = 0;
+            for(UInt8 pos = 0; pos < 25; pos++)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
+                if(bo == NULL || bo->getHP() == 0)
+                    continue;
+
+                if(bo->getClass() == e_cls_mo)
+                {
+                    const GData::SkillBase* peerless = bo->getBFPeerless();
+                    if(peerless && peerless->getId() == 28309)
+                        continue;
+
+                    UInt8 col = pos % 5;
+                    if(moPos[col] == 0)
+                    {
+                        moPos[moCnt] = col;
+                        ++moCnt;
+                    }
+                }
+            }
+
             for(UInt8 pos = 0; pos < 25; pos++)
             {
                 if(pos == petPos)
                     continue;
+
+                if(pos < 5)
+                {
+                    UInt8 i = 0;
+                    for(UInt8 i = 0; i < moCnt; i++)
+                    {
+                        if(pos == moPos[i])
+                            break;
+                    }
+                    if(i < moCnt)
+                        continue;
+                }
+
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
                 if(bo == NULL || bo->getHP() == 0)
                 {
