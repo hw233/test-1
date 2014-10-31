@@ -7266,7 +7266,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             UInt8 target_side = bf->getSide();
             UInt8 target_pos;
             UInt8 petPos;
-            if(_backupObjs[side])
+            if(_backupObjs[target_side])
                 petPos = _backupTargetPos[target_side];
             else
                 petPos = 0xFF;
