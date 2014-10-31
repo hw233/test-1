@@ -197,8 +197,10 @@ UInt8 Fighter::getColor2( float pot )
 		return 2;
 	if(pot < 1.799f)
 		return 3;
-	if(pot < 2.099f)
+	if(pot < 2.399f)
 		return 4;
+    if(pot < 3.001f)
+        return 5;
 	return 10;
 }
 
@@ -7156,7 +7158,7 @@ void Fighter::GMSetXCTMaxVal(UInt16 value)
 
 void Fighter::updateDBxingchen()
 {
-    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`, `xctCurVal`, `xctMaxVal`)\
+    DB1().PushUpdateData("REPLACE INTO `fighter_xingchen` (`fighterId`, `playerId`, `level`, `curVal`, `gem1`, `gem2`, `gem3`, `gem4`, `gem5`, `gem6`,`gem7`, `xctCurVal`, `xctMaxVal`)\
             VALUES(%u, %" I64_FMT "u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), m_xingchen.lvl, m_xingchen.curVal,
             m_xingchen.gems[0], m_xingchen.gems[1], m_xingchen.gems[2], m_xingchen.gems[3], m_xingchen.gems[4], m_xingchen.gems[5], m_xingchen.gems[6], m_xingchen.xctCurVal, m_xingchen.xctMaxVal);
 }
@@ -8393,6 +8395,24 @@ Evolution * Fighter::getEvolution()
 void Fighter::UpdateIncenseToDB()
 {
     DB2().PushUpdateData("UPDATE `fighter` SET `incense` = %u WHERE `id` = %u AND `playerId` = %" I64_FMT "u", _incense, _id, _owner->getId());
+}
+
+void Fighter::setpotentialFail(UInt32 p, bool toDB)
+{
+    _potentialFailTimes = p;
+    if(toDB)
+    {
+        DB1().PushUpdateData("UPDATE `fighter` SET `potentialFail` = %u where `id` = %u and `playerId` = %" I64_FMT "u", _potentialFailTimes, getId(), _owner->getId());
+    }
+}
+
+void Fighter::setcapacityFail(UInt32 c, bool toDB)
+{
+    _capacityFailTimes = c;
+    if(toDB)
+    {
+        DB1().PushUpdateData("UPDATE `fighter` SET `capacityFail` = %u where `id` = %u and `playerId` = %" I64_FMT "u", _capacityFailTimes, getId(), _owner->getId());
+    }
 }
 
 /*
