@@ -8216,7 +8216,7 @@ namespace GObject
 		    Player* pl = globalPlayers[dbk.playerId];
 			if(pl == NULL)
 				continue;
-            if(dbk.num >= 12)
+            if(dbk.num >= 15)
                 continue;
             pl->getMonsterKettleMgr()->SetKettleHistory(dbk.num ,dbk.history);
             pl->getMonsterKettleMgr()->SetKettleOccupy(dbk.num , dbk.occupy);
