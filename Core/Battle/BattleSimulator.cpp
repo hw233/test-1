@@ -7265,9 +7265,16 @@ UInt32 BattleSimulator::doAttack( int pos )
             UInt8 snowmanCnt = 0;
             UInt8 target_side = bf->getSide();
             UInt8 target_pos;
+            UInt8 petPos;
+            if(_backupObjs[side])
+                petPos = _backupTargetPos[target_side];
+            else
+                petPos = 0xFF;
 
             for(UInt8 pos = 0; pos < 25; pos++)
             {
+                if(pos == petPos)
+                    continue;
                 BattleFighter* bo = static_cast<BattleFighter*>(getObject(target_side, pos));
                 if(bo == NULL || bo->getHP() == 0)
                 {
