@@ -80,9 +80,9 @@ bp_factor_toughl   = 3.5      -- 坚韧等级
 bp_factor_action   = 1        -- 身法
 bp_factor_hitrl    = 4        -- 命中等级
 bp_factor_evadl    = 4        -- 闪避等级
-bp_factor_crtl     = 3.5      -- 暴击等级
-bp_factor_pirl     = 3.5      -- 破击等级
-bp_factor_counterl = 3        -- 反击等级
+bp_factor_crtl     = 3.5      -- 暴击等级  暴击抗性
+bp_factor_pirl     = 3.5      -- 破击等级  破击抗性
+bp_factor_counterl = 3        -- 反击等级  反击抗性
 bp_factor_magresl  = 3        -- 法术抵抗等级
 bp_factor_aura     = 50       -- 初始灵气
 bp_factor_auraMax  = 8        -- 最大灵气
@@ -90,12 +90,13 @@ bp_factor_crtdmg   = 8000     -- 暴击伤害
 bp_factor_tough    = 14000    -- 坚韧
 bp_factor_hitr     = 16000     -- 命中
 bp_factor_evad     = 16000    -- 闪避
-bp_factor_crt      = 14000    -- 暴击
-bp_factor_pir      = 14000    -- 破击
-bp_factor_counter  = 12000    -- 反击
+bp_factor_crt      = 14000    -- 暴击  
+bp_factor_pir      = 14000    -- 破击  
+bp_factor_counter  = 12000    -- 反击 
 bp_factor_magres   = 12000    -- 法术抵抗
 bp_factor_crtdmgimm   = 14000     -- 暴击减免
 
+bp_factor_attackPricel  = 0.6    -- 攻击穿透
 
 bp_factor_skill_color = {0, 20, 30, 40, 50}    -- 技能颜色
 bp_factor_skill_level = {3.81, 4.58, 5.5, 6.59, 7.85, 9.31, 10.98, 12.87, 15}  -- 技能等级
@@ -533,8 +534,8 @@ function calcPierce( fgt, defgt )
   return prc + fgt:getExtraPierce() + prclvl/(prclvl + pirlvl_factor*deflev + pirlvl_addon_factor)*100
 end
 
-function calcDamage( atk, def, atklvl, toughFactor, dmgreduce )
-    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100)
+function calcDamage( atk, def, atklvl, toughFactor, dmgreduce, attackpierce )
+    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * (1 - attackpierce / 100) * toughFactor - dmgreduce/100)
     if dmgP < 0.20 then
         dmgP = 0.20
     elseif dmgP > 1.0 then
@@ -621,6 +622,18 @@ function calcBattlePoint(fgt)
 
     bp = bp + fgt:getExtraFairyAtk() * bp_factor_fairyatk
     bp = bp + fgt:getExtraFairyDef() * bp_factor_fairydef
+
+    --print("BattlePointBefore:" .. bp)
+    bp = bp + fgt:getExtraCriticalDef() * bp_factor_crtl
+    bp = bp + fgt:getExtraPierceDef() * bp_factor_pirl
+    bp = bp + fgt:getExtraCounterDef() * bp_factor_counterl
+    bp = bp + fgt:getExtraAttackPierce() * bp_factor_attackPricel
+    --print(fgt:getExtraCriticalDef())
+    --print(fgt:getExtraPierceDef())
+    --print(fgt:getExtraCounterDef())
+    --print(fgt:getExtraAttackPierce())
+    --print("BattlePointAfter:" .. bp)
+
     --if fgt:getExtraFairyAtk() ~= 0 then
     --    print("getExtraFairyAtk:"..fgt:getExtraFairyAtk())
     --    print("攻系数："..bp_factor_atk)
@@ -804,5 +817,43 @@ function calcAutoBattle( mybp, theirbp )
     return (theirbp + (autobattle_A - 1) * mybp) / (autobattle_A * mybp)
   end
   return 1 + autobattle_tweak - autobattle_tweak * mybp / theirbp
+end
+
+function calcCriticalDef(defgt)
+  if defgt == nil then
+    return 0
+  end
+  local deflev = defgt:getLevel();
+  local criticaldeflvl = defgt:getExtraCriticalDef()
+  --print("criticaldeflvl: "..criticaldeflvl)
+  return criticaldeflvl/(criticaldeflvl + criticaldeflvl_factor*deflev + criticaldeflvl_addon_factor)*100
+end
+
+function calcPierceDef(defgt)
+  if defgt == nil then
+    return 0
+  end
+  local deflev = defgt:getLevel();
+  local piercedeflvl = defgt:getExtraPierceDef()
+  --print("piercedeflvl: "..piercedeflvl)
+  return piercedeflvl/(piercedeflvl + piercedeflvl_factor*deflev + piercedeflvl_addon_factor)*100
+end
+
+function calcCounterDef(defgt)
+  if defgt == nil then
+    return 0
+  end
+  local deflev = defgt:getLevel();
+  local counterdeflvl = defgt:getExtraCounterDef()
+  return counterdeflvl/(counterdeflvl + counterdeflvl_factor*deflev + counterdeflvl_addon_factor)*100
+end
+
+function calcAttackPierce(fgt)
+  if fgt == nil then
+    return 0
+  end
+  local deflev = fgt:getLevel();
+  local attackpiercelvl = fgt:getExtraAttackPierce()
+  return attackpiercelvl/(attackpiercelvl + attackpiercelvl_factor*deflev + attackpiercelvl_addon_factor)*100
 end
 

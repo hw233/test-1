@@ -99,6 +99,7 @@
 #include "GObject/Evolution.h"
 #include "GObject/DarkDargon.h"
 #include "GData/IncenseTable.h"
+#include "GObject/Horcrux.h"
 
 #define NTD_ONLINE_TIME (4*60*60)
 #ifndef _DEBUG
@@ -3300,6 +3301,18 @@ namespace GObject
                 if(lingshi)
                     m_Package->AddExistEquip(lingshi);
             }
+            for(UInt8 t = 0;t < 3; ++t)
+            { 
+                ItemEquip * equip = fgt->getEvolution()->SetEvolutionEquip(t, NULL);
+                if(equip)
+                     m_Package->AddExistEquip(equip);
+            } 
+            for(UInt8 t = 0;t < 4; ++t)
+            { 
+                ItemHorcrux * equip = fgt->getHorcrux()->SetHorcruxEquip(t, NULL);
+                if(equip)
+                     m_Package->AddExistEquip(equip);
+            } 
 		    m_Package->EquipTo(0, fgt, 0x70, equip, true);
 
 			_fighters.erase(it);
@@ -3633,7 +3646,10 @@ namespace GObject
 		st.init(REP::FIGHTER_INFO);
 		st << static_cast<UInt8>(c);
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+    //      it->second->getHorcrux()->sendHorcruxInfo();
 			makeFighterInfo(st, it->second);
+        }
 		st << Stream::eos;
 	}
 
@@ -3668,6 +3684,13 @@ namespace GObject
                 else
                     st << static_cast<UInt32>(0);
             }
+            for(UInt8 i = 0; i < 4; ++i)
+            { 
+                if(fgt->getHorcrux()->GetEquip(i))
+                    st << static_cast<UInt32>(fgt->getHorcrux()->GetEquip(i)->getId());
+                else
+                    st << static_cast<UInt32>(0);
+            } 
 
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -31522,6 +31545,7 @@ UInt8 Player::useChangeSexCard()
     do_fighter_lingbaoLevel(fgt, oldId);
     do_fighter_lingbaoFall(fgt, oldId);
     do_fighter_evolution(fgt, oldId);
+    do_fighter_horcrux(fgt, oldId);
 
     struct _stTable
     {
@@ -31751,6 +31775,10 @@ void Player::do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId)
 void Player::do_fighter_evolution(Fighter* fgt, UInt32 oldId)
 {
     DB1().PushUpdateData("UPDATE `fighter_evolution` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
+}
+void Player::do_fighter_horcrux(Fighter* fgt, UInt32 oldId)
+{
+    DB1().PushUpdateData("UPDATE `fighter_horcrux` SET `fighterId` = %u WHERE `fighterId` = %u AND `playerId` = %" I64_FMT "u", fgt->getId(), oldId, getId());
 }
 
 void Player::BuyLeftPower()
@@ -36623,6 +36651,17 @@ void Player::sendRoseDemonInfo()
         st << static_cast<UInt32>( time > begin ? 0 :(begin-time));
     st << Stream::eos;
     send(st);
+}
+void Player::sendFighterHorcruxInfo()
+{
+
+    for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    {
+        if(it->second)
+        {
+            it->second->getHorcrux()->sendHorcruxInfo();
+        }
+    }
 }
 
 void Player::onWinterEncounterReturn()

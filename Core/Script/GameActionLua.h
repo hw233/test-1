@@ -343,7 +343,6 @@ namespace Script
 		template<typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
 		inline R Call(const std::string& name, const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5);
 
-
 	protected:
 		void RegisterActionInterface();						//ע??C++?????ӿ?
 
@@ -433,6 +432,7 @@ namespace Script
         bool getFlyRoadAward(Player * player, UInt8 index, UInt8 isdouble);
         bool getBaiFuBagAward(Player * player);
         bool getXCTJCountAward(Player * player,UInt8 type, UInt8 index);
+        UInt32 getHorcruxEquipment(Player * player,UInt8 type);
         bool getHitEggAward(Player * player,UInt8 count);
         bool exchangeTreasure(Player * player, UInt8 index, UInt32 num, UInt32 now);
 

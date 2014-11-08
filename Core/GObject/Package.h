@@ -57,7 +57,7 @@ namespace GObject
 
 	class Fighter;
 	class Player;
-
+    class Horcrux;
     struct SplitItemOut
     {
         UInt16 itemId;
@@ -396,6 +396,13 @@ namespace GObject
 	    void SendLSPackageItemInfor();
         void setLingshi(Fighter *, UInt32, UInt8);
         /**********灵侍end***********/
+       
+        //void SendSingleHorcruxData(ItemHorcrux *, UInt8);
+	    //static void AppendHorcruxData(Stream&, ItemHorcrux *);
+	    //void SendHorcruxPackageItemInfor();
+        //void setHorcrux(Fighter *, UInt32, UInt8);
+        
+
         UInt8 lingBaoUpLevel( UInt16 fighterId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed,UInt8& enLevel, UInt16& bless /*, bool protect*/ );
         bool BindItem(UInt32 id, UInt16 num);
     protected:
@@ -414,6 +421,9 @@ namespace GObject
 		ItemCont m_ItemsZY; //阵元背包
 		ItemCont m_ItemsSL; //元神背包
         ItemCont m_ItemsTemporary; //临时物品
+
+        //std::map<ItemKey, Horcrux *>  m_ItemsHorcrux;   //魂器背包
+
 		UInt16 m_Size;		//already used grids
 		UInt16 m_SizeSoul;  //already used soul grids
 		UInt16 m_SizeLS;    //already used lingshi grids
@@ -422,6 +432,9 @@ namespace GObject
 		UInt16 m_SizeZY;  //阵元
 		UInt16 m_SizeSL;  //元神
         UInt16 m_TempItemSize;
+
+        //UInt16 m_SizeHorcrux; //魂器
+
 		UInt8 _lastActivateLv;
 		UInt8 _lastActivateQ;
 		UInt8 _lastActivateCount;

@@ -113,7 +113,7 @@ public:
 	float calcHP(Battle::BattleFighter *);
 	float calcAction(Battle::BattleFighter *);
 
-	float calcDamage(float, float, float, float, float);
+	float calcDamage(float, float, float, float, float, float);
     float calcPracticeInc(GObject::Fighter * , bool merged);
     float calcBasePExp(GObject::Fighter *);
     float calcPExpNoBuf(GObject::Fighter *);
@@ -131,6 +131,10 @@ public:
 	}
 
 	static BattleFormula * getCurrent();
+    float calcCriticalDef(Battle::BattleFighter* defgt);
+    float calcPierceDef(Battle::BattleFighter* defgt);
+    float calcCounterDef(Battle::BattleFighter* defgt);
+    float calcAttackPierce(Battle::BattleFighter* fgt);
 
 private:
 	SkillData _skillData[3][10][40];

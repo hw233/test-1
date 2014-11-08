@@ -30,6 +30,7 @@
 #include "LBNameTmpl.h"
 #include "GData/lingbaoLevel.h"
 #include "GObject/Evolution.h"
+#include "GObject/Horcrux.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_FORGE_L2 17109    //仙装洗炼符
@@ -546,6 +547,85 @@ namespace GObject
                 break;
             }
         }
+    }
+    static void getRandomHorcruxAttr(UInt32 ItemId, UInt8 color, ItemHorcruxAttr& lbattr)
+    {
+        if(!IsHorcruxItem(ItemId))
+            return ;
+        if(color < 2 || color >5)
+            return ;
+        static UInt32 attrValue[] = {20,31,45,64};   //基础值
+        UInt8 index = (ItemId - HORCRUX_ID )/4;
+        UInt32 values[4] = {0,0,0,0};
+        UInt32 max = 0;
+        UInt8 idx = 0;
+        for(UInt8 i = 0; i < 4; ++i)
+        {
+            UInt32 value =  attrValue[color - 2] + uRand(20);   //基础值+ uRand(20)
+            if(value > max)
+            {
+                idx = i;
+                max = value;
+            }
+            else if( value == max)
+            {
+                value -= 1;
+            }
+            values[i] = value ;
+        }
+        if(idx != index )
+        {
+            UInt32 value = values[index];
+            values[index] = values[idx];
+            values[idx] = value;
+        }
+        switch(color-1)
+        {
+            case 1:
+                {
+                    for(UInt8 i = 0; i < 4; ++i)
+                    {
+                        if( i != index )
+                            values[i] = 0;
+                    }
+                }
+                break;
+            case 2:
+                {
+                    UInt8 num = uRand(3);
+                    for(UInt8 i = 0; i < 4; ++i)
+                    {
+                        if(i == index)
+                        {
+                            ++num;
+                            continue;
+                        }
+                        if(i == num)
+                            continue ;
+                        values[i] = 0;
+                    }
+                }
+                break;
+            case 3:
+                {
+                    UInt8 num = uRand(3);
+                    for(UInt8 i = 0; i < 4; ++i)
+                    {
+                        if(i == index)
+                        {
+                           ++num;
+                           continue; 
+                        }
+                        if(i != num)
+                            continue ;
+                        values[i] = 0;
+                    }
+                }
+                break;
+            case 4:
+                break;
+        }
+        lbattr.setAttr(values[0],values[1],values[2],values[3]);
     }
 
 	Package::Package(Player* player) : m_Owner(player), m_Size(0), m_SizeSoul(0), m_SizeLS(0), m_SizeGem(0), m_SizeFormula(0), m_SizeZY(0), m_SizeSL(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
@@ -1183,6 +1263,7 @@ namespace GObject
         case Item_Evolution1:
         case Item_Evolution2:
         case Item_Evolution3:
+        case Item_Horcrux:
 			{
 				ItemEquip * equip;
 				ItemEquipData edata;
@@ -1200,6 +1281,7 @@ namespace GObject
                 case Item_LBwu:
                 case Item_LBxin:
                 case Item_Evolution3:
+                case Item_Horcrux:
                     break;
                 default:
                     if(itype->quality > 2)
@@ -1334,9 +1416,17 @@ namespace GObject
                         DB4().PushUpdateData("REPLACE INTO `lingbaoattr`(`id`, `tongling`, `lbcolor`, `types`, `values`, `skills`, `factors`, `battlepoint`) VALUES(%u, %d, %d, '%s', '%s', '%s', '%s', '%u')", id, lbattr.tongling, lbattr.lbColor, strType.c_str(), strValue.c_str(), strSkill.c_str(), strFactor.c_str(), lbattr.battlePoint);
                     }
                     break;
-				default:
-					equip = new ItemEquip(id, itype, edata);
-					break;
+                case Item_Horcrux:
+                    {
+                        ItemHorcruxAttr horcruxAttr;
+                        getRandomHorcruxAttr( typeId, itype->quality, horcruxAttr);
+                        equip = new ItemHorcrux(id, itype, edata, horcruxAttr);
+                        DB1().PushUpdateData("INSERT INTO `horcruxAttr`(`id`, `itemId`, `value1`, `value2`,`value3`,`value4`) VALUES(%u, %u , %u,%u,%u,%u)",id,typeId ,horcruxAttr.getAttr(0),horcruxAttr.getAttr(1),horcruxAttr.getAttr(2),horcruxAttr.getAttr(3));
+                    }
+                    break;
+                default:
+                    equip = new ItemEquip(id, itype, edata);
+                    break;
 				}
 				if(equip == NULL)
 					return NULL;
@@ -1356,7 +1446,7 @@ namespace GObject
 					++ m_Size;
 				e = equip;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %" I64_FMT "u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
-				DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
+                DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
                 GenSpirit(equip);
 
 				SendSingleEquipData(equip);
@@ -1817,6 +1907,10 @@ namespace GObject
         {
             DB4().PushUpdateData("DELETE FROM `zhenyuanAttr` WHERE `id`=%u", item->getId());
         }
+        else if(item->getClass() == Item_Horcrux)
+        { 
+            DB4().PushUpdateData("DELETE FROM `horcruxAttr` WHERE `id`=%u", item->getId());
+        } 
 
 		SendDelEquipData(static_cast<ItemEquip *>(item));
 		SAFE_DELETE(item);
@@ -1848,6 +1942,11 @@ namespace GObject
         {
             DB4().PushUpdateData("DELETE FROM `zhenyuanAttr` WHERE `id`=%u", equip->getId());
         }
+        else if(equip->getClass() == Item_Horcrux)
+        { 
+            DB4().PushUpdateData("DELETE FROM `horcruxAttr` WHERE `id`=%u", equip->getId());
+        } 
+        
 		//SendDelEquipData(equip);
 		SAFE_DELETE(equip);
 		return true;
@@ -1942,10 +2041,11 @@ namespace GObject
 		if(id != 0)
 		{
 			if (!IsEquipId(id)) return false;
-			item_elem_iter iter = m_Items.find(ItemKey(id));
-			if(iter == m_Items.end())
-				return false;
-			ItemBase * item = iter->second;
+            item_elem_iter iter ;
+            iter = m_Items.find(ItemKey(id));
+            if(iter == m_Items.end())
+                return false;
+            ItemBase * item = iter->second;
 			if(fgt->getLevel() < item->getReqLev())
 				return false;
             if (item->GetCareer() && fgt->getClass() != item->GetCareer())
@@ -2039,6 +2139,17 @@ namespace GObject
                     return false;
                 old  = fgt->getEvolution()->SetEvolutionEquip(part - 0x66 ,static_cast<GObject::ItemEquip *>(item));
                 break;
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+                {
+                    if(item->getClass() != Item_Horcrux)
+                        return false;
+                    ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(item);
+                    old  = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 ,horcrux);
+                    break;
+                }
             default:
                 return false;
 			}
@@ -2100,6 +2211,12 @@ namespace GObject
                 break;
             case 0x70:
 				old = fgt->setInnateTrump(NULL);
+                break;
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+                old = fgt->getHorcrux()->SetHorcruxEquip(part - 0x71 , NULL);
                 break;
             default:
                 return false;
@@ -2740,7 +2857,7 @@ namespace GObject
 		for (; cit != m_Items.end(); ++cit)
 		{
 			ItemBase * item = cit->second;
-			if(IsEquip(item->getClass()))
+            if(IsEquip(item->getClass()))
 			{
 				count ++;
 				ItemEquip * equip = static_cast<ItemEquip *>(item);
@@ -2789,7 +2906,6 @@ namespace GObject
             count++;
             AppendItemData(st, cit->second);
 		}
-
 		st.data<UInt16>(4) = count;
 		st << Stream::eos;
 		m_Owner->send(st);
@@ -2801,7 +2917,8 @@ namespace GObject
 		st << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0);
 		if(hascount)
 			st << equip->Count();
-		st << static_cast<UInt16>(equip->GetItemType().getId()) << equip->getItemEquipData().enchant;
+		st << static_cast<UInt16>(equip->GetItemType().getId());
+        st << equip->getItemEquipData().enchant;
 		ItemEquipData& ied = equip->getItemEquipData();
 		st << ied.sockets;
 		for(UInt8 z = 0; z < ied.sockets; ++ z)
@@ -2828,7 +2945,13 @@ namespace GObject
             ItemLingbaoAttr& lba = (static_cast<ItemLingbao*>(equip))->getLingbaoAttr();
             lba.appendAttrToStream(st);
         }
-	}
+        else if(equip->getClass() == Item_Horcrux)
+        { 
+            ItemHorcruxAttr& horcruxAttr = (static_cast<ItemHorcrux *>(equip))->getHorcruxAttr();
+            for(UInt8 i = 0; i < 4; i++)
+                st << horcruxAttr.getAttr(i);
+        } 
+    }
 
 	void Package::AppendItemData( Stream& st, ItemBase * item )
 	{
@@ -8867,13 +8990,13 @@ namespace GObject
 		return lingshi;
 	}
 
-	void Package::lingshiUpgrade(UInt16 fighterId, UInt32 lsId, std::string& idStr)
+    void Package::lingshiUpgrade(UInt16 fighterId, UInt32 lsId, std::string& idStr)
     {
         Fighter * fgt = NULL;
         UInt8 pos = 0;
-		ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
-		if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
-			return;
+        ItemLingshi * lingshi = static_cast<ItemLingshi *>(FindEquip(fgt, pos, fighterId, lsId));
+        if(!fgt || !lingshi || !IsLingShi(lingshi->getClass()))
+            return;
         ItemLingshiAttr& lsAttr = lingshi->getLingshiAttr();
         if(lsAttr.lv >= GET_LS_MAXLEVEL(lingshi->getQuality()))
             return;
@@ -8930,13 +9053,13 @@ namespace GObject
         ConsumeInfo ci(LingShiPeiYang, 0, 0);
         m_Owner->useTael(needTael, &ci);
 
-		Stream st(REP::ERLKING_INFO);
+        Stream st(REP::ERLKING_INFO);
         st << static_cast<UInt8>(0x13);
         st << fighterId << pos;
-		AppendLingshiData(st, lingshi);
-		st << Stream::eos;
-		m_Owner->send(st);
-		DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
+        AppendLingshiData(st, lingshi);
+        st << Stream::eos;
+        m_Owner->send(st);
+        DB4().PushUpdateData("UPDATE `lingshiAttr` SET `level` = %u, `exp` = %u WHERE `id` = %u", lsAttr.lv, lsAttr.exp, lsId);
 
         if(backCnt > 0)
         {
@@ -9375,6 +9498,22 @@ namespace GObject
             fgt->updateLingbaoFallToDB(type);
         return res;
     } 
+ 
+
+    /* ****************** */
+    /* *****魂器装备***** */
+    /* ****************** */
+	//void Package::AppendHorcruxData(Stream& st, ItemHorcrux * horcrux)
+	//{
+	//	st << horcrux->getId() << static_cast<UInt8>(horcrux->GetBindStatus() ? 1 : 0);
+    //    st << static_cast<UInt16>(1);
+	//	st << horcrux->GetItemType().getId();
+
+    //    ItemHorcruxAttr& horcruxAttr = horcrux->getHorcruxAttr();
+    //    for(UInt8 i = 0; i < 4; i++)
+    //        st << horcruxAttr.getAttr(i);
+	//}
+   
 	
     bool Package::BindItem(UInt32 id, UInt16 num)
     {

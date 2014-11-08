@@ -1276,6 +1276,7 @@ namespace GObject
         void SendWCGradeAward2(UInt8 type);
         UInt8 supportWorldCup(UInt8 num ,UInt8 res , UInt32 number);
         void sendMyWorldCupInfo();
+        void sendFighterHorcruxInfo();
         void setMyWorldCupInfo(UInt8 num , UInt8 res ,UInt32 count , UInt32 time)
         {
             if(num >= WC_MAX_COUNT) 
@@ -3658,6 +3659,7 @@ namespace GObject
         void do_fighter_lingbaoLevel(Fighter* fgt, UInt32 oldId);
         void do_fighter_lingbaoFall(Fighter* fgt, UInt32 oldId);
         void do_fighter_evolution(Fighter* fgt, UInt32 oldId);
+        void do_fighter_horcrux(Fighter* fgt, UInt32 oldId);
 
     public:
         void makeClanTitleInfo(Stream & st);

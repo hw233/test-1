@@ -2387,3 +2387,32 @@ function getHitEggAward(player,num)
     player:AddXCTJAward(num,itemId,count);
     return true
 end
+ 
+function getHorcruxEquipment(player,opt)
+    local chance ={
+        [1] ={ 4800,9600,9800,10000},
+        [2] ={ 3500,7000,9000,10000}
+    }
+    if opt > 2 then
+        return 0
+    end
+    local package = player:GetPackage();
+    local count = package:GetItemAnyNum(557 + opt - 1)
+    if count < 1 then
+        return 0;
+    end
+    package:DelItemAny2(557 + opt - 1,1)
+    local itemId = 0
+    local g = math.random(1,10000)
+    local index = 1;
+    for i =1,#chance[opt] do
+        if g <= chance[opt][i] then
+            index = i
+            break
+        end
+    end
+    local r = math.random(0,3);
+    itemId = 19000 + r*4 + index - 1;
+    package:AddEquip(itemId , true, 1, 39);
+    return itemId;
+end

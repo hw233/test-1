@@ -2038,6 +2038,11 @@ namespace Script
 		assert(player != NULL);
         return Call<bool>("getXCTJCountAward", player,opt,index);
     }
+    UInt32 GameActionLua::getHorcruxEquipment(Player * player, UInt8 opt)
+    {
+		assert(player != NULL);
+        return Call<UInt32>("getHorcruxEquipment", player,opt);
+    }
     bool GameActionLua::getHitEggAward(Player * player,UInt8 count)
     {
 		assert(player != NULL);

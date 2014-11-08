@@ -397,6 +397,7 @@ enum ItemTo
     ToZhenyuanMgerge = 167, //阵元合成
     ToLingShiUpgrade = 168, //灵侍升级(吞噬/培养)
     ToLingShiBreak = 169, //灵侍突破
+    ToHorcruxHold = 170, //魂器吞噬
 };
 
 struct IncommingInfo

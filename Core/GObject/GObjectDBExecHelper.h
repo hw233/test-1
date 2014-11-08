@@ -529,6 +529,7 @@ struct DBFighter2
     std::string trump;      // 法宝
     std::string lingbao;    // 灵宝
     std::string evolution;    // 仙器
+    std::string horcrux;    // 魂器
     std::string acupoints;  // 穴道,打通次数
     std::string acupointsgold;  // 本命金丹,打通次数
     std::string skill;      // 装备的技能
@@ -1777,6 +1778,25 @@ struct DBExchangeTreasureLog
     UInt32 count;
 };
 
+struct DBHorcruxAttr
+{
+	UInt32 id;
+    UInt32 value1;
+    UInt32 value2;
+    UInt32 value3;
+    UInt32 value4;
+};
+struct DBHorcruxHold
+{
+	UInt32 fighterId;
+    UInt64 playerId;
+    UInt32 criticaldefExp;
+    UInt32 piercedefExp;
+    UInt32 counterdefExp;
+    UInt32 attackpierceExp;
+    UInt32 lingshi_exp;
+};
+
 }
 
 namespace DB {
@@ -2306,7 +2326,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(64)
+SPECIALDEF(65)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -2332,6 +2352,7 @@ SPECIALDEF(64)
     std::string, trump,
     std::string, lingbao,
     std::string, evolution,
+    std::string, horcrux,
     std::string, acupoints,
     std::string, acupointsgold,
     std::string, skill,
@@ -4019,6 +4040,29 @@ SPECIALDEF(4)
     UInt32, date,
     UInt32, itemid,
     UInt32, count
+)
+SPECIALEND()
+SPECIALBEGIN(GObject::DBHorcruxAttr)
+SPECIALDEF(5)
+(
+	UInt32, id,
+    UInt32, value1,
+    UInt32, value2,
+    UInt32, value3,
+    UInt32, value4
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBHorcruxHold)
+SPECIALDEF(7)
+(
+	UInt32, fighterId,
+    UInt64, playerId,
+    UInt32, criticaldefExp,
+    UInt32, piercedefExp,
+    UInt32, counterdefExp,
+    UInt32, attackpierceExp,
+    UInt32, lingshi_exp
 )
 SPECIALEND()
 }

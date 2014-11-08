@@ -172,6 +172,7 @@ struct ElixirAttr
 
 class Player;
 class Evolution;
+class Horcrux;
 class Fighter
 {
 public:
@@ -552,6 +553,8 @@ public:
     bool delLBSkill(UInt32 lbid);
     void getAllLbSkills(Stream& st);
 
+    void loadHorcruxEquip(std::string& ee);
+
 
 
 	UInt32 getMaxHP();
@@ -715,6 +718,11 @@ public:
 
     inline float getExtraFairyAtk(){ checkDirty(); return _attrExtraEquip.fairyAck;}
     inline float getExtraFairyDef(){ checkDirty(); return _attrExtraEquip.fairyDef;}
+
+    inline float getExtraCriticalDef() { checkDirty(); return _attrExtraEquip.criticaldef; } //暴击抗性
+    inline float getExtraPierceDef() { checkDirty(); return _attrExtraEquip.piercedef; } //破击抗性
+    inline float getExtraCounterDef() { checkDirty(); return _attrExtraEquip.counterdef; } //反击抗性
+    inline float getExtraAttackPierce() { checkDirty(); return _attrExtraEquip.attackpierce; } //攻击穿透
 
 public:
     inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
@@ -1140,12 +1148,15 @@ private:
     UInt8 lingbaoLevel[3];
     UInt32 lingbaoFall[3];  //祝福值
     Evolution * _evl;
+    Horcrux * _hor;      // 魂器
     UInt32 _incense;
 public:
     inline Xingchenzhen& getXingchen() { return m_xingchen; }
     inline UInt8 getXingchenLvl()  {return m_xingchen.lvl;}
 
     Evolution * getEvolution();
+    Horcrux * getHorcrux();
+
     inline UInt8 getLingbaoLevel(UInt8 type) { if (type > 2) return 0; return lingbaoLevel[type];}
     inline void setLingbaoLevel(UInt8 type ,UInt8 val){ if(type > 2) return; lingbaoLevel[type] = val; }
 

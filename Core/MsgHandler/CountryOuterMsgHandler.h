@@ -80,6 +80,7 @@
 #include "GObject/Evolution.h"
 #include "GObject/DarkDargon.h"
 #include "GObject/QuestionPaper.h"
+#include "GObject/Horcrux.h"
 
 struct NullReq
 {
@@ -1156,6 +1157,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->sendPictureInfo();
     }
     {
+        pl->sendFighterHorcruxInfo(); 
+    }
+    {
       //  pl->sendHappyXXLInfo();
       //  pl->sendXXLMapInfo();
     }
@@ -1389,6 +1393,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendFairyPetList(); //仙宠列表
     pl->GetPetPackage()->SendPackageItemInfor(); //仙宠背包列表
     pl->GetPackage()->SendLSPackageItemInfor(); //灵侍背包列表
+    //pl->GetPackage()->SendHorcruxPackageItemInfor();
     if (pl->getClan() != NULL)
     {
         pl->getClan()->sendQQOpenid(pl);
@@ -1801,15 +1806,17 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[23] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65,0x66,0x67,0x68};
-		ItemEquip * e[23] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[27] = {0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x0a, 0x0b, 0x0c, 0x60, 0x61, 0x62, 0x70, 0x63, 0x64, 0x65,0x66,0x67,0x68,0x71,0x72,0x73,0x74};
+		ItemEquip * e[27] = {fgt->getHalo(), fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2),
             fgt->getLingbao(0), fgt->getLingbao(1), fgt->getLingbao(2), fgt->getInnateTrump(),
             fgt->getLingshi(0), fgt->getLingshi(1), fgt->getLingshi(2),
-            fgt->getEvolution()->getEquip(0),fgt->getEvolution()->getEquip(1),fgt->getEvolution()->getEquip(2)
+            fgt->getEvolution()->getEquip(0),fgt->getEvolution()->getEquip(1),fgt->getEvolution()->getEquip(2),
+            fgt->getHorcrux()->GetEquip(0), fgt->getHorcrux()->GetEquip(1), fgt->getHorcrux()->GetEquip(2), fgt->getHorcrux()->GetEquip(3)
+
         };
-		fgt->sendModification(23, p, e, false);
+		fgt->sendModification(27, p, e, false);  //XXX
 		return;
 	}
 
@@ -10870,6 +10877,75 @@ void OnExtendProtocol( GameMsgHdr & hdr, const void * data )
             GLOBAL().PushMsg(hdr, (void*)data);
         }
             break;
+        case 0x06:
+            {
+                if(player->GetLev() < 85)
+                    return ;
+                UInt8 index = 0;
+                br >> index;
+                switch(index)
+                {
+                    case 0x01:
+                        {
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 85) 
+                                return ;
+                            fgt->getHorcrux()->sendHorcruxInfo();
+                        }
+                        break;
+                    case 0x02:
+                        {
+                            UInt16 fighterId = 0;
+                            br >> fighterId;
+                            GObject::Fighter * fgt = player->findFighter(fighterId);
+                            if(!fgt || fgt->getLevel() < 85) 
+                                return ;
+                            UInt8 count = 0;
+                            br >> count;
+                            for(UInt8 i = 0; i < count ; ++i)
+                            {
+                                UInt32 itemId = 0;
+                                br >> itemId;
+                                ItemBase * item = player->GetPackage()->FindItem(itemId);
+                                if(!item)
+                                    item = player->GetPackage()->FindItem(itemId,true);
+                                if(!item)
+                                    continue;
+                                if(item->getClass() != Item_Horcrux)
+                                    return ;
+                                ItemHorcrux * horcrux = static_cast<ItemHorcrux *>(item);
+                                fgt->getHorcrux()->EatHorcrux(horcrux);
+                            }
+                            fgt->getHorcrux()->UpdateHorcurxHoldToDB();
+                            fgt->getHorcrux()->sendHorcruxInfo();
+                        }
+                        break;
+                    case 0x04:
+                        {
+                            UInt8 item = 0;
+                            UInt8 count = 0;
+                            br >> item >> count;
+                            if (player->GetPackage()->GetRestPackageSize() < count)
+                            {
+                                player->sendMsgCode(2, 1011, 0);
+                                return ;
+                            }
+                            Stream st(REP::EXTEND_PROTOCAOL);
+                            st << static_cast<UInt8>(0x06);
+                            st << static_cast<UInt8>(0x04);
+                            st << static_cast<UInt32>(count);
+                            for(UInt8 i = 0; i < count; ++i)
+                            {
+                                st <<  GameAction()->getHorcruxEquipment(player,item);
+                            }
+                            st << Stream::eos;
+                            player->send(st);
+                        }
+                }
+                break;
+            }
         case 7:
         {
             UInt32 itemid = 0;

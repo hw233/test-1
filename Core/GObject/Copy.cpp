@@ -415,7 +415,8 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u, `lootlvl`=%u WHERE `playerId` = %" I64_FMT "u AND `id` = %u",
                 tcd.floor, tcd.spot, lootlvl, pl->getId(), id);
 
-        GameAction()->doStrong(pl, SthCopy , 0,0);
+        if(id < 100)
+            GameAction()->doStrong(pl, SthCopy , 0,0);
         pl->getSummerMeetScore(1);
     }
 

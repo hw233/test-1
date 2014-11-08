@@ -119,6 +119,11 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getSoulPracticeFactor", &GObject::Fighter::getSoulPracticeFactor);
 	class_def<GObject::Fighter>("getExtraCriticalDmgImmune", &GObject::Fighter::getExtraCriticalDmgImmune);
 
+	class_def<GObject::Fighter>("getExtraCriticalDef", &GObject::Fighter::getExtraCriticalDef);
+	class_def<GObject::Fighter>("getExtraPierceDef", &GObject::Fighter::getExtraPierceDef);
+	class_def<GObject::Fighter>("getExtraCounterDef", &GObject::Fighter::getExtraCounterDef);
+	class_def<GObject::Fighter>("getExtraAttackPierce", &GObject::Fighter::getExtraAttackPierce);
+
 	class_def<GObject::Fighter>("getExtraFairyAtk", &GObject::Fighter::getExtraFairyAtk);
 	class_def<GObject::Fighter>("getExtraFairyDef", &GObject::Fighter::getExtraFairyDef);
 
@@ -200,6 +205,11 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraCounterLevel", &Battle::BattleFighter::getExtraCounterLevel);
 	class_def<Battle::BattleFighter>("getExtraToughLevel", &Battle::BattleFighter::getExtraToughLevel);
 	class_def<Battle::BattleFighter>("getExtraMagResLevel", &Battle::BattleFighter::getExtraMagResLevel);
+
+	class_def<Battle::BattleFighter>("getExtraCriticalDef", &Battle::BattleFighter::getExtraCriticalDef);
+	class_def<Battle::BattleFighter>("getExtraPierceDef", &Battle::BattleFighter::getExtraPierceDef);
+	class_def<Battle::BattleFighter>("getExtraCounterDef", &Battle::BattleFighter::getExtraCounterDef);
+	class_def<Battle::BattleFighter>("getExtraAttackPierce", &Battle::BattleFighter::getExtraAttackPierce);
 
 	class_add<GObject::SecondSoul>("SecondSoul");
 	class_def<GObject::SecondSoul>("getClass", &GObject::SecondSoul::getClass);
@@ -568,9 +578,9 @@ float BattleFormula::calcAction(Battle::BattleFighter * fgt)
 	return call<UInt32>("calcAction", fgt);
 }
 
-float BattleFormula::calcDamage( float atk, float def, float atklvl, float toughFactor, float dmgreduce )
+float BattleFormula::calcDamage( float atk, float def, float atklvl, float toughFactor, float dmgreduce, float attackpierce )
 {
-	return call<float>("calcDamage", atk, def, atklvl, toughFactor, dmgreduce);
+	return call<float>("calcDamage", atk, def, atklvl, toughFactor, dmgreduce, attackpierce);
 }
 
 float BattleFormula::calcAutoBattle( float mybp, float theirbp )
@@ -623,6 +633,26 @@ BattleFormula * BattleFormula::getCurrent()
         return reinterpret_cast<GObject::SortWorker &>(worker).getBattleFormula();
 	}
 	return NULL;
+}
+
+float BattleFormula::calcCriticalDef(Battle::BattleFighter* defgt)
+{
+	return call<float>("calcCriticalDef", defgt);
+}
+
+float BattleFormula::calcPierceDef(Battle::BattleFighter* defgt)
+{
+	return call<float>("calcPierceDef", defgt);
+}
+
+float BattleFormula::calcCounterDef(Battle::BattleFighter* defgt)
+{
+	return call<float>("calcCounterDef", defgt);
+}
+
+float BattleFormula::calcAttackPierce(Battle::BattleFighter* fgt)
+{
+	return call<float>("calcAttackPierce", fgt);
 }
 
 }
