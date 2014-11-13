@@ -5893,6 +5893,7 @@ void Fighter::getAttrExtraEquip(Stream& st)
 	st << attr.hitrateP << attr.evadeP << attr.criticalP << attr.criticaldmgP << attr.pierceP << attr.counterP << attr.magresP;
 
     st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl << attr.criticaldmgimmune << attr.fairyAck << attr.fairyDef;
+    st << attr.criticaldef << attr.piercedef << attr.counterdef << attr.attackpierce;
 }
 
 bool Fighter::changeSecondSoulXinxiu(UInt8 xinxiu)
