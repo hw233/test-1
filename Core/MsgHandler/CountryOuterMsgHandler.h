@@ -1488,6 +1488,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     if(pl->GetVar(VAR_FLY_ROAD_GIFT_GOT_NUM) < 10 && pl->GetLev() >= 80)
         pl->SendFlyRoadGiftInfo();
 
+    if(World::getWinterEncounter(1) && pl->GetVar(VAR_WINTER_ENCOUNTER_PLAN_STATUS))
+        pl->onWinterEncounterReturn();
+
     {
         GameMsgHdr hdr(0x188, WORKER_THREAD_WORLD, pl, 0);
         GLOBAL().PushMsg(hdr, NULL);
@@ -2577,6 +2580,18 @@ void OnCountryActReq( GameMsgHdr& hdr, const void * data )
                     break;
             }
 
+        }
+        break;
+        case 0x20:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(0 == type)
+                player->onWinterEncounterReturn();
+            else
+            {
+                player->buyWinterEncounterPlan(type);
+            }
         }
         break;
         default:
