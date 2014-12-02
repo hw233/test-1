@@ -874,7 +874,7 @@ function RunBlueDiamondAward(player, opt)
         [7] = {2200,4150,5350,5850,5950,6450,6950,7050,7650,7700,9850,10000},
         --[8] = {115,125,3125,6125,6825,9325,9975,10000},
         [8] = {2 ,5 ,3005 ,3150 ,3800 ,6800 ,9300 ,10000},
-        [9] = {2500,4450,5650,5850,5950,6510,7070,7120,7720,7820,9970,10000}
+        [9] = {2005,3885,5435,5785,5985,6985,7585,7615,8415,8445,9995,10000}
     };
     local item = {
         [1] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{9022,1},{1717,1},{5137,1}},
@@ -885,7 +885,7 @@ function RunBlueDiamondAward(player, opt)
         [6] = {{515,3},{134,4},{1325,4},{507,2},{509,2},{503,5},{1719,1},{5135,1}},
         [7] = {{503,1},{9414,1},{9438,1},{515,1},{9076,2},{1325,1},{9649,1},{8555,1},{134,1},{5065,1},{56,2},{5005,1}},
         [8] = {{1735,1},{1734,1},{501,1},{9022,1},{17107,1},{503,1},{551,1},{515,1}},
-        [9] = {{503,1},{500,2},{517,1},{515,1},{9076,2},{1325,1},{516,1},{1729,1},{134,1},{5065,1},{56,2},{1733,1}}
+        [9] = {{17103,1},{17109,2},{6036,1},{515,1},{9076,2},{1636,1},{8555,1},{1742,1},{134,1},{5067,1},{6035,1},{1733,1}}
     };
     local item_id = {9190, 9191, 9217, 9284,10119};
     
@@ -935,7 +935,7 @@ function RunBlueDiamondAward(player, opt)
     if opt ==7 and (items[j][1] == 134 or items[j][1]==515 or items[j][1] == 1325 or items[j][1]==9076 or items[j][1] == 8555 or items[j][1] == 5065 or items[j][1] ==5005)  then 
         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."通过财富罗盘获得了".."[4:"..items[j][1].."]x"..items[j][2])
    end
-    if opt ==9 and (items[j][1] == 515 or items[j][1]==9076 or items[j][1] == 1325 or items[j][1]==1729 or items[j][1] == 134 or items[j][1] == 5065 or items[j][1] ==1733)  then 
+    if opt ==9 and (items[j][1] == 6036 or items[j][1]== 515 or items[j][1] == 9076 or items[j][1]== 1636 or items[j][1] == 8555 or items[j][1] == 1742 or items[j][1] == 134 or items[j][1] == 5067 or items[j][1] == 6035 or items[j][1] ==1733)  then 
         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]".."通过财富罗盘获得了".."[4:"..items[j][1].."]x"..items[j][2])
     end
    
@@ -2414,5 +2414,8 @@ function getHorcruxEquipment(player,opt)
     local r = math.random(0,3);
     itemId = 19000 + r*4 + index - 1;
     package:AddEquip(itemId , true, 1, 39);
+    if index == 4 then
+        Broadcast(0x27, "天呐！[p:"..player:getCountry()..":"..player:getPName().."]转动斗魂罗盘，获得了[4:"..itemId.."],简直是太幸运了")
+    end
     return itemId;
 end

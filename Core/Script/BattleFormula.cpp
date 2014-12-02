@@ -1,14 +1,11 @@
 #include "Config.h"
 #include "BattleFormula.h"
 #include "Battle/BattleFighter.h"
-#include "GObject/Fighter.h"
-#include "GObject/SecondSoul.h"
-#include "GObject/Country.h"
+//#include "GObject/Fighter.h"
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
-#include "GObject/SortWorker.h"
 #include "GObject/ItemData.h"
-
+#include "Server/WorkerRunner.h"
 namespace Script
 {
 
@@ -27,239 +24,55 @@ void BattleFormula::init()
 	set("Warlock2", 6);
 	class_add<BattleFormula>("BattleFormula");
 	set("battle", this);
-	class_add<GObject::Fighter>("Fighter");
-	class_def<GObject::Fighter>("getId", &GObject::Fighter::getId);
-	class_def<GObject::Fighter>("getClass", &GObject::Fighter::getClass);
-	class_def<GObject::Fighter>("getLevel", &GObject::Fighter::getLevel);
-    class_def<GObject::Fighter>("getLevelInLua", &GObject::Fighter::getLevelInLua);
-	class_def<GObject::Fighter>("getColor", &GObject::Fighter::getColor);
-	class_def<GObject::Fighter>("getPotential", &GObject::Fighter::getPotential);
-	class_def<GObject::Fighter>("getCapacity", &GObject::Fighter::getCapacity);
-	class_def<GObject::Fighter>("getExtraStrength", &GObject::Fighter::getExtraStrength);
-	class_def<GObject::Fighter>("getExtraPhysique", &GObject::Fighter::getExtraPhysique);
-	class_def<GObject::Fighter>("getExtraAgility", &GObject::Fighter::getExtraAgility);
-	class_def<GObject::Fighter>("getExtraIntelligence", &GObject::Fighter::getExtraIntelligence);
-	class_def<GObject::Fighter>("getExtraWill", &GObject::Fighter::getExtraWill);
-	class_def<GObject::Fighter>("getExtraSoul", &GObject::Fighter::getExtraSoul);
-	class_def<GObject::Fighter>("getExtraAura", &GObject::Fighter::getExtraAura);
-	class_def<GObject::Fighter>("getExtraAuraMax", &GObject::Fighter::getExtraAuraMax);
-	class_def<GObject::Fighter>("getExtraTough", &GObject::Fighter::getExtraTough);
-	class_def<GObject::Fighter>("getExtraStrengthPercent", &GObject::Fighter::getExtraStrengthP);
-	class_def<GObject::Fighter>("getExtraPhysiquePercent", &GObject::Fighter::getExtraPhysiqueP);
-	class_def<GObject::Fighter>("getExtraAgilityPercent", &GObject::Fighter::getExtraAgilityP);
-	class_def<GObject::Fighter>("getExtraIntelligencePercent", &GObject::Fighter::getExtraIntelligenceP);
-	class_def<GObject::Fighter>("getExtraWillPercent", &GObject::Fighter::getExtraWillP);
-	class_def<GObject::Fighter>("getExtraSoulPercent", &GObject::Fighter::getExtraSoulP);
-	class_def<GObject::Fighter>("getExtraAuraPercent", &GObject::Fighter::getExtraAuraP);
-	class_def<GObject::Fighter>("getExtraAuraMaxPercent", &GObject::Fighter::getExtraAuraMaxP);
-	class_def<GObject::Fighter>("getExtraAttack", &GObject::Fighter::getExtraAttack);
-	class_def<GObject::Fighter>("getExtraAttackPercent", &GObject::Fighter::getExtraAttackP);
-	class_def<GObject::Fighter>("getExtraMagAttack", &GObject::Fighter::getExtraMagAttack);
-	class_def<GObject::Fighter>("getExtraMagAttackPercent", &GObject::Fighter::getExtraMagAttackP);
-	class_def<GObject::Fighter>("getExtraDefend", &GObject::Fighter::getExtraDefend);
-	class_def<GObject::Fighter>("getExtraDefendPercent", &GObject::Fighter::getExtraDefendP);
-	class_def<GObject::Fighter>("getExtraMagDefend", &GObject::Fighter::getExtraMagDefend);
-	class_def<GObject::Fighter>("getExtraMagDefendPercent", &GObject::Fighter::getExtraMagDefendP);
-	class_def<GObject::Fighter>("getExtraHP", &GObject::Fighter::getExtraHP);
-	class_def<GObject::Fighter>("getExtraHPPercent", &GObject::Fighter::getExtraHPP);
-	class_def<GObject::Fighter>("getExtraAction", &GObject::Fighter::getExtraAction);
-	class_def<GObject::Fighter>("getExtraActionPercent", &GObject::Fighter::getExtraActionP);
-	class_def<GObject::Fighter>("getExtraHitrate", &GObject::Fighter::getExtraHitrate);
-	class_def<GObject::Fighter>("getExtraEvade", &GObject::Fighter::getExtraEvade);
-	class_def<GObject::Fighter>("getExtraCritical", &GObject::Fighter::getExtraCritical);
-	class_def<GObject::Fighter>("getExtraCriticalDmg", &GObject::Fighter::getExtraCriticalDmg);
-	class_def<GObject::Fighter>("getExtraPierce", &GObject::Fighter::getExtraPierce);
-	class_def<GObject::Fighter>("getExtraCounter", &GObject::Fighter::getExtraCounter);
-	class_def<GObject::Fighter>("getExtraMagRes", &GObject::Fighter::getExtraMagRes);
 
-	class_def<GObject::Fighter>("isNpc", &GObject::Fighter::isNpc);
-	class_def<GObject::Fighter>("isPet", &GObject::Fighter::isPet);
-	class_def<GObject::Fighter>("isMale", &GObject::Fighter::isMale);
-	class_def<GObject::Fighter>("isBoy", &GObject::Fighter::isBoy);
-	class_def<GObject::Fighter>("getSex", &GObject::Fighter::getSex);
-	class_def<GObject::Fighter>("getBaseStrength", &GObject::Fighter::getBaseStrength);
-	class_def<GObject::Fighter>("getBasePhysique", &GObject::Fighter::getBasePhysique);
-	class_def<GObject::Fighter>("getBaseAgility", &GObject::Fighter::getBaseAgility);
-	class_def<GObject::Fighter>("getBaseIntelligence", &GObject::Fighter::getBaseIntelligence);
-	class_def<GObject::Fighter>("getBaseWill", &GObject::Fighter::getBaseWill);
-	class_def<GObject::Fighter>("getBaseSoul", &GObject::Fighter::getBaseSoul);
-	class_def<GObject::Fighter>("getBaseAura", &GObject::Fighter::getBaseAura);
-	class_def<GObject::Fighter>("getBaseAuraMax", &GObject::Fighter::getBaseAuraMax);
-	class_def<GObject::Fighter>("getBaseTough", &GObject::Fighter::getBaseTough);
-	class_def<GObject::Fighter>("getAcupointsGoldAttr", &GObject::Fighter::getAcupointsGoldAttr);
-	class_def<GObject::Fighter>("getBaseAttack", &GObject::Fighter::getBaseAttack);
-	class_def<GObject::Fighter>("getBaseMagAttack", &GObject::Fighter::getBaseMagAttack);
-	class_def<GObject::Fighter>("getBaseDefend", &GObject::Fighter::getBaseDefend);
-	class_def<GObject::Fighter>("getBaseMagDefend", &GObject::Fighter::getBaseMagDefend);
-	class_def<GObject::Fighter>("getBaseHP", &GObject::Fighter::getBaseHP);
-	class_def<GObject::Fighter>("getBaseAction", &GObject::Fighter::getBaseAction);
-	class_def<GObject::Fighter>("getBaseHitrate", &GObject::Fighter::getBaseHitrate);
-	class_def<GObject::Fighter>("getBaseEvade", &GObject::Fighter::getBaseEvade);
-	class_def<GObject::Fighter>("getBaseCritical", &GObject::Fighter::getBaseCritical);
-	class_def<GObject::Fighter>("getBaseCriticalDmg", &GObject::Fighter::getBaseCriticalDmg);
-	class_def<GObject::Fighter>("getBasePierce", &GObject::Fighter::getBasePierce);
-	class_def<GObject::Fighter>("getBaseCounter", &GObject::Fighter::getBaseCounter);
-	class_def<GObject::Fighter>("getBaseMagRes", &GObject::Fighter::getBaseMagRes);
-	class_def<GObject::Fighter>("getPracticePlace", &GObject::Fighter::getPracticePlace);
-	class_def<GObject::Fighter>("isGoldPractice", &GObject::Fighter::isGoldPractice);
-	class_def<GObject::Fighter>("getClanTechAddon", &GObject::Fighter::getClanTechAddon);
-	class_def<GObject::Fighter>("getAcuPraAdd", &GObject::Fighter::getAcuPraAdd);
-	class_def<GObject::Fighter>("getPracticeBufFactor", &GObject::Fighter::getPracticeBufFactor);
-	class_def<GObject::Fighter>("getPracticeIncByDiamond", &GObject::Fighter::getPracticeIncByDiamond);
-	class_def<GObject::Fighter>("getPracticeIncByQQVip", &GObject::Fighter::getPracticeIncByQQVip);
-	class_def<GObject::Fighter>("getExtraHitrateLevel", &GObject::Fighter::getExtraHitrateLevel);
-	class_def<GObject::Fighter>("getExtraEvadeLevel", &GObject::Fighter::getExtraEvadeLevel);
-	class_def<GObject::Fighter>("getExtraCriticalLevel", &GObject::Fighter::getExtraCriticalLevel);
-	class_def<GObject::Fighter>("getExtraPierceLevel", &GObject::Fighter::getExtraPierceLevel);
-	class_def<GObject::Fighter>("getExtraCounterLevel", &GObject::Fighter::getExtraCounterLevel);
-	class_def<GObject::Fighter>("getExtraToughLevel", &GObject::Fighter::getExtraToughLevel);
-	class_def<GObject::Fighter>("getExtraMagResLevel", &GObject::Fighter::getExtraMagResLevel);
-
-	class_def<GObject::Fighter>("getSoulPracticeAddOn", &GObject::Fighter::getSoulPracticeAddOn);
-	class_def<GObject::Fighter>("getSoulPracticeFactor", &GObject::Fighter::getSoulPracticeFactor);
-	class_def<GObject::Fighter>("getExtraCriticalDmgImmune", &GObject::Fighter::getExtraCriticalDmgImmune);
-
-	class_def<GObject::Fighter>("getExtraCriticalDef", &GObject::Fighter::getExtraCriticalDef);
-	class_def<GObject::Fighter>("getExtraPierceDef", &GObject::Fighter::getExtraPierceDef);
-	class_def<GObject::Fighter>("getExtraCounterDef", &GObject::Fighter::getExtraCounterDef);
-	class_def<GObject::Fighter>("getExtraAttackPierce", &GObject::Fighter::getExtraAttackPierce);
-
-	class_def<GObject::Fighter>("getExtraFairyAtk", &GObject::Fighter::getExtraFairyAtk);
-	class_def<GObject::Fighter>("getExtraFairyDef", &GObject::Fighter::getExtraFairyDef);
+	//class_add<GObject::Fighter>("Fighter");
+	//class_def<GObject::Fighter>("getId", &GObject::Fighter::getId);
 
 	class_add<Battle::BattleFighter>("BattleFighter");
-	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
-	class_def<Battle::BattleFighter>("getClass", &Battle::BattleFighter::getClass);
-	class_def<Battle::BattleFighter>("getLevel", &Battle::BattleFighter::getLevel);
-    class_def<Battle::BattleFighter>("getLevelInLua", &Battle::BattleFighter::getLevelInLua);
-	class_def<Battle::BattleFighter>("getColor", &Battle::BattleFighter::getColor);
-	class_def<Battle::BattleFighter>("getPotential", &Battle::BattleFighter::getPotential);
-	class_def<Battle::BattleFighter>("getExtraStrength", &Battle::BattleFighter::getExtraStrength);
-	class_def<Battle::BattleFighter>("getExtraPhysique", &Battle::BattleFighter::getExtraPhysique);
-	class_def<Battle::BattleFighter>("getExtraAgility", &Battle::BattleFighter::getExtraAgility);
-	class_def<Battle::BattleFighter>("getExtraIntelligence", &Battle::BattleFighter::getExtraIntelligence);
-	class_def<Battle::BattleFighter>("getExtraWill", &Battle::BattleFighter::getExtraWill);
-	class_def<Battle::BattleFighter>("getExtraSoul", &Battle::BattleFighter::getExtraSoul);
-	class_def<Battle::BattleFighter>("getExtraAura", &Battle::BattleFighter::getExtraAura);
-	class_def<Battle::BattleFighter>("getExtraAuraMax", &Battle::BattleFighter::getExtraAuraMax);
-	class_def<Battle::BattleFighter>("getExtraTough", &Battle::BattleFighter::getExtraTough);
-	class_def<Battle::BattleFighter>("getExtraStrengthPercent", &Battle::BattleFighter::getExtraStrengthP);
-	class_def<Battle::BattleFighter>("getAcupointsGoldAttr", &Battle::BattleFighter::getAcupointsGoldAttr);
-	class_def<Battle::BattleFighter>("getExtraPhysiquePercent", &Battle::BattleFighter::getExtraPhysiqueP);
-	class_def<Battle::BattleFighter>("getExtraAgilityPercent", &Battle::BattleFighter::getExtraAgilityP);
-	class_def<Battle::BattleFighter>("getExtraIntelligencePercent", &Battle::BattleFighter::getExtraIntelligenceP);
-	class_def<Battle::BattleFighter>("getExtraWillPercent", &Battle::BattleFighter::getExtraWillP);
-	class_def<Battle::BattleFighter>("getExtraSoulPercent", &Battle::BattleFighter::getExtraSoulP);
-	class_def<Battle::BattleFighter>("getExtraAuraPercent", &Battle::BattleFighter::getExtraAuraP);
-	class_def<Battle::BattleFighter>("getExtraAuraMaxPercent", &Battle::BattleFighter::getExtraAuraMaxP);
-	class_def<Battle::BattleFighter>("getExtraAttack", &Battle::BattleFighter::getExtraAttack);
-	class_def<Battle::BattleFighter>("getExtraAttackPercent", &Battle::BattleFighter::getExtraAttackP);
-	class_def<Battle::BattleFighter>("getExtraMagAttack", &Battle::BattleFighter::getExtraMagAttack);
-	class_def<Battle::BattleFighter>("getExtraMagAttackPercent", &Battle::BattleFighter::getExtraMagAttackP);
-	class_def<Battle::BattleFighter>("getExtraDefend", &Battle::BattleFighter::getExtraDefend);
-	class_def<Battle::BattleFighter>("getExtraDefendPercent", &Battle::BattleFighter::getExtraDefendP);
-	class_def<Battle::BattleFighter>("getExtraMagDefend", &Battle::BattleFighter::getExtraMagDefend);
-	class_def<Battle::BattleFighter>("getExtraMagDefendPercent", &Battle::BattleFighter::getExtraMagDefendP);
-	class_def<Battle::BattleFighter>("getExtraHP", &Battle::BattleFighter::getExtraHP);
-	class_def<Battle::BattleFighter>("getExtraHPPercent", &Battle::BattleFighter::getExtraHPP);
-	class_def<Battle::BattleFighter>("getExtraAction", &Battle::BattleFighter::getExtraAction);
-	class_def<Battle::BattleFighter>("getExtraActionPercent", &Battle::BattleFighter::getExtraActionP);
-	class_def<Battle::BattleFighter>("getExtraHitrate", &Battle::BattleFighter::getExtraHitrate);
-	class_def<Battle::BattleFighter>("getExtraEvade", &Battle::BattleFighter::getExtraEvade);
-	class_def<Battle::BattleFighter>("getExtraCritical", &Battle::BattleFighter::getExtraCritical);
-	class_def<Battle::BattleFighter>("getExtraCriticalDmg", &Battle::BattleFighter::getExtraCriticalDmg);
-	class_def<Battle::BattleFighter>("getExtraPierce", &Battle::BattleFighter::getExtraPierce);
-	class_def<Battle::BattleFighter>("getExtraCounter", &Battle::BattleFighter::getExtraCounter);
-	class_def<Battle::BattleFighter>("getExtraMagRes", &Battle::BattleFighter::getExtraMagRes);
-	class_def<Battle::BattleFighter>("isNpc", &Battle::BattleFighter::isNpc);
-	class_def<Battle::BattleFighter>("isPet", &Battle::BattleFighter::isPet);
-	class_def<Battle::BattleFighter>("isMale", &Battle::BattleFighter::isMale);
-	class_def<Battle::BattleFighter>("isBoy", &Battle::BattleFighter::isBoy);
-	class_def<Battle::BattleFighter>("getSex", &Battle::BattleFighter::getSex);
-	class_def<Battle::BattleFighter>("getBaseStrength", &Battle::BattleFighter::getBaseStrength);
-	class_def<Battle::BattleFighter>("getBasePhysique", &Battle::BattleFighter::getBasePhysique);
-	class_def<Battle::BattleFighter>("getBaseAgility", &Battle::BattleFighter::getBaseAgility);
-	class_def<Battle::BattleFighter>("getBaseIntelligence", &Battle::BattleFighter::getBaseIntelligence);
-	class_def<Battle::BattleFighter>("getBaseWill", &Battle::BattleFighter::getBaseWill);
-	class_def<Battle::BattleFighter>("getBaseSoul", &Battle::BattleFighter::getBaseSoul);
-	class_def<Battle::BattleFighter>("getBaseAura", &Battle::BattleFighter::getBaseAura);
-	class_def<Battle::BattleFighter>("getBaseAuraMax", &Battle::BattleFighter::getBaseAuraMax);
-	class_def<Battle::BattleFighter>("getBaseTough", &Battle::BattleFighter::getBaseTough);
-	class_def<Battle::BattleFighter>("getBaseAttack", &Battle::BattleFighter::getBaseAttack);
-	class_def<Battle::BattleFighter>("getBaseMagAttack", &Battle::BattleFighter::getBaseMagAttack);
-	class_def<Battle::BattleFighter>("getBaseDefend", &Battle::BattleFighter::getBaseDefend);
-	class_def<Battle::BattleFighter>("getBaseMagDefend", &Battle::BattleFighter::getBaseMagDefend);
-	class_def<Battle::BattleFighter>("getBaseHP", &Battle::BattleFighter::getBaseHP);
-	class_def<Battle::BattleFighter>("getBaseAction", &Battle::BattleFighter::getBaseAction);
-	class_def<Battle::BattleFighter>("getBaseHitrate", &Battle::BattleFighter::getBaseHitrate);
-	class_def<Battle::BattleFighter>("getBaseEvade", &Battle::BattleFighter::getBaseEvade);
-	class_def<Battle::BattleFighter>("getBaseCritical", &Battle::BattleFighter::getBaseCritical);
-	class_def<Battle::BattleFighter>("getBaseCriticalDmg", &Battle::BattleFighter::getBaseCriticalDmg);
-	class_def<Battle::BattleFighter>("getBasePierce", &Battle::BattleFighter::getBasePierce);
-	class_def<Battle::BattleFighter>("getBaseCounter", &Battle::BattleFighter::getBaseCounter);
-	class_def<Battle::BattleFighter>("getBaseMagRes", &Battle::BattleFighter::getBaseMagRes);
-	class_def<Battle::BattleFighter>("getExtraHitrateLevel", &Battle::BattleFighter::getExtraHitrateLevel);
-	class_def<Battle::BattleFighter>("getExtraEvadeLevel", &Battle::BattleFighter::getExtraEvadeLevel);
-	class_def<Battle::BattleFighter>("getExtraCriticalLevel", &Battle::BattleFighter::getExtraCriticalLevel);
-	class_def<Battle::BattleFighter>("getExtraPierceLevel", &Battle::BattleFighter::getExtraPierceLevel);
-	class_def<Battle::BattleFighter>("getExtraCounterLevel", &Battle::BattleFighter::getExtraCounterLevel);
-	class_def<Battle::BattleFighter>("getExtraToughLevel", &Battle::BattleFighter::getExtraToughLevel);
-	class_def<Battle::BattleFighter>("getExtraMagResLevel", &Battle::BattleFighter::getExtraMagResLevel);
 
-	class_def<Battle::BattleFighter>("getExtraCriticalDef", &Battle::BattleFighter::getExtraCriticalDef);
-	class_def<Battle::BattleFighter>("getExtraPierceDef", &Battle::BattleFighter::getExtraPierceDef);
-	class_def<Battle::BattleFighter>("getExtraCounterDef", &Battle::BattleFighter::getExtraCounterDef);
-	class_def<Battle::BattleFighter>("getExtraAttackPierce", &Battle::BattleFighter::getExtraAttackPierce);
-
-	class_add<GObject::SecondSoul>("SecondSoul");
-	class_def<GObject::SecondSoul>("getClass", &GObject::SecondSoul::getClass);
-	class_def<GObject::SecondSoul>("getPracticeLevel", &GObject::SecondSoul::getPracticeLevel);
-	class_def<GObject::SecondSoul>("getStateLevel", &GObject::SecondSoul::getStateLevel);
-	class_def<GObject::SecondSoul>("getXinxiu", &GObject::SecondSoul::getXinxiu);
-
-    class_add<GObject::ItemLingbaoAttr>("ItemLingbaoAttr");
-    class_def<GObject::ItemLingbaoAttr>("getType", &GObject::ItemLingbaoAttr::getType);
-    class_def<GObject::ItemLingbaoAttr>("getValue", &GObject::ItemLingbaoAttr::getValue);
+    //class_add<GObject::ItemLingbaoAttr>("ItemLingbaoAttr");
+    //class_def<GObject::ItemLingbaoAttr>("getType", &GObject::ItemLingbaoAttr::getType);
+    //class_def<GObject::ItemLingbaoAttr>("getValue", &GObject::ItemLingbaoAttr::getValue);
 }
 
 void BattleFormula::postInit()
 {
-	call<void>("initSeed", IDGenerator::gSeedOidGenerator.ID());
+    call<void>("initSeed", IDGenerator::gSeedOidGenerator.ID());
 }
 
 float BattleFormula::calcSoulStrenght(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulStrength", ss);
+    return call<float>("calcSoulStrength", ss);
 }
 
 float BattleFormula::calcSoulAgility(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulAgility", ss);
+    return call<float>("calcSoulAgility", ss);
 }
 
 float BattleFormula::calcSoulPhysique(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulPhysique", ss);
+    return call<float>("calcSoulPhysique", ss);
 }
 
 float BattleFormula::calcSoulIntelligence(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulIntelligence", ss);
+    return call<float>("calcSoulIntelligence", ss);
 }
 
 float BattleFormula::calcSoulWill(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulWill", ss);
+    return call<float>("calcSoulWill", ss);
 }
 
 float BattleFormula::calcSoulXinxiuAttack(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulXinxiuAttack", ss);
+    return call<float>("calcSoulXinxiuAttack", ss);
 }
 
 float BattleFormula::calcSoulXinxiuAction(GObject::SecondSoul* ss)
 {
-	return call<float>("calcSoulXinxiuAction", ss);
+    return call<float>("calcSoulXinxiuAction", ss);
 }
 
 float BattleFormula::calcSoulXinxiuDefend(GObject::SecondSoul* ss)
@@ -618,6 +431,7 @@ UInt32 BattleFormula::calcLingbaoBattlePoint(const GObject::ItemLingbaoAttr *lba
     return call<UInt32>("calcLingbaoBattlePoint", lbatr);
 }
 
+/*
 BattleFormula * BattleFormula::getCurrent()
 {
 	WorkerRunner<>& worker = WorkerThread<WorkerRunner<> >::LocalWorker();
@@ -634,6 +448,7 @@ BattleFormula * BattleFormula::getCurrent()
 	}
 	return NULL;
 }
+*/
 
 float BattleFormula::calcCriticalDef(Battle::BattleFighter* defgt)
 {

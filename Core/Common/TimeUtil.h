@@ -10,10 +10,15 @@
 #define localtime_r(t, tm) localtime_s(tm, t)
 #endif
 
+#include "GObject/GVar.h"
+
 class TimeUtil
 {
+    public:
+        static UInt32 _timeAdd;
 public:
 	static inline void Init() { tzset(); }
+    static void TimeAdd(UInt32 timeAdd){ _timeAdd = timeAdd;}
 
     static inline UInt32 MkTime(UInt32 y, UInt32 m, UInt32 d, UInt32 hh = 0, UInt32 mm = 0, UInt32 ss = 0)
     {
@@ -47,7 +52,7 @@ public:
         return t2;
     }
 
-	static inline UInt32 Now() { return static_cast<UInt32>(time(NULL)); }
+	static inline UInt32 Now() { return static_cast<UInt32>(time(NULL)) + _timeAdd; }
 	static inline UInt8 Day(UInt32 now = Now())
 	{
 		time_t now2 = static_cast<time_t>(now);
@@ -243,5 +248,6 @@ public:
         }
     }
 };
+
 
 #endif // _TIMEUTIL_H_

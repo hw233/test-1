@@ -33,7 +33,7 @@ namespace GObject
 
             struct UrlParam
             {
-                UInt64 playerId;
+                std::string playerId;
                 UInt16 type;
             };
 

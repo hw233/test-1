@@ -1,1 +1,0 @@
-DELETE FROM var WHERE id = 291;

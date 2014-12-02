@@ -81,7 +81,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
             //if (type != 0xFF)
             {
                 char id[32] = {0};
-                size_t vlen = snprintf(id, 32, "%" I64_FMT "u", key->player->getId());
+                size_t vlen = snprintf(id, 32, "%s", key->player->getId().c_str());
                 memcached_return_t rc = memcached_set(&memc, key->key, len, id, vlen, (time_t)(60), 0);
 
                 int retry = 2;
@@ -150,38 +150,19 @@ void OnForbidSale( LoginMsgHdr&hdr, const void *data)
     {
         if (cfg.merged)
         {
-            setForbidSaleValue(pl->getId()&0xFFFFFFFF, true);
+            setForbidSaleValue(pl->getId(), true);
         }
         else
         {
             setForbidSaleValue(pl->getId(), true);
         }
-        pl->setForbidSale(true, true);
+        //pl->setForbidSale(true, true);
     }
     else
     {
-        pl->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
+        //pl->udpLog("svr_forbid_sale", "known", "", "", "", "", "act_tmp");
     }
 }
 
-struct RechargeInfo
-{
-    char name[64];
-    UInt32 total;
-} RechargeRank4IDIP[7] = {{{0,},0},};
-
-void OnRecharge4IDIP( LoginMsgHdr&hdr, const void *data )
-{
-    memcpy(&RechargeRank4IDIP, data, sizeof(RechargeRank4IDIP));
-    struct RechargeInfo* pinfo = (RechargeInfo*)(&RechargeRank4IDIP);
-    for (UInt32 i = 0; i < 7; ++i)
-    {
-        if (!pinfo[i].total)
-            break;
-
-        fprintf(stderr, "name: %s\n", pinfo[i].name);
-        fprintf(stderr, "total: %u\n", pinfo[i].total);
-    }
-}
 
 #endif // _LOGININNERMSGHANDLER_H_

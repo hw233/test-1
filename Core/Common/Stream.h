@@ -210,6 +210,12 @@ public:
 		}
 		return *(T *)&_buf[offset];
 	}
+
+	inline Stream& operator<<(const Stream& v)
+    { 
+        (*this) << v._buf;        
+        return *this;
+    } 
 protected:
 	size_t _pos;
 	std::vector<UInt8> _buf;

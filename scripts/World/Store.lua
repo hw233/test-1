@@ -135,6 +135,9 @@ function loadStore()
     if getCelebrateCardActivity(300) then --庆典令
         store:add(2 ,17026,20)
     end
+    if getGGCardActivity(300) then --光棍令
+        store:add(2 ,17118,20)
+    end
     if get61CardActivity(300) then --童心令
         store:add(2 ,9895,20)
     end

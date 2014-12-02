@@ -1,68 +1,85 @@
 #ifndef _BATTLEOBJECT_H_
 #define _BATTLEOBJECT_H_
 
+#include "BattleAction.h"
+#include "BattleField.h"
+#include "Common/Stream.h"
 namespace Battle
 {
 
-class BattleObject
-{
-public:
-	enum Class
-	{
-		Char = 0,
-		Stone = 253,
-		Tree = 254,
-		Water = 255
-	};
-public:
-	BattleObject(Class c, UInt8 s, UInt8 p): _cls(c), _hp(0), _side(s), _pos(p), _hide(false), _shieldObj(NULL), _protectObj(NULL), _protectProb(0) {}
-    virtual ~BattleObject() {};
-
-	inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
-
-	inline void setHP(UInt32 u) {_hp = u;}
-
-	inline Class getClass() {return _cls;}
-	inline UInt32 getHP() {return _hp;}
-
-	virtual void makeDamage(UInt32& u)
+    class BattleField;
+    class BattleObject
     {
-        if(_hp < u)
-            _hp = 0;
-        else
-            _hp -= u;
-    }
+        public:
+            enum 
+            {
+                Rider = 1 ,   //骑将
+                Walker = 2 ,  //步将
+                shooter = 3 , //弓将
+                adviser = 4 , //谋将
 
+                eMain  = 10,
 
+                eTower = 15,   //箭塔
+                eCar   = 16,   //投石车
+                eAirship = 17, //飞艇(孔明灯)
 
-	inline bool isChar() { return _cls == Char; }
+                eFighter = 100,
 
-	inline UInt8 getSide() { return _side; }
-    inline void setPos (UInt8 pos) 
-    { 
-        if (pos >= 0 && pos < 25)
-            _pos = pos;
-    }
+                Stone = 253,
+                Tree = 254,
+                Water = 255
+            };
+        public:
+            BattleObject(UInt8 c, UInt8 px, UInt8 py, BattleField * field): _cls(c), _hp(0), _pointX(px), _pointY(py),_field(field) {}
+            virtual ~BattleObject() {};
 
-	inline UInt8 getPos() { return _pos; }
-    inline bool isHide() { return _hide; }
-    inline void setHide(bool hide) { _hide = hide; }
-    inline void setShieldObj(BattleObject* obj) { if(_shieldObj != obj) _shieldObj = obj; }
-    inline BattleObject* getShieldObj() { return _shieldObj; }
+            //inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
 
-    inline void setProtectObj(BattleObject* obj) { if (_protectObj != obj) _protectObj = obj; }
-    inline BattleObject* getProtectObj() { return _protectObj; }
-    inline UInt16   getProtectProb()    { if (_protectObj) return _protectProb; }
+            inline void setHP(UInt32 u) {_hp = u;}
 
-protected:
-	Class _cls;
-	UInt32 _hp;
-	UInt8 _side, _pos;
-    bool _hide;
-    BattleObject* _shieldObj;
-    BattleObject* _protectObj;
-    UInt16 _protectProb;
-};
+            inline UInt8 getClass() {return _cls;}
+            inline UInt32 getHP() {return _hp;}
+
+            virtual void makeDamage(UInt32 u)
+            {
+                if(_hp < u)
+                    _hp = 0;
+                else
+                    _hp -= u;
+            }
+
+            inline bool isChar() { return _cls < eFighter; }
+
+            inline void setPos (UInt8 x , UInt8 y) 
+            { 
+                _pointX = x;
+                _pointY = y;
+            }
+
+            UInt8 getPosX(){return _pointX;} 
+            UInt8 getPosY(){return _pointY;} 
+
+            //inline bool isHide() { return _hide; }
+            //inline void setHide(bool hide) { _hide = hide; }
+
+            virtual void BeActed(BattleAction battleAction){ makeDamage(battleAction.GetAttack());}   //用于非战斗对象
+            virtual BattleField * GetField(){ return _field;}
+            UInt32 GetDefendNear() {return defend_near;}
+            UInt32 GetDefendDistance(){ return defend_distance;}
+            void AppendFighterStream(Stream & st){ st << _st; _st.reset();}
+        protected:
+            UInt8 _cls;
+            UInt32 _hp;
+            UInt8 _pointX ;
+            UInt8 _pointY;
+            //bool _hide;
+            UInt32 defend_near;
+            UInt32 defend_distance;
+            BattleField * _field;
+            //流
+            Stream _st;
+    };
 
 }
 

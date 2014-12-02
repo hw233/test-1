@@ -1,6 +1,6 @@
 ﻿#include "Config.h"
 #include "Store.h"
-#include "GObject/Country.h"
+//#include "GObject/Country.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
 #include "MsgID.h"
@@ -136,10 +136,6 @@ void Store::addSpecialDiscount()
             }
             _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
             ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
-            GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.endTime, true);
-            GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.exType);
-            GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_BEGIN1 + discount.discountType - 4, discount.beginTime);
-            GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_END1 + discount.discountType - 4, discount.endTime);
         }
     }
 
@@ -160,10 +156,6 @@ UInt8 Store::addSpecialDiscountFromBS(Discount discount)
     {
         return 1;
     }
-    GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.endTime, true);
-    GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_TYPE1 + discount.discountType - 4, discount.exType);
-    GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_BEGIN1 + discount.discountType - 4, discount.beginTime);
-    GObject::GVAR.SetVar(GObject::GVAR_DISCOUNT_END1 + discount.discountType - 4, discount.endTime);
     _itemsDiscount[DISCOUNTEND - DISCOUNT].push_back(discount);
     ++ (_itemTypeCountDiscount[DISCOUNTEND - DISCOUNT][discount.discountType]);
     return 0;
@@ -192,7 +184,6 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
                 ++ it;
             }
         }
-        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1 + type - 4, 0, true);
     }
     else
     {
@@ -208,9 +199,6 @@ UInt8 Store::clearSpecialDiscountFromBS(UInt8 type /* = 0 */)
                 ++ it;
             }
         }
-        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE1, 0, true);
-        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE2, 0, true);
-        GObject::GVAR.SetOverTime(GObject::GVAR_DISCOUNT_TYPE3, 0, true);
     }
     return result;
 }
@@ -314,7 +302,7 @@ void Store::sendList( UInt8 type, GObject::Player * player )
     if (type == 1)
     {
         player->send(_storePacketDiscount[type - DISCOUNT]);
-        player->sendDiscountLimit();
+        //player->sendDiscountLimit();
     }
 }
 
@@ -508,23 +496,23 @@ UInt8 Store::getDisTypeVarOffset(UInt8 type)
     // type：
     //       4,5,6为活动限时限购
     //       7,8,9为普通三五八折限购
-    switch (type)
-    {
-        case 4:
-            return GObject::VAR_DISCOUNT_SP_1 - GObject::VAR_DISCOUNT_1;
-        case 5:
-            return GObject::VAR_DISCOUNT_SP_2 - GObject::VAR_DISCOUNT_1;
-        case 6:
-            return GObject::VAR_DISCOUNT_SP_3 - GObject::VAR_DISCOUNT_1;
-        case 7:
-            return GObject::VAR_DISCOUNT_1 - GObject::VAR_DISCOUNT_1;
-        case 8:
-            return GObject::VAR_DISCOUNT_2 - GObject::VAR_DISCOUNT_1;
-        case 9:
-            return GObject::VAR_DISCOUNT_3 - GObject::VAR_DISCOUNT_1;
-        default:
-            return 0xff;
-    }
+    //switch (type)
+    //{
+    //    case 4:
+    //        return GObject::VAR_DISCOUNT_SP_1 - GObject::VAR_DISCOUNT_1;
+    //    case 5:
+    //        return GObject::VAR_DISCOUNT_SP_2 - GObject::VAR_DISCOUNT_1;
+    //    case 6:
+    //        return GObject::VAR_DISCOUNT_SP_3 - GObject::VAR_DISCOUNT_1;
+    //    case 7:
+    //        return GObject::VAR_DISCOUNT_1 - GObject::VAR_DISCOUNT_1;
+    //    case 8:
+    //        return GObject::VAR_DISCOUNT_2 - GObject::VAR_DISCOUNT_1;
+    //    case 9:
+    //        return GObject::VAR_DISCOUNT_3 - GObject::VAR_DISCOUNT_1;
+    //    default:
+    //        return 0xff;
+    //}
     return 0xff;
 }
 

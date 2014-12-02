@@ -2,7 +2,7 @@
 #define _BATTLEFIELD_H_
 
 #include "BattleFighter.h"
-#include "GData/Formation.h"
+//#include "GData/Formation.h"
 
 /* Battle Field grid indexes:
 defender:	9 8 7 6 5
@@ -12,6 +12,9 @@ attacker:	0 1 2 3 4
 			5 6 7 8 9
 */
 
+#define FIELD_WIDTH 20
+#define FIELD_HIGH  9
+#define STEP 50
 namespace GObject
 {
 	class Player;
@@ -22,14 +25,16 @@ namespace Battle
 
 const int MAX_REIATSU = 100;
 
-enum ReiatsuType    // 灵压值增加值类型
+enum fieldType
 {
-    e_reiatsu_normal_attack = 1,
-    e_reiatsu_skill_attack = 2,
-    e_reiatsu_peerless = 3,
-    e_reiatsu_round = 4,
+    filed_none = 0,
+    filed_flat = 1,
+    filed_glass = 2,
+    filed_desert = 3,
+    filed_water = 4,
 };
 
+class BattleObject;
 class BattleField
 {
 
@@ -38,66 +43,47 @@ public:
 	virtual ~BattleField();
 	void clear();
 	void reset();
-	void setObject(int, int, BattleObject *, UInt8 = 0);
-	void setObjectXY(int, int, int, BattleObject *, bool = false, UInt8 = 0, UInt8 = 0);
-	void setFormation(int, UInt32);
-    void setPetObject(int, BattleObject *, UInt8 = 0);
+	void setObject(UInt8, UInt8, BattleObject *, UInt8 = 0);
+	void setObjectXY(UInt8, UInt8, UInt8, BattleObject *, bool = false, UInt8 = 0, UInt8 = 0);
 
-    bool addReiatsu(int, int);
-    int getReiatsu(int side);
-    inline int getToggleReiatsu(int side) 
-    {
-        if (side < 0 || side >= 2)
-            return 0;
-        return _toggleReiatsu[side];
-    }
+	BattleObject * operator()(UInt8, UInt8);
+	BattleObject * getObjectXY(UInt8, UInt8, UInt8);
 
-	BattleObject * operator()(int, int);
-	BattleObject * getObjectXY(int, int, int);
-	int getDistance(int, int, int, int);
-    int getSpecificTarget(int side, bool(*f)(BattleObject* bo));
-    bool getSpecificTargets(int side, int pos, int val, std::vector<UInt8>& poslist, 
-            bool(*f)(BattleObject* bo, UInt8 targetPos, UInt8 maxLength));
-	int getPossibleTarget(int, int); // return -1 for no found target, overload in Simulator
-	void updateDistance();
-	void updateDistance(int, int);
-	void getFormationPositions(int, std::vector<UInt8>&);
-	UInt32 getAliveCount(int);
-	UInt32 getObjHp(int);
-	UInt32 getMaxObjHp(int);
-	inline bool isBody(int side, int pos) { return _isBody[side][pos] > 0; }
+    UInt8 getDistance(UInt8, UInt8, UInt8, UInt8);
+    int getSpecificTarget(UInt8 side, bool(*f)(BattleObject* bo));
+    bool getSpecificTargets(UInt8 side, UInt8 pos, UInt8 val, std::vector<UInt8>& poslist, bool(*f)(BattleObject* bo, UInt8 targetPos, UInt8 maxLength));
+    int getPossibleTarget(UInt8, UInt8); // return -1 for no found target, overload in Simulator
 
-	inline BattleObject * getObject(int side, int idx)
+	UInt32 getAliveCount(UInt8);
+	UInt32 getObjHp(UInt8 x, UInt8 y);
+
+	inline BattleObject * getObject(UInt8 side, UInt8 idx)
     {
         if(side < 0 || side > 1 || idx < 0 || idx > 24)
             return NULL;
         return _objs[side][idx];
     }
-    inline void deleteObject(int side, int idx)
+    inline void deleteObject(UInt8 side, UInt8 idx)
     {
         if(side < 0 || side > 1 || idx < 0 || idx > 24)
             return;
         if(_objs[side][idx])
         {
-            delete _objs[side][idx];
+            //delete _objs[side][idx];
             _objs[side][idx] = NULL;
         }
     }
 
-protected:
-	bool anyObjectInRow(int, int);
-	void updateStats(int);
-	void updateStats(int, int);
+    BattleObject * GetTarget(UInt8 side , UInt8 posX , UInt8 posY);
 
 protected:
-	BattleObject * _objs[2][25];
-    BattleObject * _backupObjs[2];
-    bool  _hpCheckCache[2][25];
-	UInt8 _isBody[2][25];
-    UInt8 _reiatsu[2];          // 战场中双方的灵压(这单词是网上搜的，就是灵压的意思)
-    UInt8 _toggleReiatsu[2];    // 后备军团上场所需的灵压（仙宠上场）
-    UInt8 _backupTargetPos[2];  // 备胎上场时的位置
-	const GData::Formation * _formation[2];
+	bool anyObjectInRow(UInt8, UInt8);
+	void updateStats(UInt8);
+	void updateStats(UInt8, UInt8);
+
+protected:
+	BattleObject * _objs[FIELD_HIGH][FIELD_WIDTH];     //战场成员
+    fieldType _field[FIELD_HIGH][FIELD_WIDTH];    //场地信息
 };
 
 }

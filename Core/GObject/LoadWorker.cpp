@@ -1,6 +1,5 @@
 #include "Config.h"
 #include "LoadWorker.h"
-#include "Mail.h"
 #include "Player.h"
 
 #include "Server/Cfg.h"
@@ -55,7 +54,7 @@ namespace GObject
 
             if(0 == it->type)
             {
-                GetMailInfo(it->playerId);
+                //GetMailInfo(it->playerId);
             }
         }
     }
@@ -77,50 +76,6 @@ namespace GObject
 
     bool LoadWorker::GetMailInfo(UInt64 playerId)
     {
-        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-        if (execu.get() == NULL || !execu->isConnected()) return false;
-
-        LoadingCounter lc("Loading mail package:");
-        DBMailPackageData mpdata;
-        char buf[1024] = {0};
-        snprintf(buf, sizeof(buf), "SELECT `id`, `itemId`, `itemCount` FROM `mail_package` m_p, `mail` m  WHERE m_p.id = m.mailId AND m.playerId = %" I64_FMT "u  ORDER BY `id`", playerId);
-        if(execu->Prepare(buf, mpdata) != DB::DB_OK) return false;
-        lc.reset(50);
-        UInt32 last_pid = 0xFFFFFFFF;
-        MailPackage * mp = NULL;
-
-        bool needjump = false;
-        while(execu->Next() == DB::DB_OK)
-        {
-            lc.advance();
-            if(mpdata.id != last_pid)
-            {
-                needjump = false;
-                last_pid = mpdata.id;
-                mp = mailPackageManager.add(last_pid, &needjump);
-            }
-
-            if (!needjump)
-                mp->push(mpdata.itemId, mpdata.itemCount);
-        }
-        lc.finalize();
-
-        lc.prepare("Loading mails:");
-        DBMailData mdata;
-        char buf1[1024] = {0};
-        snprintf(buf1, sizeof(buf1), "SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` WHERE `playerId` = %" I64_FMT "u ORDER BY `playerId`, `mailId`", playerId);
-        if(execu->Prepare(buf1, mdata) != DB::DB_OK) return false;
-        lc.reset(500);
-        GObject::Player *pl = GObject::globalPlayers[playerId];
-        if(pl == NULL) return false;
-
-        while(execu->Next() == DB::DB_OK)
-        {
-            lc.advance();
-            pl->GetMailBox()->newMail2(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
-        }
-        lc.finalize();
-
         return true;
     }
 }

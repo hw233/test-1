@@ -1,336 +1,43 @@
 #include "Config.h"
-#include "GObject/Country.h"
+//#include "GObject/Country.h"
 #include "BattleField.h"
-#include "GObject/FairyPet.h"
+//#include "GObject/FairyPet.h"
 
 namespace Battle
 {
 
-BattleField::BattleField()
-{
-	memset(_objs, 0, sizeof(_objs));
-	memset(_isBody, 0, sizeof(_isBody));
-	memset(_formation, 0, sizeof(_formation));
-    memset(_backupObjs, 0, sizeof(_backupObjs));
-    memset(_reiatsu, 0, sizeof(_reiatsu));
-    memset(_toggleReiatsu, 0, sizeof(_toggleReiatsu));
-    memset(_hpCheckCache, 0, sizeof(_hpCheckCache));
-}
-
-BattleField::~BattleField()
-{
-	clear();
-}
-
-void BattleField::setObject( int side, int idx, BattleObject * obj, UInt8 isBody )
-{
-	if(_objs[side][idx] != NULL)
-	{
-		if(!_isBody[side][idx])
-			delete _objs[side][idx];
-		_objs[side][idx] = NULL;
-	}
-	if(_formation[side] != NULL && obj->getClass() == BattleObject::Char)
-	{
-		int c = _formation[side]->getGridCount();
-		for(int i = 0; i < c; ++ i)
-		{
-			if(idx == (*_formation[side])[i].pos)
-			{
-				BattleFighter * fgt = static_cast<BattleFighter *>(obj);
-				fgt->setFormationEffect(&(*_formation[side])[i]);
-			}
-		}
-	}
-	_objs[side][idx] = obj;
-	_isBody[side][idx] = isBody;
-	if(!isBody && obj->getClass() == BattleObject::Char)
-	{
-		BattleFighter * bfgt = static_cast<BattleFighter *>(obj);
-		GObject::Fighter * fgt_ = bfgt->getFighter();
-		if(!fgt_->isNpc())
-			return;
-		GObject::Fighter * fgt = static_cast<GObject::Fighter *>(fgt_);
-		if(!fgt->extraPos.empty())
-		{
-			Int8 x = idx % 5;
-			Int8 y = idx / 5;
-			for(std::vector<GObject::Fighter::Offset>::iterator iter = fgt->extraPos.begin(); iter != fgt->extraPos.end(); ++ iter)
-			{
-				int nx = x + iter->x;
-				int ny = y + iter->y;
-				setObjectXY(1, nx, ny, bfgt, true, x, y);
-			}
-		}
-	}
-}
-
-void BattleField::setObjectXY( int side, int x, int y, BattleObject * obj, bool isBody, UInt8 isBodyX, UInt8 isBodyY )
-{
-	if(isBodyX > 4 || isBodyY > 4)
-		isBodyX = isBodyY = 0;
-	if(isBody)
-		setObject(side, x + y * 5, obj, isBodyX + isBodyY * 5 + 1);
-	else
-		setObject(side, x + y * 5, obj, 0);
-}
-
-void BattleField::setPetObject( int side, BattleObject * obj, UInt8 isBody)
-{
-    // 放置仙宠
-    if (side < 0 || side >= 2)
-        return;
-	if(_backupObjs[side] != NULL)
-	{
-        delete _backupObjs[side];
-	}
-    _backupObjs[side] = obj;
-    if(!isBody && obj->getClass() == BattleObject::Char)
+    BattleField::BattleField()
     {
-        BattleFighter * bfgt = static_cast<BattleFighter *> (obj);
-        GObject::FairyPet * fgt = static_cast<GObject::FairyPet *>(bfgt->getFighter());
-        if (fgt->getClass() >= GObject::e_cls_qinglong && fgt->getClass() <= GObject::e_cls_xuanwu)
-        {
-            // 出场所需的灵压
-            _toggleReiatsu[side] = fgt->getPetLingya();
-            _backupTargetPos[side] = fgt->getTargetPos();
-            _reiatsu[side] = 0;
-        }
+        memset(_objs, 0, sizeof(_objs));
     }
-}
 
-bool BattleField::addReiatsu(int side, int value)
-{
-    // 增加场上灵压，返回值表示是否需要仙宠出场
-    if (side < 0 || side >= 2)
-        return false;
-    if (_reiatsu[side] == _toggleReiatsu[side])
-        return false;
-    if (_reiatsu[side] + value > _toggleReiatsu[side])
-        _reiatsu[side] = _toggleReiatsu[side];
-    else
-        _reiatsu[side] += value;
-#ifdef _DEBUG
-    //printf ("addValue = %d, reiastu[%d] = %d, maxReiastu[%d] = %d\n", value, side, _reiatsu[side], side, _toggleReiatsu[side]);
-#endif
-    return _reiatsu[side] >= _toggleReiatsu[side] ? true:false;
-}
+    BattleField::~BattleField()
+    {
+        clear();
+    }
+    void BattleField::clear()
+    {
 
-int BattleField::getReiatsu(int side)
-{
-    if (side < 0 || side >= 2)
+    }
+    BattleObject * BattleField::GetTarget(UInt8 side, UInt8 posX ,UInt8 posY)
+    { 
+        //TODO
+        return NULL;
+    } 
+    UInt8 BattleField::getDistance(UInt8 x1, UInt8 y1, UInt8 x2, UInt8 y2)
+    { 
+        //TODO
         return 0;
-#ifdef _DEBUG
-    //printf ("reiastu[%d] = %d, maxReiastu[%d] = %d\n", side, _reiatsu[side], side, _toggleReiatsu[side]);
-#endif
-    return _reiatsu[side];
-}
+    } 
 
-BattleObject * BattleField::operator()( int side, int idx )
-{
-	return _objs[side][idx];
-}
-
-BattleObject * BattleField::getObjectXY( int side, int x, int y )
-{
-	return (*this)(side, x + y * 5);
-}
-
-int BattleField::getSpecificTarget(int side, bool(*f)(BattleObject* bo))
-{
-    for (int i = 0; i < 25; ++i)
-    {
-        if (_objs[side][i] && f(_objs[side][i]))
-            return i;
-    }
-	return -1;
-}
-
-bool BattleField::getSpecificTargets(int side, int pos, int val, std::vector<UInt8>& poslist, bool(*f)(BattleObject* bo, UInt8 targetPos, UInt8 maxLength))
-{
-    bool ret = false;
-    for (UInt8 i = 0; i < 25; ++i)
-    {
-        if (_objs[side][i] && f(_objs[side][i], pos, val))
-        {
-            poslist.push_back(i);
-            ret = true;
-        }
-    }
-    return ret;
-}
-
-int BattleField::getPossibleTarget( int side, int idx )
-{
-    //overload in Simulator
-	static int select_table[5][5] = {
-		{0 , 1 , 2 , 3 , 4},
-		{1 , 0 , 2 , 3 , 4},
-		{2 , 1 , 3 , 0 , 4},
-		{3 , 2 , 4 , 1 , 0},
-		{4 , 3 , 2 , 1 , 0},
-	};
-    BattleObject* hideObj = NULL;
-	int targetidx = 4 - (idx % 5);
-	int tside = 1 - side;
-    for(int irow = 0; irow < 5; ++ irow)
-    {
-        int tidx = irow * 5 + targetidx;
-        if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0 && !static_cast<BattleFighter *>(_objs[tside][tidx])->isSoulOut())
-        {
-            if(!_objs[tside][tidx]->isHide())
-            {
-                _objs[tside][tidx]->setShieldObj(hideObj);
-                return tidx;
-            }
-            else
-            {
-                hideObj = _objs[tside][tidx];
-            }
-        }
-    }
-
-	int * tbl = select_table[targetidx];
-	for(int i = 0; i < 5; ++ i)
-	{
-		for(int j = 0; j < 5; ++ j)
-		{
-			int tidx = tbl[j] + i * 5;
-			if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0 && !static_cast<BattleFighter *>(_objs[tside][tidx])->isSoulOut())
-			{
-                if(!_objs[tside][tidx]->isHide())
-                {
-                    _objs[tside][tidx]->setShieldObj(hideObj);
-                    return tidx;
-                }
-                else
-                {
-                    hideObj = _objs[tside][tidx];
-                }
-			}
-		}
-	}
-	return -1;
-}
-
-bool BattleField::anyObjectInRow( int side, int row )
-{
-	int start = row * 5, end = start + 5;
-	for(int p = start; p < end; ++ p)
-	{
-		if(_objs[side][p] != NULL && _objs[side][p]->getHP() > 0)
-			return true;
-	}
-	return false;
-}
-
-void BattleField::setFormation( int idx, UInt32 id )
-{
-	_formation[idx] = GData::formationManager[id];
-}
-
-void BattleField::getFormationPositions( int idx, std::vector<UInt8>& poslist )
-{
-	if(_formation[idx] == NULL)
-		return;
-	int gridCount = _formation[idx]->getGridCount();
-	for(int i = 0; i < gridCount; ++ i)
-	{
-		poslist.push_back((*_formation[idx])[i].pos);
-	}
-}
-
-UInt32 BattleField::getAliveCount( int side )
-{
-	UInt32 r = 0;
-	for(int i = 0; i < 25; ++ i)
-	{
-		BattleObject * obj = _objs[side][i];
-		if(obj != NULL && obj->getClass() == BattleObject::Char &&
-			obj->getHP() > 0)
-		{
-			++ r;
-		}
-	}
-	return r;
-}
-
-UInt32 BattleField::getObjHp( int side )
-{
-	UInt32 r = 0;
-	for (int i = 0; i < 25; ++ i)
-	{
-		BattleObject * obj = _objs[side][i];
-		if (obj != NULL)
-			r += obj->getHP();
-	}
-	return r;
-}
-
-UInt32 BattleField::getMaxObjHp( int side )
-{
-	UInt32 r = 0;
-	for (int i = 0; i < 25; ++ i)
-	{
-		BattleFighter * obj = static_cast<BattleFighter *>(_objs[side][i]);
-		if (obj != NULL)
-			r += obj->getMaxHP();
-	}
-	return r;
-}
-
-void BattleField::clear()
-{
-	for(int i = 0; i < 2; ++ i)
-		for(int j = 0; j < 25; ++ j)
-			if(_objs[i][j] && !_isBody[i][j])
-				delete _objs[i][j];
-    for (int i = 0; i < 2; ++i)
-        if (_backupObjs[i])
-            delete _backupObjs[i];
-	memset(_objs, 0, sizeof(_objs));
-	memset(_formation, 0, sizeof(_formation));
-    memset(_backupObjs, 0, sizeof(_backupObjs));
-	for(int i = 0; i < 2; ++ i)
-		for(int j = 0; j < 25; ++ j)
-            _hpCheckCache[i][j] = false;
-}
-
-void BattleField::reset()
-{
-	for(int i = 0; i < 2; ++ i)
-		for(int j = 0; j < 25; ++ j)
-			if(_objs[i][j] && _objs[i][j]->getClass() == BattleObject::Char)
-			{
-				BattleFighter * bf = static_cast<BattleFighter *>(_objs[i][j]);
-				bf->setHP(bf->getMaxHP());
-			}
-}
-
-void BattleField::updateStats( int side )
-{
-	for(int i = 0; i < 2; ++ i)
-    {
-		for(int j = 0; j < 25; ++ j)
-			if(_objs[i][j] && _objs[i][j]->getClass() == BattleObject::Char)
-			{
-				BattleFighter * bf = static_cast<BattleFighter *>(_objs[i][j]);
-				bf->setFormationEffect(NULL);
-				bf->updateAllAttr();
-			}
-        BattleFighter * bf = static_cast<BattleFighter *>(_backupObjs[i]);
-        if (bf)
-            bf->updateAllAttr();
-    }
-}
-
-void BattleField::updateStats( int side, int pos )
-{
-	if(_objs[side][pos] && _objs[side][pos]->getClass() == BattleObject::Char)
-	{
-		BattleFighter * bf = static_cast<BattleFighter *>(_objs[side][pos]);
-		bf->updateAllAttr();
-	}
-}
-
+    void BattleField::setObject(UInt8 x , UInt8 y , BattleObject * bo ,UInt8 isBody)
+    { 
+        if(_objs[x][y] != NULL)
+        {   
+            if(!_objs[x][y])
+                delete _objs[x][y];
+            _objs[x][y] = NULL;
+        }   
+        _objs[x][y] = bo;
+    } 
 }

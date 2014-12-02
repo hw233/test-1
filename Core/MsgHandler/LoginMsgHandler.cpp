@@ -5,85 +5,10 @@
 #include "MsgID.h"
 
 MSG_HANDLER_DECLARE(LoginMsgHandler)
-MSG_REG(GameMsgHdr, UserDisconnect);
 MSG_REG(LoginMsgHdr, UserLoginReq);
-MSG_REG_2(LoginMsgHdr, SPEQ::SOCK_ADDR, SockAddrReq);
-MSG_REG(LoginMsgHdr, UserReconnectReq);
-MSG_REG(LoginMsgHdr, NewUserReq);
-MSG_REG_2(LoginMsgHdr, SPEQ::PLAYERIDAUTH, PlayerIDAuth);
-MSG_REG_2(LoginMsgHdr, SPEQ::WORLDANNOUNCE, WorldAnnounce);
-MSG_REG_2(LoginMsgHdr, SPEQ::USERRECHARGE, onUserRecharge);
-MSG_REG_2(LoginMsgHdr, SPEQ::RERECHARGE, onUserReRecharge);
-MSG_REG_2(LoginMsgHdr,SPEQ::KILLUSER,OnKickUser);
-MSG_REG_2(LoginMsgHdr,SPEQ::LOCKUSER,LockUser);
-MSG_REG_2(LoginMsgHdr,SPEQ::UNLOCKUSER,UnlockUser);
-MSG_REG_2(LoginMsgHdr,SPEQ::GMHANDLERFROMBS,GmHandlerFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::MAILFROMBS,MailFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::BANCHATFROMBS,BanChatFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMFROMBS,AddItemFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMTOALL,AddItemToAllFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMFROMBSBYCOUNTRY,AddItemToAllFromBsByCountry);
-MSG_REG_2(LoginMsgHdr,SPEQ::MAILVIP,MailVIPFromBs);
-//MSG_REG_2(LoginMsgHdr,SPEQ::JASON,JasonParse);
-MSG_REG_2(LoginMsgHdr,SPEQ::BATTLEREPORT,BattleReportReq);
-MSG_REG_2(LoginMsgHdr,SPEQ::ONLINE,ServerOnlineNum);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETLEVEL,SetLevelFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETPROPS,SetPropsFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETMONEY,SetMoneyFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::LOADLUA,LoadLuaFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETVIPL,SetVIPLFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::CLSTASK,ClearTaskFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::CLSTASKALL,ClearTaskAllFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::SALE_ONOFF,reqSaleOnOffFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::PLAYERINFO,PlayerInfoFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::WBOSS,WBossMgrFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::ONLINEPF,ServerOnlinePFNum);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMFROMBSBYID,  AddItemFromBsById);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDFIGHTER,  AddFighterFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::GETMONEY, GetMoneyFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::SYSDAILOG, SysDailog);
-MSG_REG_2(LoginMsgHdr,SPEQ::PWDINFO, PwdInfo);
-MSG_REG_2(LoginMsgHdr,SPEQ::PWDRESET, PwdReset);
-MSG_REG_2(LoginMsgHdr,SPEQ::CFRIEND,SetCFriend);
-MSG_REG_2(LoginMsgHdr,SPEQ::GMCMD, GMCmd);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDDISCOUNT,AddDiscountFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::QUERYDISCOUNT,QueryDiscountFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::CLEARDISCOUNT,ClearDiscountFromBs);
-
-MSG_REG_2(LoginMsgHdr,SPEQ::REALAWARDINFO, QueryRealAwardInfo);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDREALAWARD, AddRealAward);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDCLANAWARD, AddClanAward);
-MSG_REG_2(LoginMsgHdr,SPEQ::MANUALOPENTJ, ManualOpenTj);
-MSG_REG_2(LoginMsgHdr,SPEQ::SHSTAGEONOFF, SHStageOnOff);
-MSG_REG_2(LoginMsgHdr,SPEQ::QUERYSHSTAGEONOFF, QuerySHStageOnOff);
-MSG_REG_2(LoginMsgHdr,SPEQ::ACTIVITYONOFF, ControlActivityOnOff);
-MSG_REG_2(LoginMsgHdr,SPEQ::QUERYACTIVITYONOFF, QueryOneActivityOnOff);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETVAR, SetPlayersVar);
-MSG_REG_2(LoginMsgHdr,SPEQ::VIAPLAYERINFO, ViaPlayerInfoFromBs);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETMARRYBOARD, SetMarryBoard);
-MSG_REG_2(LoginMsgHdr,SPEQ::WORLDCUP , SetWorldCupResult);
-
-MSG_REG_2(LoginMsgHdr,SPEQ::BIGLOCKUSER,BigLockUser);
-MSG_REG_2(LoginMsgHdr,SPEQ::BIGUNLOCKUSER,BigUnlockUser);
-
-MSG_REG_2(LoginMsgHdr,SPEQ::FORBIDSALE,ForbidSale);
-MSG_REG_2(LoginMsgHdr,SPEQ::UNFORBIDSALE,UnForbidSale);
-MSG_REG_2(LoginMsgHdr,SPEQ::QUERYLOCKUSER,QueryLockUser);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETLOGINLIMIT,SetPlatformLoginLimit);
-MSG_REG_2(LoginMsgHdr,SPEQ::DELETEGOLD,DeleteGold);
-MSG_REG_2(LoginMsgHdr,SPEQ::ADDRECHARGESCORE,addRechargeScore);
-MSG_REG_2(LoginMsgHdr,SPEQ::SYSUPDATE, SysUpdate);
-MSG_REG_2(LoginMsgHdr,SPEQ::OPENCB,OpenCb);
-MSG_REG_2(LoginMsgHdr,SPEQ::TOTALRECHARGEACT, OnTotalRechargeAct);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETTOTALRECHARGEACT, OnSetTotalRechargeAct);
-MSG_REG_2(LoginMsgHdr,SPEQ::SETMAXNEWUSER, OnSetMaxCreate);
-MSG_REG_2(LoginMsgHdr,SPEQ::GETMAXNEWUSER, OnGetMaxCreate);
-MSG_REG_2(LoginMsgHdr,SPEQ::GETQQCLANTALK, OnGetQQClanTalk);
-MSG_REG_2(LoginMsgHdr,SPEQ::OFFQQOPENID, OnoffQQOpenid);
-
-MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
-MSG_REG_2(LoginMsgHdr, 0x301, OnSetCrackValue);
-MSG_REG_2(LoginMsgHdr, 0x330, OnForbidSale);
-MSG_REG_2(LoginMsgHdr, 0x331, OnRecharge4IDIP);
+//MSG_REG_2(LoginMsgHdr, SPEQ::USERRECHARGE, onUserRecharge);
+//MSG_REG(LoginMsgHdr, NewUserReq);
+//MSG_REG_2(LoginMsgHdr, 0x330, OnForbidSale);
+//MSG_REG(GameMsgHdr, UserDisconnect);
 
 MSG_HANDLER_END()

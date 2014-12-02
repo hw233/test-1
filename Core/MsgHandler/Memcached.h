@@ -116,8 +116,8 @@ static void setCrackValue(const char* ip, int v)
     }
 }
 
-//static void setForbidSaleValue(const UInt64 playerId, bool isForbid)
-static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTime = 9999999)
+//static void setForbidSaleValue(const std::string playerId, bool isForbid)
+static void setForbidSaleValue(const std::string playerId, bool isForbid, UInt32 fTime = 9999999)
 {
     (void)setForbidSaleValue;
     initMemcache();
@@ -127,7 +127,7 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTim
     {
         char value[32] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", playerId);
+        size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", playerId.c_str());
         if (isForbid) value[0] = '1';
         sprintf(&value[1],"%d", TimeUtil::Now());
         {
@@ -143,16 +143,16 @@ static void setForbidSaleValue(const UInt64 playerId, bool isForbid, UInt32 fTim
     }
 }
 
-//static bool checkForbidSale(const UInt64 playerId, std::string& t)
-static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::string& over)
+//static bool checkForbidSale(const std::string playerId, std::string& t)
+static bool checkForbidSale(const std::string playerId, std::string& fsale, std::string& over)
 {
     (void)checkForbidSale;
     initMemcache();
     std::string t="0";
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    UInt64 pid = playerId & 0xFFFFFFFFFF;
-    size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", pid);
+    std::string pid = playerId ;
+    size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", pid.c_str());
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));
@@ -188,7 +188,7 @@ static bool checkForbidSale(const UInt64 playerId, std::string& fsale, std::stri
     return true;
 }
 
-static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
+static bool checkCrack(std::string& platform, std::string& ip, std::string id)
 {
     (void)checkCrack;
     int pf = atoi(platform.c_str());
@@ -225,7 +225,7 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
                 }*/
                 if (g_platform_login_number[pf] > 0 && v >= g_platform_login_number[pf])
                 {
-                    TRACE_LOG("id: %" I64_FMT "u from %s of asss_%d is cracking...", id, ip.c_str(), cfg.serverNum);
+                    TRACE_LOG("id: %s from %s of asss_%d is cracking...", id.c_str(), ip.c_str(), cfg.serverNum);
                     return true;
                 }
             }
@@ -236,7 +236,7 @@ static bool checkCrack(std::string& platform, std::string& ip, UInt64 id)
 
     return false;
 }
-static void memLockUser(const UInt64 playerId, UInt32 expireTime)
+static void memLockUser(const std::string playerId, UInt32 expireTime)
 {
     (void)memLockUser;
     initMemcache();
@@ -244,13 +244,13 @@ static void memLockUser(const UInt64 playerId, UInt32 expireTime)
     {
         char value[32] = {0};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%" I64_FMT "u", playerId);
+        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%s", playerId.c_str());
         size_t vlen = snprintf(value, sizeof(value), "%d", expireTime);
 
         MemcachedSet(key, len, value, vlen, 0);
     }
 }
-static void memUnLockUser(const UInt64 playerId)
+static void memUnLockUser(const std::string playerId)
 {
     (void)memUnLockUser;
     initMemcache();
@@ -258,21 +258,21 @@ static void memUnLockUser(const UInt64 playerId)
     {
         char value[2] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%" I64_FMT "u", playerId);
+        size_t len = snprintf(key, sizeof(key), "asss_locklogin_%s", playerId.c_str());
 
         MemcachedSet(key, len, value, 1, 0);
     }
 }
 
 
-static UInt32 getLockUserValue(const UInt64 playerId)
+static UInt32 getLockUserValue(const std::string playerId)
 {
     (void)getLockUserValue;
     initMemcache();
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    UInt64 pid = playerId & 0xFFFFFFFFFF;
-    size_t len = snprintf(key, sizeof(key), "asss_locklogin_%" I64_FMT "u", pid);
+    std::string pid = playerId  ;
+    size_t len = snprintf(key, sizeof(key), "asss_locklogin_%s", pid.c_str());
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));

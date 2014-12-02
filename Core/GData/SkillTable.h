@@ -1,297 +1,85 @@
-﻿
+
 #ifndef SKILLTABLE_H_
 #define SKILLTABLE_H_
 
 #include "Config.h"
-#include "ObjectManager.h"
-
+#include "GObject/GObjectManager.h"
 namespace GData
 {
+    enum    // 技能触发方式
+    {
+        /*0*/ SKILL_ACTIVE = 0,  //主动技能
+        /*1*/ SKILL_PEERLESS = 1,   //无双技能
+        SKILL_PASSSTART,
+    };
+    enum 
+    {
+        SCOPE_SINGAL = 0,  //单体
+        SCOPE_ROUND = 1 ,  //四周
+        SCOPE_CORESS,      //十字形
+    };
 
-#define SKILL_LEVEL_MAX 100
-#define SKILL_LEVEL(x)  (((UInt16)(x))%SKILL_LEVEL_MAX)
-#define SKILL_ID(x) (((UInt16)(x))/SKILL_LEVEL_MAX)
-#define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX + ((UInt16)(l)))
+    class SkillCondition : public ObjectBaseT<UInt16>
+    { 
+        public:
+            SkillCondition(UInt16 id, const std::string& name)
+                : ObjectBaseT<UInt16>(id,name) ,cond(0),prob(0),cd(0),actionCd(0),distance(0),priority(0)
+            { } 
+            ~SkillCondition(){}
+            bool MeetCondition(UInt8 advance ,UInt8& pri) const 
+            {
+                if(distance >= advance && pri < priority)
+                { 
+                    pri = priority;
+                    return true;
+                } 
+                return false;
+            }
+        public:
+            UInt16 cond;     //释放条件
+            UInt8 prob;     //释放几率 (x/100)
+            UInt16 cd ;     //冷却时间  ( %d s * 8)
+            UInt16 actionCd ;     //释放时间  ( %d s * 8)  用于设置外部的行为
+            UInt16 distance;  //攻击距离
+            UInt8 priority;   //优先级
+    };
+    class SkillScope : public ObjectBaseT<UInt16>
+    { 
+        public:
+            SkillScope(UInt16 id , const std::string& name)
+                : ObjectBaseT<UInt16>(id,name) { } 
+        public:
+            UInt8 area;  //范围类型
+            UInt8 rad;  //范围半径
+    };
+    class SkillEffect : public ObjectBaseT<UInt16>
+    { 
+        public:
+            SkillEffect(UInt16 id , const std::string& name)
+                : ObjectBaseT<UInt16>(id,name) { } 
+        public:
+            UInt8 skillType;
 
-#define CITTA_LEVEL_MAX 100
-#define CITTA_LEVEL(x) (((UInt16)(x))%CITTA_LEVEL_MAX)
-#define CITTA_ID(x) (((UInt16)(x))/CITTA_LEVEL_MAX)
-#define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX + ((UInt16)(l)))
-#define CITTA_TO_ITEMID(x) ((UInt16)(x) / CITTA_LEVEL_MAX + LCITTA_ID - 1)
-#define ITEMID_TO_CITTA(x,l) (((UInt16)(x) - LCITTA_ID + 1)*100 + ((UInt16)(l > 9 ? 9 : l)))
+            UInt16 damage;   //基础伤害
+            float damageP;   //伤害百分比
 
-enum    // 技能触发方式
-{
-    /*0*/ SKILL_ACTIVE = 0,
-    /*1*/ SKILL_PEERLESS,
-    SKILL_PASSSTART,
-    /*2*/ SKILL_PREATK = SKILL_PASSSTART,
-    /*3*/ SKILL_AFTATK,
-    /*4*/ SKILL_BEATKED,
-    /*5*/ SKILL_AFTEVD,
-    /*6*/ SKILL_AFTRES,
-    /*7*/ SKILL_ENTER,
-    /*8*/ SKILL_DEAD,
-    /*9*/ SKILL_AFTNATK,
-    /*10*/ SKILL_ONTHERAPY,
-    /*11*/ SKILL_ONSKILLDMG,
-    /*12*/ SKILL_ONOTHERDEAD,
-    /*13*/ SKILL_ONCOUNTER,
-    /*14*/ SKILL_ONATKBLEED,
-    /*15*/ SKILL_ONATKDMG,
-    /*16*/ SKILL_ONPETPROTECT,
-    /*17*/ SKILL_ONGETDMG,      // 受到任何伤害触发
-    /*18*/ SKILL_ONBEDMG,       // 被其他人攻击触发
-    /*19*/ SKILL_ONBEPHYDMG,
-    /*20*/ SKILL_ONBEMAGDMG,
-    /*21*/ SKILL_ONHP10P,    // 生命剩余1/3
-    /*22*/ SKILL_DEAD_FAKE,  // 复活
-    /*23*/ SKILL_ABNORMAL_TYPE_DMG,  // 异常类状态伤害
-    /*24*/ SKILL_BLEED_TYPE_DMG,  // 流血类状态伤害
-    /*25*/ SKILL_XMCZ,  //降魔禅杖
-    /*26*/ SKILL_BLTY,  //碧岚天衣
-    /*27*/ SKILL_AFTACTION,      // 行动后触发（包括被眩晕）
-    /*28*/ SKILL_ONHPCHANGE,       // HP改变时触发
-    /*29*/ SKILL_ONWITHSTAND,    // 招架（可以反击状态下触发）
-    /*30*/ SKILL_VIOLENT,    // 狂暴(怪物技能)
-    /*31*/ SKILL_REVIVAL,    // 生生不息(怪物技能)
-    /*32*/ SKILL_LINGSHI,    // 灵侍技能
-    /*33*/ SKILL_ONOTHERCONFUSEFORGET,  // 其他人获得沉默和混乱
-    /*34*/ SKILL_ENTER_LINGSHI,  // 灵侍入场技能
-    /*35*/ SKILL_ONATKSTUN,         // 攻击带眩晕的主目标后
-    /*36*/ SKILL_ONATKCONFUSEFORGET,// 攻击带混乱沉默的主目标后
-    /*37*/ SKILL_ONATKBLIND,        // 攻击带致盲的主目标后
-    /*38*/ SKILL_CONDITION,        // 达到条件100%触发
-    /*39*/ SKILL_EVOLUTION,        // 达到仙气达到
-    SKILL_PASSIVES
-};
+            UInt16 trerapy;  //基础治疗
+            float trerapyP;  //治疗百分比
 
-enum
-{
-    SKILL_EFFECT_FALG_VALUE = 30000
-};
+            // UInt16 defend;   //附加防御增加
+            // float defendP;   //附加防御百分比增加
+    };
 
-enum
-{
-    e_battle_target_selfside  = 0,
-    e_battle_target_otherside = 1,
-    e_battle_target_self      = 2,
-    e_battle_target_otherside_max = 3,
-    e_battle_target_otherside_min = 4,
-    e_battle_target_selfside_max = 5,
-    e_battle_target_selfside_min = 6,
-    e_battle_target_selfside_atk_max = 7,
-    e_battle_target_selfside_atk_2nd = 8,
-};
+    typedef ObjectMapT<SkillCondition, UInt16> SkillConditionManager;
+#define skillConditionManager SkillConditionManager::Instance()
 
+    typedef ObjectMapT<SkillScope, UInt16> SkillScopeManager;   
+#define skillScopeManager SkillScopeManager::Instance()
 
-// 技能附加特效类型:
-enum
-{
-    e_eft_hide = 1, // 潜行 
-    e_eft_double_hit = 2, // 连击 
-    e_eft_mark_hide_dhit = 3, // (墨印或潜行时)加连击
-    e_eft_mark_hide_blind = 4, // (墨印或潜行时)至盲
-    e_eft_selfside_ru_shi_magatk = 5, // (友方全体,队友为释儒)加法术攻击
-    e_eft_selfside_dao_dmgreduce = 6, // (友方全体,队友为道)加伤害减免
-    e_eft_hide_attack = 7, // (潜行时)加攻击
-    e_eft_mark_hide_week = 8, // (墨印或潜行时)加虚弱
-    e_eft_hide_summon = 9, // (潜行时)召唤潜行的残影
-    e_eft_rnd_fgt_buf_aura = 10, // 随机队友获得心动后涨灵气的buf
-    e_eft_evade100 = 11, // 百分百闪避一次主动攻击
-    e_eft_selfside_buf_aura = 12, // 全体队友获得心动后涨灵气的buf
-    e_eft_selfside_absorb = 13, // 给队友吸血
-    e_eft_hide_aura = 14, // (墨印或潜行时)敌方被攻击时不增加灵气
-    e_eft_counter_hate = 15, // 反击后的仇恨值(反击伤害累计到敌方，buf消除时累计的伤害爆炸，并波及斜十字的对象)
-    e_eft_hp_shield = 16,       // 释放自己生命值百分比的护盾
-    e_eft_self_bleed = 17,           // 给自己加点燃效果（自焚？）
-    e_eft_random_shield = 18,        // 随机释放护盾
-    e_eft_self_attack = 19,        // 附加自己百分比攻击力
-    e_eft_random_target_attack = 20,    // 随机选择人加攻击力
-    e_eft_mark_pet  = 21,               // 神兽印记
-    e_eft_atk_pet_mark_aura = 22,       // 攻击带神兽印记的涨自身灵气
-    e_eft_atk_pet_mark_extra_dmg = 23,  // 攻击带神兽印记的造成额外攻击
-    e_eft_protect_pet_100 = 24,         // 宠物100%保护目标
-    e_eft_pet_atk_100 = 25,             // 宠物100%帮目标合击
-    e_eft_pet_protect_reduce = 26,      // 宠物援护免伤
-    e_eft_counter_spirit = 27,     // 反击后的士气(增加防御、攻击,累计5次对敌方全体造成物理伤害)
-    e_eft_fire_def = 28,           // 火甲(增加防御，不被其他buf覆盖)
-    e_eft_sneak_atk = 29,           // 暗杀(闪避时对敌方造成伤害并吸血)
-    e_eft_dec_wave_dmg = 30,           // 减少受到的波及伤害
-    e_eft_lingqu = 31,             // 灵躯
-    e_eft_lingshi_bleed = 32,           // 灵蚀（宠物流血)
-    e_eft_lingyou_atk = 33,           // 灵佑（物攻)
-    e_eft_lingyou_magatk = 34,           // 灵佑（法功)
-    e_eft_lingyou_def = 35,           // 灵佑（物防)
-    e_eft_lingyou_magdef = 36,           // 灵佑（法防)
-    e_eft_criticaldmgreduce = 37,           //减敌方暴击伤害
-    e_eft_soul_out = 38,           //元神出窍
-    e_eft_abnormal_type_dmg = 39,           //异常类伤害
-    e_eft_bleed_type_dmg = 40,           //流血类伤害
-    e_eft_buddha_light = 41,           //佛光效果
-    e_eft_no_use = 42,           //未使用
-    e_eft_bi_lan_tian_yi = 43,   //未使用
-    e_eft_zhu_tian_bao_jian = 44, //诸天宝鉴
-    e_eft_trigger_count_max = 45, // 技能触发上限
-    e_eft_hp_lostp = 46,    // HP损失百分比
-    e_eft_withstand = 47,       // 招架效果
-    e_eft_flaw = 48,            // 破绽效果
-    e_eft_ru_red_carpet = 49,    // 儒：红毯
-    e_eft_shi_flower = 50,    // 释：鲜花
-    e_eft_dao_rose = 51,    // 道：玫瑰
-    e_eft_mo_knot = 52,    // 墨：同心结
-    e_eft_prudent = 53,    //谨慎，现在叫九霄风云变
-    e_eft_silkworm = 54,    // 天蚕变，现在叫魔杀漩涡
-    e_eft_chaos_world = 55,     // 混世状态
-    e_eft_lingshi_enter = 56,    //灵侍入场
-    e_eft_lingshi_mojian = 57,    //魔剑
-    e_eft_lingshi_buqu = 58,    //不屈
-    e_eft_lingshi_mozhu = 59,    //墨诛
-    e_eft_lingshi_gaoneng = 60,    //高能
-    e_eft_round_add  = 61,      // 每回合增加的buff
-    e_eft_round_sub  = 62,      // 每回合减少的buff
-    e_eft_control_ball  = 63,      // 足球法宝
-    e_eft_dispeerless  = 64,      // 慈悲效果
-
-    e_eft_evolution1 = 65,       //仙器技能概率随机伤害一次
-    e_eft_evolution2 = 66,       //仙器技能回复HP最低同伴血量
-    e_eft_evolution3 = 67,       //仙器技能回复自身血量
-    e_eft_evolution4 = 68,      //仙器技能对对方血量最少3次伤害
-    e_eft_evolution5 = 69,      //伤害技能参数填充
-    e_eft_bimutianluo = 70,    //碧目天罗
-    e_eft_max
-};
-
-enum
-{
-    e_state_poison = 0x1, // 中毒
-    e_state_confuse = 0x2, // 混乱
-    e_state_stun = 0x4, // 晕眩
-    e_state_forget = 0x8, // 封印
-    e_state_dmgback = 0x10, // 伤害反弹
-    e_state_weak = 0x20, // 虚弱
-    e_state_dec_aura = 0x40, // 减灵气
-    e_state_mark_mo = 0x80, // 墨印
-    e_state_blind = 0x100, // 至盲
-
-    e_state_c_s_f = 0x0E, //混乱、晕眩、沉默
-    e_state_c_s_f_w = 0x2e, // 混乱，晕眩，封印，虚弱
-    e_state_c_s_f_m_b = 0x18e, // 混乱，晕眩，封印，墨印，至盲
-    e_state_c_s_f_b = 0x10e, // 混乱，晕眩，封印，至盲
-    e_state_c_s_f_w_m_b = 0x1ae, // 混乱，晕眩，封印，虚弱，墨印，至盲
-};
-
-
-struct SkillEffect : public ObjectBaseNT<UInt16>
-{
-    SkillEffect(UInt16 id)
-        : ObjectBaseNT<UInt16>(id), state(0), immune(0), disperse(0),
-        damage(0), damageP(0), adddam(0), magdam(0), magdamP(0), addmag(0), crrdam(0), crrdamP(0), addcrr(0),
-        hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),inj2hp(0), inj2hpP(0),
-        aura(0), auraP(0), atk(0), atkP(0), def(0), defP(0), magatk(0),
-        magatkP(0), magdef(0), magdefP(0), tough(0), action(0), actionP(0), hitrate(0), evade(0),
-        critical(0), pierce(0), counter(0), magres(0), atkreduce(0), magatkreduce(0), hppec(0), maxhpdampec(0) {}
-    ~SkillEffect() {}
-
-    UInt16 state; // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱, 64-降灵气 有等级之分
-    UInt16 immune; // 对状态技能的免疫,只能免疫比自己技能低的技能
-    UInt16 disperse; // 驱散状态,只对友方使用,除自己外,是状态的值的和
-    Int16 damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)
-    float damageP;
-    float adddam; // 物理伤害附加(具体值)
-    Int16 magdam; // 法术伤害 num/num%
-    float magdamP;
-    float addmag; // 法术伤害附加(具体值)
-    Int16 crrdam; // 职业伤害 num/num%
-    float crrdamP;
-    float addcrr; // 职业伤害附加(具体值)
-    Int16 hp; // HP改变 [+/-]num/num%
-    float hpP;
-    float addhp; // HP改变附加(具体值)[+/-]
-    Int16 absorb; // 伤害吸血 num/num%
-    float absorbP;
-    Int16 thorn; // 反弹 num/num%
-    float thornP;
-    Int16 inj2hp; // 受伤回扣 num/num%
-    float inj2hpP;
-    Int16 aura; // 作用士气 [+/-]num/num%
-    float auraP;
-    Int16 atk; // 物理攻击 [+/-]num/num%
-    float atkP;
-    Int16 def; // 物理防御 [+/-]num/num%
-    float defP;
-    Int16 magatk; // 法术攻击 [+/-]num/num%
-    float magatkP;
-    Int16 magdef; // 法术防御 [+/-]num/num%
-    float magdefP;
-    float tough; // 坚韧[+/-]
-    float action; // 身法[+/-]num/num%
-    float actionP;
-    float hitrate; // 命中[+/-]
-    float evade; // 闪避[+/-]
-    float critical; // 暴击[+/-]
-    float pierce; // 击破/护甲穿透[+/-]
-    float counter; // 反击[+/-]
-    float magres; // 法术抵抗[+/-]
-    float atkreduce; // 物理伤害减免
-    float magatkreduce; // 法术伤害减免
-    float hppec;        // 最大生命值伤害百分比
-    float maxhpdampec;  // 最大生命值伤害百分比最大值（最高攻击力的百分比）
-
-    // 技能附加特效类型:
-    std::vector<UInt16> eft;
-    std::vector<UInt8> efl; // 技能附加特效持续回合
-    std::vector<float> efv; // 技能附加特效值
-};
-
-struct SkillBase : public ObjectBaseT<UInt16>
-{
-    SkillBase(UInt16 id, const std::string& name)
-        : ObjectBaseT<UInt16>(id, name), target(0), cond(0),
-        prob(0), area(0), last(0), cd(0), effect(0) {}
-    ~SkillBase() { if (effect) delete effect; }
-
-    UInt8 color;               // 技能颜色 1-白色 2-绿色 3-蓝色 4-紫色 5-橙色
-    UInt8 target;              // 作用对象: 0-友方,1-敌方,2-自己(对友方和自己加,对敌方减)
-                               //           3-敌方血量最高 4-敌方血量最低
-                               //           5-我方血量最高 6-我方血量最低
-    UInt16 cond;               // 触发条件: SKILL_ACTIVE     - 主动
-                               //           SKILL_PEERLESS   - 无双技能,当灵气>=100释放
-                               //           SKILL_PREATK     - 攻击前被动触发(回血技能,无概率)
-                               //           SKILL_AFTATK     - 攻击后被动触发(有概率)
-                               //           SKILL_AFTNATK    - 普通攻击后被动触发(有概率)
-                               //           SKILL_BEATKED    - 被攻击后触发(有概率)
-                               //           SKILL_AFTEVD     - 闪避后触发
-                               //           SKILL_AFTRES     - 抵抗后触发
-                               //           SKILL_ENTER      - 入场时触发
-                               //           SKILL_DEAD       - 死亡后触发
-                               //           SKILL_ONCOUNTER  - 反击后触发
-                               //           SKILL_ONATKBLEED - 攻击流血对象触发
-                               //           and so on...
-    float prob;                // 主动状态触发概率 或 被动触发概率
-    UInt8 area;                // 伤害范围: 0-单体,1-全体,2-横排,3-竖列,4-十字,5-V字,6-T字
-    std::vector<float> factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 距离攻击目标为0的伤害系数是1,距离为2的伤害系数为0.5
-    Int16 last;                // 持续时间: -1-一直有效,0-非持续,N-持续次数
-    UInt16 cd;                 // 冷却回合
-    const SkillEffect* effect;
-};
-
-struct SkillItem
-{
-    const SkillBase* base;
-    float rateExtent;
-    UInt16 cd;
-};
-
-typedef ObjectMapT<SkillBase, UInt16> SkillManager;
-#define skillManager SkillManager::Instance()
-
-typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;
+    typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;   
 #define skillEffectManager SkillEffectManager::Instance()
-
-} // namespace GData
-
-#endif // CITTA_H
+}
+#endif // SKILLTABLE_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

@@ -1,8 +1,9 @@
 ﻿#ifndef _ITEMTYPE_H_
 #define _ITEMTYPE_H_
 
-#include "AttrExtra.h"
-#include "WeaponDef.h"
+#include "AttrExtra.h" 
+//#include "WeaponDef.h"
+#include "GObject/GObjectBase.h"
 
 #define LNORMAL_ID      0
 #define RNORMAL_ID      499
@@ -75,88 +76,9 @@ enum ItemClass
 	Item_Armor3,		//防具3 肩甲 4
 	Item_Armor4,		//防具4 腰带 5
 	Item_Armor5,		//防具5 腿甲 6
-	Item_Amulet,		//项链 7
-	Item_Ring,			//戒指 8
-	Item_Reserved,		//保留 9
-	Item_Trump,			//法宝 10
-	Item_Fashion,		//时装 11
-    Item_Halo,          //光环 12
-    Item_LBling,        // 灵宝-灵 13
-    Item_LBwu,          // 灵宝-悟 14
-    Item_LBxin,         // 灵宝-信 15
-    Item_InnateTrump,   // 先天法宝 16
+
 	Item_Normal = 20,	//普通物品 20~29
-    Item_Mount = 25,    //坐骑
-    Item_MountChip = 26, //坐骑碎片
-    Item_Normal27 = 27,
-    Item_Normal28 = 28,
-    Item_Normal29 = 29,
-	Item_Formula = 30,	//阵法 30~39
-	Item_Formula1, Item_Formula2, Item_Formula3,
-	Item_Formula4, Item_Formula5, Item_Formula6,
-	Item_Formula7, Item_Formula8, Item_Formula9,
-	Item_Citta = 40,	//心法 40~49
-	Item_Citta1, Item_Citta2, Item_Citta3,
-	Item_Citta4, Item_Citta5, Item_Citta6,
-	Item_Citta7, Item_Citta8, Item_Citta9,
-	Item_Enhance = 50,	//强化 50~59
-	Item_Enhance1, Item_Enhance2, Item_Enhance3,
-	Item_Enhance4, Item_Enhance5, Item_Enhance6,
-	Item_Enhance7, Item_Enhance8, Item_Enhance9,
-	Item_Gem = 60,		//宝石 60~79                       力量宝石
-    Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4,         // 敏捷宝石， 智力宝石， 耐力宝石， 意志宝石
-    Item_Gem5, Item_Gem6, Item_Gem8, Item_Gem9,         // 生命宝石， 攻击宝石， 防御宝石， 命中宝石
-    Item_Gem10, Item_Gem11, Item_Gem12, Item_Gem13,     // 反击宝石， 闪避宝石， 暴击宝石， 破击宝石
-    Item_Gem14, Item_Gem15, Item_Gem16, Item_Gem17,     // 身法宝石， 坚韧宝石， 法抗宝石
-    Item_Gem18, Item_Gem19,
-	Item_Task = 80,		//任务 80~89
-    Item_Soul = 90, Item_Soul1, Item_Soul2, Item_Soul3,
-    Item_Soul4, Item_Soul5, Item_Soul6, Item_Soul7,
-    Item_Soul8, Item_Soul9,
-    Item_SL = 100, // 元神技能材料
-    Item_SL1, // 元神技能
-    Item_SL2, // 元神技能
-	Item_Other = 103,	//其他
-    Item_Guji = 110, // 通用古籍
-    Item_Guji_Ling = 111, // 灵·古籍
-    Item_Guji_Wu = 112, // 悟·古籍
-    Item_Guji_Xin = 113, // 信·古籍
-    Item_Guji_Ling_Atk = 114, // 灵·物功古籍
-    Item_Guji_Ling_MagAtk = 115, // 灵·法功古籍
-    Item_Guji_Ling_Counter = 116, // 灵·反击古籍
-    Item_Guji_Ling_Action = 117, // 灵·身法古籍
-    Item_Guji_Wu_Def = 118, // 悟·物防古籍
-    Item_Guji_Wu_MagDef = 119, // 悟·法防古籍
-    Item_Guji_Wu_Tough = 120, // 悟·坚韧古籍
-    Item_Guji_Wu_HP = 121, // 悟·生命古籍
-    Item_Guji_Xin_Critical = 122, // 信·暴击古籍
-    Item_Guji_Xin_Pierce = 123, // 信·破击古籍
-    Item_Guji_Xin_Evade = 124, // 信·闪避古籍
-    Item_Guji_Xin_Hitrate = 125, // 信·命中古籍
-    Item_Guji_Dossier = 126, // 通用卷宗
-    Item_Horcrux = 127, // 魂器
-
-    Item_Evolution = 170,   //仙界装备
-    Item_Evolution1 ,Item_Evolution2,Item_Evolution3,  //仙兵，仙衣，仙器
-	Item_EvolutionGem = 174,		//宝石 60~79                       力量宝石
-    Item_EvolutionGem1, Item_EvolutionGem2, Item_EvolutionGem3,Item_EvolutionGem4,// 敏捷宝石， 智力宝石， 耐力宝石， 意志宝石
-    Item_EvolutionGem5, Item_EvolutionGem6, Item_EvolutionGem8,Item_EvolutionGem9,// 生命宝石， 攻击宝石， 防御宝石， 命中宝石
-    Item_EvolutionGem10,Item_EvolutionGem11,Item_EvolutionGem12,Item_EvolutionGem13,// 反击宝石,闪避宝石， 暴击宝石， 破击宝石
-    Item_EvolutionGem14, Item_EvolutionGem15,Item_EvolutionGem16,Item_EvolutionGem17,// 身法宝石， 坚韧宝石， 法抗宝石
-    Item_EvolutionGem18, Item_EvolutionGem19,
-
-    Item_PetEquip = 200,    //仙宠装备 200~219                          //生命
-    Item_PetEquip1, Item_PetEquip2, Item_PetEquip3, Item_PetEquip4,     //物攻，法功，物防，法防
-    Item_PetEquip5, Item_PetEquip6, Item_PetEquip7, Item_PetEquip8,     //暴击，破击，命中，躲避
-    Item_PetEquip9, Item_PetEquip10,                                    //反击，坚韧
-	Item_PetGem = 220,		//仙宠宝石 220~229                          //生命
-    Item_PetGem1, Item_PetGem2, Item_PetGem3, Item_PetGem4,             //物攻，法功，物防，法防
-    Item_PetGem5, Item_PetGem6, Item_PetGem7, Item_PetGem8,             //暴击，暴击伤害，破击，命中
-    Item_PetGem9, Item_PetGem10, Item_PetGem11,                         //躲避，反击，坚韧
-    Item_LingShi = 240,
-    Item_LingShi1, Item_LingShi2, Item_LingShi3,
-    Item_Zhenyuan = 250,
-};
+   };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
 {
@@ -169,121 +91,11 @@ inline bool IsEquipTypeId(UInt32 id)
 	return (id >= LARM_ID && id <= RARM_ID) || (id >=LBMIN_ID && id <= LBMAX_ID) || (id > XIAN_ID && id < LXIANGEM_ID);
 }
 
-inline bool IsLingbaoTypeId(UInt32 id)
-{
-	return (id >= LBMIN_ID && id <= LBMAX_ID);
-}
-
-inline bool IsPetEquipTypeId(UInt32 id)
-{
-	return id >= LPETARM_ID && id <= RPETARM_ID;
-}
-
-inline bool IsPetItem(UInt32 id)
-{
-	return id >= LPETGEM_ID && id <= RPETGEM_ID;
-}
-
-inline bool IsZhenYuanItem(UInt32 id)
-{
-	return id >= LZHENYAUN_ID && id <= RZHENYUAN_ID;
-}
-
-inline bool IsLingShiItem(UInt32 id)
-{
-	return id >= LLINGSHI_ID && id <= RLINGSHI_ID;
-}
-
-inline bool IsHorcruxItem(UInt32 id)
-{ 
-	return id >= HORCRUX_ID && id <= HORCRUX_ID_END;
-} 
-
-/** 新增11,12级宝石 **/
-inline bool IsGemId2(UInt32 id)
-{
-    if(id >= 5501 && id <= 5502)
-        return true;
-    else if(id >= 5511 && id <= 5512)
-        return true;
-    else if(id >= 5521 && id <= 5522)
-        return true;
-    else if(id >= 5531 && id <= 5532)
-        return true;
-    else if(id >= 5541 && id <= 5542)
-        return true;
-    else if(id >= 5551 && id <= 5552)
-        return true;
-    else if(id >= 5561 && id <= 5562)
-        return true;
-    else if(id >= 5571 && id <= 5572)
-        return true;
-    else if(id >= 5631 && id <= 5632)
-        return true;
-    else if(id >= 20161 && id <= 20162)
-        return true;
-    else if(id >= 20166 && id <= 20167)
-        return true;
-    else if(id >= 20171 && id <= 20172)
-        return true;
-    else if(id >= 20176 && id <= 20177)
-        return true;
-    else if(id >= 20181 && id <= 20182)
-        return true;
-    else if(id >= 20186 && id <= 20187)
-        return true;
-    else if(id >= 20191 && id <= 20192)
-        return true;
-    else if(id >= 20196 && id <= 20197)
-        return true;
-    else if(id >= 20201 && id <= 20202)
-        return true;
-    else
-        return false;
-}
-
-inline bool IsGemId(UInt32 id)
-{
-	return (id > LGEM_ID && id <= RGEM_ID);
-}
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3)) || (subClass == static_cast<UInt8>(Item_Horcrux) );
-}
-
-inline bool IsZhenYuan(UInt8 subClass)
-{
-	return subClass >= static_cast<UInt8>(Item_Formula6) && subClass <= static_cast<UInt8>(Item_Formula9);
-}
-
-inline bool IsLingShi(UInt8 subClass)
-{
-	return subClass >= static_cast<UInt8>(Item_LingShi) && subClass <= static_cast<UInt8>(Item_LingShi3);
-}
-
-inline bool IsWeapon(UInt8 subClass)
-{
-    return subClass == static_cast<UInt8>(Item_Weapon);
-}
-
-inline bool IsArmor(UInt8 subClass)
-{
-    return subClass > static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Ring);
-}
-
-inline UInt8 getGemLev(UInt32 id)
-{
-    UInt8 lev = id%10;
-    if(IsGemId(id))
-    {
-        if(lev == 0)
-            return 10;
-        else
-            return lev;
-    }
-    else
-        return 0;
+	//return (subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_InnateTrump)) || (subClass >= static_cast<UInt8>(Item_Evolution) && subClass <= static_cast<UInt8>(Item_Evolution3)) || (subClass == static_cast<UInt8>(Item_Horcrux) );
+    return false;
 }
 
 inline bool IsFighterTypeId(UInt32 id)
@@ -291,44 +103,6 @@ inline bool IsFighterTypeId(UInt32 id)
     if (id == 73 || id == 74 || id == 75 || id == 76 || id == 75 || id == 77)
         return true;
     return false;
-}
-
-inline ItemClass GetItemSubClass(UInt32 id)
-{
-    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID) || (id >= LNORMAL2_ID && id <= RNORMAL2_ID))
-        return Item_Normal;
-    if (id >= LENHANCE_ID && id <= RENHANCE_ID)
-        return Item_Enhance;
-    if (id >= LTASK_ID && id <= RTASK_ID)
-        return Item_Task;
-    if (id >= LFORMULA_ID && id <= RFORMULA_ID)
-        return Item_Formula;
-    if ((id >= LCITTA_ID && id <= RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID))
-        return Item_Citta;
-    if (id >= LGEM_ID && id <= RGEM_ID)
-		return Item_Gem;
-    if (id >= LSOUL_ID && id <= RSOUL_ID)
-        return Item_Soul;
-    if (id >= LSL_ID && id <= RSL_ID)
-        return Item_SL;
-    if (id >= LPETGEM_ID && id <= RPETGEM_ID)
-        return Item_PetGem;
-    if (id >= LLINGSHI_ID && id <= RLINGSHI_ID)
-        return Item_LingShi;
-    if (id >= LZHENYAUN_ID && id <= RZHENYUAN_ID)
-        return Item_Zhenyuan;
-    if (id >= LXIANGEM_ID && id <= LXIANGEM_ID_END)
-        return Item_EvolutionGem;
-	return Item_Other;
-}
-
-inline UInt8 GetItemLogType(UInt16 id)
-{
-    if (id < LGEM_ID)
-        return 1;
-    if (id >= LGEM_ID && id <= RGEM_ID)
-        return 3;
-    return 1;
 }
 
 namespace GData
@@ -356,8 +130,8 @@ namespace GData
 		bool operator==(const ItemBaseType& other) const { return getId() == other.getId(); }
 		inline UInt16 Size(UInt16 num) const
 		{
-			if(subClass == Item_Task)
-				return 0;
+		//	if(subClass == Item_Task)
+		//		return 0;
 			if(IsEquip(subClass))
 				return num;
 			return (num + maxQuantity - 1) / maxQuantity;
@@ -372,20 +146,7 @@ namespace GData
 	};
 
 	//宝石
-	struct ItemGemType : public ItemBaseType
-	{
-		const AttrExtra* attrExtra;	//附加属性
-		ItemGemType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
-		{
-			const AttrExtraItem * attr = attrExtraManager[attrId];
-			if(attr != NULL)
-				attrExtra = *attr;
-			else
-				attrExtra = NULL;
-		}
-		virtual ~ItemGemType() { }
-	};
-
+	
 	//装备
 	struct ItemEquipType : public ItemBaseType
 	{
@@ -432,15 +193,12 @@ namespace GData
 	};
 	typedef ObjectListT<ItemBaseType> ItemBaseTypeManager;
 	typedef ObjectMapT<ItemBaseType, std::string> ItemBaseTypeNameManager;
+
 	extern ItemBaseTypeManager itemBaseTypeManager;
 	extern ItemBaseTypeNameManager itemBaseTypeNameManager;
-	extern std::vector<ItemGemType *> gemTypes;
-	extern std::vector<ItemGemType *> petGemTypes;
-	extern std::vector<ItemGemType *> mountTypes;
-	extern std::vector<ItemGemType *> lingshiTypes;
+
 	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
 	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
-	extern std::vector<ItemGemType *> evolutionTypes;
 
 #define ITEM_BIND_CHECK(bindType, bind)	\
 	if(!bind && bindType == 1) bind = true;

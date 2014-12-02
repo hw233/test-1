@@ -1,1 +1,0 @@
-ALTER TABLE `sale` ADD PRIMARY KEY (`saleId`);

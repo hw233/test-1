@@ -1,6 +1,7 @@
 #ifndef _GOBJECTBASE_H_
 #define _GOBJECTBASE_H_
 
+#include "Config.h"
 namespace GObject
 {
 

@@ -22,7 +22,7 @@ DBWorker::DBWorker(UInt8 type, UInt8 worker) :
 DBWorker::~DBWorker()
 {
 }
-
+/*
 void DBWorker::CalcUserLost(DBWorker * worker)
 {
 	UInt32 tstart = TimeUtil::SharpDay(-1);
@@ -47,6 +47,7 @@ void DBWorker::CalcUserLost(DBWorker * worker)
 	}
 	worker->PushUpdateData("call update_register(%u,%u)", cfg.serverLogId, tend);
 }
+*/
 
 bool DBWorker::Init()
 {

@@ -1,1 +1,0 @@
-UPDATE wboss SET atk=100000,matk=100000;

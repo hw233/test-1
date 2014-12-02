@@ -6,8 +6,9 @@
 #include "GObject/World.h"
 #include "GObject/Country.h"
 #include "GObject/Var.h"
+#include "GObject/GVar.h"
 #include "Battle/BattleReport.h"
-#include "GObject/ClanManager.h"
+//#include "GObject/ClanManager.h"
 #include "DB/DBWorker.h"
 #include "WorkerThread.h"
 #include "DB/DBConnectionMgr.h"
@@ -19,15 +20,15 @@
 #ifndef _VT
 #ifndef _WIN32
 #include "GObject/DCWorker.h"
-#include "GObject/DCLogger.h"
+//#include "GObject/DCLogger.h"
 #include "kingnet_analyzer.h"
-#include "GObject/OpenAPIWorker.h"
+//#include "GObject/OpenAPIWorker.h"
 #endif
 #endif
 #endif
-#include "GObject/SortWorker.h"
+//#include "GObject/SortWorker.h"
 #include "Common/StringTokenizer.h"
-#include "GObject/Tianjie.h"
+//#include "GObject/Tianjie.h"
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
 WorldServer::WorldServer() : m_IsActive(false), curl(NULL)
@@ -97,7 +98,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 #endif
 #ifdef _FB
 #else
-    GObject::dclogger.init();
+    //GObject::dclogger.init();
 #endif
 #endif
 
@@ -148,8 +149,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	worker = WORKER_THREAD_LOGIN;
 	m_AllWorker[worker] = new WorkerThread<Login::LoginWorker>(new Login::LoginWorker());
 
-	worker = WORKER_THREAD_SORT;
-	m_AllWorker[worker] = new WorkerThread<GObject::SortWorker>(new GObject::SortWorker(0, WORKER_THREAD_SORT));
+	//worker = WORKER_THREAD_SORT;
+	//m_AllWorker[worker] = new WorkerThread<GObject::SortWorker>(new GObject::SortWorker(0, WORKER_THREAD_SORT));
 #ifndef _FB
 #ifndef _VT
 #ifndef _WIN32
@@ -276,8 +277,8 @@ void WorldServer::Run()
 {
 	int worker;
 
-	worker = WORKER_THREAD_SORT;
-	m_AllWorker[worker]->Run();
+	//worker = WORKER_THREAD_SORT;
+	//m_AllWorker[worker]->Run();
 
 	worker = WORKER_THREAD_WORLD;
 	m_AllWorker[worker]->Run();
@@ -336,7 +337,7 @@ void WorldServer::Shutdown()
 
     // XXX: erase all event
 	Thread::sleep(2000);
-    GObject::eventWrapper.clear();
+    //GObject::eventWrapper.clear();   //LIBODELETE 
 	Thread::sleep(2000);
 	m_AllWorker[WORKER_THREAD_DB]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB1]->Shutdown();
@@ -467,7 +468,7 @@ void WorldServer::Up()
                 State("open", atoi(st[i].c_str()));
         }
     }
-    GObject::Tianjie::instance().setNetOk();
+    //GObject::Tianjie::instance().setNetOk();   //LIBODELETE
 }
 
 void WorldServer::Down()
@@ -484,11 +485,6 @@ GObject::Country& WorldServer::GetCountry(UInt8 worker)
 GObject::World& WorldServer::GetWorld()
 {
 	return Worker<GObject::World>(WORKER_THREAD_WORLD);
-}
-
-GObject::SortWorker& WorldServer::GetSort()
-{
-	return Worker<GObject::SortWorker>(WORKER_THREAD_SORT);
 }
 
 #ifndef _FB

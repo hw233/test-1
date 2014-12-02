@@ -182,6 +182,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 void GameClient::onRecv( int cmd, int len, void * buf )
 {
 	/* hack: ????xml??ȫ??????flash?ͻ??? */
+    printf("I Get The Message \n");
 	if(cmd > 0x1FF)
 	{
 		static char resp[1024] = {0};
@@ -259,7 +260,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             if(cmd == SPEQ::JASON)
             {
                 Stream st(SPEP::JASON);
-                jsonParser2(buf, len, st);
+                //jsonParser2(buf, len, st);
                 st << Stream::eos;
                 send(&st[0], st.size());
             }

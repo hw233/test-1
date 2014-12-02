@@ -19,7 +19,7 @@ enum
 	WORKER_THREAD_NEUTRAL,			//中立
 	WORKER_THREAD_WORLD,			//世界线程
 	WORKER_THREAD_LOGIN,			//登录
-	WORKER_THREAD_SORT,				//排序
+	//WORKER_THREAD_SORT,				//排序
 #ifndef _WIN32
 	WORKER_THREAD_DC,				//
 #ifdef OPEN_API_ON

@@ -17,7 +17,6 @@ extern const char* s_HelpInfo;
 namespace GObject
 {
 	class Country;
-	class SortWorker;
 #ifndef _WIN32
     class DCWorker;
     class OpenAPIWorker;
@@ -47,7 +46,6 @@ public:
 public:
 	GObject::Country& GetCountry(UInt8 worker);
 	GObject::World& GetWorld();
-	GObject::SortWorker& GetSort();
 #ifndef _WIN32
 	GObject::DCWorker& GetDC();
     GObject::OpenAPIWorker& GetOpenAPI();

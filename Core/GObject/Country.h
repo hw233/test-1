@@ -1,96 +1,25 @@
-﻿#ifndef COUNTRY_INC
-#define COUNTRY_INC
 
+#ifndef COUNTRY_H_
+#define COUNTRY_H_
 #include "Server/WorkerRunner.h"
-#include "Map.h"
-#include "GObjectManager.h"
 #include "MsgHandler/CountryMsgHandler.h"
-
-
-namespace Script
-{
-	class GameActionLua;
-	class BattleFormula;
-}
-
-class Log;
 namespace GObject
 {
-
-class Player;
-
-class Country:
-	public WorkerRunner<CountryMsgHandler>
-{
-public:
-	Country(UInt8 id);
-	virtual ~Country();
-
-public:
-	inline UInt8 GetThreadID() const
-	{
-		return m_ThreadID;
-	}
-
-	inline Script::GameActionLua* GetGameActionLua()
-	{
-		return m_GameActionLua;
-	}
-
-	inline Script::BattleFormula* GetBattleFormula()
-	{
-		return m_BattleFormula;
-	}
-
-public:
-	void MergePendingPlayerList();
-	void PlayerEnter(Player * pl, bool = true);
-	void PlayerLeave(Player * pl);
-
-	Player * FindPlayer(UInt32 slot);
-
-	void Broadcast(UInt16, Stream&);
-
-protected:
-	bool Init();
-	void UnInit();
-	UInt8 TID() const { return m_ThreadID; }
-	std::string GetLogName();
-
-private:
-	static void Country_Boss_Check(void *);
-	static void Country_Battle_Check(void *);
-    static void Hero_Island_Check(void *);
-    static void ClanBigBoss_Refesh(void *);
-    static void DarkDargon_Refesh(void *);
-    static void ClanRankBattleCheck(void *);
-    static void TownDeamonTmAward(void *);
-    static void PhysicalCheckTimer(void *para);
-
-    static void ClanCopyCheck(void *);
-    static void ClanCopyResetBegin(void *);
-    static void ClanCopyReset(void *);
-    static void ClanCopyResetEnd(void *);
-
-    static void ClanBoss_Refresh(void*);
-	static void raceBattleCheck(void* );
-    
-private:
-	UInt8		m_ThreadID;					//?????߳?
-
-	std::vector<Map *>	m_MapManager;
-
-	Script::GameActionLua*	m_GameActionLua;
-	Script::BattleFormula*	m_BattleFormula;
-
-	typedef GLocalObjectManagerT<Player> LocalPlayers;
-
-	LocalPlayers m_Players;
-};
-
+    class Country
+        :public WorkerRunner<CountryMsgHandler>
+    {
+        public:
+            Country(UInt8 id);
+            inline UInt8 TID() const { return m_ThreadID; }
+            bool Init();
+            void UnInit();
+            std::string GetLogName();
+        
+        private:
+            UInt8       m_ThreadID;
+    };
 }
+#endif // COUNTRY_H_
 
-#define CURRENT_COUNTRY() WorkerThread<GObject::Country>::LocalWorker()
-#define GameAction() CURRENT_COUNTRY().GetGameActionLua()
+/* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 
-#endif
