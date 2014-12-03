@@ -66,7 +66,7 @@ namespace Script
         public:
 
             UInt32 GetSharpDay(UInt32);
-            inline Player * GetPlayerPtr(std::string playerId);
+            //inline Player * GetPlayerPtr(IDTYPE playerId);
 
         private:
             Player* _player1;	//?ű???????Ϊ????1

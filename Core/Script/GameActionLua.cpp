@@ -253,9 +253,9 @@ namespace Script
         return TimeUtil::SharpDay(0, now);
     }
 
-    Player * GameActionLua::GetPlayerPtr(std::string playerId)
-    {
-        return globalPlayers[playerId];
-    }
+    //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
+    //{
+    //    return globalPlayers[playerId];
+    //}
 }
 

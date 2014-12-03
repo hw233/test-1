@@ -7,6 +7,9 @@
 #include "Common/AtomicVal.h"
 #include "Common/MCached.h"
 #include <curl/curl.h>
+#ifndef IDTYPE
+#define IDTYPE UInt64
+#endif
 
 namespace GObject
 {
@@ -33,7 +36,7 @@ namespace GObject
 
             struct UrlParam
             {
-                std::string playerId;
+                IDTYPE playerId;
                 UInt16 type;
             };
 

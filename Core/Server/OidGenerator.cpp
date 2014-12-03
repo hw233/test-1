@@ -3,6 +3,7 @@
 
 namespace IDGenerator
 {
+    PlayerOidGenerator gPlayerOidGenerator;
 	ItemOidGenerator gItemOidGenerator;
 	ChatFgtOidGenerator gChatFgtOidGenerator;
 	MailOidGenerator gMailOidGenerator;

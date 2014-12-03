@@ -25,18 +25,6 @@ namespace GObject
     enum VarID
     {
         VAR_INVALID = 0,    //无效变量
-        VAR_GOLD = 1,       //仙石
-        VAR_COUPON = 2,     //礼券
-        VAR_TAEL = 3,      //硬币
-        VAR_TOTAL_RECHARGE = 4, //总充值
-        VAR_LASTONLINE_TIME = 5, //上次登录的时间戳
-        VAR_EQUIPMENT_1,    //装备1
-        VAR_EQUIPMENT_2,    //装备2
-        VAR_EQUIPMENT_3,    //装备3
-        VAR_EQUIPMENT_4,    //装备4
-        VAR_EQUIPMENT_5,    //装备5
-        VAR_EQUIPMENT_6,    //装备6
-
         VAR_MAX
     };
 
@@ -62,41 +50,39 @@ namespace GObject
     /**
      *@brief 变量系统
      */
-    class Player;
     class VarSystem
     {
-        public:
-            VarSystem(Player * pl);
-            ~VarSystem();
+    public:
+        VarSystem(UInt64 playerid);
+         ~VarSystem();
 
-        public:
+    public:
 
-            static void Init()
-            {
-                //注册变量
-            }
+        static void Init()
+        {
+        }
 
-            UInt32 GetVar(UInt32 id, UInt32 now = 0);
-            void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
-            void DelVar(UInt32 id);
-            void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
-            void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
-            void SetOffset(UInt32 offset){ m_Offset = offset; }
+        UInt32 GetVar(UInt32 id, UInt32 now = 0);
+        void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
+        void DelVar(UInt32 id);
+        void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
+        void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
+        void SetOffset(UInt32 offset){ m_Offset = offset; }
 
-        private:
-            UInt32 GetType(UInt32 id) const;
-            bool CheckReset(UInt32 id, UInt32 now);
-            void UpdateDB(UInt32 id);
+    private:
+        UInt32 GetType(UInt32 id) const;
+        bool CheckReset(UInt32 id, UInt32 now);
+        void UpdateDB(UInt32 id);
 
-        private:
-            //玩家
-            Player * m_owner;
-            UInt32 m_Vars[VAR_MAX];
-            UInt32 m_OverTime[VAR_MAX];
-            UInt32 m_Offset;
-            FastMutex _mutex;
+    private:
+        //玩家
+        UInt64 m_PlayerID;
+        UInt32 m_Vars[VAR_MAX];
+        UInt32 m_OverTime[VAR_MAX];
+        UInt32 m_Offset;
+        FastMutex _mutex;
 
-            static UInt32 m_VarTypes[VAR_MAX];
+        static UInt32 m_VarTypes[VAR_MAX];
     };
 }
 

@@ -19,6 +19,7 @@ namespace GObject
             static bool loadEquipments();
             static bool unloadEquipments();
             static bool loadAllPlayers();
+            static bool loadPlayerId(); 
         private:
             static std::map<UInt32, ItemEquip *> equips;
     };

@@ -20,11 +20,9 @@ DROP TABLE IF EXISTS `player`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `player` (
-    `id` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
-    `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
-    `password` varchar(255) NOT NULL DEFAULT '',   /*密码*/
+    `id` bigint(20) unsigned NOT NULL,
     `name` varchar(255) NOT NULL,
-    PRIMARY KEY (`id`,`accounts`),
+    PRIMARY KEY (`id`),
     KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -39,13 +37,21 @@ CREATE TABLE `gvar` (
 
 DROP TABLE IF EXISTS `var`; 
 CREATE TABLE `var` (
-    `id` varchar(255) NOT NULL DEFAULT '',   /*手机号*/
-    `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `playerId` bigint(20) unsigned NOT NULL,
     `id` smallint(5) NOT NULL,
     `data` int(10) unsigned NOT NULL,
     `over` int(10) unsigned NOT NULL,
-    PRIMARY KEY (`playerId`,`accounts`,`id`)
+    PRIMARY KEY (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `player_id`; 
+CREATE TABLE `player_id` (
+    `id` bigint(20) unsigned NOT NULL DEFAULT 0,
+    `phoneId` bigint(20) unsigned NOT NULL DEFAULT 0,
+    `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `password` varchar(255) NOT NULL DEFAULT '',   /*密码*/
+    /*PRIMARY KEY (`phoneId`,`accounts`)*/
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

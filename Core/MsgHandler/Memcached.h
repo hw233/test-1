@@ -117,7 +117,7 @@ static void setCrackValue(const char* ip, int v)
 }
 
 //static void setForbidSaleValue(const std::string playerId, bool isForbid)
-static void setForbidSaleValue(const std::string playerId, bool isForbid, UInt32 fTime = 9999999)
+static void setForbidSaleValue(const IDTYPE playerId, bool isForbid, UInt32 fTime = 9999999)
 {
     (void)setForbidSaleValue;
     initMemcache();
@@ -127,7 +127,9 @@ static void setForbidSaleValue(const std::string playerId, bool isForbid, UInt32
     {
         char value[32] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
-        size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", playerId.c_str());
+        //size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", playerId.c_str());
+        //size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", playerId);  //LIBOUInt64
+        size_t len = snprintf(key, sizeof(key), "asss_globallock_%u", playerId);  //LIBOUInt32
         if (isForbid) value[0] = '1';
         sprintf(&value[1],"%d", TimeUtil::Now());
         {
@@ -144,15 +146,17 @@ static void setForbidSaleValue(const std::string playerId, bool isForbid, UInt32
 }
 
 //static bool checkForbidSale(const std::string playerId, std::string& t)
-static bool checkForbidSale(const std::string playerId, std::string& fsale, std::string& over)
+static bool checkForbidSale(const IDTYPE playerId, std::string& fsale, std::string& over)
 {
     (void)checkForbidSale;
     initMemcache();
     std::string t="0";
     char value[32] = {0};
     char key[MEMCACHED_MAX_KEY] = {0};
-    std::string pid = playerId ;
-    size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", pid.c_str());
+    IDTYPE pid = playerId ;
+    //size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", pid.c_str());
+    //size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", pid);  //LIBO  UInt64
+    size_t len = snprintf(key, sizeof(key), "asss_globallock_%u", pid);  //LIBO  UInt64
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));

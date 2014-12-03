@@ -48,9 +48,13 @@ namespace GData
         public:
             SkillScope(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
+            bool InTheScope(UInt16 loaclX ,UInt16 localY ,UInt16 targetX , UInt16 targetY)
         public:
-            UInt8 area;  //范围类型
-            UInt8 rad;  //范围半径
+            UInt16 area;  //范围类型  0-单体 1-目标扩散型 2-地形半径扩散型  3-地形直线扩散型 4-无限范围
+            UInt16 x ;
+            UInt16 y ;
+            UInt16 radx;  //范围半径
+            UInt16 rady;
     };
     class SkillEffect : public ObjectBaseT<UInt16>
     { 

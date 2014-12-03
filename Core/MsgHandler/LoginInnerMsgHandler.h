@@ -81,7 +81,9 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
             //if (type != 0xFF)
             {
                 char id[32] = {0};
-                size_t vlen = snprintf(id, 32, "%s", key->player->getId().c_str());
+                //size_t vlen = snprintf(id, 32, "%s", key->player->getId().c_str());
+                //size_t vlen = snprintf(id, 32, "%" I64_FMT "u", key->player->getId());
+                size_t vlen = snprintf(id, 32, "%u", key->player->getId());
                 memcached_return_t rc = memcached_set(&memc, key->key, len, id, vlen, (time_t)(60), 0);
 
                 int retry = 2;

@@ -23,18 +23,13 @@ namespace GObject
 
     struct DBPlayerData
     {
-        std::string id;
-        std::string accounts;
-        std::string password;
+        IDTYPE id;
         std::string name;
-        UInt32 gold;
-        UInt32 coupon;
-        UInt32 tael;
     };              
 
     struct DBPlayerVar
     { 
-        std::string playerId;
+        IDTYPE playerId;
         UInt16 id;
         UInt32 data;
         UInt32 overTime;
@@ -49,7 +44,7 @@ namespace GObject
     struct DBMailData 
     {
         UInt32      id; 
-        std::string      playerId;
+        IDTYPE     playerId;
         std::string sender;
         UInt32      recvTime;
         UInt8       flag;
@@ -57,10 +52,18 @@ namespace GObject
         std::string content;
         UInt32      additionalId;
     };
+
+    struct DBPlayer2Id
+    {
+        UInt64 id;
+        UInt64 phoneId;
+        std::string accounts;
+        std::string password;
+    };
 }
 namespace DB
 {
-
+    //
     SPECIALBEGIN(GObject::DBGVar)
     SPECIALDEF(3)
     (
@@ -71,22 +74,17 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBPlayerData)
-    SPECIALDEF(7)
+    SPECIALDEF(2)
     (
-     std::string, id,
-     std::string, accounts,
-     std::string, password,
-     std::string, name,
-     UInt32, gold,
-     UInt32, coupon,
-     UInt32, tael
+     IDTYPE, id,
+     std::string, name
     )
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBPlayerVar)
     SPECIALDEF(4)
     (
-     std::string, playerId,   
+     IDTYPE, playerId,   
      UInt16, id,
      UInt32, data,
      UInt32, overTime
@@ -106,7 +104,7 @@ namespace DB
     SPECIALDEF(8)
     (
      UInt32,     id,
-     std::string,     playerId,
+     IDTYPE,     playerId,
      std::string,sender,
      UInt32,     recvTime,
      UInt8,      flag,
@@ -115,6 +113,16 @@ namespace DB
      UInt32,     additionalId
     )
     SPECIALEND()
+    SPECIALBEGIN(GObject::DBPlayer2Id)
+    SPECIALDEF(4)
+    (
+     UInt64, id,
+     UInt64, phoneId,
+     std::string, accounts,
+     std::string, password
+    )
+    SPECIALEND()
+
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

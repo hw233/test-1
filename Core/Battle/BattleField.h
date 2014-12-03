@@ -15,6 +15,7 @@ attacker:	0 1 2 3 4
 #define FIELD_WIDTH 20
 #define FIELD_HIGH  9
 #define STEP 50
+
 namespace GObject
 {
 	class Player;

@@ -30,6 +30,7 @@
 //BattleSimulator
 //Function
 
+#define IDTYPE UInt32   //LIBO
 namespace Battle
 {
     class BattleSimulator;
@@ -56,14 +57,13 @@ namespace GObject
     };
     class FriendManager ;
     class Fighter;
-    class Player //:
-        //public GObjectBaseT<Player,std::string>
+    class Player :
+        public GObjectBaseT<Player,IDTYPE>
     {
         public:
-            Player();
+            Player(IDTYPE id);
             ~Player();
             //VAR
-            VarSystem * getVarSystem();
             UInt32 GetVar(UInt32 id);
             Int32 GetVarS(Int32 id);
             void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
@@ -131,7 +131,7 @@ namespace GObject
             }
 
             //serverNo
-            inline UInt16 getServerNo() { return 0 ;/*static_cast<UInt16>(getId() >> 48);*/ }
+            inline UInt16 getServerNo() { return 0;}//static_cast<UInt16>(getId() >> 48); }
 
             //log 
             void udpLog(const char* str1, const char* str2, const char* str3, const char* str4, 
@@ -153,14 +153,20 @@ namespace GObject
             void Login();
 
             //login
-            inline void setId(std::string id){ _id = id;}
-            inline std::string getId(){ return _id;}
+            //inline void setId(IDTYPE id){ _id = id;}
+            //inline IDTYPE getId(){ return _id;}
             inline void setAccounts(std::string accounts) { _accounts = accounts;}
             inline std::string getAccounts(){return _accounts;}
             inline void setPassword(std::string password) {_password = password;}
 
+            //Battle
+            void setBattleId(UInt32 bid) { _battleId = bid;}
+            UInt32 getBattleId(){ return _battleId;}
+            void setBattleSide(UInt8 side) { _battleSide = side; }
+            UInt8 getBattleSide() { return _battleSide;}
+
         private:
-            std::string _id;
+            //IDTYPE _id;
             std::string _accounts;
             std::string _password;
             bool _isOnline;  
@@ -176,14 +182,19 @@ namespace GObject
             Package* m_Package;
             FriendManager * m_friendMgr;
             PlayerData _playerData;
+
+
+            //战斗相关
+            UInt32 _battleId ; //战斗ID
+            UInt8  _battleSide; //战斗所属
     };
     typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
+    extern GlobalPlayers globalPlayers;
+    extern GlobalPlayers globalOnlinePlayers;
 
     typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
-    extern GlobalNamedPlayers globalPlayers;
-    extern GlobalNamedPlayers globalOnlinePlayers;
     extern GlobalNamedPlayers globalNamedPlayers;
-    extern GlobalNamedPlayers globalAccountsPlayers;
+    //extern GlobalNamedPlayers globalAccountsPlayers;
 }
 #endif // PLAYER_H_
 

@@ -1,7 +1,6 @@
 ﻿#include "Var.h"
 #include "Config.h"
 #include "Server/WorldServer.h"
-#include "GObject/Player.h"
 
 namespace GObject
 {
@@ -9,8 +8,9 @@ namespace GObject
     UInt32 VarSystem::m_VarTypes[VAR_MAX];
 
 
-    VarSystem::VarSystem(Player * pl):m_owner(pl)
+    VarSystem::VarSystem(UInt64 playerid)
     {
+        m_PlayerID = playerid;
         memset(m_Vars, 0, sizeof(m_Vars));
         memset(m_OverTime, 0, sizeof(m_OverTime));
         m_Offset = 0;
@@ -55,7 +55,7 @@ namespace GObject
         if(oldVal == 0 )
             return ;
         m_Vars[id] = 0;
-        DB7().PushUpdateData("delete from var where `playerId` = '%s' and accounts = '%s' and `id` = %u ",m_owner->getId().c_str(),m_owner->getAccounts().c_str(), id);
+        DB7().PushUpdateData("delete from var where `playerId` = %" I64_FMT "u  and `id` = %u ",m_PlayerID, id);
 
     }
 
@@ -151,8 +151,8 @@ namespace GObject
 
     void VarSystem::UpdateDB(UInt32 id)
     {
-        DB7().PushUpdateData("REPLACE INTO `var` (`playerId`,`accounts` `id`, `data`, `over`) VALUES ('%s','%s', %u, %u, %u)"
-                ,m_owner->getId().c_str(),m_owner->getAccounts().c_str(), id, m_Vars[id], m_OverTime[id]);
+        DB7().PushUpdateData("REPLACE INTO `var` (`playerId`, `id`, `data`, `over`) VALUES (%" I64_FMT "u, %u, %u, %u)"
+                ,m_PlayerID, id, m_Vars[id], m_OverTime[id]);
     }
 }
 

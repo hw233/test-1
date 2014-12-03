@@ -5,6 +5,8 @@
 
 #include "TcpConduit.h"
 
+#define IDTYPE UInt32  //LIBO
+
 namespace GObject
 {
 	class Player;
@@ -42,10 +44,10 @@ public:
 
 	void SetClientAddr(const struct sockaddr *);
 
-	inline void SetPlayer( GObject::Player * pl ) { m_Player = pl; m_PlayerId = ""; }
-	inline void SetPlayerId( std::string id ) { m_PlayerId = id; }
+	inline void SetPlayer( GObject::Player * pl ) { m_Player = pl; m_PlayerId = IDTYPE(); }
+	inline void SetPlayerId( IDTYPE id ) { m_PlayerId = id; }
 	inline GObject::Player * GetPlayer() const { return m_Player.value(); }
-	inline std::string GetPlayerId( ) { return m_PlayerId; }
+	inline IDTYPE GetPlayerId( ) { return m_PlayerId; }
     void setChk(UInt8);
 
 	virtual bool active();
@@ -59,7 +61,7 @@ private:
 	AtomicVal<GObject::Player *>	m_Player;
 	UInt32	m_RemoteIP;
 	UInt16	m_RemotePort;
-    std::string	m_PlayerId;
+    IDTYPE	m_PlayerId;
     UInt8 _chk;
     UInt8 m_Chk;
     UInt8 m_OldChk;

@@ -3,6 +3,8 @@
 
 #include "Common/Queue.h"
 #include "Common/Platform.h"
+
+#define IDTYPE UInt32   //LIBO
 namespace GObject
 {
 	class Player;
@@ -43,10 +45,10 @@ struct LoginMsgHdr
     LoginMsgHdr(UInt32 id, UInt8 did, int sess, UInt32 blen):
         msgHdr(id, did, blen), sessionID(sess) { }
 #endif
-	LoginMsgHdr(UInt32 id, UInt8 did, std::string pid, int sess, UInt32 blen):
+	LoginMsgHdr(UInt32 id, UInt8 did, IDTYPE pid, int sess, UInt32 blen):
 		msgHdr(id, did, blen), playerID(pid), sessionID(sess) { }
 	MsgHdr	msgHdr;
-    std::string	playerID;
+    IDTYPE	playerID;
 	int	sessionID;
 };
 
