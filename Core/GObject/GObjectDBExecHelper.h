@@ -55,10 +55,32 @@ namespace GObject
 
     struct DBPlayer2Id
     {
-        UInt64 id;
+        IDTYPE id;
         UInt64 phoneId;
         std::string accounts;
         std::string password;
+    };
+
+    struct DBFighterVar
+    { 
+        IDTYPE playerId;
+        UInt32 fighterId;
+        UInt16 id;
+        UInt32 data;
+        UInt32 overTime;
+    };
+
+    struct DBFighterInfo
+    { 
+        IDTYPE playerId;
+        UInt32 fighterId;
+        UInt64 experience;
+        UInt32 weapon;
+        UInt32 armor1;
+        UInt32 armor2;
+        UInt32 armor3;
+        UInt32 armor4;
+        UInt32 armor5;
     };
 }
 namespace DB
@@ -116,12 +138,39 @@ namespace DB
     SPECIALBEGIN(GObject::DBPlayer2Id)
     SPECIALDEF(4)
     (
-     UInt64, id,
+     UInt32, id,
      UInt64, phoneId,
      std::string, accounts,
      std::string, password
     )
     SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBFighterVar)
+    SPECIALDEF(5)
+    (
+        IDTYPE, playerId,
+        UInt32, fighterId,
+        UInt16, id,
+        UInt32, data,
+        UInt32, overTime
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBFighterInfo)
+    SPECIALDEF(9)
+    (
+        IDTYPE, playerId,
+        UInt32, fighterId,
+        UInt64, experience,
+        UInt32, weapon,
+        UInt32, armor1,
+        UInt32, armor2,
+        UInt32, armor3,
+        UInt32, armor4,
+        UInt32, armor5
+    )
+    SPECIALEND()
+
 
 }
 

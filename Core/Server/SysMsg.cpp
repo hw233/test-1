@@ -90,7 +90,7 @@ bool enum_send_same_server_no(GObject::Player* player, void* ptr)
         Stream _st;
     };
     _data* curData = reinterpret_cast<_data *>(ptr);
-	if(player != NULL && player->getServerNo() == curData->_serverNo)
+	if(player != NULL && player->GetServerNo() == curData->_serverNo)
 		player->send(curData->_st);
     return true;
 }

@@ -31,6 +31,7 @@ namespace GObject
 
         private:
             static void World_Midnight_Check( World * );
+            static void World_Test( World * );
 
         public:
 

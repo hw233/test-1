@@ -478,7 +478,7 @@ void WorldServer::Down()
 
 GObject::Country& WorldServer::GetCountry(UInt8 worker)
 {
-	assert(worker==WORKER_THREAD_NEUTRAL || worker==WORKER_THREAD_COUNTRY_1 || worker==WORKER_THREAD_COUNTRY_2);
+	assert(worker==WORKER_THREAD_NEUTRAL || worker==WORKER_THREAD_COUNTRY_1 || worker==WORKER_BATTLE);
 	return Worker<GObject::Country>(worker);
 }
 

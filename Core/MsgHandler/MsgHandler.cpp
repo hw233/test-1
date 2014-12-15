@@ -51,6 +51,7 @@ bool MsgHandler::ProcessMsg()
             if (!handler->m_Wrapper(handler->m_Func, hdr))
             {
                 //Error
+                std::cout << "ERROR" << std::endl;
 			}
 		}
 		else

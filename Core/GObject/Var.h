@@ -43,8 +43,10 @@ namespace GObject
 #define TARGET_SELECTPRAY         0x1000
 
 
+#ifndef REGISTER_VAR
 #define REGISTER_VAR(Var, Type) \
     m_VarTypes[Var] = Type;
+#endif
 
 
     /**

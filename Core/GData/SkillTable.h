@@ -26,7 +26,7 @@ namespace GData
                 : ObjectBaseT<UInt16>(id,name) ,cond(0),prob(0),cd(0),actionCd(0),distance(0),priority(0)
             { } 
             ~SkillCondition(){}
-            bool MeetCondition(UInt8 advance ,UInt8& pri) const 
+            bool MeetCondition(UInt16 advance ,UInt8& pri) const 
             {
                 if(distance >= advance && pri < priority)
                 { 
@@ -40,7 +40,7 @@ namespace GData
             UInt8 prob;     //释放几率 (x/100)
             UInt16 cd ;     //冷却时间  ( %d s * 8)
             UInt16 actionCd ;     //释放时间  ( %d s * 8)  用于设置外部的行为
-            UInt16 distance;  //攻击距离
+            UInt16 distance;  //攻击距离   平方值
             UInt8 priority;   //优先级
     };
     class SkillScope : public ObjectBaseT<UInt16>
@@ -48,9 +48,9 @@ namespace GData
         public:
             SkillScope(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
-            bool InTheScope(UInt16 loaclX ,UInt16 localY ,UInt16 targetX , UInt16 targetY)
+            bool InTheScope(UInt16 loaclX ,UInt16 localY ,UInt16 targetX , UInt16 targetY);
         public:
-            UInt16 area;  //范围类型  0-单体 1-目标扩散型 2-地形半径扩散型  3-地形直线扩散型 4-无限范围
+            UInt8 area;  //范围类型  0-单体 1-目标扩散型 2-地形半径扩散型  3-地形直线扩散型 4-无限范围
             UInt16 x ;
             UInt16 y ;
             UInt16 radx;  //范围半径

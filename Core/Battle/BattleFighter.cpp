@@ -1,19 +1,38 @@
 #include "BattleFighter.h"
-#include "BattleAction.h"
 #include "BattleField.h"
 #include "Common/URandom.h"
 #include "GData/SkillTable.h"
 #include "Script/BattleFormula.h"
+#include "BattleAction.h"
 
 namespace Battle
 {
-    BattleFighter::BattleFighter( Script::BattleFormula * bf ,GObject::Fighter * f ,BattleField * field, UInt8 pointX , UInt8 pointY):BattleObject(1/*XXX*/, pointX, pointY, field),_formula(bf)
+    BattleFighter::BattleFighter( Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(1/*XXX*/, pointX, pointY/*, field*/),_formula(bf)
     { 
         setFighter(f);
-        //_field = field;
+        m_fighters = NULL;
+        setNumber(0);
+        m_mainFighter = NULL;
+        if( f != NULL)
+        {
+            m_fighters = new BattleFighter*[MYFIGHTERMAX];
+            for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
+            {
+                m_fighters[i] = new BattleFighter(_formula,NULL,0,0);
+                if( m_fighters[i])
+                     m_fighters[i]->setNumber(i+1);
+            }
+        }
+        SetGroundX(pointX);
+        SetGroundY(pointY);
+        _st.reset();
+        _hp = 1000;
+        _attack_near = 100;
     } 
     BattleFighter::~BattleFighter()
     {
+        if(m_fighters)
+            delete [] m_fighters;
     }   
 
     void BattleFighter::setFighter(GObject::Fighter * f)
@@ -25,15 +44,15 @@ namespace Battle
         preActionList.push_back(ActionBase(1,0,0));
     } 
 
-    void BattleFighter::GoForward(UInt8 targetX ,UInt8 targetY,UInt8 advance)
+    void BattleFighter::GoForward(UInt16 targetX ,UInt16 targetY,UInt16 advance)
     { 
-        UInt8 x = getPosX();
-        UInt8 y = getPosY();
-        UInt8 distanceX = x > targetX ? x - targetX:targetX -x;
-        UInt8 distanceY = y > targetY ? y - targetY:targetY -y;
+        UInt16 x = getPosX();
+        UInt16 y = getPosY();
+        UInt16 distanceX = x > targetX ? x - targetX:targetX -x;
+        UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
         while(advance--)
         { 
-            if(distanceX > distanceY)
+            if(distanceX < distanceY)
             {
                 if(x > targetX && x > 0) 
                     --x;
@@ -59,23 +78,26 @@ namespace Battle
         UInt32 defend = GetDefendNear();
         UInt32 hpSub = attack - defend;
         makeDamage(hpSub);
+
         BuildLocalStream(e_be_attacked , hpSub);
     } 
     void BattleFighter::Action()
     { 
         _st.reset();
-        updateActionList();
+        UpdateActionList();
+        //硬直
         if(_crick)
         {
             --_crick;
             return ;
         }
-
+        //动作行为
         if(_actionLast)
         { 
             --_actionLast;
             return ;
         } 
+
         switch(_actionType)
         { 
             case e_none:
@@ -104,7 +126,7 @@ namespace Battle
                     std::list<BattleObject *>::iterator it = targetList.begin();
                     for(;it!=targetList.end();++it)
                     { 
-                        (*it)->BeActed(ActionPackage(_actionType, _hit, _wreck, _critical, this));
+                        (*it)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
                         (*it)->AppendFighterStream(_st);
                     } 
                 }
@@ -120,26 +142,36 @@ namespace Battle
     { 
         //填充 actionType actionLast targetList
         //获得视野范围进攻对象 (如无对象则返回中心点虚拟对象)
-        BattleObject * bo = GetField()->GetTarget(1,getPosX(),getPosY());  
-        if(bo == NULL)   
+        BattleObject * bo = NULL;
+        if(getClass() == eMain + Walker && targetList.size())
+        {
+           bo = targetList.front(); 
+           if(bo->getHP() == 0)
+               bo = NULL;
+        }
+        if(!bo)
+            bo = GetField()->GetTarget(GetSide(),getPosX(),getPosY(),1);   //XXX
+        if(bo == NULL)  
             return ;
 
         //40%不行动
         if(uRand(100) < 40)
             return ;
 
-        UInt8 advance = GetField()->getDistance(getPosX(), getPosY(), bo->getPosX(), bo->getPosY());
+        UInt16 advance = GetField()->getDistance(getPosX(), getPosY(), bo->getPosX(), bo->getPosY());
         //TODO 判断与目标的攻击距离
         //攻击距离不够，前进
-        ActionBase ab = GetActionCurrent(advance);
+
+        _ab = GetActionCurrent(advance);
 
         if(1) 
         { 
-            _actionType = GData::skillEffectManager[ab._effect]->skillType;  //XXX
-            _actionLast =  GData::skillConditionManager[ab._condition]->actionCd;; //行进时间一秒
+            _actionType = GData::skillEffectManager[_ab._effect]->skillType;  //XXX
+            _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd;; //行进时间一秒
             targetList.clear();
             targetList.push_back(bo);
         }
+
         _st << static_cast<UInt8>(_actionType);  //动作类型
         _st << static_cast<UInt8>(_actionLast);  //动作持续帧数(*8)
         _st << static_cast<UInt8>(ACTION_WAIT);   //延迟起作用
@@ -148,7 +180,7 @@ namespace Battle
      
     } 
 
-    void BattleFighter::updateActionList()
+    void BattleFighter::UpdateActionList()
     { 
         for(ActionSort::iterator it = preActionCD.begin(); it != preActionCD.end();)
         { 
@@ -159,6 +191,7 @@ namespace Battle
                 preActionList.push_back((*it));
                 preActionCD.erase(it);
                 it = it_next;
+                continue ;
             } 
             ++it;
         } 
@@ -214,5 +247,37 @@ namespace Battle
             default :
                 break;
         }
+    } 
+    ActionPackage BattleFighter::MakeActionEffect()   //实现动作效果  伤害 法术等
+    { 
+        UInt8 aEffect = _ab._effect;
+        const GData::SkillEffect * se = GData::skillEffectManager[aEffect];
+        if(!se)
+            return ActionPackage(_actionType, _hit, _wreck, _critical, this);
+        UInt32 attack ;
+        if(_actionType == e_attack_near)  //近战
+            attack =  _attack_near ;
+        else if( _actionType == e_attack_distant)  //远攻
+            attack =  _attack_distance ;
+        else if( _actionType == e_image_attack || _actionType == e_image_therapy )  //魔法
+            attack = _attack_near;
+        return  ActionPackage(attack, _hit, _wreck, _critical, this);  //未加入目标对象
+    } 
+    BattleFighter * BattleFighter::getMyFighters(UInt8 index)
+    { 
+        if(_fighter == NULL )
+            return NULL;
+        if(index >= MYFIGHTERMAX)
+            return NULL;
+        UInt8 count = 0;  
+        for(UInt8 i = 0; i < MYFIGHTERMAX; ++i)
+        {
+            if(m_fighters[i]->getHP() == 0)
+                continue ;
+            if(count++ < index) 
+                continue;
+            return m_fighters[i];
+        }
+        return NULL;
     } 
 }

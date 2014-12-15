@@ -105,7 +105,7 @@ namespace GObject
             {
                 const GData::AttrExtra* attrExtra = getAttrExtra();
                 if (attrExtra)
-                    return attrExtra->magatk;
+                    return attrExtra->magic_attack;
                 return 0;
             }
             inline UInt16 getDefend()
@@ -119,7 +119,7 @@ namespace GObject
             {
                 const GData::AttrExtra* attrExtra = getAttrExtra();
                 if (attrExtra)
-                    return attrExtra->magdef;
+                    return attrExtra->magic_defend;
                 return 0;
             }
 
@@ -133,6 +133,14 @@ namespace GObject
     {
         public:
             ItemWeapon(UInt32 id, const GData::ItemBaseType* itemArmorType, ItemEquipData& itemEquipData)
+                : ItemEquip(id, itemArmorType, itemEquipData)
+            { }
+    };
+
+    class ItemArmor : public ItemEquip  
+    {
+        public:
+            ItemArmor(UInt32 id, const GData::ItemBaseType* itemArmorType, ItemEquipData& itemEquipData)
                 : ItemEquip(id, itemArmorType, itemEquipData)
             { }
     };

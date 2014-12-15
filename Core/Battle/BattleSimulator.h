@@ -8,6 +8,10 @@ namespace Script
 {
     class BattleFormula;
 }          
+namespace GObject
+{
+    class Fighter;
+}
 namespace Battle
 {
     struct Point
@@ -16,23 +20,25 @@ namespace Battle
         UInt8 y;
         Point(UInt8 px,UInt8 py):x(px),y(py){}
     };
-    class BattleSimulator:
-        public BattleField
+
+    class BattleSimulator : public BattleField 
     {
         public:
-            BattleSimulator();
+            BattleSimulator(BattleFighter * bf, BattleFighter * bo);
             virtual ~BattleSimulator() {};
             inline int getId() {return _id;} 
 
-            BattleFighter * newFighter( UInt8 x , UInt8 y, GObject::Fighter *);
             void start(UInt8 prevWin = 0xFF, bool checkEnh = true);   
+            void InitFighters(UInt8 index, UInt8 flag = 0);
 
             //Script
             inline Script::BattleFormula * getFormula() { return _formula; }
             inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
+            UInt8 GetWin();
         private:
             int _id;
+            BattleFighter* _fgt[2];
             Script::BattleFormula * _formula; 
     };
 }

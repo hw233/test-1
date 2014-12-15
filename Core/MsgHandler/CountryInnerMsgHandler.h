@@ -26,7 +26,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	player->Login();
 
 	Stream st(REP::LOGIN);
-	st << static_cast<UInt32>(0) << player->getName() << Stream::eos;
+	st << static_cast<UInt32>(0) << player->GetName() << Stream::eos;
 	TcpConnection conn = NETWORK()->GetConn(player->GetSessionID());
 	if(conn.get() == NULL)
 	{

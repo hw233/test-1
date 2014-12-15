@@ -13,7 +13,7 @@
 #include "Package.h"
 #include "Server/WorldServer.h"
 //#include "Player.h"
-#include "Battle/BattleSimulator.h"
+#include "Battle/BattleGround.h"
 
 //VAR
 //Package
@@ -38,6 +38,7 @@ namespace Battle
 
 namespace GObject
 {
+    class Fighter;
     struct lineup
     {
         lineup(): fid(0), pos(0) {} //, fighter(NULL) {}
@@ -45,16 +46,16 @@ namespace GObject
         void updateId();
         UInt32 fid; 
         UInt8 pos; 
-        //Fighter * fighter;
+        Fighter * fighter;
     };
 
     struct PlayerData
     {
-        std::string name;
         UInt16 location;
         UInt32 packSize;  //背包空间
-        lineup lineip[5];
+        lineup line[6];
     };
+    class VarSystem;
     class FriendManager ;
     class Fighter;
     class Player :
@@ -131,7 +132,7 @@ namespace GObject
             }
 
             //serverNo
-            inline UInt16 getServerNo() { return 0;}//static_cast<UInt16>(getId() >> 48); }
+            inline UInt16 GetServerNo() { return 0;}//static_cast<UInt16>(getId() >> 48); }
 
             //log 
             void udpLog(const char* str1, const char* str2, const char* str3, const char* str4, 
@@ -141,13 +142,16 @@ namespace GObject
             void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op); 
 
             //
-            inline const std::string& getName(){ return _playerData.name; }
+            inline const std::string& GetName(){return name; }
+            inline void SetName(std::string name1){name = name1; }
             
             //Fighter
             void addFighter(Fighter * fgt, bool = true, bool = false); 
+            Fighter * findFighter(UInt32);
+            Fighter * getMainFighter();
 
             //BattleSimulator
-            void PutFighters( Battle::BattleSimulator& bsim, int side, bool fullhp ,UInt16 fighterId);
+            void PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId);
 
             //Function
             void Login();
@@ -155,15 +159,17 @@ namespace GObject
             //login
             //inline void setId(IDTYPE id){ _id = id;}
             //inline IDTYPE getId(){ return _id;}
-            inline void setAccounts(std::string accounts) { _accounts = accounts;}
-            inline std::string getAccounts(){return _accounts;}
-            inline void setPassword(std::string password) {_password = password;}
+
+            inline void SetAccounts(std::string accounts) { _accounts = accounts;}
+            inline std::string GetAccounts(){return _accounts;}
+            inline void SetPassword(std::string password) {_password = password;}
 
             //Battle
-            void setBattleId(UInt32 bid) { _battleId = bid;}
-            UInt32 getBattleId(){ return _battleId;}
-            void setBattleSide(UInt8 side) { _battleSide = side; }
-            UInt8 getBattleSide() { return _battleSide;}
+            //设置战斗ID，0表示未在战斗中
+            void SetBattleId(UInt32 bid) { _battleId = bid;}
+            UInt32 GetBattleId(){ return _battleId;}
+            void SetBattleSide(UInt8 side) { _battleSide = side; }
+            UInt8 GetBattleSide() { return _battleSide;}
 
         private:
             //IDTYPE _id;
@@ -182,11 +188,15 @@ namespace GObject
             Package* m_Package;
             FriendManager * m_friendMgr;
             PlayerData _playerData;
+            std::string name;
 
 
             //战斗相关
             UInt32 _battleId ; //战斗ID
             UInt8  _battleSide; //战斗所属
+
+            //散仙相关
+            std::map<UInt32, Fighter *> _fighters;
     };
     typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
     extern GlobalPlayers globalPlayers;

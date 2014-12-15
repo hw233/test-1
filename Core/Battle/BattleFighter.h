@@ -2,11 +2,12 @@
 #ifndef BATTLEFIGHTER_H_
 #define BATTLEFIGHTER_H_
 //#include "GObject/Fighter.h"
-#include "GData/AttrExtra.h"                                                                                                      
+#include "GData/AttrExtra.h"   
 #include <set>
 #include "BattleObject.h"
 #include "GObject/Fighter.h"
 #include "BattleAction.h"
+#include "Battle/BattleSimulator.h"
 namespace Script
 {
     class BattleFormula;
@@ -19,6 +20,7 @@ namespace Battle
 {
 #define  ACTION_WAIT 0  //动作延迟起作用
 #define  ACTION_HAPPEN 1  //动作立即起作用
+#define  MYFIGHTERMAX 10
     enum 
     {
         e_none = 0, //待机
@@ -34,16 +36,17 @@ namespace Battle
 
     struct ActionBase
     {
-        ActionBase(UInt16 condition ,UInt16 scope, UInt16 effect):_condition(condition),_scpoe(scope),_effect(effect),_cd(0) { } 
+        ActionBase(UInt16 condition ,UInt16 scope, UInt16 effect):_condition(condition),_scpoe(scope),_effect(effect),_cd(0),_priority(0) { } 
+        ActionBase():_condition(0),_scpoe(0),_effect(0),_cd(8),_priority(0){}
         UInt16 _condition ;
         UInt16 _scpoe ;
         UInt16 _effect ;
         UInt8 _cd;
-        UInt8 priority ;  //触发优先级
+        UInt8 _priority ;  //触发优先级
     };
     struct lt_absort
     {  
-        bool operator()(ActionBase& a, ActionBase& b) const { return a.priority > b.priority;}
+        bool operator()(ActionBase& a, ActionBase& b) const { return a._priority > b._priority;}
     };
 
     typedef std::list<ActionBase /*, lt_absort*/> ActionSort;
@@ -55,7 +58,7 @@ namespace Battle
     {
         friend class BattleSimulator;
         public:
-            BattleFighter(Script::BattleFormula * bf,GObject::Fighter * = NULL,BattleField * field = NULL ,UInt8 pointX = 0, UInt8 pointY = 0);
+            BattleFighter(Script::BattleFormula * bf,GObject::Fighter * = NULL,UInt8 pointX = 0, UInt8 pointY = 0);
             virtual ~BattleFighter();
 
             void setFighter( GObject::Fighter * f );
@@ -63,12 +66,16 @@ namespace Battle
             void StartAction(UInt8 actionType);
             inline UInt8 GetActionLast(){ return _actionLast;}  //获得当前状态
 
+            UInt8 GetSide() {return _fighter->GetSide();}
+            void SetGroundX(UInt8 x){_groundX = x;}
+            void SetGroundY(UInt8 y){_groundY = y;}
+            UInt8 GetGroundX(){ return _groundX;}
+            UInt8 GetGroundY(){ return _groundY;}
+
             void Action();  //行动
-
             //移动
-            void GoForward(UInt8 targetX,UInt8 targetY,UInt8 advance);
-
-            void MakeActionEffect();   //实现动作效果  伤害 法术等
+            void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
+             ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
             void BeActed(BattleAction  bAction);
@@ -76,22 +83,42 @@ namespace Battle
             //添加本身数据包
             void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
 
-            //从战场中或许自己该有的行为
+            //战斗时期
+            //从战斗中或许自己该有的行为
             void GetActionFromField();
-
             //updateAction
-            void updateActionList();
+            void UpdateActionList();
 
             ActionBase GetActionCurrent(UInt8 advance);
+            void SetField(BattleField* bfield){ _field = bfield;}
+            BattleField * GetField(){ return _field;}
+
+            UInt8 GetRide(){ return 3 ;} //TODO
+            UInt8 GetClass(){ return _fighter->GetClass();}
+            UInt8 GetDistance(){ return 1;}  
+
+            void setNumber(UInt8 num){ _number = num;}
+            UInt8 getNumber(){ return _number; }
+
+            void setMainFighter(BattleFighter * bf){m_mainFighter = bf;}
+
+            void PutBattleFighters(BattleSimulator& bsim);
+            BattleFighter* getMyFighters(UInt8 index);
+
+            UInt16 GetRad(){ if(_fighter) return _fighter->GetRad(); return 0;}
         private:
             Script::BattleFormula * _formula;
+            BattleFighter ** m_fighters;
+            BattleFighter * m_mainFighter;
+            UInt8 _number;
 
+            ActionBase _ab;
             UInt8 _actionType;  // 动作类型
             UInt8 _actionLast ;   //动作持续
             std::list<BattleObject*>  targetList; //对象列表 (待解)
 
-            ActionSort  preActionList;
-            ActionSort  preActionCD;
+            ActionSort  preActionList;   //动作行为列表O
+            ActionSort  preActionCD;     //待CD动作行为列表
 
 
             GObject::Fighter * _fighter;
@@ -114,7 +141,10 @@ namespace Battle
             UInt32 _critical; //暴击 
             UInt32 _wreck; //破击
             UInt32 _parry;  //格挡
-             
+
+            UInt8 _groundX;
+            UInt8 _groundY;
+
     };
 }
 #endif // BATTLEFIGHTER_H_

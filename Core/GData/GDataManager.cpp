@@ -11,6 +11,7 @@
 #include "GObject/Item.h"
 #include "GData/ExpTable.h"
 #include "GData/SkillTable.h"
+#include "GObject/Fighter.h"
 
 namespace GData
 {
@@ -30,6 +31,29 @@ namespace GData
         if (!LoadItemTypeData())  
         {
             fprintf(stderr, "Load ItemTypeData Error !\n");
+            std::abort();
+        }
+
+        if (!LoadSkillConditionData())  
+        {
+            fprintf(stderr, "Load LoadSkillConditionData Error !\n");
+            std::abort();
+        }
+
+        if (!LoadSkillScopeData())  
+        {
+            fprintf(stderr, "Load LoadSkillScopeData Error !\n");
+            std::abort();
+        }
+        if (!LoadSkillEffectData())  
+        {
+            fprintf(stderr, "Load LoadSkillEffectData Error !\n");
+            std::abort();
+        }
+
+        if (!LoadFighterBase())  
+        {
+            fprintf(stderr, "Load LoadFighterBase Error !\n");
             std::abort();
         }
         return true;
@@ -139,7 +163,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillScope dbskscope;
-        if(execu->Prepare("SELECT `id`,`name`,`area` ,`rad` FROM `skillScope`", dbskscope) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`area` ,`x`,`y`,`radx`,`rady` FROM `skillScope`", dbskscope) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -147,7 +171,10 @@ namespace GData
             if(!ss)
                 return false;
             ss->area = dbskscope.area;
-            ss->rad = dbskscope.rad;
+            ss->x = dbskscope.x;
+            ss->y = dbskscope.y;
+            ss->radx = dbskscope.radx;
+            ss->rady = dbskscope.rady;
 
             skillScopeManager.add(ss);
         }    
@@ -174,6 +201,41 @@ namespace GData
 
             skillEffectManager.add(se);
         }    
+        return true;
+    } 
+
+    bool GDataManager::LoadFighterBase()
+    { 
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBFighterBase dbfb;
+        if(execu->Prepare("SELECT `id`,`name`,`color`,`typeId`,`childType`,`bodySize`,`attack`,`defend`,`magatk`,`magdef`,`critical`,`evade` FROM `fighter_base`", dbfb) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {    
+            GObject::Fighter* fgt = new GObject::Fighter(dbfb.id,NULL);
+            if(!fgt)
+                continue;
+            fgt->SetName(dbfb.name);
+            fgt->SetColor(dbfb.color);
+            fgt->SetTypeId(dbfb.typeId);
+            fgt->SetChildTypeId(dbfb.childType);
+            fgt->SetRad(dbfb.bodySize);
+            fgt->SetBaseAttr(dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical,dbfb.evade);
+            GObject::globalFighters.add(fgt);
+        }    
+
+        DBFighterBaseSkill dbfbs;
+        if(execu->Prepare("SELECT `id`,`levelLimit`,`skillCondId`,`skillScopeId`,`skillEffectId` FROM`fighter_base_skill`", dbfbs) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {    
+            GObject::Fighter* fgt = GObject::globalFighters[dbfbs.id];
+            if(!fgt)
+                continue;
+            fgt->SetBaseSkill(dbfbs.levelLimit,dbfbs.skillCondId, dbfbs.skillScopeId, dbfbs.skillEffectId);
+        }  
+
         return true;
     } 
 }

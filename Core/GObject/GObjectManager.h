@@ -8,6 +8,8 @@
 namespace GObject
 {
     class ItemEquip ;
+    class ItemWeapon;
+    class ItemArmor;
     class GObjectManager
     {
         public:
@@ -20,6 +22,12 @@ namespace GObject
             static bool unloadEquipments();
             static bool loadAllPlayers();
             static bool loadPlayerId(); 
+            static bool loadFighter(); 
+            static bool loadFighterVar(); 
+
+            static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
+            static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
+            static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现
         private:
             static std::map<UInt32, ItemEquip *> equips;
     };

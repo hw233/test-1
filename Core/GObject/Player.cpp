@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Fighter.h"
 
 namespace GObject
 {
@@ -109,21 +110,46 @@ namespace GObject
         {     
             //DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = '%s' and `accounts` = '%s'"  , m_openid, getId().c_str(),getAccounts().c_str());
             //DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %" I64_FMT "u and `accounts` = '%s'"  , m_openid, getId(),getAccounts().c_str());   //LIBO UInt64
-            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %u and `accounts` = '%s'"  , m_openid, getId(),getAccounts().c_str());   //LIBO UInt32
+            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %u "  , m_openid, getId());   //LIBO UInt32
         }     
     }
 
     void Player::addFighter( Fighter * fgt, bool writedb, bool load )
     { 
         //TODO
+        UInt32 id = fgt->getId();
+        UInt32 now = TimeUtil::Now();
+        if(id < 10) 
+            _fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
+        else  
+            _fighters[fgt->getId()] = fgt;
+        DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %u,%u,0,%u)",getId(),id,now);
     } 
 
     void Player::Login()
     { 
         //TODO
     } 
-    void Player::PutFighters( Battle::BattleSimulator& bsim, int side, bool fullhp ,UInt16 fighterId)
+    void Player::PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId)
     { 
         //TODO
     } 
+
+    Fighter * Player::findFighter(UInt32 fighterId)
+    { 
+        std::map<UInt32, Fighter *>::iterator it = _fighters.find(fighterId);
+        if(it == _fighters.end())
+            return NULL;
+        return it->second;
+    } 
+
+    Fighter * Player::getMainFighter()
+    {
+        if(_fighters.empty())
+            return NULL;
+        Fighter * fgt = _fighters.begin()->second;
+        if(fgt->getId() > 9)
+            return NULL;
+        return fgt;
+    }
 }

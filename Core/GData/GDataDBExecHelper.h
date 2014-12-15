@@ -51,7 +51,10 @@ namespace GData
         UInt16 id; 
         std::string name; 
         UInt8 area;
-        UInt8 rad;
+        UInt32 x;
+        UInt32 y;
+        UInt32 radx;
+        UInt32 rady;
     };
 
     struct DBSkillEffect  
@@ -65,6 +68,31 @@ namespace GData
 
         UInt16 trerapy;
         float trerapyP;
+    };
+
+    struct DBFighterBase  
+    {
+        UInt32 id;
+        std::string name;
+        UInt8 color;
+        UInt8 typeId;
+        UInt8 childType;
+        UInt16 bodySize;
+        UInt32 attack;
+        UInt32 defend;
+        UInt32 magatk;
+        UInt32 magdef;
+        UInt32 critical;
+        UInt32 evade;
+    };
+
+    struct DBFighterBaseSkill  
+    {
+        UInt32 id;
+        UInt8  levelLimit;
+        UInt32 skillCondId; 
+        UInt32 skillScopeId;
+        UInt32 skillEffectId;
     };
 }
 namespace DB
@@ -121,12 +149,15 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkillScope)
-        SPECIALDEF(4)
+        SPECIALDEF(7)
         (
          UInt16, id,
          std::string, name,
          UInt8, area,
-         UInt8, rad
+         UInt32, x,
+         UInt32, y,
+         UInt32, radx,
+         UInt32, rady
         )
         SPECIALEND()
 
@@ -144,5 +175,35 @@ namespace DB
          float, trerapyP
         )
         SPECIALEND()
+
+        SPECIALBEGIN(GData::DBFighterBase)
+        SPECIALDEF(12)
+        (
+         UInt32, id,
+         std::string, name,
+         UInt8, color,
+         UInt8, typeId,
+         UInt8, childType,
+         UInt16, bodySize,
+         UInt32, attack,
+         UInt32, defend,
+         UInt32, magatk,
+         UInt32, magdef,
+         UInt32, critical,
+         UInt32, evade
+        )
+        SPECIALEND()
+        SPECIALBEGIN(GData::DBFighterBaseSkill)
+        SPECIALDEF(5)
+        (
+         UInt32, id,
+         UInt8 , levelLimit,
+         UInt32, skillCondId,
+         UInt32, skillScopeId,
+         UInt32, skillEffectId
+        )
+        SPECIALEND()
+
+
 }
 #endif

@@ -81,7 +81,10 @@ CREATE TABLE `skillScope` (
       `id` int(10) NOT NULL DEFAULT '0',
       `name` varchar(255) NOT NULL,
       `area` tinyint(3) unsigned NOT NULL DEFAULT '0',
-      `rad` tinyint(3) unsigned NOT NULL DEFAULT '0',
+      `x` int(10) unsigned NOT NULL DEFAULT '0',
+      `y` int(10) unsigned NOT NULL DEFAULT '0',
+      `radx` int(10) unsigned NOT NULL DEFAULT '0',
+      `rady` int(10) unsigned NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -99,6 +102,39 @@ CREATE TABLE `skillEffect` (
       `trerapy` int(10) NOT NULL DEFAULT '0',
       `trerapyP` float(10,2) NOT NULL COMMENT '治疗增幅百分比',
       PRIMARY KEY (`id`,`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `fighter_base`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fighter_base` (
+      `id` int(10) NOT NULL DEFAULT '0',
+      `name` varchar(255) NOT NULL,
+      `color` tinyint(3) NOT NULL DEFAULT '0',
+      `typeId` tinyint(3) NOT NULL DEFAULT '0',
+      `childType` tinyint(3) NOT NULL DEFAULT '0',
+      `bodySize`  int(10) NOT NULL DEFAULT '0',
+      `attack` int(10) NOT NULL DEFAULT '0',
+      `defend` int(10) NOT NULL DEFAULT '0',
+      `magatk` int(10) NOT NULL DEFAULT '0',
+      `magdef` int(10) NOT NULL DEFAULT '0',
+      `critical` int(10) NOT NULL DEFAULT '0',
+      `evade` int(10) NOT NULL DEFAULT '0',
+      PRIMARY KEY (`id`,`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `fighter_base_skill`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fighter_base_skill` (
+      `id` int(10) NOT NULL DEFAULT '0',  /*武将ID*/
+      `levelLimit` tinyint(3) NOT NULL DEFAULT '0',  /*技能开启等级*/
+      `skillCondId` int(10) NOT NULL DEFAULT '0',
+      `skillScopeId` int(10) NOT NULL DEFAULT '0',
+      `skillEffectId` int(10) NOT NULL DEFAULT '0',
+      PRIMARY KEY (`id`,`levelLimit`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

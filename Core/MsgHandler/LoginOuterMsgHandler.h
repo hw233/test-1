@@ -40,10 +40,10 @@
 bool getId(char buf[64], UInt8 type = 0);
 bool checkKey(UInt8 type, const UInt8* _hashval, std::string  _userid);
 
-inline UInt8 doLogin(Network::GameClient * cl, IDTYPE phoneid,std::string accounts, std::string password, UInt32 hsid, GObject::Player *& player, bool kickOld = true, bool reconnect = false)
+inline UInt8 doLogin(Network::GameClient * cl, IDTYPE phoneId,std::string accounts, std::string password, UInt32 hsid, GObject::Player *& player, bool kickOld = true, bool reconnect = false)
 { 
     //return ：0--成功 1--失败  2--重复登录   6--封登录
-    IDTYPE pid = player2Id.getPlayerId(phoneid , accounts ,password);
+    IDTYPE pid = player2Id.getPlayerId(phoneId , accounts ,password);
 
     player = GObject::globalPlayers[pid];
 
@@ -95,7 +95,7 @@ struct UserReconnectStruct
 
 struct UserLoginStruct
 {
-    IDTYPE _userid;
+    IDTYPE _phoneId;
     std::string accounts;
     std::string password;
     typedef Array<UInt8, 36> HashValType;
@@ -106,14 +106,15 @@ struct UserLoginStruct
     //std::string _openkey;
     //std::string _via;
     std::string _para;
-    MESSAGE_DEF5(REQ::LOGIN, IDTYPE, _userid, std::string, accounts, std::string, password, HashValType, _hashval/*, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via */, std::string, _para);
+    MESSAGE_DEF5(REQ::LOGIN, IDTYPE, _phoneId, std::string, accounts, std::string, password, HashValType, _hashval/*, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via */, std::string, _para);
 };
 
 struct UserLogonRepStruct 
 {
     UInt32 _result;
+    IDTYPE _playerId ;
     std::string _name;
-    MESSAGE_DEF2(REP::LOGIN, UInt32, _result, std::string, _name);
+    MESSAGE_DEF3(REP::LOGIN, UInt32, _result, IDTYPE, _playerId,std::string, _name);
 };
 void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 { 
@@ -121,7 +122,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
     if(conn.get() == NULL)
         return;
     UInt8 res = 0;
-    if(!ul._userid)  //LIBO  UInt64
+    if(!ul._phoneId)  //LIBO  UInt64
     {    
         conn->pendClose();
         return;
@@ -138,7 +139,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
     {
         Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());  
         GObject::Player * player = NULL;
-        IDTYPE pid = ul._userid;
+        IDTYPE pid = ul._phoneId;
         std::string accounts = ul.accounts;
         if(cfg.merged)
         { 
@@ -160,9 +161,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         char domain[256] = "";
         if (player)
         {
+            UInt8 flag = 0;
             strncpy (domain, player->getDomain(), 256);
             player->setClientIp(clientIp);
             GObject::globalOnlinePlayers.add(player);
+            GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
+            GLOBAL().PushMsg(imh, &flag);
         }
         if(res == 0)
         { 
@@ -171,6 +175,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         if(res > 0)
         {
             UserLogonRepStruct rep;
+            if(player)
+                rep._playerId = player->getId();
+            else
+                rep._playerId = 0;
             rep._result = res;
             NETWORK()->SendMsgToClient(conn.get(), rep);
         }
@@ -180,14 +188,14 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
 struct NewUserStruct
 {
-    IDTYPE playerId;
+    UInt64 phoneId;
     std::string accounts;
     std::string password;
     std::string _name;
     UInt8 _class;
     //UInt8 _rp; //1:回流免费用户 2:回流vip1-vip4用户 3:回流vip5+用户
     std::string _para;
-    MESSAGE_DEF6(REQ::CREATE_ROLE, IDTYPE , playerId,std::string ,accounts,std::string ,password ,std::string, _name, UInt8, _class, std::string, _para);
+    MESSAGE_DEF6(REQ::CREATE_ROLE, UInt64 , phoneId,std::string ,accounts,std::string ,password ,std::string, _name, UInt8, _class, std::string, _para);
 };
 bool checkKey(UInt8 type, const UInt8* _hashval, IDTYPE _userid)
 {
@@ -236,17 +244,26 @@ bool checkKey(UInt8 type, const UInt8* _hashval, IDTYPE _userid)
 struct NewUserRepStruct 
 {
     UInt32 _result;
+    IDTYPE _playerId;
     std::string _name;
-    MESSAGE_DEF2(REP::NEW_CHARACTER, UInt32, _result, std::string, _name);
+    MESSAGE_DEF3(REP::NEW_CHARACTER, UInt32, _result,IDTYPE , _playerId, std::string, _name);
 };
 //创号， 根据手机号（playerId） 根绝帐号密码(accounts)
 void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 {
     TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
-    if(conn.get() == NULL)
-        return;
+    //if(conn.get() == NULL)
+    //   return;
 
-    if (!hdr.playerID && nu.accounts.empty())
+    nu.phoneId = 3 ;
+    nu.accounts = "libo_3";
+    nu.password = "123456";
+    nu._name = "libo_3";
+    nu._class = 1;
+    nu._para = "192.168.88.250";
+
+
+    if (!nu.phoneId && nu.accounts.empty())
     {
         conn->pendClose();
         return;
@@ -273,7 +290,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         return;
     }
 
-    nu._class &= ~0x80;
+    //nu._class &= ~0x80;
 
     if(nu._name.empty() || nu._name.length() > 15 || (strncmp(nu._name.c_str(), "ERROR_", 6) == 0))
     {
@@ -284,6 +301,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     }
 
     UInt32 res;
+    UInt32 playerId = 0;
 
     std::string newname = nu._name;
 
@@ -301,20 +319,21 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     }
     else
     {
-        pl = new(std::nothrow) GObject::Player(hdr.playerID);  //XXX
+        playerId =  IDGenerator::gPlayerOidGenerator.ID();
+        pl = new(std::nothrow) GObject::Player(playerId);  //XXX
         //pl->setId(nu.playerId);
         //pl->setAccounts(nu.accounts);
 
         //设置玩家数据
         //TODO
 
-        UInt32 fgtId = nu._class + 1;
+        UInt32 fgtId = nu._class;
 
         GObject::Fighter * fgt2 = GObject::globalFighters[fgtId];
         GObject::Fighter * fgt = NULL;
         if(fgt2 != NULL)
         {
-            fgt = fgt2->clone(pl);
+            fgt = fgt2->Clone(pl);
             if(fgt != NULL)
                 pl->addFighter(fgt, true);
         }
@@ -325,10 +344,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         }
         else
         {
-
-            //插入player表
-            //TODO
-
             //GObject::newPlayers.add(pl);
             if(pl->getId())
                 GObject::globalPlayers.add(pl);
@@ -340,8 +355,13 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetSessionID(hdr.sessionID);
             Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
-            cl->SetPlayer(pl);
+            // TEST cl->SetPlayer(pl);
+            
+            DB1().PushUpdateData("insert into `player_id` values(%u,%"I64_FMT"u,'%s','%s')",playerId, nu.phoneId ,nu.accounts.c_str(),nu.password.c_str());
 
+            DB1().PushUpdateData("insert into `player` values(%u,'%s')" , playerId , nu._name.c_str() );
+
+            DB1().PushUpdateData("insert into `fighter`(fighterId,playerId) values(%u,%u)" ,fgtId,playerId );
         }
     }
 
@@ -352,7 +372,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
     NewUserRepStruct rep;
     rep._result = res;
-    NETWORK()->SendMsgToClient(conn.get(), rep);
+    rep._playerId = playerId;
+    //TEST NETWORK()->SendMsgToClient(conn.get(), rep);
 }
 #endif // _LOGINOUTERMSGHANDLER_H_
 
