@@ -107,9 +107,9 @@ namespace Battle
             case e_run:
                 {
                     BattleObject * bo = targetList.front();
-                    if(bo == NULL)
-                        GoForward(FIELD_HIGH/2, FIELD_WIDTH/2 , 1);
-                    else
+                    //if(bo == NULL)
+                    //    GoForward(FIELD_HIGH/2, FIELD_WIDTH/2 , 1);
+                    //else
                     {
                         GoForward(bo->getPosX(), bo->getPosY(), 1);
                         targetList.pop_front();
