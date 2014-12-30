@@ -38,10 +38,10 @@ namespace Battle
     {
         ActionBase(UInt16 condition ,UInt16 scope, UInt16 effect):_condition(condition),_scpoe(scope),_effect(effect),_cd(0),_priority(0) { } 
         ActionBase():_condition(0),_scpoe(0),_effect(0),_cd(8),_priority(0){}
-        UInt16 _condition ;
-        UInt16 _scpoe ;
-        UInt16 _effect ;
-        UInt8 _cd;
+        UInt16 _condition ;  // 触发条件编号
+        UInt16 _scpoe ;      // 触发范围编号
+        UInt16 _effect ;     // 触发效果编号
+        UInt8 _cd;           //行动cd  
         UInt8 _priority ;  //触发优先级
     };
     struct lt_absort
@@ -74,7 +74,7 @@ namespace Battle
 
             void Action();  //行动
             //移动
-            void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
+            virtual void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
@@ -96,6 +96,7 @@ namespace Battle
             UInt8 GetRide(){ return 3 ;} //TODO
             UInt8 GetClass(){ return _fighter->GetClass();}
             UInt8 GetDistance(){ return 1;}  
+            UInt16 GetId(){ if(!_fighter) return 0; return _fighter->getId();}
 
             void setNumber(UInt8 num){ _number = num;}
             UInt8 getNumber(){ return _number; }
@@ -106,11 +107,18 @@ namespace Battle
             BattleFighter* getMyFighters(UInt8 index);
 
             UInt16 GetRad(){ if(_fighter) return _fighter->GetRad(); return 0;}
+            void SetEnterPos(UInt8 x1 , UInt8  y1){ if(!_fighter)return ; EnterX = x1; EnterY = y1;}
+            inline UInt8 GetEnterPosX(){ return EnterX;}
+            inline UInt8 GetEnterPosY(){ return EnterY;}
+
+
+            void InsertFighterInfo(Stream& st ,UInt8 flag = 0);
+
         private:
             Script::BattleFormula * _formula;
             BattleFighter ** m_fighters;
-            BattleFighter * m_mainFighter;
-            UInt8 _number;
+            BattleFighter * m_mainFighter;   //主将指针
+            UInt8 _number;   //所在阵营
 
             ActionBase _ab;
             UInt8 _actionType;  // 动作类型
@@ -123,6 +131,8 @@ namespace Battle
 
             GObject::Fighter * _fighter;
             BattleField * _field;
+            UInt8 EnterX;
+            UInt8 EnterY;
 
             //属性
             UInt8 _crick;  //硬直
@@ -145,6 +155,13 @@ namespace Battle
             UInt8 _groundX;
             UInt8 _groundY;
 
+    };
+
+    class BattleRideFighter :
+        public BattleFighter
+    {
+        public:
+            virtual void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
     };
 }
 #endif // BATTLEFIGHTER_H_

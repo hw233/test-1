@@ -128,8 +128,8 @@ static void setForbidSaleValue(const IDTYPE playerId, bool isForbid, UInt32 fTim
         char value[32] = {'0'};
         char key[MEMCACHED_MAX_KEY] = {0};
         //size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", playerId.c_str());
-        //size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", playerId);  //LIBOUInt64
-        size_t len = snprintf(key, sizeof(key), "asss_globallock_%u", playerId);  //LIBOUInt32
+        size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", playerId);  //LIBOUInt64
+        //size_t len = snprintf(key, sizeof(key), "asss_globallock_%u", playerId);  //LIBOUInt32
         if (isForbid) value[0] = '1';
         sprintf(&value[1],"%d", TimeUtil::Now());
         {
@@ -155,8 +155,8 @@ static bool checkForbidSale(const IDTYPE playerId, std::string& fsale, std::stri
     char key[MEMCACHED_MAX_KEY] = {0};
     IDTYPE pid = playerId ;
     //size_t len = snprintf(key, sizeof(key), "asss_globallock_%s", pid.c_str());
-    //size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", pid);  //LIBO  UInt64
-    size_t len = snprintf(key, sizeof(key), "asss_globallock_%u", pid);  //LIBO  UInt64
+    size_t len = snprintf(key, sizeof(key), "asss_globallock_%" I64_FMT "u", pid);  //LIBO  UInt64
+    //size_t len = snprintf(key, sizeof(key), "asss_globallock_%u", pid);  //LIBO  UInt32
 
     if (memcinited)
         MemcachedGet(key, len, value, sizeof(value));

@@ -26,8 +26,9 @@ namespace Battle
         SetGroundX(pointX);
         SetGroundY(pointY);
         _st.reset();
-        _hp = 1000;
         _attack_near = 100;
+
+        setHP(1000);
     } 
     BattleFighter::~BattleFighter()
     {
@@ -142,15 +143,19 @@ namespace Battle
     { 
         //填充 actionType actionLast targetList
         //获得视野范围进攻对象 (如无对象则返回中心点虚拟对象)
+
         BattleObject * bo = NULL;
-        if(getClass() == eMain + Walker && targetList.size())
+        if(getClass() == eMain + Walker && targetList.size())  //步兵
         {
            bo = targetList.front(); 
            if(bo->getHP() == 0)
                bo = NULL;
         }
         if(!bo)
+        {
+            targetList.clear();
             bo = GetField()->GetTarget(GetSide(),getPosX(),getPosY(),1);   //XXX
+        }
         if(bo == NULL)  
             return ;
 
@@ -164,11 +169,10 @@ namespace Battle
 
         _ab = GetActionCurrent(advance);
 
-        if(1) 
+        if(1)  //XXX
         { 
             _actionType = GData::skillEffectManager[_ab._effect]->skillType;  //XXX
             _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd;; //行进时间一秒
-            targetList.clear();
             targetList.push_back(bo);
         }
 
@@ -263,7 +267,7 @@ namespace Battle
             attack = _attack_near;
         return  ActionPackage(attack, _hit, _wreck, _critical, this);  //未加入目标对象
     } 
-    BattleFighter * BattleFighter::getMyFighters(UInt8 index)
+    BattleFighter * BattleFighter::getMyFighters(UInt8 index)   //找第几个活着的 (0开始)
     { 
         if(_fighter == NULL )
             return NULL;
@@ -280,4 +284,25 @@ namespace Battle
         }
         return NULL;
     } 
+    void BattleFighter::InsertFighterInfo(Stream& st,UInt8 flag)
+    {
+        if(m_mainFighter)
+            return ;
+        if(!_fighter)
+            return ;
+        
+        if(!flag)
+            st << static_cast<UInt8>(0xFE);
+        st << static_cast<UInt8>(GetSide());
+        st << static_cast<UInt16>(GetId());
+        st << static_cast<UInt8>(GetGroundX());
+        st << static_cast<UInt8>(GetGroundY());
+    }
+
+
+    //BattleRideFighter
+    void BattleRideFighter::GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance)
+    {
+    
+    }
 }

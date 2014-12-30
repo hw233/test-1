@@ -4,7 +4,7 @@
 #include "Common/Queue.h"
 #include "Common/Platform.h"
 
-#define IDTYPE UInt32   //LIBO
+#define IDTYPE UInt64   //LIBO
 namespace GObject
 {
 	class Player;

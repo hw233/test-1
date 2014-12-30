@@ -71,12 +71,13 @@ namespace GObject
         LoginMsgHdr hdr1(0xE1, WORKER_THREAD_LOGIN, 8500, 1212121 , sizeof(ns)); 
         GLOBAL().PushMsg(hdr1, &ns);
         UInt32 BattleId = Battle::battleManager.CreateBattleGround();
-        for(UInt8 i = 1; i < 5 ;++i)
+        for(UInt8 i = 1; i < 10 ;++i)
         {
-            Player *pl = globalPlayers[i];
+            UInt64 pid = (static_cast<UInt64>(1)<<48)|i;
+            Player *pl = globalPlayers[pid];
             if(!pl)
                 continue;
-            Battle::battleManager.EnterBattleGround(BattleId,pl,i);
+            Battle::battleManager.EnterBattleGround(BattleId,pl,i*2);
         }
         Battle::battleManager.StartGround(BattleId);
     } 

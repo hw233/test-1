@@ -109,8 +109,8 @@ namespace GObject
         if (!load)
         {     
             //DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = '%s' and `accounts` = '%s'"  , m_openid, getId().c_str(),getAccounts().c_str());
-            //DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %" I64_FMT "u and `accounts` = '%s'"  , m_openid, getId(),getAccounts().c_str());   //LIBO UInt64
-            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %u "  , m_openid, getId());   //LIBO UInt32
+            DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %" I64_FMT "u "  , m_openid, getId());   //LIBOUInt64
+            //DB1().PushUpdateData("UPDATE `player` SET `openid` = '%s' WHERE `id` = %u "  , m_openid, getId());   //LIBOUInt32
         }     
     }
 
@@ -151,5 +151,12 @@ namespace GObject
         if(fgt->getId() > 9)
             return NULL;
         return fgt;
+    }
+    void Player::makePlayerInfo(Stream& st)
+    {
+        st << name ; 
+        st << GetVar(VAR_TEAL);
+        st << GetVar(VAR_COUPON);
+        st << GetVar(VAR_GOLD);
     }
 }

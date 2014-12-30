@@ -143,7 +143,7 @@ namespace Battle
            */
         for(UInt8 j = 0; j < 2; ++j)
         {
-            for(UInt8 i = 0; i < _fighters[0].size() ; ++i)
+            for(UInt8 i = 0; i < _fighters[j].size() ; ++i)
             { 
                 if(bo == _fighters[j][i])
                     continue ;

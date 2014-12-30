@@ -20,41 +20,61 @@
 #include "LoginMsgHandler.h"
 
 #include "Memcached.h"
+#include "GObject/Player.h"
 
 struct NullReq
 {
     UInt32 ticket;
     MESSAGE_DEF1(REQ::KEEP_ALIVE, UInt32, ticket);
 };
-/*
-void OnNullReq( GameMsgHdr& hdr, NullReq& nr )
+
+struct PlayerInfoReq
 {
-    MSG_QUERY_PLAYER(player);
-    Stream st(REP::KEEP_ALIVE);
-    st << nr.ticket << Stream::eos;
-    player->send(st);
-}
-*/
+    MESSAGE_DEF(REQ::USER_INFO) ;
+};
+/*
+   void OnNullReq( GameMsgHdr& hdr, NullReq& nr )
+   {
+   MSG_QUERY_PLAYER(player);
+   Stream st(REP::KEEP_ALIVE);
+   st << nr.ticket << Stream::eos;
+   player->send(st);
+   }
+   */
 
 /*
-void OnQixiReq2(GameMsgHdr& hdr, const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-    if(!player->hasChecked())
-        return;
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    UInt8 op = 0;
-    UInt8 type = 0;
+   void OnQixiReq2(GameMsgHdr& hdr, const void * data)
+   {
+   MSG_QUERY_PLAYER(player);
+   if(!player->hasChecked())
+   return;
+   BinaryReader brd(data, hdr.msgHdr.bodyLen);
+   UInt8 op = 0;
+   UInt8 type = 0;
 
-    brd >> type;
-    switch(type)
+   brd >> type;
+   switch(type)
+   {
+   default:
+   break;
+   }
+   }
+   */
+
+void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
+{
+    MSG_QUERY_CONN_PLAYER(conn,pl);
+
+    pl->setOnline(true);
+
+    //个人信息
     {
-        default:
-            break;
+        Stream st(REP::USER_INFO);
+        pl->makePlayerInfo(st);
+        st << Stream::eos;
+        conn->send(&st[0],st.size());
     }
 }
-*/
-
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

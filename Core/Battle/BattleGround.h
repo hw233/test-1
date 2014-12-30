@@ -15,7 +15,7 @@ namespace GObject
 }
 namespace Battle
 {
-#define PLAYERMAX 4
+#define PLAYERMAX 10
     struct BattleInfo
     {
         UInt16 _round;
@@ -57,6 +57,7 @@ namespace Battle
                 memset(_mapGround,0,sizeof(UInt8)*x*y);
                 memset(_mapFighters,0,sizeof(BattleObject*)*x*y);
                 memset(_mapFlag,0,sizeof(UInt8)*x*y);
+                _pack.reset();
             }
             BattleGround(){}
             ~BattleGround()
@@ -73,7 +74,7 @@ namespace Battle
             //对象移动
             void Move();
             //产生战报信息
-            void Fight(BattleFighter *bf , BattleFighter * bo);
+            void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport);
             void FighterMove(BattleFighter *, UInt8 x ,UInt8 y);
             void GetNearPos(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
             void GetTargetBo(UInt8 x ,UInt8 y ,UInt8 step = 0);
@@ -86,22 +87,24 @@ namespace Battle
             void start();
             
             void TestCoutBattleS(BattleFighter* bf = NULL);
+            void InsertFighterInfo(UInt8 flag = 0);
         private:
             UInt32 _id;
             UInt8 _x;
             UInt8 _y;
-            std::map<UInt8 ,GObject::Player *>  map_player;
+            std::map<UInt8 ,std::vector<GObject::Player *> >  map_player;
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
             UInt8 * _mapFlag;
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
             //来一个记录战将分布的结构 满足
-            std::vector<BattleFighter *> fighters[PLAYERMAX];
+            std::vector<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;
 
             std::vector<TargetInfo>  targetVec;
             BattleFighter * currentBf;
             //static UInt8 scopeForOne[12];
+            Stream _pack;
     };
 }
 #endif // BATTLEGROUND_H_

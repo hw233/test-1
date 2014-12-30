@@ -56,7 +56,12 @@ namespace GObject
     struct DBPlayer2Id
     {
         IDTYPE id;
-        UInt64 phoneId;
+        std::string phoneId;
+        std::string accounts;
+    };
+
+    struct DBAccountPwd
+    {
         std::string accounts;
         std::string password;
     };
@@ -136,10 +141,17 @@ namespace DB
     )
     SPECIALEND()
     SPECIALBEGIN(GObject::DBPlayer2Id)
-    SPECIALDEF(4)
+    SPECIALDEF(3)
     (
-     UInt32, id,
-     UInt64, phoneId,
+     IDTYPE, id,
+     std::string, phoneId,
+     std::string, accounts
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBAccountPwd)
+    SPECIALDEF(2)
+    (
      std::string, accounts,
      std::string, password
     )

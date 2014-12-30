@@ -77,6 +77,7 @@ namespace Battle
             UInt32 defend_near;
             UInt32 defend_distance;
             //BattleField * _field;
+
             //流
             Stream _st;
     };

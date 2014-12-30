@@ -8,7 +8,7 @@
 #include "Common/MCached.h"
 #include <curl/curl.h>
 #ifndef IDTYPE
-#define IDTYPE UInt32
+#define IDTYPE UInt64
 #endif
 
 namespace GObject

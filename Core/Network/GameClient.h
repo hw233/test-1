@@ -5,7 +5,7 @@
 
 #include "TcpConduit.h"
 
-#define IDTYPE UInt32  //LIBO
+#define IDTYPE UInt64//LIBO
 
 namespace GObject
 {

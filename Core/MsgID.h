@@ -56,7 +56,12 @@ namespace REQ
     /**请求玩家信息 */
     const UInt8 USER_INFO           = 0xE4;// 0x14
     /**BUFFER信息改变 */
-    const UInt8 STATE               = 0xE5;// 0x15
+    
+    //创建帐号
+    const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15
+
+    const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15
+
     /**回流用户7日活动指令 */
     const UInt8 RF7DAY              = 0x15;
     /** ??? */
@@ -488,12 +493,17 @@ namespace REP
     const UInt8 BE_DISCONNECT       = 0xF2;// 0x0E
     const UInt8 ALERT_MSG           = 0xF3;// 0x0F
 
-    const UInt8 LOGIN               = 0xE0;// 0x10
-    const UInt8 NEW_CHARACTER       = 0xE1;// 0x11
+    const UInt8 LOGIN               = 0xE0;// 0x10  //DOEN
+    const UInt8 NEW_CHARACTER       = 0xE1;// 0x11  //DOEN
+    const UInt8 USER_INFO_CHANGE    = 0xE2;
+    const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15 //DOEN
+    const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15 //DOEN
+    
+
     const UInt8 WALLOW_VERIFY       = 0xE2;// 0x12
     const UInt8 GUIDE_RESPONSE_STEP = 0xE3;// 0x13
     const UInt8 USER_INFO           = 0xE4;// 0x14
-    const UInt8 USER_INFO_CHANGE    = 0xE5;// 0x15
+
     const UInt8 STATE_CHANGE        = 0x16;
     const UInt8 RF7DAY              = 0x15;
     const UInt8 BOOK_SHOP_LIST      = 0xEC;// 0x1A

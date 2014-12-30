@@ -27,7 +27,7 @@ namespace GObject
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
         UInt32 maxId = 0;
-        execu->Extract("SELECT max(`id`) FROM `player_id`", maxId);
+        execu->Extract("SELECT max(`id`&0xffffffffff) FROM `player_id`", maxId);
         IDGenerator::gPlayerOidGenerator.Init(maxId);
         return true;
     }
@@ -47,6 +47,11 @@ namespace GObject
         if(!loadPlayerId())
         {
             fprintf(stderr, "loadPlayerId error!\n");
+            std::abort();
+        }
+        if(!loadAccountPwd())
+        {
+            fprintf(stderr, "loadAccountPwd error!\n");
             std::abort();
         }
         if(!loadFighter())
@@ -155,16 +160,17 @@ namespace GObject
         LoadingCounter lc("Loading player_id");
         lc.reset(1000);
         DBPlayer2Id p2i;
-        if(execu->Prepare("SELECT `id`,`phoneId`, `accounts`, `password` FROM `player_id` ORDER BY `id`", p2i) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`phoneId`, `accounts` FROM `player_id` ORDER BY `id`", p2i) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
             lc.advance();
-            player2Id.InsertId(p2i.phoneId , p2i.accounts , p2i.password , p2i.id);
+            player2Id.InsertId(p2i.phoneId , p2i.accounts , p2i.id);
         }
         lc.finalize();
         return true;
     }
+
     bool GObjectManager::loadFighterVar()
     { 
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -280,5 +286,23 @@ namespace GObject
             return NULL;
         }
         return static_cast<ItemArmor *>(equip);
+    }
+
+    bool GObjectManager::loadAccountPwd()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading account_pwd");
+        lc.reset(1000);
+        DBAccountPwd ap;
+        if(execu->Prepare("SELECT `accounts`,`password` FROM `account_pwd`", ap) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            player2Id.InsertAccount(ap.accounts,ap.password);
+        }
+        lc.finalize();
+        return true;
     }
 }

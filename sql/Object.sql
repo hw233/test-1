@@ -22,7 +22,6 @@ DROP TABLE IF EXISTS `player`;
 CREATE TABLE `player` (
     `id` bigint(20) unsigned NOT NULL,
     `name` varchar(255) NOT NULL,
-
     PRIMARY KEY (`id`),
     KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -38,8 +37,8 @@ CREATE TABLE `gvar` (
 
 DROP TABLE IF EXISTS `var`; 
 CREATE TABLE `var` (
-    `playerId` int(10) unsigned NOT NULL,
-    `id` smallint(5) NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `id` int(10) NOT NULL,
     `data` int(10) unsigned NOT NULL,
     `over` int(10) unsigned NOT NULL,
     PRIMARY KEY (`playerId`,`id`)
@@ -47,10 +46,9 @@ CREATE TABLE `var` (
 
 DROP TABLE IF EXISTS `player_id`; 
 CREATE TABLE `player_id` (
-    `id` int(10) unsigned NOT NULL DEFAULT 0,
-    `phoneId` bigint(20) unsigned NOT NULL DEFAULT 0,
+    `id` bigint(20) unsigned NOT NULL,
+    `phoneId` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
     `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
-    `password` varchar(255) NOT NULL DEFAULT '',   /*密码*/
     /*PRIMARY KEY (`phoneId`,`accounts`)*/
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -58,7 +56,7 @@ CREATE TABLE `player_id` (
 
 DROP TABLE IF EXISTS `fvar`; 
 CREATE TABLE `fvar` (
-    `playerId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
     `fighterId` int(10) unsigned NOT NULL,
     `id` smallint(5) NOT NULL,
     `data` int(10) unsigned NOT NULL,
@@ -69,7 +67,7 @@ CREATE TABLE `fvar` (
 DROP TABLE IF EXISTS `fighter`; 
 CREATE TABLE `fighter` (
     `fighterId` int(10) unsigned NOT NULL,
-    `playerId` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
     `experience` bigint(20) unsigned NOT NULL DEFAULT '0',
     `weapon` int(10) unsigned NOT NULL DEFAULT '0',
     `armor1` int(10) unsigned NOT NULL DEFAULT '0',
@@ -80,5 +78,13 @@ CREATE TABLE `fighter` (
     `addTime` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`fighterId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `account_pwd`; 
+CREATE TABLE `account_pwd` (
+    `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `password` varchar(255) NOT NULL DEFAULT '',   /*密码*/
+    PRIMARY KEY (`accounts`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 

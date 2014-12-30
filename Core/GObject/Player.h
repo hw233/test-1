@@ -30,7 +30,7 @@
 //BattleSimulator
 //Function
 
-#define IDTYPE UInt32   //LIBO
+#define IDTYPE UInt64   //LIBO
 namespace Battle
 {
     class BattleSimulator;
@@ -144,7 +144,7 @@ namespace GObject
             //
             inline const std::string& GetName(){return name; }
             inline void SetName(std::string name1){name = name1; }
-            
+
             //Fighter
             void addFighter(Fighter * fgt, bool = true, bool = false); 
             Fighter * findFighter(UInt32);
@@ -155,6 +155,9 @@ namespace GObject
 
             //Function
             void Login();
+            void makePlayerInfo(Stream& st);
+
+
 
             //login
             //inline void setId(IDTYPE id){ _id = id;}
@@ -171,7 +174,8 @@ namespace GObject
             void SetBattleSide(UInt8 side) { _battleSide = side; }
             UInt8 GetBattleSide() { return _battleSide;}
 
-        private:
+
+    private:
             //IDTYPE _id;
             std::string _accounts;
             std::string _password;
@@ -197,14 +201,14 @@ namespace GObject
 
             //散仙相关
             std::map<UInt32, Fighter *> _fighters;
-    };
-    typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
-    extern GlobalPlayers globalPlayers;
-    extern GlobalPlayers globalOnlinePlayers;
+};
+typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
+extern GlobalPlayers globalPlayers;
+extern GlobalPlayers globalOnlinePlayers;
 
-    typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
-    extern GlobalNamedPlayers globalNamedPlayers;
-    //extern GlobalNamedPlayers globalAccountsPlayers;
+typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
+extern GlobalNamedPlayers globalNamedPlayers;
+//extern GlobalNamedPlayers globalAccountsPlayers;
 }
 #endif // PLAYER_H_
 

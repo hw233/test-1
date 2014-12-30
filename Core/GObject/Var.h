@@ -25,6 +25,9 @@ namespace GObject
     enum VarID
     {
         VAR_INVALID = 0,    //无效变量
+        VAR_TEAL    = 1,
+        VAR_COUPON  = 2,
+        VAR_GOLD    = 3,
         VAR_MAX
     };
 
@@ -54,37 +57,40 @@ namespace GObject
      */
     class VarSystem
     {
-    public:
-        VarSystem(UInt64 playerid);
-         ~VarSystem();
+        public:
+            VarSystem(UInt64 playerid);
+            ~VarSystem();
 
-    public:
+        public:
 
-        static void Init()
-        {
-        }
+            static void Init()
+            {
+                REGISTER_VAR(VAR_TEAL , CYCLE_NONE);
+                REGISTER_VAR(VAR_COUPON , CYCLE_NONE);
+                REGISTER_VAR(VAR_GOLD , CYCLE_NONE);
+            }
 
-        UInt32 GetVar(UInt32 id, UInt32 now = 0);
-        void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
-        void DelVar(UInt32 id);
-        void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
-        void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
-        void SetOffset(UInt32 offset){ m_Offset = offset; }
+            UInt32 GetVar(UInt32 id, UInt32 now = 0);
+            void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
+            void DelVar(UInt32 id);
+            void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
+            void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
+            void SetOffset(UInt32 offset){ m_Offset = offset; }
 
-    private:
-        UInt32 GetType(UInt32 id) const;
-        bool CheckReset(UInt32 id, UInt32 now);
-        void UpdateDB(UInt32 id);
+        private:
+            UInt32 GetType(UInt32 id) const;
+            bool CheckReset(UInt32 id, UInt32 now);
+            void UpdateDB(UInt32 id);
 
-    private:
-        //玩家
-        UInt64 m_PlayerID;
-        UInt32 m_Vars[VAR_MAX];
-        UInt32 m_OverTime[VAR_MAX];
-        UInt32 m_Offset;
-        FastMutex _mutex;
+        private:
+            //玩家
+            UInt64 m_PlayerID;
+            UInt32 m_Vars[VAR_MAX];
+            UInt32 m_OverTime[VAR_MAX];
+            UInt32 m_Offset;
+            FastMutex _mutex;
 
-        static UInt32 m_VarTypes[VAR_MAX];
+            static UInt32 m_VarTypes[VAR_MAX];
     };
 }
 

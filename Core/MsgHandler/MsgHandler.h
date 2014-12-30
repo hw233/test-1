@@ -71,7 +71,7 @@ protected:
 		 char* msgBody = (char*)((HdrType*)hdr + 1);
 
 		 // 返回-1表示代码解析有问题，通常是数据包长度和需要的字段不匹配
-		 if(msg1.Unserialize( msgBody, ((HdrType*)hdr)->msgHdr.bodyLen ) != static_cast<UInt32>(-1));
+		 if(msg1.Unserialize( msgBody, ((HdrType*)hdr)->msgHdr.bodyLen ) != static_cast<UInt32>(-1))
 		 	((void (*)(HdrType&, MsgType&))func)(*(HdrType*)hdr, msg1);
 		 return true;
 	 }
