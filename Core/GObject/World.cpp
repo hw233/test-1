@@ -77,7 +77,7 @@ namespace GObject
             Player *pl = globalPlayers[pid];
             if(!pl)
                 continue;
-            Battle::battleManager.EnterBattleGround(BattleId,pl,i*2);
+            Battle::battleManager.EnterBattleGround(BattleId,pl,i);
         }
         Battle::battleManager.StartGround(BattleId);
     } 

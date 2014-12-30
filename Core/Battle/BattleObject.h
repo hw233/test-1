@@ -66,6 +66,7 @@ namespace Battle
             void AppendFighterStream(Stream & st){ st << _st; _st.reset();}
             virtual UInt16 GetRad(){return 1;}
             virtual UInt8 GetSide(){return 0;}
+            virtual UInt16 GetBattleIndex(){return 0;}
             virtual UInt8 GetGroundX() {return 0;}
             virtual UInt8 GetGroundY() {return 0;}
         protected:

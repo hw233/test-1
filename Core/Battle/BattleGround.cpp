@@ -102,12 +102,14 @@ namespace Battle
             //Stream
             _pack << static_cast<UInt8>(targetVec[res].x) << static_cast<UInt8>(targetVec[res].y);
             _pack << static_cast<UInt8>(1);
-            currentBf->InsertFighterInfo(_pack,1);
-            targetVec[res].bo->InsertFighterInfo(_pack,1);
+
+            currentBf->InsertFighterInfo(_pack);
+            targetVec[res].bo->InsertFighterInfo(_pack);
 
             UInt8 win = 0;
             UInt32 reportId = 0;
             Fight(currentBf, targetVec[res].bo, win, reportId);
+            _pack << win << reportId;
 
             //cout
             TestCoutBattleS(targetVec[res].bo);
@@ -180,6 +182,8 @@ namespace Battle
                     continue;
                 if(_mapFighters[i + j*_x]->getClass() > 100)
                     continue;
+                if(!_mapFighters[i + j*_x]->getHP())
+                    return ;
                 if( step != 2)
                     step = 2;
                 targetVec.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[i + j*_x]),x,y,MAX((ABS(x,i)),(ABS(j,y))) )) ;
@@ -204,6 +208,8 @@ namespace Battle
         BattleFighter * bf = new(std::nothrow) Battle::BattleFighter(NULL,fgt, x, y);
         setObject(x, y, bf ,1);
         bf->SetEnterPos(x,y);
+        bf->SetBattleIndex(++_maxID);
+        bf->InsertFighterInfo(_pack,1);
         return bf;
     } 
 
@@ -228,23 +234,33 @@ namespace Battle
     { 
         preStart();  //
         TestCoutBattleS();
+        UInt32 alive = 0;
+        UInt8 count = 0;
+        UInt32 Round = 0;
         do
         {
-            for(UInt8 i = 0; i < PLAYERMAX; ++i)
+            for(UInt8 i = 0; i < PLAYERMAX; ++i)  //PLAYERMAX 表示军团数量
             { 
+                bool flag = false;
                 if(fighters[i].size() == 0)
                     continue;
                 for(UInt8 j = 0; j < fighters[i].size();++j)
                 { 
                     if(fighters[i][j] && fighters[i][j]->getHP())
                     {
+                        flag = true ;
                         currentBf = fighters[i][j];
                         Move();
                     }
                 } 
+                if(!flag)
+                { 
+                    alive |= (1 <<i);
+                    ++count;
+                } 
             } 
-
-        }while(0);
+            ++Round;
+        }while(count != (PLAYERMAX - 1) && Round < 200);
     } 
     UInt8 BattleGround::PushPlayer(GObject::Player * pl,UInt8 index)
     { 
@@ -262,6 +278,8 @@ namespace Battle
     void BattleGround::preStart()
     { 
         std::map<UInt8 ,std::vector<GObject::Player *> >::iterator it = map_player.begin();
+        size_t offset = _pack.size();
+        _pack << _maxID ;
         for(;it != map_player.end(); ++it)
         {
             if(it->first >= PLAYERMAX)
@@ -271,6 +289,7 @@ namespace Battle
             {
                 //for(UInt8 j = 0; j < 6 ; ++j)
                 {
+                    //军团成员放入战将
                     GObject::Fighter * fgt = it->second.at(0)->getMainFighter();
                     if(!fgt)
                         continue;
@@ -278,6 +297,7 @@ namespace Battle
                 }
             }
         }
+        _pack.data<UInt16>(offset) = _maxID;
     } 
 
     void BattleGround::TestCoutBattleS(BattleFighter * bf)
@@ -288,6 +308,7 @@ namespace Battle
             { 
                 if(_mapFighters[i+j*_x] &&( bf == NULL || _mapFighters[i+j*_x] == bf))
                 {
+                    std::cout << "战将编号" << static_cast<UInt32>(_mapFighters[i+j*_x]->GetBattleIndex());
                     std::cout << "玩家Side:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetSide());
                     std::cout << "  x:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundX());
                     std::cout << "  y:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundY());

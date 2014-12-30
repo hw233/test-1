@@ -4,6 +4,7 @@
 #include "GData/SkillTable.h"
 #include "Script/BattleFormula.h"
 #include "BattleAction.h"
+#include "GObject/Player.h"
 
 namespace Battle
 {
@@ -20,7 +21,7 @@ namespace Battle
             {
                 m_fighters[i] = new BattleFighter(_formula,NULL,0,0);
                 if( m_fighters[i])
-                     m_fighters[i]->setNumber(i+1);
+                    m_fighters[i]->setNumber(i+1);
             }
         }
         SetGroundX(pointX);
@@ -29,6 +30,7 @@ namespace Battle
         _attack_near = 100;
 
         setHP(1000);
+        _battleIndex = 0;
     } 
     BattleFighter::~BattleFighter()
     {
@@ -75,6 +77,7 @@ namespace Battle
 
     void BattleFighter::BeActed(BattleAction  bAction)
     { 
+        //TODO
         UInt32 attack = bAction.GetAttack();
         UInt32 defend = GetDefendNear();
         UInt32 hpSub = attack - defend;
@@ -99,6 +102,18 @@ namespace Battle
             return ;
         } 
 
+        //if(_actionType == e_run_attack)
+        BattleObject * bo = targetList.front();
+        if(bo && getPosX() > STEP && getPosX() < (FIELD_WIDTH - STEP) )
+        {
+            GoForward(bo->getPosX(), bo->getPosY(), 1);
+        }
+        else
+        {
+            GetActionFromField();
+        }
+
+
         switch(_actionType)
         { 
             case e_none:
@@ -106,16 +121,6 @@ namespace Battle
                 break;
             case e_run:
                 {
-                    BattleObject * bo = targetList.front();
-                    //if(bo == NULL)
-                    //    GoForward(FIELD_HIGH/2, FIELD_WIDTH/2 , 1);
-                    //else
-                    {
-                        GoForward(bo->getPosX(), bo->getPosY(), 1);
-                        targetList.pop_front();
-                    }
-                    _actionType = e_none;
-                    _actionLast = 0;
                 }
                 break;
             case e_attack_near:
@@ -147,9 +152,9 @@ namespace Battle
         BattleObject * bo = NULL;
         if(getClass() == eMain + Walker && targetList.size())  //步兵
         {
-           bo = targetList.front(); 
-           if(bo->getHP() == 0)
-               bo = NULL;
+            bo = targetList.front(); 
+            if(bo->getHP() == 0)
+                bo = NULL;
         }
         if(!bo)
         {
@@ -181,7 +186,7 @@ namespace Battle
         _st << static_cast<UInt8>(ACTION_WAIT);   //延迟起作用
         _st << static_cast<UInt8>(getPosX());    //产生动作的对象坐标
         _st << static_cast<UInt8>(getPosY());
-     
+
     } 
 
     void BattleFighter::UpdateActionList()
@@ -284,25 +289,77 @@ namespace Battle
         }
         return NULL;
     } 
-    void BattleFighter::InsertFighterInfo(Stream& st,UInt8 flag)
+    void BattleFighter::InsertFighterInfo(Stream& st,UInt8 flag)  //0表示入场信息，1 表示散仙战斗编号
     {
         if(m_mainFighter)
             return ;
         if(!_fighter)
             return ;
-        
+
+        st << static_cast<UInt8>(GetBattleIndex());
         if(!flag)
-            st << static_cast<UInt8>(0xFE);
-        st << static_cast<UInt8>(GetSide());
+            return ;
+        st << static_cast<UInt64>(_fighter->GetOwner()->GetId());
         st << static_cast<UInt16>(GetId());
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
+        st << static_cast<UInt8>(GetSide());
     }
-
 
     //BattleRideFighter
-    void BattleRideFighter::GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance)
-    {
-    
-    }
+    void BattleRideFighter::Action()
+    { 
+        _st.reset();
+        UpdateActionList();
+        //硬直
+        if(_crick)
+        {
+            --_crick;
+            return ;
+        }
+        //动作行为
+
+        if(_actionLast)
+        { 
+            --_actionLast;
+            return ;
+        } 
+
+        switch(_actionType)
+        { 
+            case e_none:
+                GetActionFromField();
+                break;
+            case e_run:
+                {
+                    BattleObject * bo = targetList.front();
+                    {
+                        GoForward(bo->getPosX(), bo->getPosY(), 1);
+                        targetList.pop_front();
+                    }
+                    _actionType = e_none;
+                    _actionLast = 0;
+                }
+                break;
+            case e_attack_near:
+            case e_attack_middle:
+            case e_attack_distant:
+            case e_image_attack:
+            case e_image_therapy:
+                {
+                    std::list<BattleObject *>::iterator it = targetList.begin();
+                    for(;it!=targetList.end();++it)
+                    { 
+                        (*it)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
+                        (*it)->AppendFighterStream(_st);
+                    } 
+                }
+                break;
+            case e_attack_counter:
+                break;
+            default:
+                break;
+        } 
+    } 
+
 }

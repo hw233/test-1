@@ -31,7 +31,8 @@ namespace Battle
         e_image_attack = 5,  //魔法攻击
         e_image_therapy = 6, //魔法治疗
         e_attack_counter = 7, //反击
-        e_be_attacked = 8
+        e_be_attacked = 8 , //被攻击
+        e_run_attack = 9   //跑攻 (骑兵专用)
     };
 
     struct ActionBase
@@ -72,9 +73,9 @@ namespace Battle
             UInt8 GetGroundX(){ return _groundX;}
             UInt8 GetGroundY(){ return _groundY;}
 
-            void Action();  //行动
+            virtual void Action();  //行动
             //移动
-            virtual void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
+             void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
@@ -114,6 +115,13 @@ namespace Battle
 
             void InsertFighterInfo(Stream& st ,UInt8 flag = 0);
 
+            void SetBattleIndex(UInt8 x) { _battleIndex = x;}
+            UInt16 GetBattleIndex() { return _battleIndex;}
+        protected:
+            UInt8 _crick;  //硬直
+            UInt8 _actionLast ;   //动作持续
+            std::list<BattleObject*>  targetList; //对象列表 (待解)
+            UInt8 _actionType;  // 动作类型
         private:
             Script::BattleFormula * _formula;
             BattleFighter ** m_fighters;
@@ -121,9 +129,6 @@ namespace Battle
             UInt8 _number;   //所在阵营
 
             ActionBase _ab;
-            UInt8 _actionType;  // 动作类型
-            UInt8 _actionLast ;   //动作持续
-            std::list<BattleObject*>  targetList; //对象列表 (待解)
 
             ActionSort  preActionList;   //动作行为列表O
             ActionSort  preActionCD;     //待CD动作行为列表
@@ -135,7 +140,6 @@ namespace Battle
             UInt8 EnterY;
 
             //属性
-            UInt8 _crick;  //硬直
             UInt8 _crickSum;  //硬直累计
             UInt8 _crickLev; //硬直等级
 
@@ -155,13 +159,14 @@ namespace Battle
             UInt8 _groundX;
             UInt8 _groundY;
 
+            UInt16 _battleIndex;
     };
 
     class BattleRideFighter :
         public BattleFighter
     {
         public:
-            virtual void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
+            virtual void Action();  //行动
     };
 }
 #endif // BATTLEFIGHTER_H_

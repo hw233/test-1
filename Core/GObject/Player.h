@@ -133,6 +133,7 @@ namespace GObject
 
             //serverNo
             inline UInt16 GetServerNo() { return 0;}//static_cast<UInt16>(getId() >> 48); }
+            inline UInt64 GetId() {return getId();}
 
             //log 
             void udpLog(const char* str1, const char* str2, const char* str3, const char* str4, 

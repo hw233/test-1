@@ -48,7 +48,7 @@ namespace Battle
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 x, UInt8 y):_id(id),_x(x),_y(y)
+            BattleGround(UInt32 id , UInt8 x, UInt8 y):_id(id),_x(x),_y(y),_maxID(0)
             {
                 map_player.clear();
                 _mapGround = new UInt8[x*y];
@@ -85,7 +85,7 @@ namespace Battle
 
             void preStart();
             void start();
-            
+
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
         private:
@@ -105,6 +105,8 @@ namespace Battle
             BattleFighter * currentBf;
             //static UInt8 scopeForOne[12];
             Stream _pack;
+
+            UInt16 _maxID;
     };
 }
 #endif // BATTLEGROUND_H_

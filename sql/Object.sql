@@ -86,5 +86,10 @@ CREATE TABLE `account_pwd` (
     PRIMARY KEY (`accounts`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `reportid`; 
+CREATE TABLE `reportid` (
+    `maxid` int(11) NOT NULL DEFAULT '0',
+    PRIMARY KEY (`maxid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
