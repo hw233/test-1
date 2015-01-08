@@ -49,13 +49,17 @@ namespace Battle
 
     void BattleFighter::GoForward(UInt16 targetX ,UInt16 targetY,UInt16 advance)
     { 
+
+        PreGetObject();
         UInt16 x = getPosX();
         UInt16 y = getPosY();
         UInt16 distanceX = x > targetX ? x - targetX:targetX -x;
         UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
         while(advance--)
         { 
-            if(distanceX < distanceY)
+            if(!distabceX && !distanceY)
+                return ;
+            if(!distanceY)
             {
                 if(x > targetX && x > 0) 
                     --x;
@@ -87,6 +91,8 @@ namespace Battle
     } 
     void BattleFighter::Action()
     { 
+        return ;
+
         _st.reset();
         UpdateActionList();
         //硬直
@@ -149,23 +155,7 @@ namespace Battle
         //填充 actionType actionLast targetList
         //获得视野范围进攻对象 (如无对象则返回中心点虚拟对象)
 
-        BattleObject * bo = NULL;
-        if(getClass() == eMain + Walker && targetList.size())  //步兵
-        {
-            bo = targetList.front(); 
-            if(bo->getHP() == 0)
-                bo = NULL;
-        }
-        if(!bo)
-        {
-            targetList.clear();
-            bo = GetField()->GetTarget(GetSide(),getPosX(),getPosY(),1);   //XXX
-        }
-        if(bo == NULL)  
-            return ;
-
-        //40%不行动
-        if(uRand(100) < 40)
+         if(uRand(100) < 40)
             return ;
 
         UInt16 advance = GetField()->getDistance(getPosX(), getPosY(), bo->getPosX(), bo->getPosY());
@@ -296,70 +286,11 @@ namespace Battle
         if(!_fighter)
             return ;
 
-        st << static_cast<UInt8>(GetBattleIndex());
+        st << static_cast<UInt16>(GetBattleIndex());
         if(!flag)
             return ;
-        st << static_cast<UInt64>(_fighter->GetOwner()->GetId());
         st << static_cast<UInt16>(GetId());
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
-        st << static_cast<UInt8>(GetSide());
     }
-
-    //BattleRideFighter
-    void BattleRideFighter::Action()
-    { 
-        _st.reset();
-        UpdateActionList();
-        //硬直
-        if(_crick)
-        {
-            --_crick;
-            return ;
-        }
-        //动作行为
-
-        if(_actionLast)
-        { 
-            --_actionLast;
-            return ;
-        } 
-
-        switch(_actionType)
-        { 
-            case e_none:
-                GetActionFromField();
-                break;
-            case e_run:
-                {
-                    BattleObject * bo = targetList.front();
-                    {
-                        GoForward(bo->getPosX(), bo->getPosY(), 1);
-                        targetList.pop_front();
-                    }
-                    _actionType = e_none;
-                    _actionLast = 0;
-                }
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-            case e_image_attack:
-            case e_image_therapy:
-                {
-                    std::list<BattleObject *>::iterator it = targetList.begin();
-                    for(;it!=targetList.end();++it)
-                    { 
-                        (*it)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                        (*it)->AppendFighterStream(_st);
-                    } 
-                }
-                break;
-            case e_attack_counter:
-                break;
-            default:
-                break;
-        } 
-    } 
-
 }

@@ -50,6 +50,8 @@ namespace Battle
 
             UInt16 getDistance(UInt16, UInt16, UInt16, UInt16);
             UInt16 getDistance(BattleObject * bf , BattleObject* bo);
+            UInt16 getShootDistance(BattleObject * begin , BattleObject * end , BattleObject* target);
+
             int getSpecificTarget(UInt16 side, bool(*f)(BattleObject* bo));
             bool getSpecificTargets(UInt16 side, UInt16 pos, UInt16 val, std::vector<UInt16>& poslist, bool(*f)(BattleObject* bo, UInt16 targetPos, UInt16 maxLength));
             int getPossibleTarget(UInt16, UInt16); // return -1 for no found target, overload in Simulator

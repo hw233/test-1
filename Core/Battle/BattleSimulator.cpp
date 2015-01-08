@@ -83,4 +83,21 @@ namespace Battle
             return 1;
         return 2;
     } 
+    BattleFighter* BattleSimulator::CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY)
+    { 
+        switch(Class)
+        { 
+            case 1:
+                return new BattleWalkFighter(bf,f,pointX,pointY);
+            case 2:
+                return new BattleRideFighter(bf,f,pointX,pointY);
+            case 3:
+                return new BattleRideFighter(bf,f,pointX,pointY);
+            case 4:
+                return new BattleRideFighter(bf,f,pointX,pointY);
+            default:
+                return new BattleRideFighter(bf,f,pointX,pointY);
+
+        } 
+    } 
 }

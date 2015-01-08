@@ -36,6 +36,7 @@ namespace Battle
             inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
             UInt8 GetWin();
+            static BattleFighter* CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY);
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

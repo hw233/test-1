@@ -205,7 +205,7 @@ namespace Battle
 
     BattleFighter* BattleGround::newFighter(UInt8 x,UInt8 y ,GObject::Fighter * fgt)
     { 
-        BattleFighter * bf = new(std::nothrow) Battle::BattleFighter(NULL,fgt, x, y);
+        BattleFighter * bf = new(std::nothrow) Battle::BattleSimulator::CreateFighter(fgt->GetTypeId(),NULL,fgt, x, y);
         setObject(x, y, bf ,1);
         bf->SetEnterPos(x,y);
         bf->SetBattleIndex(++_maxID);

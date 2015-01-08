@@ -154,4 +154,15 @@ namespace Battle
         bo->setPos(x,y);
         return true;
     } 
+
+    UInt16 BattleField::getShootDistance(BattleObject * begin , BattleObject * end , BattleObject* target)
+    { 
+        int x1 =static_cast<int>(begin->getPosX());
+        int y1 =static_cast<int>(begin->getPosY());
+        int x2 =static_cast<int>(end->getPosX());
+        int y2 =static_cast<int>(end->getPosY());
+        int x3 =static_cast<int>(target->getPosX());
+        int y3 =static_cast<int>(target->getPosY());
+        return static_cast<UInt16>(abs((y1-y2)*x3+(x2-x1)*y3-y1*x2+x1*y2)/sqrt(((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2))));
+    } 
 }

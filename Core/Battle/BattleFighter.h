@@ -117,12 +117,19 @@ namespace Battle
 
             void SetBattleIndex(UInt8 x) { _battleIndex = x;}
             UInt16 GetBattleIndex() { return _battleIndex;}
+
+            void SetMinX(UInt16 x) { _minX = x;}
+            UInt16 GetMinX(){return _minX;}
+            
+            virtual void PreGetObject();  //设定攻击对象，以及战斗
+
+            void SetBattleTargetPos(UInt16 x,UInt16 y){ _battleTargetX = x; _battleTargetY = y;}
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
-            std::list<BattleObject*>  targetList; //对象列表 (待解)
+            //std::list<BattleObject*>  targetList; //对象列表 (待解)
             UInt8 _actionType;  // 动作类型
-        private:
+
             Script::BattleFormula * _formula;
             BattleFighter ** m_fighters;
             BattleFighter * m_mainFighter;   //主将指针
@@ -160,14 +167,16 @@ namespace Battle
             UInt8 _groundY;
 
             UInt16 _battleIndex;
+
+            UInt32 _nowTime; //行动时间
+
+            UInt16 _minX;  //控制骑兵  //TODO
+
+            UInt16 _battleTargetX;
+            UInt16 _battleTargetY;
+
     };
 
-    class BattleRideFighter :
-        public BattleFighter
-    {
-        public:
-            virtual void Action();  //行动
-    };
 }
 #endif // BATTLEFIGHTER_H_
 
