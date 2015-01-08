@@ -3,6 +3,7 @@
 #include "BattleFighter.h" 
 #include "GObject/Player.h"
 #include "Battle/BattleSimulator.h"
+#include "Battle/BattleReport.h"
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
 namespace Battle
@@ -61,6 +62,7 @@ namespace Battle
 
             currentBf->SetGroundX(resx);
             currentBf->SetGroundY(resy);
+
             std::cout <<"无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
             _pack << static_cast<UInt8>(resx) << static_cast<UInt8>(resy) << static_cast<UInt8>(0); //无战斗发生
         }
@@ -205,7 +207,7 @@ namespace Battle
 
     BattleFighter* BattleGround::newFighter(UInt8 x,UInt8 y ,GObject::Fighter * fgt)
     { 
-        BattleFighter * bf = new(std::nothrow) Battle::BattleSimulator::CreateFighter(fgt->GetTypeId(),NULL,fgt, x, y);
+        BattleFighter * bf = BattleSimulator::CreateFighter(fgt->GetTypeId(),NULL,fgt, x, y);
         setObject(x, y, bf ,1);
         bf->SetEnterPos(x,y);
         bf->SetBattleIndex(++_maxID);
@@ -261,6 +263,7 @@ namespace Battle
             } 
             ++Round;
         }while(count != (PLAYERMAX - 1) && Round < 200);
+        battleReport.addReport(_battleNum,_pack);
     } 
     UInt8 BattleGround::PushPlayer(GObject::Player * pl,UInt8 index)
     { 
@@ -278,12 +281,14 @@ namespace Battle
     void BattleGround::preStart()
     { 
         std::map<UInt8 ,std::vector<GObject::Player *> >::iterator it = map_player.begin();
-        size_t offset = _pack.size();
-        _pack << _maxID ;
+        _pack << map_player.size() ;
         for(;it != map_player.end(); ++it)
         {
             if(it->first >= PLAYERMAX)
                 break;
+            size_t offset = _pack.size();
+            UInt8 count = 0;
+            _pack << count ;
             std::vector<GObject::Player *> vec = it->second;
             for(UInt8 i = 0; i < vec.size(); ++i)
             {
@@ -294,10 +299,11 @@ namespace Battle
                     if(!fgt)
                         continue;
                     fighters[it->first].push_back(newFighter(it->first,it->first,fgt));
+                    ++count;
                 }
             }
+            _pack.data<UInt16>(offset) = count;
         }
-        _pack.data<UInt16>(offset) = _maxID;
     } 
 
     void BattleGround::TestCoutBattleS(BattleFighter * bf)
@@ -318,11 +324,4 @@ namespace Battle
         } 
     } 
 
-
 }
-
-
-
-
-
-

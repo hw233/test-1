@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include "Common/Stream.h"
+#include "Server/OidGenerator.h"
 
 #define GROUND_LENGTH 20
 
@@ -48,7 +49,7 @@ namespace Battle
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 x, UInt8 y):_id(id),_x(x),_y(y),_maxID(0)
+            BattleGround(UInt32 id , UInt8 x, UInt8 y):_id(id),_x(x),_y(y),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator.ID())
             {
                 map_player.clear();
                 _mapGround = new UInt8[x*y];
@@ -107,6 +108,7 @@ namespace Battle
             Stream _pack;
 
             UInt16 _maxID;
+            UInt32 _battleNum;
     };
 }
 #endif // BATTLEGROUND_H_

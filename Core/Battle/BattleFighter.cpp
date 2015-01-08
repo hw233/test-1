@@ -19,7 +19,7 @@ namespace Battle
             m_fighters = new BattleFighter*[MYFIGHTERMAX];
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
             {
-                m_fighters[i] = new BattleFighter(_formula,NULL,0,0);
+                m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,NULL,0,0);
                 if( m_fighters[i])
                     m_fighters[i]->setNumber(i+1);
             }
@@ -47,17 +47,19 @@ namespace Battle
         preActionList.push_back(ActionBase(1,0,0));
     } 
 
-    void BattleFighter::GoForward(UInt16 targetX ,UInt16 targetY,UInt16 advance)
+    void BattleFighter::GoForward(UInt16 advance)
     { 
 
         PreGetObject();
+        UInt16 targetX = _battleTargetX ;
+        UInt16 targetY = _battleTargetY ;
         UInt16 x = getPosX();
         UInt16 y = getPosY();
         UInt16 distanceX = x > targetX ? x - targetX:targetX -x;
         UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
         while(advance--)
         { 
-            if(!distabceX && !distanceY)
+            if(!distanceX && !distanceY)
                 return ;
             if(!distanceY)
             {
@@ -77,6 +79,7 @@ namespace Battle
             }
         } 
         setPos(x,y);
+        BuildLocalStream(e_run);
     } 
 
     void BattleFighter::BeActed(BattleAction  bAction)
@@ -93,61 +96,61 @@ namespace Battle
     { 
         return ;
 
-        _st.reset();
-        UpdateActionList();
-        //硬直
-        if(_crick)
-        {
-            --_crick;
-            return ;
-        }
-        //动作行为
-        if(_actionLast)
-        { 
-            --_actionLast;
-            return ;
-        } 
+        //_st.reset();
+        //UpdateActionList();
+        ////硬直
+        //if(_crick)
+        //{
+        //    --_crick;
+        //    return ;
+        //}
+        ////动作行为
+        //if(_actionLast)
+        //{ 
+        //    --_actionLast;
+        //    return ;
+        //} 
 
-        //if(_actionType == e_run_attack)
-        BattleObject * bo = targetList.front();
-        if(bo && getPosX() > STEP && getPosX() < (FIELD_WIDTH - STEP) )
-        {
-            GoForward(bo->getPosX(), bo->getPosY(), 1);
-        }
-        else
-        {
-            GetActionFromField();
-        }
+        ////if(_actionType == e_run_attack)
+        //BattleObject * bo = targetList.front();
+        //if(bo && getPosX() > STEP && getPosX() < (FIELD_WIDTH - STEP) )
+        //{
+        //    GoForward(bo->getPosX(), bo->getPosY(), 1);
+        //}
+        //else
+        //{
+        //    GetActionFromField();
+        //}
 
 
-        switch(_actionType)
-        { 
-            case e_none:
-                GetActionFromField();
-                break;
-            case e_run:
-                {
-                }
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-            case e_image_attack:
-            case e_image_therapy:
-                {
-                    std::list<BattleObject *>::iterator it = targetList.begin();
-                    for(;it!=targetList.end();++it)
-                    { 
-                        (*it)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                        (*it)->AppendFighterStream(_st);
-                    } 
-                }
-                break;
-            case e_attack_counter:
-                break;
-            default:
-                break;
-        } 
+        //switch(_actionType)
+        //{ 
+        //    case e_none:
+        //        GetActionFromField();
+        //        break;
+        //    case e_run:
+        //        {
+        //        }
+        //        break;
+        //    case e_attack_near:
+        //    case e_attack_middle:
+        //    case e_attack_distant:
+        //    case e_image_attack:
+        //    case e_image_therapy:
+        //        {
+        //            std::list<BattleObject *>::iterator it = targetList.begin();
+        //            for(;it!=targetList.end();++it)
+        //            { 
+        //                (*it)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
+        //                (*it)->AppendFighterStream(_st);
+        //            } 
+        //        }
+        //        break;
+        //    case e_attack_counter:
+        //        break;
+        //    default:
+        //        break;
+        //} 
     } 
 
     void BattleFighter::GetActionFromField()
@@ -158,24 +161,24 @@ namespace Battle
          if(uRand(100) < 40)
             return ;
 
-        UInt16 advance = GetField()->getDistance(getPosX(), getPosY(), bo->getPosX(), bo->getPosY());
+        //UInt16 advance = GetField()->getDistance(this,_target);
         //TODO 判断与目标的攻击距离
         //攻击距离不够，前进
 
-        _ab = GetActionCurrent(advance);
+        _ab = GetActionCurrent(GetTargetDistance());
 
         if(1)  //XXX
         { 
             _actionType = GData::skillEffectManager[_ab._effect]->skillType;  //XXX
             _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd;; //行进时间一秒
-            targetList.push_back(bo);
         }
 
-        _st << static_cast<UInt8>(_actionType);  //动作类型
-        _st << static_cast<UInt8>(_actionLast);  //动作持续帧数(*8)
-        _st << static_cast<UInt8>(ACTION_WAIT);   //延迟起作用
-        _st << static_cast<UInt8>(getPosX());    //产生动作的对象坐标
-        _st << static_cast<UInt8>(getPosY());
+        BuildLocalStream();
+        //_st << static_cast<UInt8>(_actionType);  //动作类型
+        //_st << static_cast<UInt8>(_actionLast);  //动作持续帧数(*8)
+        //_st << static_cast<UInt8>(ACTION_WAIT);   //延迟起作用
+        //_st << static_cast<UInt8>(getPosX());    //产生动作的对象坐标
+        //_st << static_cast<UInt8>(getPosY());
 
     } 
 
@@ -215,37 +218,37 @@ namespace Battle
     } 
     void BattleFighter::BuildLocalStream(UInt8 wait , UInt8 param)
     { 
-        _st.reset();
-        _st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
-        _st << static_cast<UInt8>(getPosX());
-        _st << static_cast<UInt8>(getPosY());
-        //TODO 被击
-        _st << _actionType;
-        switch(_actionType)
-        {
-            case e_run:
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-            case e_image_attack:
-            case e_image_therapy:
-                {
-                    _st << static_cast<UInt8>(wait);  //是否延迟
-                    _st << static_cast<UInt8>(_actionLast); //动作持续
-                    _st << static_cast<UInt8>(targetList.size());  //动作作用对象个数
-                    std::list<BattleObject *>::iterator it = targetList.begin();
-                    for(;it!=targetList.end();++it)
-                    { 
-                        _st << (*it)->getPosX();
-                        _st << (*it)->getPosY();
-                    } 
-                }
-            case e_be_attacked:
-                _st << static_cast<UInt32>(param);
-                break;
-            default :
-                break;
-        }
+        //_st.reset();
+        //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
+        //_st << static_cast<UInt8>(getPosX());
+        //_st << static_cast<UInt8>(getPosY());
+        ////TODO 被击
+        //_st << _actionType;
+        //switch(_actionType)
+        //{
+        //    case e_run:
+        //    case e_attack_near:
+        //    case e_attack_middle:
+        //    case e_attack_distant:
+        //    case e_image_attack:
+        //    case e_image_therapy:
+        //        {
+        //            _st << static_cast<UInt8>(wait);  //是否延迟
+        //            _st << static_cast<UInt8>(_actionLast); //动作持续
+        //            _st << static_cast<UInt8>(targetList.size());  //动作作用对象个数
+        //            std::list<BattleObject *>::iterator it = targetList.begin();
+        //            for(;it!=targetList.end();++it)
+        //            { 
+        //                _st << (*it)->getPosX();
+        //                _st << (*it)->getPosY();
+        //            } 
+        //        }
+        //    case e_be_attacked:
+        //        _st << static_cast<UInt32>(param);
+        //        break;
+        //    default :
+        //        break;
+        //}
     } 
     ActionPackage BattleFighter::MakeActionEffect()   //实现动作效果  伤害 法术等
     { 

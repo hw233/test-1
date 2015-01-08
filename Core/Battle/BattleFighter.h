@@ -75,14 +75,13 @@ namespace Battle
 
             virtual void Action();  //行动
             //移动
-             void GoForward(UInt16 targetX,UInt16 targetY,UInt16 advance);
+             void GoForward(UInt16 advance = 50);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
             void BeActed(BattleAction  bAction);
 
             //添加本身数据包
-            void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
 
             //战斗时期
             //从战斗中或许自己该有的行为
@@ -121,9 +120,15 @@ namespace Battle
             void SetMinX(UInt16 x) { _minX = x;}
             UInt16 GetMinX(){return _minX;}
             
-            virtual void PreGetObject();  //设定攻击对象，以及战斗
+            void SetSideInBS(UInt8 side) { _sideInBS = side;}
+            UInt8 GetSideInBS() { return _sideInBS;}
 
             void SetBattleTargetPos(UInt16 x,UInt16 y){ _battleTargetX = x; _battleTargetY = y;}
+
+            //Virtual 
+            virtual void PreGetObject(){};  //设定攻击对象，以及战斗
+            virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
+            virtual UInt16 GetTargetDistance(){ return -1;}
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
@@ -175,6 +180,7 @@ namespace Battle
             UInt16 _battleTargetX;
             UInt16 _battleTargetY;
 
+            UInt8 _sideInBS;
     };
 
 }

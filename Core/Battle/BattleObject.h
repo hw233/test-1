@@ -69,6 +69,7 @@ namespace Battle
             virtual UInt16 GetBattleIndex(){return 0;}
             virtual UInt8 GetGroundX() {return 0;}
             virtual UInt8 GetGroundY() {return 0;}
+            virtual void InsertFighterInfo(Stream& st,UInt8 flag = 0){}
         protected:
             UInt8 _cls;
             UInt32 _hp;

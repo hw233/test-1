@@ -38,6 +38,7 @@ namespace GObject
             ItemArmor * SetArmor(int idx, ItemArmor * a, bool = true);  //TODO
             void SetColor(UInt8 color) { _color = color;}
             void SetTypeId(UInt8 type) { _typeId = type;}
+            UInt8 GetTypeId(){return _typeId;}
             void SetChildTypeId(UInt8 type) { _childTypeId = type;}
 
             //Get
