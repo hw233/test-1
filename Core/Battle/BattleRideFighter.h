@@ -9,7 +9,7 @@ namespace Battle
     {
         public:
             BattleRideFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
-                BattleFighter(bf,f,pointX,pointY),_target(NULL),count(0)
+                BattleFighter(2,bf,f,pointX,pointY),_target(NULL),count(0)
         { 
 
         } 

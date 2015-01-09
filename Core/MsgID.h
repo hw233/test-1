@@ -299,7 +299,7 @@ namespace REQ
     /**商城购买 */
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
     /**请求交易列表信息 */
-    const UInt8 TRADE_LIST          = 0x80;// 0xC0
+    const UInt8 BATTLE_REPORT_REQ        = 0x80;// 0xC0
     /**根据交易ID请求交易内容 */
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
     /**发起交易 */

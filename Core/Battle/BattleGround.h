@@ -49,16 +49,12 @@ namespace Battle
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 x, UInt8 y):_id(id),_x(x),_y(y),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator.ID())
+            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator.ID())
             {
                 map_player.clear();
-                _mapGround = new UInt8[x*y];
-                _mapFighters = new BattleObject*[x*y];
-                _mapFlag = new UInt8[x*y];
-                memset(_mapGround,0,sizeof(UInt8)*x*y);
-                memset(_mapFighters,0,sizeof(BattleObject*)*x*y);
-                memset(_mapFlag,0,sizeof(UInt8)*x*y);
-                _pack.reset();
+                _x = 20;
+                _y = 10;
+                InitMapFight(mapId);
             }
             BattleGround(){}
             ~BattleGround()

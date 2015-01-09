@@ -100,11 +100,11 @@ namespace Battle
             actCount += bf[index]->AppendFighterStream(_packet);
             ++act;
         }
-         _packet.data<UInt32>(offset) = actCount;
+        _packet.data<UInt32>(offset) = actCount;
         _packet << Stream::eos;
         battleReport.addReport(_id,_packet);
     } 
-   
+
     UInt8 BattleSimulator::GetWin()
     { 
         if(!_fgt[0] || !_fgt[0]->getHP())

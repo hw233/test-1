@@ -8,7 +8,7 @@
 
 namespace Battle
 {
-    BattleFighter::BattleFighter( Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(1/*XXX*/, pointX, pointY/*, field*/),_formula(bf)
+    BattleFighter::BattleFighter( UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(Class/*XXX*/, pointX, pointY/*, field*/),_formula(bf)
     { 
         setFighter(f);
         m_fighters = NULL;
@@ -292,7 +292,7 @@ namespace Battle
         if(!_fighter)
             return ;
 
-        st << static_cast<UInt16>(GetBattleIndex());
+        st << static_cast<UInt8>(GetBattleIndex());
         if(!flag)
             return ;
         st << static_cast<UInt16>(GetId());

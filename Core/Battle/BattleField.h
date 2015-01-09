@@ -79,6 +79,7 @@ namespace Battle
             */
 
             BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY,UInt16 skillScopeId = 0);
+            void GetTargetList(UInt8 side ,std::vector<BattleObject *>& vec , UInt16 );
 
             inline UInt16 GetTimeActionLimit() { return _timeActionLimit;}
             inline UInt16 GetFieldDistance() { return _fieldDistance ;}

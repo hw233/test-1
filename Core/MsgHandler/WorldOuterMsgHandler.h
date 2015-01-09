@@ -14,11 +14,16 @@
 #include "Battle/BattleReport.h"
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
+#include "GObject/Player.h"
 
 #include <mysql.h>
 #include "Memcached.h"
 
-/*
+struct BattleReportReq 
+{
+    UInt32 _reportId;
+    MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
+};
 void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
 {
     MSG_QUERY_PLAYER(player);
@@ -26,9 +31,8 @@ void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
     if(r == NULL)
         return;
     player->send(&(*r)[0], r->size());
-
 }
-
+/*
 void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
 {
     MSG_QUERY_PLAYER(player);

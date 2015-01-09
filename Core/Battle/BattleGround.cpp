@@ -15,7 +15,35 @@ namespace Battle
     }
     void BattleGround::InitMapFight(UInt8 mapId)   
     { 
-        //TODO
+        static UInt8 point[][2] = {
+            {3, 1}, 
+            {4, 1}, 
+            {5, 1}, 
+            {2, 2}, 
+            {4, 2}, 
+            {6, 2}, 
+            {8, 2}, 
+            {3, 3}, 
+            {5, 3}, 
+            {6, 3}, 
+            {2, 4}, 
+            {4, 4}, 
+            {6, 4}, 
+            {8, 4}, 
+        };
+        _mapGround = new UInt8[_x*_y];
+        memset(_mapGround , 0 ,_x*_y*sizeof(UInt8));
+        for(UInt8 i = 0; i < 15 ; ++i)
+        {
+           _mapGround[point[i][0] + point[i][1]*_x] = 1;
+        }
+        _mapFighters = new BattleObject*[_x*_y];
+        _mapFlag = new UInt8[_x*_y];
+        memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
+        memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
+        _pack.init(0x80);
+        return ;
+
     } 
     void BattleGround::Move()
     { 
@@ -31,7 +59,7 @@ namespace Battle
         //写入当前战将信息
         currentBf->InsertFighterInfo(_pack);  //Stream
 
-        GetNearPos(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundX());
+        GetNearPos(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
         if(targetVec.size() == 0)
         {
             //TODO  按照原定计划行动
@@ -44,7 +72,7 @@ namespace Battle
             UInt8 desty = _y - currentBf->GetEnterPosY();
             UInt8 minDistance = -1 ;
 
-                for(UInt8 j = (nowy > ride)?(nowy - ride):0; j < _y && j < (nowy + ride) ; ++j)
+            for(UInt8 j = (nowy > ride)?(nowy - ride):0; j < _y && j < (nowy + ride) ; ++j)
             {
                 for(UInt8 i = (nowx > 2*ride)?(nowx - 2*ride):0; i < _x && j < (nowx + 2*ride) ; ++i)
                 {
@@ -105,7 +133,7 @@ namespace Battle
             _pack << static_cast<UInt8>(targetVec[res].x) << static_cast<UInt8>(targetVec[res].y);
             _pack << static_cast<UInt8>(1);
 
-            currentBf->InsertFighterInfo(_pack);
+            //currentBf->InsertFighterInfo(_pack);
             targetVec[res].bo->InsertFighterInfo(_pack);
 
             UInt8 win = 0;
@@ -126,10 +154,17 @@ namespace Battle
     { 
         UInt8 scopeForOne[12] = {254,0, 255,1, 1,255, 2,0, 1,255, 255,255};
 
+        if(!_mapGround[x + y*_x])
+            return ;
         if(_mapFlag[x+y*_x])
             return ;
         if(ride == 0 || ride > 10)
             return ;
+
+        if(x >= _x || x >= _y)
+            return ;
+        if(!_mapFighters[x+y*_x] || _mapFighters[x+y*_x] == currentBf )// || _mapFighters[x+y*_x]->GetSide() == currentBf->GetSide()*/
+            GetTargetBo(x ,y,flag);
 
         for(UInt8 i = 0; i < 6 ; ++i) 
         {
@@ -139,18 +174,13 @@ namespace Battle
             if(_mapFlag[posx + posy * _x])
                 continue;
 
-            if(posx >= _x || posy >= _y)
-                continue ;
-            if(!_mapFighters[x+y*_x] || _mapFighters[x+y*_x] == currentBf )// || _mapFighters[x+y*_x]->GetSide() == currentBf->GetSide()*/
-                GetTargetBo(posx ,posy,flag);
-
-            _mapFlag[posx + posy * _x] = 1;
-
             UInt8 rideSub = GetRideSub(posx , posy);
             if(rideSub < 1)
                 continue;
             if(ride <= rideSub )
                 continue;
+
+            _mapFlag[posx + posy * _x] = 1;
             GetNearPos(ride - rideSub , posx,posy , flag + rideSub);
         }
     } 
@@ -196,13 +226,14 @@ namespace Battle
     void BattleGround::Fight(BattleFighter *bf , BattleFighter * bo, UInt8& result, UInt32& BattleReport)
     { 
         //TODO   连接BattleSimulator
-        //BattleSimulator bsim(bf,bo);
+        BattleSimulator bsim(bf,bo);
         //bsim.start(); 
-        //result = bsim.GetWin();
-        //BattleReport = bsim.getId();
-        result = 0;
-        BattleReport = 111;
-        bo->setHP(0);
+        result = bsim.GetWin();
+        BattleReport = bsim.getId();
+        std::cout << "发生战斗" << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果:" << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        //result = 0;
+        //BattleReport = 111;
+        //bo->setHP(0);
     } 
 
     BattleFighter* BattleGround::newFighter(UInt8 x,UInt8 y ,GObject::Fighter * fgt)
@@ -281,6 +312,22 @@ namespace Battle
     //战将进入战场
     void BattleGround::preStart()
     { 
+        static UInt16 point[][2] = {
+            {3, 1}, 
+            {4, 1}, 
+            {5, 1}, 
+            {2, 2}, 
+            {4, 2}, 
+            {6, 2}, 
+            {8, 2}, 
+            {3, 3}, 
+            {5, 3}, 
+            {6, 3}, 
+            {2, 4}, 
+            {4, 4}, 
+            {6, 4}, 
+            {8, 4}, 
+        };
         std::map<UInt8 ,std::vector<GObject::Player *> >::iterator it = map_player.begin();
         _pack << map_player.size() ;
         for(;it != map_player.end(); ++it)
@@ -299,7 +346,7 @@ namespace Battle
                     GObject::Fighter * fgt = it->second.at(0)->getMainFighter();
                     if(!fgt)
                         continue;
-                    fighters[it->first].push_back(newFighter(it->first,it->first,fgt));
+                    fighters[it->first].push_back(newFighter(point[it->first][0],point[it->first][1],fgt));
                     ++count;
                 }
             }

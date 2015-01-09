@@ -9,7 +9,7 @@ namespace Battle
     {
         public:
             BattleWalkFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
-                BattleFighter(bf,f,pointX,pointY),_target(NULL)
+                BattleFighter(1,bf,f,pointX,pointY),_target(NULL)
         { 
 
         } 

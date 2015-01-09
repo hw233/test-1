@@ -59,7 +59,7 @@ namespace Battle
     {
         friend class BattleSimulator;
         public:
-            BattleFighter(Script::BattleFormula * bf,GObject::Fighter * = NULL,UInt8 pointX = 0, UInt8 pointY = 0);
+            BattleFighter(UInt8 Class ,Script::BattleFormula * bf,GObject::Fighter * = NULL,UInt8 pointX = 0, UInt8 pointY = 0);
             virtual ~BattleFighter();
 
             void setFighter( GObject::Fighter * f );
@@ -91,7 +91,7 @@ namespace Battle
 
             ActionBase GetActionCurrent(UInt8 advance);
             void SetField(BattleField* bfield){ _field = bfield;}
-            BattleField * GetField(){ return _field;}
+            BattleField * GetField(){ if(m_mainFighter && m_mainFighter != this) return m_mainFighter->GetField(); return _field;}
 
             UInt8 GetRide(){ return 3 ;} //TODO
             UInt8 GetClass(){ return _fighter->GetClass();}

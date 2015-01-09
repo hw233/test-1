@@ -62,10 +62,10 @@ inline UInt8 doLogin(Network::GameClient * cl, const std::string& phoneId,std::s
     if(hsid != sid)  //重复登录 （挤下线）
     { 
         //TODO
-        return 4;
     } 
     player->SetSessionID(hsid);
     cl->SetPlayer(player);
+    player->setOnline(true);
     return res;
 } 
 
