@@ -63,7 +63,7 @@ namespace Battle
             //virtual BattleField * GetField(){ return _field;}
             UInt32 GetDefendNear() {return defend_near;}
             UInt32 GetDefendDistance(){ return defend_distance;}
-            void AppendFighterStream(Stream & st){ st << _st; _st.reset();}
+            UInt8 AppendFighterStream(Stream & st){if(!_st.size()) return 0; st << _st; _st.reset(); return 1;}
             virtual UInt16 GetRad(){return 1;}
             virtual UInt8 GetSide(){return 0;}
             virtual UInt16 GetBattleIndex(){return 0;}

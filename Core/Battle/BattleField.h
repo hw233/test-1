@@ -3,7 +3,7 @@
 
 //#include "BattleFighter.h"
 #include "BattleAction.h"
-
+#include "Common/Stream.h"
 /* Battle Field grid indexes:
 defender:	9 8 7 6 5
 4 3 2 1 0
@@ -82,6 +82,7 @@ namespace Battle
 
             inline UInt16 GetTimeActionLimit() { return _timeActionLimit;}
             inline UInt16 GetFieldDistance() { return _fieldDistance ;}
+            inline UInt8 GetFirstSize() { return _fighters[0].size();}
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -90,7 +91,6 @@ namespace Battle
             
 
             void GetBSEnterInfo(Stream& st);
-            UInt8 GetFirstSize() { return _fighters[0].size();}
         protected:
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
             //fieldType [FIELD_HIGH][FIELD_WIDTH];    //场地信息

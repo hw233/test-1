@@ -4,6 +4,7 @@
 #include "Server/OidGenerator.h"
 #include "Battle/BattleWalkFighter.h"
 #include "Battle/BattleRideFighter.h"
+#include "Battle/BattleReport.h"
 
 namespace Battle
 {
@@ -69,10 +70,12 @@ namespace Battle
         UInt8 act = 0;
         UInt8 index = 1;
         UInt32 curTime = 0;
-        UInrt32 actCount;
+        UInt32 actCount = 0;
+        size_t offset = _packet.size();
+        _packet << actCount; 
         while(curTime <= _limitTime && GetWin() != 2  )
         {
-            If(act > 20)
+            if(act > 20)
             {
                 ++curTime;
                 act = 0;
@@ -94,9 +97,10 @@ namespace Battle
             }
             bf[index]->Action();
 
-            bf[index]->AppendFighterStream(_packet);
+            actCount += bf[index]->AppendFighterStream(_packet);
             ++act;
         }
+         _packet.data<UInt32>(offset) = actCount;
         _packet << Stream::eos;
         battleReport.addReport(_id,_packet);
     } 

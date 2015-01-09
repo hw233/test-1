@@ -125,6 +125,8 @@ namespace Battle
 
             void SetBattleTargetPos(UInt16 x,UInt16 y){ _battleTargetX = x; _battleTargetY = y;}
 
+            UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
+
             //Virtual 
             virtual void PreGetObject(){};  //设定攻击对象，以及战斗
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
