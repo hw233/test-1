@@ -263,6 +263,7 @@ namespace Battle
             } 
             ++Round;
         }while(count != (PLAYERMAX - 1) && Round < 200);
+        _pack<<Stream::eos;
         battleReport.addReport(_battleNum,_pack);
     } 
     UInt8 BattleGround::PushPlayer(GObject::Player * pl,UInt8 index)

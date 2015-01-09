@@ -87,7 +87,10 @@ namespace Battle
             void updateStats(UInt16);
             void updateStats(UInt16, UInt16);
             
+            
 
+            void GetBSEnterInfo(Stream& st);
+            UInt8 GetFirstSize() { return _fighters[0].size();}
         protected:
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
             //fieldType [FIELD_HIGH][FIELD_WIDTH];    //场地信息

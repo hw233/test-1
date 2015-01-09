@@ -269,6 +269,9 @@ namespace Battle
     { 
         if(_fighter == NULL )
             return NULL;
+        if(index == 0)
+            return this;
+        ++index;
         if(index >= MYFIGHTERMAX)
             return NULL;
         UInt8 count = 0;  

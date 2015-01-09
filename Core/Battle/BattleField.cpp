@@ -165,4 +165,21 @@ namespace Battle
         int y3 =static_cast<int>(target->getPosY());
         return static_cast<UInt16>(abs((y1-y2)*x3+(x2-x1)*y3-y1*x2+x1*y2)/sqrt(((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2))));
     } 
+    void BattleField::GetBSEnterInfo(Stream& _st)
+    { 
+        for(UInt8 i= 0; i < 2; ++i)
+        { 
+            
+            st << static_cast<UInt8>(_fighters[i].size());
+            for(UInt8 j = 0; j < _fighters[i].size(); ++ j)
+            { 
+               st << static_cast<UInt8>( _fighters[i][j]->GetBSNumber()); 
+               st << static_cast<UInt16>(_fighters[i][j]->GetId();)
+               st << static_cast<UInt8>(_fighters[i][j]->getPosX();)
+               st << static_cast<UInt8>(_fighters[i][j]->getPosY();)
+               st << static_cast<UInt16>(_fighters[i][j]->getHP();)
+            } 
+        } 
+
+    } 
 }

@@ -58,26 +58,47 @@ namespace Battle
     } 
     void BattleSimulator::start(UInt8 prevWin , bool checkEnh)
     { 
-        _packet.reset();
+        _packet.init(0x81);
         InitFighters(0);
         InitFighters(1);
         //UInt32 time  = 0;
+
+        GetBSEnterInfo(_packet);
+
         BattleFighter * bf[2] = {NULL,NULL};
         UInt8 act = 0;
         UInt8 index = 1;
         UInt32 curTime = 0;
+        UInrt32 actCount;
         while(curTime <= _limitTime && GetWin() != 2  )
         {
-            index = !index;
-            if(!bf[0] && !bf[1])          
+            If(act > 20)
+            {
+                ++curTime;
                 act = 0;
+                continue;
+            }
+            if(!bf[0] && !bf[1])          
+            {
+                ++curTime;
+                act = 0;
+                continue;
+            }
+            index = !index;
             bf[index] = _fgt[index]->getMyFighters(act/2);
 
+            if(!bf[index] || !bf[index]->GetField())
+            {
+                ++act;
+                continue;
+            }
             bf[index]->Action();
 
             bf[index]->AppendFighterStream(_packet);
             ++act;
         }
+        _packet << Stream::eos;
+        battleReport.addReport(_id,_packet);
     } 
    
     UInt8 BattleSimulator::GetWin()
@@ -88,6 +109,7 @@ namespace Battle
             return 1;
         return 2;
     } 
+
     BattleFighter* BattleSimulator::CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY)
     { 
         switch(Class)
