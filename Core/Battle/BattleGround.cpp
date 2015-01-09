@@ -76,6 +76,8 @@ namespace Battle
             {
                 for(UInt8 i = (nowx > 2*ride)?(nowx - 2*ride):0; i < _x && j < (nowx + 2*ride) ; ++i)
                 {
+                    if(!_mapGround[i+j*_x])
+                        return ;
                     if(!_mapFlag[i+j*_x])
                         continue ;
                     UInt8 distancePre = getDistanceForTwo(i,j,destx,desty);
@@ -156,6 +158,7 @@ namespace Battle
 
         if(!_mapGround[x + y*_x])
             return ;
+
         if(_mapFlag[x+y*_x])
             return ;
         if(ride == 0 || ride > 10)
@@ -193,6 +196,8 @@ namespace Battle
 
     void BattleGround::GetTargetBo(UInt8 x,UInt8 y , UInt8 ride )
     { 
+        if(!_mapGround[x+y*_x])
+            return ;
         UInt8 distance = currentBf->GetDistance()*2 ;
         if(distance > 5)
             return ;
@@ -243,6 +248,7 @@ namespace Battle
         bf->SetEnterPos(x,y);
         bf->SetBattleIndex(++_maxID);
         bf->InsertFighterInfo(_pack,1);
+        std::cout << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
         return bf;
     } 
 
@@ -329,7 +335,8 @@ namespace Battle
             {8, 4}, 
         };
         std::map<UInt8 ,std::vector<GObject::Player *> >::iterator it = map_player.begin();
-        _pack << map_player.size() ;
+        _pack << static_cast<UInt8>(1);
+        _pack << static_cast<UInt8>(map_player.size());
         for(;it != map_player.end(); ++it)
         {
             if(it->first >= PLAYERMAX)
@@ -338,6 +345,8 @@ namespace Battle
             UInt8 count = 0;
             _pack << count ;
             std::vector<GObject::Player *> vec = it->second;
+
+            std::cout << std::endl << "势力：" << static_cast<UInt32>(it->first) <<std::endl;
             for(UInt8 i = 0; i < vec.size(); ++i)
             {
                 //for(UInt8 j = 0; j < 6 ; ++j)
@@ -350,7 +359,8 @@ namespace Battle
                     ++count;
                 }
             }
-            _pack.data<UInt16>(offset) = count;
+            _pack.data<UInt8>(offset) = count;
+            std::cout << "  人数"<< static_cast<UInt32>(count);
         }
     } 
 

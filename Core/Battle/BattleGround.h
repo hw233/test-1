@@ -1,4 +1,4 @@
-
+;
 #ifndef BATTLEGROUND_H_
 #define BATTLEGROUND_H_
 #include "Config.h"
