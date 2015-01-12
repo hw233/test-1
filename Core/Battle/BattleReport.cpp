@@ -118,7 +118,8 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 		return;
 	fwrite(&v[0], 1, v.size(), f);
 	fclose(f);
-    DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d", id, lastMaxId);
+    if(id >static_cast<UInt32>(lastMaxId))
+        DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d", id, lastMaxId);
     lastMaxId = id;
 
     RptLife rptLife = {id, TimeUtil::Now()};

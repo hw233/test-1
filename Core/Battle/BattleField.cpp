@@ -70,6 +70,8 @@ namespace Battle
        */
     BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY,UInt16 skillScopeId)
     { 
+        if(side > 1)
+            return NULL;
         UInt16 maxy = -1;
         UInt16 maxx = 0;
         UInt8 res = -1;
@@ -167,19 +169,18 @@ namespace Battle
     } 
     void BattleField::GetBSEnterInfo(Stream& st)
     { 
+        st << static_cast<UInt8>(1);
         for(UInt8 i= 0; i < 2; ++i)
         { 
-            
             st << static_cast<UInt8>(_fighters[i].size());
             for(UInt8 j = 0; j < _fighters[i].size(); ++ j)
             { 
                st << static_cast<UInt8>( _fighters[i][j]->GetBSNumber()); 
                st << static_cast<UInt16>(_fighters[i][j]->GetId());
-               st << static_cast<UInt8>(_fighters[i][j]->getPosX());
-               st << static_cast<UInt8>(_fighters[i][j]->getPosY());
+               st << static_cast<UInt16>(_fighters[i][j]->getPosX());
+               st << static_cast<UInt16>(_fighters[i][j]->getPosY());
                st << static_cast<UInt16>(_fighters[i][j]->getHP());
             } 
         } 
-
     } 
 }

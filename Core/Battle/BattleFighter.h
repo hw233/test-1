@@ -91,7 +91,8 @@ namespace Battle
 
             ActionBase GetActionCurrent(UInt8 advance);
             void SetField(BattleField* bfield){ _field = bfield;}
-            BattleField * GetField(){ if(m_mainFighter && m_mainFighter != this) return m_mainFighter->GetField(); return _field;}
+
+            BattleField * GetField();
 
             UInt8 GetRide(){ return 3 ;} //TODO
             UInt8 GetClass(){ return _fighter->GetClass();}

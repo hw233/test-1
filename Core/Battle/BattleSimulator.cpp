@@ -12,8 +12,10 @@ namespace Battle
     { 
         _fgt[0] = bf;
         bf->SetSideInBS(0); 
+        bf->SetField(this);
         _fgt[1] = bo;
         bo->SetSideInBS(1); 
+        bo->SetField(this);
     } 
     void BattleSimulator::InitFighters(UInt8 index ,UInt8 flag)
     { 
@@ -37,11 +39,12 @@ namespace Battle
             {
                 setObjectXY(myFlag?FIELD_HIGH -x[0]:x[0] , static_cast<UInt16>(i*STEP+STEP/2),_fgt[index]);
                 _fgt[index]->SetMinX(x[0]);
+                _fighters[index].push_back(_fgt[index]);
                 continue ;
             }
 
             //fgt1
-            BattleFighter* fgt1 =  _fgt[index]->getMyFighters((i-1)*2);
+            BattleFighter* fgt1 =  _fgt[index]->getMyFighters((i+1)*2);
             if(!fgt1 || fgt1->getHP() == 0)
                 return ;
             setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/2+i)*STEP-STEP/2) , fgt1);
@@ -49,7 +52,7 @@ namespace Battle
             _fighters[index].push_back(fgt1);
             
             //fgt2
-            BattleFighter* fgt2 =  _fgt[index]->getMyFighters((i-1)*2 + 1);
+            BattleFighter* fgt2 =  _fgt[index]->getMyFighters((i+1)*2 + 1);
             if(!fgt2 || fgt2->getHP() == 0)
                 return ;
             setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/2 - i)*STEP-STEP/2) , fgt2);
@@ -70,10 +73,10 @@ namespace Battle
         UInt8 act = 0;
         UInt8 index = 1;
         UInt32 curTime = 0;
-        UInt32 actCount = 0;
+        UInt16 actCount = 0;
         size_t offset = _packet.size();
         _packet << actCount; 
-        while(curTime <= _limitTime && GetWin() != 2  )
+        while(curTime <= _limitTime && GetWin() == 2  )
         {
             if(act > 20)
             {
@@ -81,14 +84,16 @@ namespace Battle
                 act = 0;
                 continue;
             }
+
+            index = !index;
+            bf[index] = _fgt[index]->getMyFighters(act/2);
+
             if(!bf[0] && !bf[1])          
             {
                 ++curTime;
                 act = 0;
                 continue;
             }
-            index = !index;
-            bf[index] = _fgt[index]->getMyFighters(act/2);
 
             if(!bf[index] || !bf[index]->GetField())
             {
@@ -100,7 +105,7 @@ namespace Battle
             actCount += bf[index]->AppendFighterStream(_packet);
             ++act;
         }
-        _packet.data<UInt32>(offset) = actCount;
+        _packet.data<UInt16>(offset) = actCount;
         _packet << Stream::eos;
         battleReport.addReport(_id,_packet);
     } 
@@ -128,7 +133,6 @@ namespace Battle
                 return new BattleRideFighter(bf,f,pointX,pointY);
             default:
                 return new BattleRideFighter(bf,f,pointX,pointY);
-
         } 
     } 
 }

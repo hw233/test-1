@@ -17,15 +17,15 @@ namespace Battle
     { 
         static UInt8 point[][2] = {
             {3, 1}, 
-            {4, 1}, 
             {5, 1}, 
+            {7, 1}, 
             {2, 2}, 
             {4, 2}, 
             {6, 2}, 
             {8, 2}, 
             {3, 3}, 
             {5, 3}, 
-            {6, 3}, 
+            {7, 3}, 
             {2, 4}, 
             {4, 4}, 
             {6, 4}, 
@@ -232,7 +232,7 @@ namespace Battle
     { 
         //TODO   连接BattleSimulator
         BattleSimulator bsim(bf,bo);
-        //bsim.start(); 
+        bsim.start(); 
         result = bsim.GetWin();
         BattleReport = bsim.getId();
         std::cout << "发生战斗" << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果:" << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
@@ -276,6 +276,9 @@ namespace Battle
         UInt32 alive = 0;
         UInt8 count = 0;
         UInt32 Round = 0;
+        UInt16 actCount = 0;
+        size_t offset = _pack.size();
+        _pack << actCount ;
         do
         {
             for(UInt8 i = 0; i < PLAYERMAX; ++i)  //PLAYERMAX 表示军团数量
@@ -290,6 +293,7 @@ namespace Battle
                         flag = true ;
                         currentBf = fighters[i][j];
                         Move();
+                        ++actCount;
                     }
                 } 
                 if(!flag)
@@ -300,6 +304,8 @@ namespace Battle
             } 
             ++Round;
         }while(count != (PLAYERMAX - 1) && Round < 200);
+
+        _pack.data<UInt16>(offset) = actCount;
         _pack<<Stream::eos;
         battleReport.addReport(_battleNum,_pack);
     } 
@@ -320,15 +326,15 @@ namespace Battle
     { 
         static UInt16 point[][2] = {
             {3, 1}, 
-            {4, 1}, 
             {5, 1}, 
+            {7, 1}, 
             {2, 2}, 
             {4, 2}, 
             {6, 2}, 
             {8, 2}, 
             {3, 3}, 
             {5, 3}, 
-            {6, 3}, 
+            {7, 3}, 
             {2, 4}, 
             {4, 4}, 
             {6, 4}, 

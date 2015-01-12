@@ -49,7 +49,7 @@ namespace Battle
     void BattleWalkFighter::PreGetObject()
     { 
         if(!_target)
-        _target = GetField()->GetTarget(GetSide(),getPosX(),getPosY(),1);
+        _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
         SetBattleTargetPos(_target->getPosX(),_target->getPosY());
     } 
 

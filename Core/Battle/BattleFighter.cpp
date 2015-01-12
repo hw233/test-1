@@ -20,6 +20,7 @@ namespace Battle
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
             {
                 m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,NULL,0,0);
+                m_fighters[i]->setMainFighter(this);
                 if( m_fighters[i])
                     m_fighters[i]->setNumber(i+1);
             }
@@ -42,7 +43,7 @@ namespace Battle
     { 
         _fighter = f ;
         //运动行为
-        preActionList.push_back(ActionBase(0,0,0));
+        //preActionList.push_back(ActionBase(0,0,0));
         //普通攻击
         preActionList.push_back(ActionBase(1,0,0));
     } 
@@ -267,11 +268,11 @@ namespace Battle
     } 
     BattleFighter * BattleFighter::getMyFighters(UInt8 index)   //找第几个活着的 (0开始)
     { 
-        if(_fighter == NULL )
+        if(_fighter == NULL || !GetField())
             return NULL;
         if(index == 0)
             return this;
-        ++index;
+
         if(index >= MYFIGHTERMAX)
             return NULL;
         UInt8 count = 0;  
@@ -299,4 +300,11 @@ namespace Battle
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
     }
+    BattleField* BattleFighter::GetField()
+    { 
+        if(m_mainFighter && m_mainFighter != this) 
+            return m_mainFighter->GetField();
+        return _field;
+    }
+
 }

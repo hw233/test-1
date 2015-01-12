@@ -12,7 +12,7 @@ namespace Battle
             return ;
         }
 
-        GoForward();
+        GoForward(50);
 
         switch(_actionType)
         { 
@@ -41,7 +41,7 @@ namespace Battle
 
     void BattleRideFighter::PreGetObject()
     { 
-        _target = GetField()->GetTarget(GetSide(),getPosX(),getPosY(),1);
+        _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
         if(getPosX() < GetMinX() || getPosX() > FIELD_WIDTH - GetMinX())
         {
             if(_battleTargetX)
