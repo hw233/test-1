@@ -33,11 +33,12 @@ namespace Battle
         };
         _mapGround = new UInt8[_x*_y];
         memset(_mapGround , 0 ,_x*_y*sizeof(UInt8));
+
         for(UInt8 i = 0; i < 15 ; ++i)
         {
            _mapGround[point[i][0] + point[i][1]*_x] = 1;
         }
-        _mapFighters = new BattleObject*[_x*_y];
+        _mapFighters = new BattleObject* [_x*_y];
         _mapFlag = new UInt8[_x*_y];
         memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
         memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
@@ -57,7 +58,6 @@ namespace Battle
         if(!currentBf)
             return ;
         //写入当前战将信息
-        currentBf->InsertFighterInfo(_pack);  //Stream
 
         GetNearPos(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
         if(targetVec.size() == 0)
@@ -77,7 +77,7 @@ namespace Battle
                 for(UInt8 i = (nowx > 2*ride)?(nowx - 2*ride):0; i < _x && j < (nowx + 2*ride) ; ++i)
                 {
                     if(!_mapGround[i+j*_x])
-                        return ;
+                        continue ;
                     if(!_mapFlag[i+j*_x])
                         continue ;
                     UInt8 distancePre = getDistanceForTwo(i,j,destx,desty);
@@ -89,11 +89,18 @@ namespace Battle
                     }
                 }
             }
+            if(currentBf->GetGroundX() == resx && currentBf->GetGroundY() == resy)
+            {
+                std::cout << "战将编号"  << static_cast<UInt32>(currentBf->GetBattleIndex()) << " 失去目标" << std::endl;
+                return ;
+            }
 
             currentBf->SetGroundX(resx);
             currentBf->SetGroundY(resy);
 
-            std::cout <<"无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
+            std::cout << "战将编号:"  << static_cast<UInt32>(currentBf->GetBattleIndex());
+            std::cout <<" 无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
+            currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(resx) << static_cast<UInt8>(resy) << static_cast<UInt8>(0); //无战斗发生
         }
         else
@@ -132,6 +139,7 @@ namespace Battle
 
 
             //Stream
+            currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(targetVec[res].x) << static_cast<UInt8>(targetVec[res].y);
             _pack << static_cast<UInt8>(1);
 
@@ -283,9 +291,10 @@ namespace Battle
         {
             for(UInt8 i = 0; i < PLAYERMAX; ++i)  //PLAYERMAX 表示军团数量
             { 
-                bool flag = false;
                 if(fighters[i].size() == 0)
                     continue;
+
+                bool flag = false;
                 for(UInt8 j = 0; j < fighters[i].size();++j)
                 { 
                     if(fighters[i][j] && fighters[i][j]->getHP())
@@ -296,14 +305,15 @@ namespace Battle
                         ++actCount;
                     }
                 } 
-                if(!flag)
+                if(!flag && !(alive &(1 <<i)) )
                 { 
                     alive |= (1 <<i);
                     ++count;
                 } 
             } 
             ++Round;
-        }while(count != (PLAYERMAX - 1) && Round < 200);
+            std::cout << "回合：" << static_cast<UInt32>(Round) << std::endl;
+        }while(count < (map_player.size() - 1) && Round < 200);
 
         _pack.data<UInt16>(offset) = actCount;
         _pack<<Stream::eos;
@@ -322,7 +332,7 @@ namespace Battle
     } 
 
     //战将进入战场
-    void BattleGround::preStart()
+    void BattleGround::preStart()  //需要玩家手动操作
     { 
         static UInt16 point[][2] = {
             {3, 1}, 
@@ -382,6 +392,7 @@ namespace Battle
                     std::cout << "玩家Side:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetSide());
                     std::cout << "  x:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundX());
                     std::cout << "  y:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundY());
+                    std::cout << " 血量：" << static_cast<UInt32>(_mapFighters[i+j*_x]->getHP()) ;
                     std::cout << std::endl;
                 }
             } 

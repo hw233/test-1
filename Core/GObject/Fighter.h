@@ -67,8 +67,7 @@ namespace GObject
             } 
             void SetBaseSkill(UInt8 level , UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId);
 
-
-
+            void SetSkill(std::string skill);
     private:
             UInt32 _id;
             Player * _owner;
@@ -94,6 +93,7 @@ namespace GObject
             UInt8 _childTypeId;
             UInt8 _color; 
             std::map<UInt8,FighterSkill> m_skills;  //仅global使用
+            std::vector<FighterSkill> m_baseSkills;
 };
 typedef GGlobalObjectManagerT<Fighter, UInt32> GlobalFighters;
 extern GlobalFighters globalFighters;

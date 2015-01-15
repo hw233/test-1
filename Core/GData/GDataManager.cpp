@@ -222,6 +222,7 @@ namespace GData
             fgt->SetChildTypeId(dbfb.childType);
             fgt->SetRad(dbfb.bodySize);
             fgt->SetBaseAttr(dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical,dbfb.evade);
+            //fgt->setSkills(dbfb.skill);
             GObject::globalFighters.add(fgt);
         }    
 

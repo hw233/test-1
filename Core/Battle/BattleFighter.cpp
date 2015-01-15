@@ -11,12 +11,12 @@ namespace Battle
     BattleFighter::BattleFighter( UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(Class/*XXX*/, pointX, pointY/*, field*/),_formula(bf)
     { 
         setFighter(f);
-        m_fighters = NULL;
+        memset(m_fighters,0,sizeof( BattleFighter *)*MYFIGHTERMAX);
         setNumber(0);
+
         m_mainFighter = NULL;
         if( f != NULL)
         {
-            m_fighters = new BattleFighter*[MYFIGHTERMAX];
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
             {
                 m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,NULL,0,0);
@@ -27,7 +27,7 @@ namespace Battle
         }
         SetGroundX(pointX);
         SetGroundY(pointY);
-        _st.reset();
+        _st.clear();
         _attack_near = 100;
 
         setHP(1000);
@@ -35,8 +35,12 @@ namespace Battle
     } 
     BattleFighter::~BattleFighter()
     {
-        if(m_fighters)
-            delete [] m_fighters;
+        for(UInt8 i = 0; i < MYFIGHTERMAX; ++i)
+        {
+            if(m_fighters[i])
+                delete m_fighters[i];
+        }
+
     }   
 
     void BattleFighter::setFighter(GObject::Fighter * f)
@@ -45,7 +49,7 @@ namespace Battle
         //运动行为
         //preActionList.push_back(ActionBase(0,0,0));
         //普通攻击
-        preActionList.push_back(ActionBase(1,0,0));
+        preActionList.push_back(ActionBase(2,0,0));
     } 
 
     void BattleFighter::GoForward(UInt16 advance)
@@ -58,10 +62,13 @@ namespace Battle
         UInt16 y = getPosY();
         UInt16 distanceX = x > targetX ? x - targetX:targetX -x;
         UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
+
+        if(!distanceX && !distanceY)
+            return ;;
         while(advance--)
         { 
             if(!distanceX && !distanceY)
-                return ;
+                break;
             if(!distanceY)
             {
                 if(x > targetX && x > 0) 
@@ -89,6 +96,7 @@ namespace Battle
         UInt32 attack = bAction.GetAttack();
         UInt32 defend = GetDefendNear();
         UInt32 hpSub = attack - defend;
+        hpSub = 100;
         makeDamage(hpSub);
 
         BuildLocalStream(e_be_attacked , hpSub);
@@ -190,10 +198,8 @@ namespace Battle
             --(it->_cd); 
             if(it->_cd == 0)
             { 
-                ActionSort::iterator it_next = ++it;
                 preActionList.push_back((*it));
-                preActionCD.erase(it);
-                it = it_next;
+                it = preActionCD.erase(it);
                 continue ;
             } 
             ++it;
@@ -278,8 +284,12 @@ namespace Battle
         UInt8 count = 0;  
         for(UInt8 i = 0; i < MYFIGHTERMAX; ++i)
         {
-            if(m_fighters[i]->getHP() == 0)
+            if(m_fighters[i] && m_fighters[i]->getHP() == 0)
+            {
+                delete m_fighters[i];
+                m_fighters[i] = NULL;
                 continue ;
+            }
             if(count++ < index) 
                 continue;
             return m_fighters[i];

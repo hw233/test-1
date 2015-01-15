@@ -121,6 +121,7 @@ CREATE TABLE `fighter_base` (
       `magdef` int(10) NOT NULL DEFAULT '0',
       `critical` int(10) NOT NULL DEFAULT '0',
       `evade` int(10) NOT NULL DEFAULT '0',
+      `skill` varchar(255) NOT NULL,
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;

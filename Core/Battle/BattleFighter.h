@@ -97,7 +97,7 @@ namespace Battle
             UInt8 GetRide(){ return 3 ;} //TODO
             UInt8 GetClass(){ return _fighter->GetClass();}
             UInt8 GetDistance(){ return 1;}  
-            UInt16 GetId(){ if(!_fighter) return 0; return _fighter->getId();}
+            UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
 
             void setNumber(UInt8 num){ _number = num;}
             UInt8 getNumber(){ return _number; }
@@ -107,18 +107,17 @@ namespace Battle
             void PutBattleFighters(BattleSimulator& bsim);
             BattleFighter* getMyFighters(UInt8 index);
 
-            UInt16 GetRad(){ if(_fighter) return _fighter->GetRad(); return 0;}
+            virtual UInt16 GetRad(){ if(_fighter) return _fighter->GetRad(); return 0;}
             void SetEnterPos(UInt8 x1 , UInt8  y1){ if(!_fighter)return ; EnterX = x1; EnterY = y1;}
             inline UInt8 GetEnterPosX(){ return EnterX;}
             inline UInt8 GetEnterPosY(){ return EnterY;}
 
-
-            void InsertFighterInfo(Stream& st ,UInt8 flag = 0);
+            virtual void InsertFighterInfo(Stream& st ,UInt8 flag = 0);
 
             void SetBattleIndex(UInt8 x) { _battleIndex = x;}
             UInt16 GetBattleIndex() { return _battleIndex;}
 
-            void SetMinX(UInt16 x) { _minX = x;}
+            void SetMinX(UInt16 x) { _minX = x; resetBattleStatue();} //入场
             UInt16 GetMinX(){return _minX;}
             
             void SetSideInBS(UInt8 side) { _sideInBS = side;}
@@ -126,12 +125,17 @@ namespace Battle
 
             void SetBattleTargetPos(UInt16 x,UInt16 y){ _battleTargetX = x; _battleTargetY = y;}
 
-            UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
+            virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
+
+            void SetNowTime(UInt32 time ){ _nowTime = time;}
+            UInt8  GetNowTime() { return _nowTime;}
 
             //Virtual 
             virtual void PreGetObject(){};  //设定攻击对象，以及战斗
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance(){ return -1;}
+
+            virtual void resetBattleStatue(){};
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
@@ -139,7 +143,7 @@ namespace Battle
             UInt8 _actionType;  // 动作类型
 
             Script::BattleFormula * _formula;
-            BattleFighter ** m_fighters;
+            BattleFighter * m_fighters[MYFIGHTERMAX];
             BattleFighter * m_mainFighter;   //主将指针
             UInt8 _number;   //所在阵营
 

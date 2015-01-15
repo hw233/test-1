@@ -35,5 +35,7 @@ namespace Battle
         if(_map.find(index) == _map.end())
             return ;
         _map[index]->start();
+        delete _map[index];
+        _map.erase(_map.find(index));
     } 
 }

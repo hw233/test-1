@@ -40,7 +40,7 @@ namespace GData
             UInt8 prob;     //释放几率 (x/100)
             UInt16 cd ;     //冷却时间  ( %d s * 8)
             UInt16 actionCd ;     //释放时间  ( %d s * 8)  用于设置外部的行为
-            UInt16 distance;  //攻击距离   平方值
+            UInt16 distance;  //攻击距离  
             UInt8 priority;   //优先级
     };
     class SkillScope : public ObjectBaseT<UInt16>
@@ -50,7 +50,7 @@ namespace GData
                 : ObjectBaseT<UInt16>(id,name) { } 
             bool InTheScope(UInt16 loaclX ,UInt16 localY ,UInt16 targetX , UInt16 targetY);
         public:
-            UInt8 area;  //范围类型  0-单体 1-目标扩散型 2-地形半径扩散型  3-地形直线扩散型 4-无限范围
+            UInt8 area;  //范围类型  0-单体 1-全体  2-目标扩散型 3-地形半径扩散型  4-地形直线扩散型 4-无限范围
             UInt16 x ;
             UInt16 y ;
             UInt16 radx;  //范围半径

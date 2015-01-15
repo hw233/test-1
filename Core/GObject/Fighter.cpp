@@ -2,6 +2,7 @@
 #include "Item.h"
 #include "Fighter.h"
 #include "FVar.h"
+#include "Common/StringTokenizer.h"
 namespace GObject
 {
     GlobalFighters globalFighters;
@@ -63,10 +64,23 @@ namespace GObject
             fVarSystem = new FVarSystem(_owner->getId(),getId());
         return fVarSystem;
     }
+
     void Fighter::SetBaseSkill(UInt8 level , UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId)
     { 
         if(level > 200)
             return ;
         m_skills[level] = FighterSkill(skillCondId,skillScopeId,skillEffectId);
+    } 
+
+    void Fighter::SetSkill(std::string skill)
+    { 
+        StringTokenizer tk(skill, ",");
+        if(!tk.count())
+            return ;
+        for(UInt8 i = 0; i < tk.count(); ++i)
+        {
+            UInt32 skillId = atoi(tk[i].c_str());
+            m_baseSkills.push_back(FighterSkill(skillId/10000, skillId%10000/100, skillId%100))  ;
+        }
     } 
 }

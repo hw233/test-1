@@ -4,7 +4,7 @@ namespace Battle
     void BattleWalkFighter::Action()
     { 
 
-        _st.reset();
+        _st.clear();
         UpdateActionList();
         //硬直
         if(_crick)
@@ -62,7 +62,7 @@ namespace Battle
 
     void BattleWalkFighter::BuildLocalStream(UInt8 wait, UInt8 param)
     {
-        _st.reset();
+        _st.clear();
         //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
         //_st << static_cast<UInt8>(getPosX());
         //_st << static_cast<UInt8>(getPosY());
@@ -96,5 +96,18 @@ namespace Battle
         }
     }
 
+     void BattleWalkFighter::resetBattleStatue()
+     { 
+         _target = NULL;
+
+         _battleTargetY = 0;
+         _battleTargetX = 0;
+         _nowTime = 0;
+         EnterX = 0;
+         EnterY = 0;
+         _crickSum = 0;
+         _sideInBS = 0;
+         return ;
+     } 
 } 
 

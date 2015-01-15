@@ -4,6 +4,7 @@
 //#include "BattleFighter.h"
 #include "BattleAction.h"
 #include "Common/Stream.h"
+#include <vector>
 /* Battle Field grid indexes:
 defender:	9 8 7 6 5
 4 3 2 1 0
@@ -12,9 +13,9 @@ attacker:	0 1 2 3 4
 5 6 7 8 9
 */
 
-#define FIELD_WIDTH 36*20
-#define FIELD_HIGH  11*20
-#define STEP 20
+#define FIELD_WIDTH 72*20
+#define FIELD_HIGH  27*20
+#define STEP 40
 
 namespace GObject
 {
@@ -56,7 +57,7 @@ namespace Battle
             bool getSpecificTargets(UInt16 side, UInt16 pos, UInt16 val, std::vector<UInt16>& poslist, bool(*f)(BattleObject* bo, UInt16 targetPos, UInt16 maxLength));
             int getPossibleTarget(UInt16, UInt16); // return -1 for no found target, overload in Simulator
 
-            UInt32 getAliveCount(UInt16);
+            std::vector<UInt8> getAliveCount(UInt8 side);
             UInt32 getObjHp(UInt16 x, UInt16 y);
 
             /*
@@ -79,20 +80,20 @@ namespace Battle
             */
 
             BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY,UInt16 skillScopeId = 0);
-            void GetTargetList(UInt8 side ,std::vector<BattleObject *>& vec , UInt16 );
+            void GetTargetList(UInt8 side, BattleFighter* bf, std::vector<BattleObject *>& vec, UInt8 );
 
             inline UInt16 GetTimeActionLimit() { return _timeActionLimit;}
             inline UInt16 GetFieldDistance() { return _fieldDistance ;}
             inline UInt8 GetFirstSize() { return _fighters[0].size();}
+
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
             void updateStats(UInt16, UInt16);
-            
-            
 
             void GetBSEnterInfo(Stream& st);
         protected:
+
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
             //fieldType [FIELD_HIGH][FIELD_WIDTH];    //场地信息
             

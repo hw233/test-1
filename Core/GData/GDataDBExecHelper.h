@@ -84,6 +84,7 @@ namespace GData
         UInt32 magdef;
         UInt32 critical;
         UInt32 evade;
+    //    std::string skill;
     };
 
     struct DBFighterBaseSkill  
@@ -191,6 +192,7 @@ namespace DB
          UInt32, magdef,
          UInt32, critical,
          UInt32, evade
+         //std::string, skill
         )
         SPECIALEND()
         SPECIALBEGIN(GData::DBFighterBaseSkill)

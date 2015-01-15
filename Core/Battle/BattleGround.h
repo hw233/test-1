@@ -94,6 +94,7 @@ namespace Battle
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
             UInt8 * _mapFlag;
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
+
             //来一个记录战将分布的结构 满足
             std::vector<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;

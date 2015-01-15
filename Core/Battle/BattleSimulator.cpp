@@ -5,7 +5,8 @@
 #include "Battle/BattleWalkFighter.h"
 #include "Battle/BattleRideFighter.h"
 #include "Battle/BattleReport.h"
-
+#define ADVANCE 180
+#define ADVANCE_M 220
 namespace Battle
 {
     BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo , bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime)
@@ -25,7 +26,7 @@ namespace Battle
             return ;
         UInt8 myFlag = false;
 
-        UInt16 x[] = {3*STEP+STEP/2, 2*STEP+STEP/2, 1*STEP+STEP/2};
+        UInt16 x[] = {0, ADVANCE , ADVANCE + ADVANCE_M};
         if(_fgt[index]->getClass() == shooter || _fgt[index]->getClass() == adviser )
             x[0] = STEP/2;
         if((!flag && index) || (flag && !index))
@@ -33,7 +34,7 @@ namespace Battle
             myFlag = true;
         } 
 
-        for(UInt8 i = 0; i < FIELD_HIGH/2; ++i)
+        for(UInt8 i = 0; i < FIELD_HIGH/(2*STEP); ++i)
         { 
             if( i ==  0)
             {
@@ -47,7 +48,7 @@ namespace Battle
             BattleFighter* fgt1 =  _fgt[index]->getMyFighters((i+1)*2);
             if(!fgt1 || fgt1->getHP() == 0)
                 return ;
-            setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/2+i)*STEP-STEP/2) , fgt1);
+            setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP-STEP/2) , fgt1);
             fgt1->SetMinX(x[2-i%2]);
             _fighters[index].push_back(fgt1);
             
@@ -55,7 +56,7 @@ namespace Battle
             BattleFighter* fgt2 =  _fgt[index]->getMyFighters((i+1)*2 + 1);
             if(!fgt2 || fgt2->getHP() == 0)
                 return ;
-            setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/2 - i)*STEP-STEP/2) , fgt2);
+            setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP-STEP/2) , fgt2);
             fgt2->SetMinX(x[2-i%2]);
             _fighters[index].push_back(fgt2);
         } 
@@ -100,9 +101,12 @@ namespace Battle
                 ++act;
                 continue;
             }
+
+            bf[index]->SetNowTime(curTime);
             bf[index]->Action();
 
             actCount += bf[index]->AppendFighterStream(_packet);
+            //std::cout << "战报id: " << static_cast<UInt32>(_id) << "包大小：" << static_cast<UInt32>(_packet.size()) << std::endl;
             ++act;
         }
         _packet.data<UInt16>(offset) = actCount;
@@ -124,7 +128,7 @@ namespace Battle
         switch(Class)
         { 
             case 1:
-                return new BattleWalkFighter(bf,f,pointX,pointY);
+                return new BattleRideFighter(bf,f,pointX,pointY);
             case 2:
                 return new BattleRideFighter(bf,f,pointX,pointY);
             case 3:
