@@ -13,9 +13,9 @@ attacker:	0 1 2 3 4
 5 6 7 8 9
 */
 
-#define FIELD_WIDTH 72*20
-#define FIELD_HIGH  27*20
-#define STEP 40
+#define FIELD_WIDTH 1440
+#define FIELD_HIGH  9*60
+#define STEP 60
 
 namespace GObject
 {

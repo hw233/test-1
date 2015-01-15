@@ -27,8 +27,8 @@ namespace Battle
                 {
                     if(_target)
                     { 
-                        BuildLocalStream();
-                        (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
+                        UInt16 parm = (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
+                        BuildLocalStream(0,parm);
                         (_target)->AppendFighterStream(_st);
                         _actionType = 0;
                     } 
@@ -101,6 +101,7 @@ namespace Battle
                             _st << GetBSNumber();
                             _st << static_cast<UInt8>(1);
                             _st << _target->GetBSNumber();
+                            _st << static_cast<UInt16>(param);
 
                             std::cout << " 回合数：" << static_cast<UInt32>(_nowTime);
                             std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
@@ -148,7 +149,6 @@ namespace Battle
         EnterX = 0;
         EnterY = 0;
         _crickSum = 0;
-        _sideInBS = 0;
     } 
 } 
 

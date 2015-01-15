@@ -79,7 +79,7 @@ namespace Battle
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
-            void BeActed(BattleAction  bAction);
+            UInt16 BeActed(BattleAction  bAction);
 
             //添加本身数据包
 
@@ -89,7 +89,7 @@ namespace Battle
             //updateAction
             void UpdateActionList();
 
-            ActionBase GetActionCurrent(UInt8 advance);
+            ActionBase GetActionCurrent(UInt16 advance);
             void SetField(BattleField* bfield){ _field = bfield;}
 
             BattleField * GetField();
@@ -121,7 +121,7 @@ namespace Battle
             UInt16 GetMinX(){return _minX;}
             
             void SetSideInBS(UInt8 side) { _sideInBS = side;}
-            UInt8 GetSideInBS() { return _sideInBS;}
+            UInt8 GetSideInBS() { if(m_mainFighter&&m_mainFighter!= this) return m_mainFighter->GetSideInBS(); return _sideInBS;}
 
             void SetBattleTargetPos(UInt16 x,UInt16 y){ _battleTargetX = x; _battleTargetY = y;}
 

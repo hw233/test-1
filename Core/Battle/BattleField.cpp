@@ -3,8 +3,8 @@
 #include "BattleField.h"
 //#include "GObject/FairyPet.h"
 #include "BattleFighter.h"
-#include "math.h"
 #include "GData/SkillTable.h"
+#include <math.h>
 
 #define SUB(x,y) (x>y)?(x-y):(y-x)
 namespace Battle
@@ -80,13 +80,13 @@ namespace Battle
 
     UInt16 BattleField::getDistance(BattleObject * bf , BattleObject* bo)
     { 
-        UInt16 x1 = bf->getPosX();
-        UInt16 y1 = bf->getPosY();
-        UInt16 x2 = bo->getPosX();
-        UInt16 y2 = bo->getPosY();
-        UInt16 adx = x1>x2?(x1-x2):(x2-x1);
-        UInt16 ady = y1>y2?(y1-y2):(y2-y1);
-        if(static_cast<UInt16>(sqrt(adx*adx + ady*ady)) <= (bf->GetRad()+bo->GetRad()))
+        float x1 = bf->getPosX()*1.0;
+        float y1 = bf->getPosY()*1.0;
+        float x2 = bo->getPosX()*1.0;
+        float y2 = bo->getPosY()*1.0;
+        float adx = x1>x2?(x1-x2):(x2-x1)*1.0;
+        float ady = y1>y2?(y1-y2):(y2-y1)*1.0;
+        if(static_cast<UInt16>(sqrt((adx*adx + ady*ady))) <= (bf->GetRad()+bo->GetRad()))
             return 0;
         return  (static_cast<UInt16>(sqrt(adx*adx + ady*ady)) - bf->GetRad() - bo->GetRad());
 
@@ -132,6 +132,10 @@ namespace Battle
                st << static_cast<UInt16>(_fighters[i][j]->getPosX());
                st << static_cast<UInt16>(_fighters[i][j]->getPosY());
                st << static_cast<UInt16>(_fighters[i][j]->getHP());
+               std::cout << " 入场战将分部" << std::endl;
+               std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
+               std::cout << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
+               std::cout << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
             } 
         } 
     } 

@@ -5,7 +5,7 @@
 #include "GlobalObject.h"
 #include <iostream>
 #include <signal.h>
-
+#include <math.h>
 #ifdef __GNUC__
 #ifndef _WIN32
 #include <sys/resource.h>
@@ -32,6 +32,11 @@ extern "C" void sigbreak(int sig)
 
 int main(int argc, char* argv[])
 {
+    float x = 900;
+    float v = sqrt(x);
+
+    std::cout << v << std::endl;
+
 	if (!SERVER().ParseCommandInfor(argc, argv))
 	{
 		fprintf(stdout, "%s\n", s_HelpInfo);

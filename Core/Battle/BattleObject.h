@@ -59,7 +59,7 @@ namespace Battle
             //inline bool isHide() { return _hide; }
             //inline void setHide(bool hide) { _hide = hide; }
 
-            virtual void BeActed(BattleAction battleAction){ makeDamage(battleAction.GetAttack());}   //用于非战斗对象
+            virtual UInt16 BeActed(BattleAction battleAction){ makeDamage(battleAction.GetAttack()); return 0;}   //用于非战斗对象
             //virtual BattleField * GetField(){ return _field;}
             UInt32 GetDefendNear() {return defend_near;}
             UInt32 GetDefendDistance(){ return defend_distance;}

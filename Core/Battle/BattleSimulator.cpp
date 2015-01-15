@@ -5,6 +5,7 @@
 #include "Battle/BattleWalkFighter.h"
 #include "Battle/BattleRideFighter.h"
 #include "Battle/BattleReport.h"
+
 #define ADVANCE 180
 #define ADVANCE_M 220
 namespace Battle
@@ -26,7 +27,7 @@ namespace Battle
             return ;
         UInt8 myFlag = false;
 
-        UInt16 x[] = {0, ADVANCE , ADVANCE + ADVANCE_M};
+        UInt16 x[] = { ADVANCE + ADVANCE_M ,ADVANCE , 0};
         if(_fgt[index]->getClass() == shooter || _fgt[index]->getClass() == adviser )
             x[0] = STEP/2;
         if((!flag && index) || (flag && !index))
@@ -38,25 +39,25 @@ namespace Battle
         { 
             if( i ==  0)
             {
-                setObjectXY(myFlag?FIELD_HIGH -x[0]:x[0] , static_cast<UInt16>(i*STEP+STEP/2),_fgt[index]);
+                setObjectXY(myFlag?(FIELD_WIDTH -x[0]):x[0] , static_cast<UInt16>(FIELD_HIGH/2),_fgt[index]);
                 _fgt[index]->SetMinX(x[0]);
                 _fighters[index].push_back(_fgt[index]);
                 continue ;
             }
 
             //fgt1
-            BattleFighter* fgt1 =  _fgt[index]->getMyFighters((i+1)*2);
+            BattleFighter* fgt1 =  _fgt[index]->getMyFighters(i*2-1);
             if(!fgt1 || fgt1->getHP() == 0)
                 return ;
-            setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP-STEP/2) , fgt1);
+            setObjectXY( myFlag?(FIELD_WIDTH -x[2-i%2]):x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP-STEP/2) , fgt1);
             fgt1->SetMinX(x[2-i%2]);
             _fighters[index].push_back(fgt1);
             
             //fgt2
-            BattleFighter* fgt2 =  _fgt[index]->getMyFighters((i+1)*2 + 1);
+            BattleFighter* fgt2 =  _fgt[index]->getMyFighters(i*2);
             if(!fgt2 || fgt2->getHP() == 0)
                 return ;
-            setObjectXY( myFlag?FIELD_HIGH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP-STEP/2) , fgt2);
+            setObjectXY( myFlag?FIELD_WIDTH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP-STEP/2) , fgt2);
             fgt2->SetMinX(x[2-i%2]);
             _fighters[index].push_back(fgt2);
         } 

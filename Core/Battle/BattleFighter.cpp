@@ -49,7 +49,7 @@ namespace Battle
         //运动行为
         //preActionList.push_back(ActionBase(0,0,0));
         //普通攻击
-        preActionList.push_back(ActionBase(2,0,0));
+        preActionList.push_back(ActionBase(2,0,2));
     } 
 
     void BattleFighter::GoForward(UInt16 advance)
@@ -90,7 +90,7 @@ namespace Battle
         BuildLocalStream(e_run);
     } 
 
-    void BattleFighter::BeActed(BattleAction  bAction)
+    UInt16 BattleFighter::BeActed(BattleAction  bAction)
     { 
         //TODO
         UInt32 attack = bAction.GetAttack();
@@ -99,7 +99,8 @@ namespace Battle
         hpSub = 100;
         makeDamage(hpSub);
 
-        BuildLocalStream(e_be_attacked , hpSub);
+        return hpSub;
+        //BuildLocalStream(e_be_attacked , hpSub);
     } 
     void BattleFighter::Action()
     { 
@@ -205,7 +206,7 @@ namespace Battle
             ++it;
         } 
     } 
-    ActionBase BattleFighter::GetActionCurrent(UInt8 advance)
+    ActionBase BattleFighter::GetActionCurrent(UInt16 advance)
     { 
         UInt8 priority = 0;
         ActionSort::iterator result ;
@@ -278,7 +279,7 @@ namespace Battle
             return NULL;
         if(index == 0)
             return this;
-
+        --index;
         if(index >= MYFIGHTERMAX)
             return NULL;
         UInt8 count = 0;  
