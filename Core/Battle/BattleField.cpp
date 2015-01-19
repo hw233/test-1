@@ -24,7 +24,7 @@ namespace Battle
 
     }
 
-    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY,UInt16 skillScopeId)
+    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY,UInt8 direction)
     { 
         if(side > 1)
             return NULL;
@@ -39,19 +39,32 @@ namespace Battle
                 return NULL;
             UInt16 x = _fighters[side][i]->getPosX();
             UInt16 y = _fighters[side][i]->getPosY();
-            if( SUB(y,posY) <= maxy)
+
+            if(direction != 2)
             {
-                if(SUB(y,posY) == maxy && x >= maxx)
+                if(posY != y )
+                    continue ;
+                if( direction == 1 && posX > x)   //表示右冲锋
+                    continue ;
+                if(direction == 0 && posX < x)
+                    continue ;
+            }
+
+            UInt16 advanceY = SUB(y,posY);
+            UInt16 advanceX = SUB(x,posX);
+            if( advanceY <= maxy)
+            {
+                if(advanceY == maxy && advanceX >= maxx)
                     continue ;
                 { 
-                    maxy = SUB(y,posY);
-                    maxx = x;
+                    maxy = advanceY;
+                    maxx = advanceX;
                     res = i;
                 } 
             }
         } 
 
-        if(res != static_cast<UInt8>(-1))
+        if(res < _fighters[side].size())
         { 
             return _fighters[side][res];
         } 
@@ -104,6 +117,7 @@ namespace Battle
                     return false;  
             } 
         }
+        bo->SetMinX(x);
         bo->setPos(x,y);
         return true;
     } 
@@ -244,5 +258,18 @@ namespace Battle
             vec.push_back(i);
         } 
         return vec;
+    } 
+    BattleFighter * BattleField::getMyFighters(UInt8 side, UInt8 index)
+    { 
+        UInt8 count = 0;
+        for(UInt8 i = 0; i < _fighters[side].size(); ++i)
+        {
+            if(count++ < index) 
+                continue;
+            if(_fighters[side][i] && _fighters[side][i]->getHP() == 0)
+                continue ;
+            return static_cast<BattleFighter*>(_fighters[side][i]);
+        }
+        return NULL;
     } 
 }

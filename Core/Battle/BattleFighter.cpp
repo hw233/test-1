@@ -54,8 +54,11 @@ namespace Battle
 
     void BattleFighter::GoForward(UInt16 advance)
     { 
-
-        PreGetObject();
+        SetGone(true);
+        if(!advance)
+            advance = GetSpeed();
+        if(!PreGetObject())
+            return ;
         UInt16 targetX = _battleTargetX ;
         UInt16 targetY = _battleTargetY ;
         UInt16 x = getPosX();
@@ -64,7 +67,7 @@ namespace Battle
         UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
 
         if(!distanceX && !distanceY)
-            return ;;
+            return ;
         while(advance--)
         { 
             if(!distanceX && !distanceY)
@@ -87,6 +90,11 @@ namespace Battle
             }
         } 
         setPos(x,y);
+       // if(1 ||GetBSNumber() == 0 || GetBSNumber() == 7)
+       // { 
+       //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
+       // } 
+            
         BuildLocalStream(e_run);
     } 
 
@@ -168,8 +176,8 @@ namespace Battle
         //填充 actionType actionLast targetList
         //获得视野范围进攻对象 (如无对象则返回中心点虚拟对象)
 
-         if(uRand(100) < 40)
-            return ;
+         //if(uRand(100) < 40)  XXX
+         //   return ;
 
         //UInt16 advance = GetField()->getDistance(this,_target);
         //TODO 判断与目标的攻击距离
@@ -180,7 +188,7 @@ namespace Battle
         if(1)  //XXX
         { 
             _actionType = GData::skillEffectManager[_ab._effect]->skillType;  //XXX
-            _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd;; //行进时间一秒
+            _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd; //行进时间一秒
         }
 
         BuildLocalStream();
@@ -206,19 +214,23 @@ namespace Battle
             ++it;
         } 
     } 
+
     ActionBase BattleFighter::GetActionCurrent(UInt16 advance)
     { 
         UInt8 priority = 0;
         ActionSort::iterator result ;
         ActionBase res(0,0,0);
+        if(advance == static_cast<UInt16>(-1))
+            return res;
         for(ActionSort::iterator it = preActionList.begin(); it != preActionList.end(); ++it)
         {   
-            if(GData::skillConditionManager[it->_condition]->MeetCondition(advance,priority))
+            if(GData::skillConditionManager[it->_condition]->MeetCondition(advance,2*GetSpeed(),priority)) //XXX
                 result = it;
         }   
         if(priority != 0)
         { 
             res = *result;
+            res._cd = GData::skillConditionManager[res._condition]->actionCd;
             preActionList.erase(result);
             preActionCD.push_back(res);
         } 
@@ -285,6 +297,8 @@ namespace Battle
         UInt8 count = 0;  
         for(UInt8 i = 0; i < MYFIGHTERMAX; ++i)
         {
+            if(!m_fighters[i])
+                continue;
             if(m_fighters[i] && m_fighters[i]->getHP() == 0)
             {
                 delete m_fighters[i];

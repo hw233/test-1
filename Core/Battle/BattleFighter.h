@@ -75,7 +75,7 @@ namespace Battle
 
             virtual void Action();  //行动
             //移动
-             void GoForward(UInt16 advance = 50);
+             void GoForward(UInt16 advance = 0);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
@@ -107,7 +107,7 @@ namespace Battle
             void PutBattleFighters(BattleSimulator& bsim);
             BattleFighter* getMyFighters(UInt8 index);
 
-            virtual UInt16 GetRad(){ if(_fighter) return _fighter->GetRad(); return 0;}
+            virtual UInt16 GetRad(){ if(m_mainFighter && m_mainFighter != this) return m_mainFighter->GetRad(); if(_fighter) return _fighter->GetRad(); return 0;}
             void SetEnterPos(UInt8 x1 , UInt8  y1){ if(!_fighter)return ; EnterX = x1; EnterY = y1;}
             inline UInt8 GetEnterPosX(){ return EnterX;}
             inline UInt8 GetEnterPosY(){ return EnterY;}
@@ -117,7 +117,7 @@ namespace Battle
             void SetBattleIndex(UInt8 x) { _battleIndex = x;}
             UInt16 GetBattleIndex() { return _battleIndex;}
 
-            void SetMinX(UInt16 x) { _minX = x; resetBattleStatue();} //入场
+            virtual void SetMinX(UInt16 x) { _minX = x; resetBattleStatue();} //入场
             UInt16 GetMinX(){return _minX;}
             
             void SetSideInBS(UInt8 side) { _sideInBS = side;}
@@ -127,15 +127,20 @@ namespace Battle
 
             virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
 
-            void SetNowTime(UInt32 time ){ _nowTime = time;}
+            void SetNowTime(UInt32 time ){ if(_nowTime != time || time == 0 ) SetGone(false); _nowTime = time;}
             UInt8  GetNowTime() { return _nowTime;}
 
             //Virtual 
-            virtual void PreGetObject(){};  //设定攻击对象，以及战斗
+            virtual bool PreGetObject(){ return false;}  //设定攻击对象，以及战斗
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance(){ return -1;}
 
-            virtual void resetBattleStatue(){};
+            UInt16 GetSpeed() {return 37;} 
+
+            virtual void resetBattleStatue() = 0;
+
+            virtual void SetGone(bool v){ }
+            virtual bool GetGone(){return true;}
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续

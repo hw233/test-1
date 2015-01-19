@@ -40,8 +40,9 @@ namespace Battle
             if( i ==  0)
             {
                 setObjectXY(myFlag?(FIELD_WIDTH -x[0]):x[0] , static_cast<UInt16>(FIELD_HIGH/2),_fgt[index]);
-                _fgt[index]->SetMinX(x[0]);
+                //_fgt[index]->SetMinX(x[0]);
                 _fighters[index].push_back(_fgt[index]);
+                _fgt[index]->resetBattleStatue();
                 continue ;
             }
 
@@ -50,7 +51,8 @@ namespace Battle
             if(!fgt1 || fgt1->getHP() == 0)
                 return ;
             setObjectXY( myFlag?(FIELD_WIDTH -x[2-i%2]):x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP-STEP/2) , fgt1);
-            fgt1->SetMinX(x[2-i%2]);
+            //fgt1->SetMinX(x[2-i%2]);
+            fgt1->resetBattleStatue();
             _fighters[index].push_back(fgt1);
             
             //fgt2
@@ -58,7 +60,8 @@ namespace Battle
             if(!fgt2 || fgt2->getHP() == 0)
                 return ;
             setObjectXY( myFlag?FIELD_WIDTH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP-STEP/2) , fgt2);
-            fgt2->SetMinX(x[2-i%2]);
+            //fgt2->SetMinX(x[2-i%2]);
+            fgt2->resetBattleStatue();
             _fighters[index].push_back(fgt2);
         } 
     } 
@@ -80,6 +83,10 @@ namespace Battle
         _packet << actCount; 
         while(curTime <= _limitTime && GetWin() == 2  )
         {
+            if(act == 0)
+            { 
+            } 
+
             if(act > 20)
             {
                 ++curTime;
@@ -88,7 +95,7 @@ namespace Battle
             }
 
             index = !index;
-            bf[index] = _fgt[index]->getMyFighters(act/2);
+            bf[index] = getMyFighters(index,act/2);
 
             if(!bf[0] && !bf[1])          
             {
@@ -97,7 +104,7 @@ namespace Battle
                 continue;
             }
 
-            if(!bf[index] || !bf[index]->GetField())
+            if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
             {
                 ++act;
                 continue;

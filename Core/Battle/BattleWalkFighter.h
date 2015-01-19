@@ -14,7 +14,7 @@ namespace Battle
 
         } 
             virtual void Action();
-            virtual void PreGetObject(); 
+            virtual bool PreGetObject(); 
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance();
             virtual void resetBattleStatue();

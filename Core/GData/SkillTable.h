@@ -26,9 +26,9 @@ namespace GData
                 : ObjectBaseT<UInt16>(id,name) ,cond(0),prob(0),cd(0),actionCd(0),distance(0),priority(0)
             { } 
             ~SkillCondition(){}
-            bool MeetCondition(UInt16 advance ,UInt8& pri) const 
+            bool MeetCondition(UInt16 advance ,UInt16 speed,UInt8& pri) const 
             {
-                if(distance >= advance && pri < priority)
+                if(distance >= advance && pri < priority && advance >= actionCd * speed)
                 { 
                     pri = priority;
                     return true;

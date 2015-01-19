@@ -46,18 +46,19 @@ namespace Battle
                 break;
         } 
     } 
-    void BattleWalkFighter::PreGetObject()
+    bool BattleWalkFighter::PreGetObject()
     { 
         if(!_target)
         _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
         SetBattleTargetPos(_target->getPosX(),_target->getPosY());
+        return 0;
     } 
 
     UInt16 BattleWalkFighter::GetTargetDistance()
     { 
         if(!_target || !GetField())
             return 0;
-        return GetField()->getDistance(this,_target);
+        return 0;// GetField()->getDistance(this,_target);
     } 
 
     void BattleWalkFighter::BuildLocalStream(UInt8 wait, UInt8 param)

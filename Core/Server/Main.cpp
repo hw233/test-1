@@ -32,10 +32,10 @@ extern "C" void sigbreak(int sig)
 
 int main(int argc, char* argv[])
 {
-    float x = 900;
-    float v = sqrt(x);
+    //float x = 900;
+    //float v = sqrt(x);
 
-    std::cout << v << std::endl;
+    //std::cout << v << std::endl;
 
 	if (!SERVER().ParseCommandInfor(argc, argv))
 	{

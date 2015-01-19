@@ -79,7 +79,7 @@ namespace Battle
             }
             */
 
-            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY,UInt16 skillScopeId = 0);
+            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY,UInt8 direction = 2);
             void GetTargetList(UInt8 side, BattleFighter* bf, std::vector<BattleObject *>& vec, UInt8 );
 
             inline UInt16 GetTimeActionLimit() { return _timeActionLimit;}
@@ -92,6 +92,7 @@ namespace Battle
             void updateStats(UInt16, UInt16);
 
             void GetBSEnterInfo(Stream& st);
+            BattleFighter *getMyFighters(UInt8 side, UInt8 index);
         protected:
 
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
