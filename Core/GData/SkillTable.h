@@ -12,6 +12,7 @@ namespace GData
         /*1*/ SKILL_PEERLESS = 1,   //无双技能
         SKILL_PASSSTART,
     };
+
     enum 
     {
         SCOPE_SINGAL = 0,  //单体

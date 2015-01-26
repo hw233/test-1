@@ -14,6 +14,8 @@ namespace Battle
         memset(m_fighters,0,sizeof( BattleFighter *)*MYFIGHTERMAX);
         setNumber(0);
 
+        _nowTime = -1;
+
         m_mainFighter = NULL;
         if( f != NULL)
         {
@@ -52,13 +54,15 @@ namespace Battle
         preActionList.push_back(ActionBase(2,0,2));
     } 
 
-    void BattleFighter::GoForward(UInt16 advance)
+    void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
     { 
         SetGone(true);
         if(!advance)
             advance = GetSpeed();
         if(!PreGetObject())
             return ;
+        flag = GetRideCount(); 
+
         UInt16 targetX = _battleTargetX ;
         UInt16 targetY = _battleTargetY ;
         UInt16 x = getPosX();
@@ -72,7 +76,8 @@ namespace Battle
         { 
             if(!distanceX && !distanceY)
                 break;
-            if(!distanceY)
+
+            if((flag && distanceX > distanceY) || (!flag && !distanceY))
             {
                 if(x > targetX && x > 0) 
                     --x;
@@ -95,16 +100,16 @@ namespace Battle
        //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
        // } 
             
-        BuildLocalStream(e_run);
+        //BuildLocalStream(e_run);
     } 
 
-    UInt16 BattleFighter::BeActed(BattleAction  bAction)
+    UInt16 BattleFighter::BeActed(ActionPackage  bAction)
     { 
         //TODO
         UInt32 attack = bAction.GetAttack();
         UInt32 defend = GetDefendNear();
         UInt32 hpSub = attack - defend;
-        hpSub = 100;
+        hpSub = 700;
         makeDamage(hpSub);
 
         return hpSub;
@@ -191,7 +196,7 @@ namespace Battle
             _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd; //行进时间一秒
         }
 
-        BuildLocalStream();
+        //BuildLocalStream();
         //_st << static_cast<UInt8>(_actionType);  //动作类型
         //_st << static_cast<UInt8>(_actionLast);  //动作持续帧数(*8)
         //_st << static_cast<UInt8>(ACTION_WAIT);   //延迟起作用
@@ -272,18 +277,21 @@ namespace Battle
     } 
     ActionPackage BattleFighter::MakeActionEffect()   //实现动作效果  伤害 法术等
     { 
-        UInt8 aEffect = _ab._effect;
-        const GData::SkillEffect * se = GData::skillEffectManager[aEffect];
-        if(!se)
-            return ActionPackage(_actionType, _hit, _wreck, _critical, this);
-        UInt32 attack ;
-        if(_actionType == e_attack_near)  //近战
-            attack =  _attack_near ;
-        else if( _actionType == e_attack_distant)  //远攻
-            attack =  _attack_distance ;
-        else if( _actionType == e_image_attack || _actionType == e_image_therapy )  //魔法
-            attack = _attack_near;
-        return  ActionPackage(attack, _hit, _wreck, _critical, this);  //未加入目标对象
+        return  ActionPackage( this,_nowTime);  //未加入目标对象
+
+        //UInt8 aEffect = _ab._effect;
+        //const GData::SkillEffect * se = GData::skillEffectManager[aEffect];
+        //if(!se)
+        //    return ActionPackage(_actionType, _hit, _wreck, _critical, this,_nowTime);
+        //UInt32 attack ;
+        //if(_actionType == e_attack_near)  //近战
+        //    attack =  _attack_near ;
+        //else if( _actionType == e_attack_distant)  //远攻
+        //    attack =  _attack_distance ;
+        //else if( _actionType == e_image_attack || _actionType == e_image_therapy )  //魔法
+        //    attack = _attack_near;
+
+        //return  ActionPackage(attack, _hit, _wreck, _critical, this,_nowTime);  //未加入目标对象
     } 
     BattleFighter * BattleFighter::getMyFighters(UInt8 index)   //找第几个活着的 (0开始)
     { 

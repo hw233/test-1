@@ -54,7 +54,7 @@ namespace Battle
             //fgt1->SetMinX(x[2-i%2]);
             fgt1->resetBattleStatue();
             _fighters[index].push_back(fgt1);
-            
+
             //fgt2
             BattleFighter* fgt2 =  _fgt[index]->getMyFighters(i*2);
             if(!fgt2 || fgt2->getHP() == 0)
@@ -85,10 +85,12 @@ namespace Battle
         {
             if(act == 0)
             { 
+                std::cout << "回合数:: " << static_cast<UInt32>(curTime) << std::endl <<std::endl;
             } 
 
             if(act > 20)
             {
+                actCount += doAttack(curTime);
                 ++curTime;
                 act = 0;
                 continue;
@@ -99,6 +101,7 @@ namespace Battle
 
             if(!bf[0] && !bf[1])          
             {
+                actCount += doAttack(curTime);
                 ++curTime;
                 act = 0;
                 continue;
@@ -146,5 +149,43 @@ namespace Battle
             default:
                 return new BattleRideFighter(bf,f,pointX,pointY);
         } 
+    } 
+    UInt8 BattleSimulator::doAttack(UInt16 time)
+    { 
+        std::vector<Battle::ActionPackage> vec = GetTimeBattleAction(time);
+
+        if(!vec.size())
+            return 0;
+        UInt8 count = 0;
+        std::vector<UInt8> vec_flag ;
+        vec_flag.clear();
+        vec_flag.resize(vec.size());
+
+        for(UInt8 i = 0; i < vec.size(); ++i)
+        { 
+            BattleFighter * fgt = vec[i].GetBattleFighter();
+            if(!fgt || !fgt->getHP())
+                vec_flag[i] = 0;
+            else
+                vec_flag[i] = 1;
+        } 
+        for(UInt8 i = 0; i < vec.size(); ++i)
+        { 
+            ActionPackage bAction = vec[i];
+            BattleFighter * fgt = bAction.GetBattleFighter();
+            if(!vec_flag[i])
+               continue; 
+            for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
+            {
+                UInt16 param = bAction.GetObject(j)->BeActed(bAction);
+                _packet << static_cast<UInt8>(bAction.GetHappenTime());
+                _packet << fgt->GetBSNumber();
+                _packet << static_cast<UInt8>(1);
+                _packet << static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber();
+                _packet << static_cast<UInt16>(param);
+                ++count;
+            }
+        } 
+        return count;
     } 
 }

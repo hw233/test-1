@@ -19,10 +19,11 @@ namespace Battle
             return ;
         } 
 
+        GetActionFromField();
+
         switch(_actionType)
         { 
             case e_none:
-                GetActionFromField();
                 break;
             case e_run:
                 GoForward();
@@ -48,8 +49,8 @@ namespace Battle
     } 
     bool BattleWalkFighter::PreGetObject()
     { 
-        if(!_target)
-        _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
+        if(!_target || !_target->getHP())
+            _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
         SetBattleTargetPos(_target->getPosX(),_target->getPosY());
         return 0;
     } 
@@ -67,9 +68,9 @@ namespace Battle
         //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
         //_st << static_cast<UInt8>(getPosX());
         //_st << static_cast<UInt8>(getPosY());
-        InsertFighterInfo(_st);
+        //InsertFighterInfo(_st);
         //TODO 被击
-        _st << _actionType;
+        //_st << _actionType;
         switch(_actionType)
         {
             case e_run:

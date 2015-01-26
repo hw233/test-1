@@ -15,6 +15,7 @@ namespace Battle
         } 
             virtual void Action();
             virtual bool PreGetObject(); 
+            void PreGetObject1();
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance();
             virtual void resetBattleStatue();
@@ -22,6 +23,7 @@ namespace Battle
             UInt8 CheckTarget();
             virtual void SetGone(bool v){ isGone = v;}
             virtual bool GetGone(){return isGone;}
+            virtual UInt8 GetRideCount() {return count-1;}
         private:
             BattleFighter * _target ; 
             UInt8 count; //控制来回次数

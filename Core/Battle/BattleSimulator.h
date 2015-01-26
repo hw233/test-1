@@ -37,6 +37,9 @@ namespace Battle
 
             UInt8 GetWin();
             static BattleFighter* CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY);
+
+            //AfterAction
+            UInt8 doAttack(UInt16 time);
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

@@ -75,11 +75,11 @@ namespace Battle
 
             virtual void Action();  //行动
             //移动
-             void GoForward(UInt16 advance = 0);
+             void GoForward(UInt8 flag = 0 ,UInt16 advance = 0);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
-            UInt16 BeActed(BattleAction  bAction);
+            UInt16 BeActed(ActionPackage  bAction ); //是否延迟
 
             //添加本身数据包
 
@@ -117,8 +117,9 @@ namespace Battle
             void SetBattleIndex(UInt8 x) { _battleIndex = x;}
             UInt16 GetBattleIndex() { return _battleIndex;}
 
-            virtual void SetMinX(UInt16 x) { _minX = x; resetBattleStatue();} //入场
+            virtual void SetMinXY(UInt16 x,UInt16 y) { _minX = x; _minY = y; resetBattleStatue();} //入场
             UInt16 GetMinX(){return _minX;}
+            UInt16 GetMinY(){return _minY;}
             
             void SetSideInBS(UInt8 side) { _sideInBS = side;}
             UInt8 GetSideInBS() { if(m_mainFighter&&m_mainFighter!= this) return m_mainFighter->GetSideInBS(); return _sideInBS;}
@@ -127,7 +128,7 @@ namespace Battle
 
             virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
 
-            void SetNowTime(UInt32 time ){ if(_nowTime != time || time == 0 ) SetGone(false); _nowTime = time;}
+            void SetNowTime(UInt32 time ){ if(_nowTime != time ) SetGone(false); _nowTime = time;}
             UInt8  GetNowTime() { return _nowTime;}
 
             //Virtual 
@@ -141,6 +142,15 @@ namespace Battle
 
             virtual void SetGone(bool v){ }
             virtual bool GetGone(){return true;}
+
+            virtual UInt8 GetRideCount() {return 1;}
+            
+            UInt32 GetAttack() { return _attack_near;}
+            UInt32 GetHit() { return _hit;}
+            UInt32 GetWreck() { return _wreck;}
+            UInt32 GetCritical() { return _critical;}
+            UInt32 GetParry(){ return _parry;}
+
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
@@ -160,6 +170,7 @@ namespace Battle
 
             GObject::Fighter * _fighter;
             BattleField * _field;
+
             UInt8 EnterX;
             UInt8 EnterY;
 
@@ -187,12 +198,14 @@ namespace Battle
 
             UInt32 _nowTime; //行动时间
 
-            UInt16 _minX;  //控制骑兵  //TODO
+            UInt16 _minX;  //入场X坐标  //TODO
+            UInt16 _minY;  //入场Y坐标  //TODO
 
             UInt16 _battleTargetX;
             UInt16 _battleTargetY;
 
             UInt8 _sideInBS;
+
     };
 
 }

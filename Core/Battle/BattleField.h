@@ -51,6 +51,7 @@ namespace Battle
 
             UInt16 getDistance(UInt16, UInt16, UInt16, UInt16);
             UInt16 getDistance(BattleObject * bf , BattleObject* bo);
+            UInt16 getDistance(BattleObject * bf , UInt16 x2 , UInt16 y2 , UInt16 rad =0);
             UInt16 getShootDistance(BattleObject * begin , BattleObject * end , BattleObject* target);
 
             int getSpecificTarget(UInt16 side, bool(*f)(BattleObject* bo));
@@ -86,6 +87,11 @@ namespace Battle
             inline UInt16 GetFieldDistance() { return _fieldDistance ;}
             inline UInt8 GetFirstSize() { return _fighters[0].size();}
 
+            void InsertTimeBattleAction(UInt16 time , ActionPackage);
+            void InsertTimeBattleAction(UInt16 time , ImagePackage ip);
+
+            std::vector<ActionPackage> GetTimeBattleAction(UInt16 time);
+            std::vector<ImagePackage> GetTimeBattleImage(UInt16 time);
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -101,7 +107,9 @@ namespace Battle
             std::vector<BattleFighter* > _fighters[2];
             UInt16 _fieldDistance;
             UInt16 _timeActionLimit ;
-            std::map<UInt16,BattleAction> FieldBuff;  //延迟性buff (定时炸弹类型的行为)
+            std::map<UInt16,std::vector<ActionPackage> > FieldAttack;  //攻击
+
+            std::map<UInt16,std::vector<ImagePackage> > FieldImage;  //延迟性buff (定时炸弹类型的行为)
 
     };
 

@@ -93,16 +93,26 @@ namespace Battle
 
     UInt16 BattleField::getDistance(BattleObject * bf , BattleObject* bo)
     { 
-        float x1 = bf->getPosX()*1.0;
-        float y1 = bf->getPosY()*1.0;
-        float x2 = bo->getPosX()*1.0;
-        float y2 = bo->getPosY()*1.0;
-        float adx = x1>x2?(x1-x2):(x2-x1)*1.0;
-        float ady = y1>y2?(y1-y2):(y2-y1)*1.0;
+        UInt16 x1 = bf->getPosX()*1.0;
+        UInt16 y1 = bf->getPosY()*1.0;
+        UInt16 x2 = bo->getPosX()*1.0;
+        UInt16 y2 = bo->getPosY()*1.0;
+        UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
+        UInt16 ady = y1>y2?(y1-y2):(y2-y1)*1.0;
         if(static_cast<UInt16>(sqrt((adx*adx + ady*ady))) <= (bf->GetRad()+bo->GetRad()))
             return 0;
         return  (static_cast<UInt16>(sqrt(adx*adx + ady*ady)) - bf->GetRad() - bo->GetRad());
+    } 
 
+    UInt16 BattleField::getDistance(BattleObject * bf , UInt16 x2 , UInt16 y2 ,UInt16 rad)
+    { 
+        UInt16 x1 = bf->getPosX()*1.0;
+        UInt16 y1 = bf->getPosY()*1.0;
+        UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
+        UInt16 ady = y1>y2?(y1-y2):(y2-y1)*1.0;
+        if(static_cast<UInt16>(sqrt((adx*adx + ady*ady))) <= (bf->GetRad()+rad))
+            return 0;
+        return  (static_cast<UInt16>(sqrt(adx*adx + ady*ady)) - bf->GetRad() - rad);
     } 
 
     bool BattleField::setObjectXY(UInt16 x, UInt16 y, BattleObject * bo, bool flag, UInt16 Body, UInt16 write)
@@ -113,11 +123,11 @@ namespace Battle
             { 
                 if(bo == _fighters[j][i])
                     continue ;
-                if(getDistance(bo,_fighters[j][i]) == 0)
+                if(getDistance(_fighters[j][i],x,y,bo->GetRad()) == 0)
                     return false;  
             } 
         }
-        bo->SetMinX(x);
+        bo->SetMinXY(x,y);
         bo->setPos(x,y);
         return true;
     } 
@@ -271,5 +281,24 @@ namespace Battle
             return static_cast<BattleFighter*>(_fighters[side][i]);
         }
         return NULL;
+    } 
+
+    void BattleField::InsertTimeBattleAction(UInt16 time , ActionPackage ba)
+    { 
+        FieldAttack[time].push_back(ba);
+    } 
+
+    std::vector<ActionPackage> BattleField::GetTimeBattleAction(UInt16 time)
+    { 
+        return FieldAttack[time];
+    } 
+
+    void BattleField::InsertTimeBattleAction(UInt16 time , ImagePackage ip)
+    { 
+        FieldImage[time].push_back(ip);
+    } 
+    std::vector<ImagePackage> BattleField::GetTimeBattleImage(UInt16 time)
+    { 
+        return FieldImage[time];
     } 
 }

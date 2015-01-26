@@ -14,8 +14,16 @@ namespace Battle
             return ;
         }
 
+        if(!isRunSend)
+        {
+            if(uRand(100) < 40)  //XXX
+                return ;
+        } 
+
         if(!GetGone())
             GoForward();
+
+        BuildLocalStream(e_run);
 
         if(_actionLast)
         { 
@@ -23,11 +31,11 @@ namespace Battle
             return ;
         } 
 
+        GetActionFromField();
 
         switch(_actionType)
         { 
             case e_none:
-                GetActionFromField();
                 break;
             case e_attack_near:
             case e_attack_middle:
@@ -37,10 +45,15 @@ namespace Battle
                 {
                     if(_target)
                     { 
-                        UInt16 parm = (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                        BuildLocalStream(0,parm);
+                        //UInt16 parm = (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
+                        ActionPackage ap(this,_nowTime);
+                        ap.PushObject(_target);
+                        //XXX
+                        
+                        GetField()->InsertTimeBattleAction( _nowTime + 3 ,ap );
+                        //BuildLocalStream(0,parm);
                         //(_target)->AppendFighterStream(_st);
-                        _actionType = 0;
+                        _actionType = e_none;
                     } 
                 }
                 break;
@@ -55,6 +68,42 @@ namespace Battle
 
     bool BattleRideFighter::PreGetObject()
     { 
+        PreGetObject1() ;
+        if(!_target)
+            return false;
+        if(getPosX() <= GetMinX() - GetSideInBS()*1000 || getPosX() >= (GetMinX()+(!GetSideInBS())*1000))
+        {
+            switch(count)
+            {
+                case 0:
+                    {
+                        _battleTargetX = (getPosX() > FIELD_WIDTH/2) ? 0:FIELD_WIDTH;
+                        break;
+                    }
+                case 1:
+                    {
+                        _battleTargetX = GetMinX();
+                        _battleTargetY = GetMinY();
+                        break;
+                    }
+                case 2:
+                    {
+                        SetBattleTargetPos(getPosX(),getPosY());
+                        break;
+                    }
+                default:
+                    return false ;
+            }
+            count++;
+        }
+
+        if(!_battleTargetY)
+            _battleTargetY = _target->getPosY();
+        return true;
+    } 
+
+    void BattleRideFighter::PreGetObject1()
+    { 
         UInt8 res = CheckTarget();
         if(res)
         {
@@ -65,31 +114,6 @@ namespace Battle
             if(target)
                 _target = target;
         }
-
-        if(!_target)
-            return false;
-        if(getPosX() <= GetMinX() - GetSideInBS()*1000 || getPosX() >= (GetMinX()+(!GetSideInBS())*1000))
-        {
-            switch(count)
-            {
-                case 0:
-                    _battleTargetX = (getPosX() > FIELD_WIDTH/2) ? 0:FIELD_WIDTH;
-                    break;
-                case 1:
-                    _battleTargetX = FIELD_WIDTH - _battleTargetX;
-                    break;
-                case 2:
-                    SetBattleTargetPos(getPosX(),getPosY());
-                    break;
-                default:
-                    return false ;
-            }
-            count++;
-        }
-
-        if(!_battleTargetY)
-            _battleTargetY = _target->getPosY();
-        return true;
     } 
 
     void BattleRideFighter::BuildLocalStream(UInt8 wait, UInt8 param)
@@ -103,11 +127,11 @@ namespace Battle
         switch(type)
         {
             case e_run:
-                if((GetBSNumber() == 0 || GetBSNumber() == 7)&& count == 2)
+                if(1)
                 {
-                    //COUNT << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    //COUNT << " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
-                    //COUNT << " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
+                    std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
+                    std::cout<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
                 }
                 if(!isRunSend)
                 {
@@ -138,11 +162,14 @@ namespace Battle
                             _st << _target->GetBSNumber();
                             _st << static_cast<UInt16>(param);
 
-                            std::cout << " 回合数：" << static_cast<UInt32>(_nowTime);
-                            std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                            std::cout << " 进攻战将编号：" << static_cast<UInt32>(_target->GetBSNumber());
-                            std::cout << " 己方坐标: " << static_cast<UInt32>(getPosX()) << "," << static_cast<UInt32>(getPosY());
-                            std::cout << " 敌方坐标: " << static_cast<UInt32>(_target->getPosX()) << "," << static_cast<UInt32>(_target->getPosY()) <<std::endl;
+                            std::cout<< " 回合数：" << static_cast<UInt32>(_nowTime);
+                            std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                            std::cout<< " 进攻战将编号：" << static_cast<UInt32>(_target->GetBSNumber());
+                            std::cout<< " 己方坐标: " << static_cast<UInt32>(getPosX()) << "," << static_cast<UInt32>(getPosY());
+                            std::cout<< " 敌方坐标: " << static_cast<UInt32>(_target->getPosX()) << "," << static_cast<UInt32>(_target->getPosY()) ;
+                            std::cout << " 对方血量: " << static_cast<UInt32>(_target->getHP()) << std::endl;
+                            _actionType = e_none;
+
                             //COUNT << std::endl;
                         }
                         //_st << (_target)->getPosX();
@@ -172,6 +199,7 @@ namespace Battle
     { 
         if(!_target || !GetField())
             return -1;
+        _target->SetNowTime(_nowTime);
         if(!_target->GetGone())
             _target->GoForward();
         if(CheckTarget())
@@ -186,9 +214,6 @@ namespace Battle
         _battleTargetY = 0;
         _battleTargetX = 0;
         count = 0;
-        _nowTime = 0;
-        EnterX = 0;
-        EnterY = 0;
         _crickSum = 0;
     } 
 
