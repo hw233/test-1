@@ -32,16 +32,18 @@ namespace Battle
         e_image_therapy = 6, //魔法治疗
         e_attack_counter = 7, //反击
         e_be_attacked = 8 , //被攻击
-        e_run_attack = 9   //跑攻 (骑兵专用)
+        e_run_attack = 9 ,   //跑攻 (骑兵专用)
+        e_object_image = 10
     };
 
     struct ActionBase
     {
-        ActionBase(UInt16 condition ,UInt16 scope, UInt16 effect):_condition(condition),_scpoe(scope),_effect(effect),_cd(0),_priority(0) { } 
-        ActionBase():_condition(0),_scpoe(0),_effect(0),_cd(8),_priority(0){}
-        UInt16 _condition ;  // 触发条件编号
-        UInt16 _scpoe ;      // 触发范围编号
-        UInt16 _effect ;     // 触发效果编号
+        ActionBase(UInt16 skillId /*UInt16 condition ,UInt16 scope, UInt16 effect*/):/*_condition(condition),_scpoe(scope),_effect(effect),*/_skillId(skillId),_cd(0),_priority(0) { } 
+        ActionBase():/*_condition(0),_scpoe(0),_effect(0),*/_skillId(0),_cd(8),_priority(0){}
+        UInt16 _skillId;
+        //UInt16 _condition ;  // 触发条件编号
+        //UInt16 _scpoe ;      // 触发范围编号
+        //UInt16 _effect ;     // 触发效果编号
         UInt8 _cd;           //行动cd  
         UInt8 _priority ;  //触发优先级
     };
@@ -66,6 +68,7 @@ namespace Battle
 
             void StartAction(UInt8 actionType);
             inline UInt8 GetActionLast(){ return _actionLast;}  //获得当前状态
+            inline UInt8 GetActionBackLast(){ return _actionBackLast;}  //获得当前状态
 
             UInt8 GetSide() {return _fighter->GetSide();}
             void SetGroundX(UInt8 x){_groundX = x;}
@@ -79,7 +82,7 @@ namespace Battle
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
-            UInt16 BeActed(ActionPackage  bAction ); //是否延迟
+            UInt16 BeActed(BattleAction *  bAction ); //是否延迟
 
             //添加本身数据包
 
@@ -146,14 +149,22 @@ namespace Battle
             virtual UInt8 GetRideCount() {return 1;}
             
             UInt32 GetAttack() { return _attack_near;}
+            UInt32 GetDistanceAttack() { return _attack_distance;}
+            UInt32 GetDefend(){ return _defend;}
+            UInt32 GetImageDefend(){ return _defend_image;}
             UInt32 GetHit() { return _hit;}
-            UInt32 GetWreck() { return _wreck;}
+            UInt32 GetEvade() {return _evade;}
             UInt32 GetCritical() { return _critical;}
+            UInt32 GetDefendCritical() { return _defend_critical;}
+
+            UInt32 GetWreck() { return _wreck;}
             UInt32 GetParry(){ return _parry;}
 
+            ImagePackage MakeImageEffect();
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
+            UInt8 _actionBackLast ;   //动作收招持续
             //std::list<BattleObject*>  targetList; //对象列表 (待解)
             UInt8 _actionType;  // 动作类型
 
@@ -166,7 +177,6 @@ namespace Battle
 
             ActionSort  preActionList;   //动作行为列表O
             ActionSort  preActionCD;     //待CD动作行为列表
-
 
             GObject::Fighter * _fighter;
             BattleField * _field;
@@ -184,10 +194,14 @@ namespace Battle
             
             UInt32 _attack_near;
             UInt32 _attack_distance;
-
-            UInt32 _hit;
-            UInt32 _evade; 
+            UInt32 _attack_image;
+            UInt32 _defend;
+            UInt32 _defend_image;
             UInt32 _critical; //暴击 
+            UInt32 _defend_critical; //抗暴
+            UInt32 _hit;  //命中
+            UInt32 _evade;  //闪避
+
             UInt32 _wreck; //破击
             UInt32 _parry;  //格挡
 

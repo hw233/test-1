@@ -10,14 +10,6 @@ namespace GObject
     class Player;
     class FVarSystem;
 
-    struct FighterSkill
-    {
-       UInt16 skillCondId;
-       UInt16 skillScopeId;
-       UInt16 skillEffectId;
-       FighterSkill(UInt16 sc , UInt16 ss,UInt16 se):skillCondId(sc),skillScopeId(ss),skillEffectId(se){}
-       FighterSkill():skillCondId(0),skillScopeId(0),skillEffectId(0){}
-    };
     class Fighter
     {
         public:
@@ -65,7 +57,7 @@ namespace GObject
                 _critical = critical;
                 _evade = evade;
             } 
-            void SetBaseSkill(UInt8 level , UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId);
+            void SetBaseSkill(UInt8 level ,UInt16 skillId); // UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId);
 
             void SetSkill(std::string skill);
     private:
@@ -92,8 +84,8 @@ namespace GObject
             UInt8 _typeId;
             UInt8 _childTypeId;
             UInt8 _color; 
-            std::map<UInt8,FighterSkill> m_skills;  //仅global使用
-            std::vector<FighterSkill> m_baseSkills;
+            std::map<UInt8,UInt16> m_skills;  //仅global使用
+            std::vector<UInt16> m_baseSkills;
 };
 typedef GGlobalObjectManagerT<Fighter, UInt32> GlobalFighters;
 extern GlobalFighters globalFighters;

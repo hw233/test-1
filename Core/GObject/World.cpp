@@ -10,11 +10,15 @@ namespace GObject
 {
     bool World::Init()
     {
+        std::string path = cfg.scriptPath + "World/main.lua";
         TimeUtil::TimeAdd(GVAR.GetVar(GVAR_TIMEADD));
         {
-            std::string path = cfg.scriptPath + "World/main.lua";
             _worldScript = new Script::WorldScript(path.c_str()); 
         }
+
+        path = cfg.scriptPath + "formula/main.lua";
+        _battleFormula = new Script::BattleFormula(path.c_str());
+
         UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10; 
 
         if(sday < now) sday += 86400;

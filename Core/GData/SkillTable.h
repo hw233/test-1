@@ -24,12 +24,12 @@ namespace GData
     { 
         public:
             SkillCondition(UInt16 id, const std::string& name)
-                : ObjectBaseT<UInt16>(id,name) ,cond(0),prob(0),cd(0),actionCd(0),distance(0),priority(0)
+                : ObjectBaseT<UInt16>(id,name) ,cond(0),prob(0),distance(0),priority(0)
             { } 
             ~SkillCondition(){}
-            bool MeetCondition(UInt16 advance ,UInt16 speed,UInt8& pri) const 
+            bool MeetCondition(UInt16 advance ,UInt8& pri) const 
             {
-                if(distance >= advance && pri < priority && advance >= actionCd * speed)
+                if(distance >= advance && pri < priority)
                 { 
                     pri = priority;
                     return true;
@@ -39,8 +39,6 @@ namespace GData
         public:
             UInt16 cond;     //释放条件
             UInt8 prob;     //释放几率 (x/100)
-            UInt16 cd ;     //冷却时间  ( %d s * 8)
-            UInt16 actionCd ;     //释放时间  ( %d s * 8)  用于设置外部的行为
             UInt16 distance;  //攻击距离  
             UInt8 priority;   //优先级
     };
@@ -75,6 +73,7 @@ namespace GData
             // float defendP;   //附加防御百分比增加
     };
 
+
     typedef ObjectMapT<SkillCondition, UInt16> SkillConditionManager;
 #define skillConditionManager SkillConditionManager::Instance()
 
@@ -83,6 +82,40 @@ namespace GData
 
     typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;   
 #define skillEffectManager SkillEffectManager::Instance()
+
+
+    class Skill : public ObjectBaseT<UInt16>
+    {
+        public:
+            Skill(UInt16 id , const std::string& name)
+                : ObjectBaseT<UInt16>(id,name) { } 
+            //Skill(SkillCondition * sc, SkillScope* ss, SkillEffect* se):_sc(sc),_ss(ss),_se(se){}
+            const SkillCondition * GetSkillCondition() const {return skillConditionManager[_conditionId];} 
+            const SkillScope * GetSkillScope() const {return skillScopeManager[_scopeId];}
+            const SkillEffect * GetSkillEffect() const {return skillEffectManager[_effectId];}
+            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId,UInt16 cd, UInt16 actionCd, UInt16 actionBackCd)
+            { 
+                _conditionId = conditionId;
+                _scopeId = scopeId;
+                _effectId = effectId;
+                _cd = cd ;
+                _actionCd = actionCd;
+                _actionBackCd = actionBackCd;
+            } 
+            UInt16 GetCd() const {return _cd;}
+            UInt16 GetActionCd() const { return _actionCd;}
+            UInt16 GetActionBackCd() const { return _actionBackCd;}
+        private:
+            UInt16 _conditionId;
+            UInt16 _scopeId;
+            UInt16 _effectId;
+            UInt16 _cd;
+            UInt16 _actionCd;
+            UInt16 _actionBackCd;
+    };
+
+    typedef ObjectMapT<Skill, UInt16> SkillManager;   
+#define skillManager SkillManager::Instance()
 }
 #endif // SKILLTABLE_H_
 

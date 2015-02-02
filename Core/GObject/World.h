@@ -28,6 +28,7 @@ namespace GObject
             bool Init();
             void UnInit();
             std::string GetLogName();
+            inline Script::BattleFormula* getBattleFormula() {return _battleFormula;}
 
         private:
             static void World_Midnight_Check( World * );
@@ -36,6 +37,7 @@ namespace GObject
         public:
 
         private:
+            Script::BattleFormula * _battleFormula;
             Script::WorldScript * _worldScript;
     };
 }

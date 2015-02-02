@@ -19,6 +19,12 @@ namespace Battle
             return ;
         } 
 
+        if(_actionBackLast)
+        { 
+            --_actionBackLast;
+            return ;
+        } 
+
         GetActionFromField();
 
         switch(_actionType)
@@ -26,19 +32,29 @@ namespace Battle
             case e_none:
                 break;
             case e_run:
-                GoForward();
+                GoForward(1);
                 break;
             case e_attack_near:
             case e_attack_middle:
             case e_attack_distant:
+                {
+                    if(_target)
+                    {
+                        ActionPackage ap(this,_nowTime);
+                        ap.PushObject(_target);
+
+                        GetField()->InsertTimeBattleAction( _nowTime + 3 ,ap );
+                        // (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
+                        // (_target)->AppendFighterStream(_st);
+                    }
+                } 
+                break;
             case e_image_attack:
             case e_image_therapy:
-                {
-                        if(_target)
-                        {
-                            (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                            (_target)->AppendFighterStream(_st);
-                        }
+                { 
+                    ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+                    GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId);
+                    GetField()->InsertTimeBattleAction(_nowTime+3,ip);
                 } 
                 break;
             case e_attack_counter:
@@ -50,7 +66,10 @@ namespace Battle
     bool BattleWalkFighter::PreGetObject()
     { 
         if(!_target || !_target->getHP())
+        {
             _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
+            BuildLocalStream(e_run);
+        }
         SetBattleTargetPos(_target->getPosX(),_target->getPosY());
         return 0;
     } 
@@ -59,21 +78,29 @@ namespace Battle
     { 
         if(!_target || !GetField())
             return 0;
-        return 0;// GetField()->getDistance(this,_target);
+        return  GetField()->getDistance(this,_target);
     } 
 
     void BattleWalkFighter::BuildLocalStream(UInt8 wait, UInt8 param)
     {
-        _st.clear();
+        _st.reset();
         //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
         //_st << static_cast<UInt8>(getPosX());
         //_st << static_cast<UInt8>(getPosY());
         //InsertFighterInfo(_st);
         //TODO 被击
         //_st << _actionType;
-        switch(_actionType)
+        switch(wait)
         {
             case e_run:
+                if(_target)
+                {
+                    _st << static_cast<UInt8>(_nowTime);
+                    _st << GetBSNumber();
+                    _st << static_cast<UInt8>(wait);
+                    _st << _target->GetBSNumber();
+                }
+                break;
             case e_attack_near:
             case e_attack_middle:
             case e_attack_distant:
@@ -84,8 +111,6 @@ namespace Battle
                     //_st << static_cast<UInt8>(_actionLast); //动作持续
                     //for(;it!=targetList.end();++it)
                     { 
-                        if(_target)
-                            _target->InsertFighterInfo(_st);
                         //_st << (_target)->getPosX();
                         //_st << (_target)->getPosY();
                     } 
@@ -98,18 +123,18 @@ namespace Battle
         }
     }
 
-     void BattleWalkFighter::resetBattleStatue()
-     { 
-         _target = NULL;
+    void BattleWalkFighter::resetBattleStatue()
+    { 
+        _target = NULL;
 
-         _battleTargetY = 0;
-         _battleTargetX = 0;
-         _nowTime = 0;
-         EnterX = 0;
-         EnterY = 0;
-         _crickSum = 0;
-         _sideInBS = 0;
-         return ;
-     } 
+        _battleTargetY = 0;
+        _battleTargetX = 0;
+        _nowTime = 0;
+        EnterX = 0;
+        EnterY = 0;
+        _crickSum = 0;
+        _sideInBS = 0;
+        return ;
+    } 
 } 
 

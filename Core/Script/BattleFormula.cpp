@@ -2,6 +2,7 @@
 #include "BattleFormula.h"
 #include "Battle/BattleFighter.h"
 //#include "GObject/Fighter.h"
+#include "GObject/Country.h"
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
 #include "GObject/ItemData.h"
@@ -431,7 +432,6 @@ UInt32 BattleFormula::calcLingbaoBattlePoint(const GObject::ItemLingbaoAttr *lba
     return call<UInt32>("calcLingbaoBattlePoint", lbatr);
 }
 
-/*
 BattleFormula * BattleFormula::getCurrent()
 {
 	WorkerRunner<>& worker = WorkerThread<WorkerRunner<> >::LocalWorker();
@@ -440,15 +440,14 @@ BattleFormula * BattleFormula::getCurrent()
 	case WORKER_THREAD_WORLD:
 		return reinterpret_cast<GObject::World &>(worker).getBattleFormula();
 	case WORKER_THREAD_COUNTRY_1:
-	case WORKER_THREAD_COUNTRY_2:
+	case WORKER_BATTLE:
 	case WORKER_THREAD_NEUTRAL:
 		return reinterpret_cast<GObject::Country &>(worker).GetBattleFormula();
-    case WORKER_THREAD_SORT:
-        return reinterpret_cast<GObject::SortWorker &>(worker).getBattleFormula();
+    //case WORKER_THREAD_SORT:
+    //    return reinterpret_cast<GObject::SortWorker &>(worker).getBattleFormula();
 	}
 	return NULL;
 }
-*/
 
 float BattleFormula::calcCriticalDef(Battle::BattleFighter* defgt)
 {

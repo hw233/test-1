@@ -1,4 +1,5 @@
 #include "BattleRideFighter.h"
+#include "GData/SkillTable.h"
 namespace Battle
 { 
     void BattleRideFighter::Action()
@@ -31,6 +32,12 @@ namespace Battle
             return ;
         } 
 
+        if(_actionBackLast)
+        { 
+            --_actionBackLast;
+            return ;
+        } 
+
         GetActionFromField();
 
         switch(_actionType)
@@ -40,24 +47,63 @@ namespace Battle
             case e_attack_near:
             case e_attack_middle:
             case e_attack_distant:
-            case e_image_attack:
-            case e_image_therapy:
                 {
                     if(_target)
                     { 
                         //UInt16 parm = (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                        ActionPackage ap(this,_nowTime);
+                        ActionPackage ap(this,_nowTime/*,_target*/);
                         ap.PushObject(_target);
                         //XXX
                         
-                        GetField()->InsertTimeBattleAction( _nowTime + 3 ,ap );
+                        GetField()->InsertTimeBattleAction( _nowTime + _actionLast ,ap );
                         //BuildLocalStream(0,parm);
                         //(_target)->AppendFighterStream(_st);
                         _actionType = e_none;
                     } 
                 }
                 break;
+            case e_image_attack:
+            case e_image_therapy:
+                { 
+                    ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+                    GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
+                    GetField()->InsertTimeBattleAction(_nowTime+3,ip);
+                } 
+                break;
             case e_attack_counter:
+                break;
+            case e_object_image:
+                { 
+                    {
+                        const GData::SkillScope* ss =GData::skillManager[_ab._skillId]->GetSkillScope();
+                        if(!ss)
+                            return ;
+
+                        UInt16 myY = getPosY();
+
+                        UInt8  minNumber = ss->radx / 2 ;  //radx 表示数量(一般情况为奇数) rady表示间隔 x,y作为上下闭合区间
+                        UInt16 width = ss->x + ss->y;
+                        UInt16 minY  =  0;
+                        if(myY > ((width * ss->rady + width)*minNumber + ss->y))
+                            minY = myY - ((width * ss->rady + width)*minNumber);
+
+                        std::cout << " 战将编号：" << static_cast<UInt32>(GetBSNumber());
+                        std::cout << std::endl;
+                        std::cout << " 施放技能 半月斩 ";
+                        std::cout << std::endl;
+                        for(UInt8 i = 0 ; i < ss->radx ; ++i)
+                        {
+                            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+                            op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
+                            GetField()->InsertObjectPackage(op);
+
+                            std::cout << " 范围 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width - 25) << " 到 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width + 25);
+                            std::cout << std::endl;
+                        }
+                        std::cout << std::endl;
+                    }
+
+                } 
                 break;
             default:
                 {

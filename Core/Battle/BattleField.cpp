@@ -151,27 +151,27 @@ namespace Battle
             st << static_cast<UInt8>(_fighters[i].size());
             for(UInt8 j = 0; j < _fighters[i].size(); ++ j)
             { 
-               st << static_cast<UInt8>( _fighters[i][j]->GetBSNumber()); 
-               st << static_cast<UInt16>(_fighters[i][j]->GetId());
-               st << static_cast<UInt16>(_fighters[i][j]->getPosX());
-               st << static_cast<UInt16>(_fighters[i][j]->getPosY());
-               st << static_cast<UInt16>(_fighters[i][j]->getHP());
-               std::cout << " 入场战将分部" << std::endl;
-               std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
-               std::cout << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
-               std::cout << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
+                st << static_cast<UInt8>( _fighters[i][j]->GetBSNumber()); 
+                st << static_cast<UInt16>(_fighters[i][j]->GetId());
+                st << static_cast<UInt16>(_fighters[i][j]->getPosX());
+                st << static_cast<UInt16>(_fighters[i][j]->getPosY());
+                st << static_cast<UInt16>(_fighters[i][j]->getHP());
+                std::cout << " 入场战将分部" << std::endl;
+                std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
+                std::cout << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
+                std::cout << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
             } 
         } 
     } 
 
-    void BattleField::GetTargetList(UInt8 side, BattleFighter * bf ,std::vector<BattleObject *>& vec , UInt8 skillScopeId)
+    void BattleField::GetTargetList(UInt8 side, BattleFighter * bf ,std::vector<BattleObject *>& vec , UInt16 skillId, UInt8 flag)   //flag == 2 ==> 
     { 
         if(!_fighters[side].size())
             return ;
 
-        const GData::SkillScope* ss =GData::skillScopeManager[skillScopeId];
+        const GData::SkillScope* ss =GData::skillManager[skillId]->GetSkillScope();
 
-        switch(skillScopeId)
+        switch(ss->area)
         {
             case 1:  //随机N个敌人 ss->x 为数量 
                 { 
@@ -193,7 +193,7 @@ namespace Battle
                 { 
                     for(UInt8 i = 0; i < _fighters[side].size(); ++i)
                     { 
-                        if(!_fighters[side][i] || _fighters[side][i]->getHP())
+                        if(!_fighters[side][i] || !_fighters[side][i]->getHP())
                             continue ;
                         vec.push_back(_fighters[side][i]);
                     } 
@@ -214,7 +214,7 @@ namespace Battle
                     } 
                     break;
                 } 
-            case 4:
+            case 4:  
                 { 
                     BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY(),0);
                     if(!bo)
@@ -229,32 +229,51 @@ namespace Battle
                     } 
                     break;
                 } 
-            case 5:  //y轴攻击型
+            case 5:  //y轴攻击型  //半月斩
                 { 
                     UInt16 myY = bf->getPosY();
                     UInt8  minNumber = ss->radx / 2 ;  //radx 表示数量(一般情况为奇数) rady表示间隔 x,y作为上下闭合区间
                     UInt16 width = ss->x + ss->y;
                     UInt16 minY  =  0;
                     if(myY > ((width * ss->rady + width)*minNumber + ss->y))
-                        minY = myY - (width * ss->rady + width + ss->y);
+                        minY = myY - ((width * ss->rady + width)*minNumber + ss->y);
 
                     for(UInt8 i = 0; i < _fighters[side].size(); ++i)
                     { 
                         BattleObject* fgt1 = _fighters[side][i] ;
                         if(!fgt1 || !fgt1->getHP())
                             continue;
-                        UInt16 disy = bf->getPosY();  //目标y坐标
+                        if(flag == 2 && bf->getPosX() >= fgt1->getPosX())  
+                            continue;
+                        if(flag == 1 && bf->getPosX() <= fgt1->getPosX())  
+                            continue;
+                        UInt16 disy = fgt1->getPosY();  //目标y坐标
                         for(UInt8 i = 0; i < ss->radx; ++i)
                         { 
-                           if(minY + (ss->rady + 1 + i)*width < disy && disy < minY + (ss->rady + 1 + i)*width +width)
-                           {
-                               vec.push_back(fgt1);
-                               break;  
-                           }
+                            if(minY + (ss->rady+1)*i*width < disy && disy < minY + (ss->rady + 1)*i*width +width)
+                            {
+                                vec.push_back(fgt1);
+                                break;  
+                            }
                         } 
                     } 
                     break;
                 } 
+            case 6:
+                {
+                    
+                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY(),0);
+                    if(!bo)
+                        return ;
+                    for(UInt8 i = 0; i < _fighters[side].size(); ++i)
+                    { 
+                        BattleObject* fgt1 = _fighters[side][i] ;
+                        if(!fgt1 || !fgt1->getHP())
+                            continue;
+                            vec.push_back(fgt1);
+                    } 
+                    break;
+                }
         }
     } 
 
@@ -300,5 +319,15 @@ namespace Battle
     std::vector<ImagePackage> BattleField::GetTimeBattleImage(UInt16 time)
     { 
         return FieldImage[time];
+    } 
+
+
+    void BattleField::InsertObjectPackage(ObjectPackage ba)
+    { 
+        FieldObject.push_back(ba);
+    } 
+    std::list<ObjectPackage>& BattleField::GetObjectpackage()
+    { 
+        return FieldObject;
     } 
 }

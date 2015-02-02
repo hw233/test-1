@@ -59,7 +59,7 @@ namespace Battle
             //inline bool isHide() { return _hide; }
             //inline void setHide(bool hide) { _hide = hide; }
 
-            virtual UInt16 BeActed(ActionPackage battleAction){ makeDamage(battleAction.GetAttack()); return 0;}   //用于非战斗对象
+            virtual UInt16 BeActed(BattleAction * battleAction){ makeDamage(battleAction->GetAttack()); return 0;}   //用于非战斗对象
             //virtual BattleField * GetField(){ return _field;}
             UInt32 GetDefendNear() {return defend_near;}
             UInt32 GetDefendDistance(){ return defend_distance;}
@@ -71,7 +71,7 @@ namespace Battle
             virtual UInt8 GetGroundY() {return 0;}
             virtual void InsertFighterInfo(Stream& st,UInt8 flag = 0){}
             virtual void SetMinXY(UInt16 ,UInt16 ){}
-            //virtual UInt8 GetBSNumber(){return 0;}
+            virtual UInt8 GetBSNumber(){return 0;}
         protected:
             UInt8 _cls;
             UInt32 _hp;

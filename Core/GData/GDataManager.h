@@ -19,6 +19,7 @@ namespace GData
             static bool LoadSkillScopeData();
             static bool LoadSkillEffectData();
             static bool LoadFighterBase();
+            static bool LoadSkillData();
         private:
 
     };

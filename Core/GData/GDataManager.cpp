@@ -51,11 +51,18 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadSkillData())  
+        {
+            fprintf(stderr, "Load LoadSkillData Error !\n");
+            std::abort();
+        }
+
         if (!LoadFighterBase())  
         {
             fprintf(stderr, "Load LoadFighterBase Error !\n");
             std::abort();
         }
+
         return true;
     }
     bool GDataManager::LoadExpData()
@@ -140,7 +147,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillCondition dbskcond;
-        if(execu->Prepare("SELECT `id`,`name`,`cond` ,`prob`,`cd`,`actionCd`,`distance`,`priority` FROM `skillCondition`", dbskcond) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`cond` ,`prob`,`distance`,`priority` FROM `skillCondition`", dbskcond) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -149,8 +156,7 @@ namespace GData
                 return false;
             sc->cond = dbskcond.cond;
             sc->prob = dbskcond.prob;
-            sc->cd = dbskcond.cd;
-            sc->actionCd = dbskcond.actionCd;
+            //sc->cd = dbskcond.cd;
             sc->distance = dbskcond.distance;
             sc->priority = dbskcond.priority;
             skillConditionManager.add(sc);
@@ -194,6 +200,7 @@ namespace GData
             if(!se)
                 return false;
             se->skillType = dbskeffect.skillType;
+            //se->actionCd = dbskeffect.actionCd;
             se->damage = dbskeffect.damage;
             se->damageP = dbskeffect.damageP;
             se->trerapy = dbskeffect.trerapy;
@@ -227,16 +234,34 @@ namespace GData
         }    
 
         DBFighterBaseSkill dbfbs;
-        if(execu->Prepare("SELECT `id`,`levelLimit`,`skillCondId`,`skillScopeId`,`skillEffectId` FROM`fighter_base_skill`", dbfbs) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`levelLimit`,`skillId` FROM`fighter_base_skill`", dbfbs) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
             GObject::Fighter* fgt = GObject::globalFighters[dbfbs.id];
             if(!fgt)
                 continue;
-            fgt->SetBaseSkill(dbfbs.levelLimit,dbfbs.skillCondId, dbfbs.skillScopeId, dbfbs.skillEffectId);
+            fgt->SetBaseSkill(dbfbs.levelLimit,dbfbs.skillId);
         }  
 
+        return true;
+    } 
+
+    bool GDataManager::LoadSkillData()
+    { 
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSkill dbskill;
+        if(execu->Prepare("SELECT `id`,`name`,`skillCondId`,`skillScopeId`,`skillEffectId`,`cd`,`actionCostCd`,`actionBackCd` FROM `skill`", dbskill) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            //skill[dbskill].LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId);
+            Skill* se = new Skill(dbskill.id, dbskill.name);
+            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd, dbskill.actionCd,dbskill.actionBackCd);
+
+            skillManager.add(se);
+        }
         return true;
     } 
 }

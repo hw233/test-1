@@ -40,8 +40,6 @@ namespace GData
         std::string name; 
         UInt16 cond;
         UInt8 prob;
-        UInt16 cd;
-        UInt16 actionCd;
         UInt16 distance;
         UInt8 priority;
     };
@@ -91,9 +89,19 @@ namespace GData
     {
         UInt32 id;
         UInt8  levelLimit;
+        UInt32 skillId;
+    };
+
+    struct DBSkill  
+    {
+        UInt32 id;
+        std::string name;
         UInt32 skillCondId; 
         UInt32 skillScopeId;
         UInt32 skillEffectId;
+        UInt16 cd;
+        UInt16 actionCd;
+        UInt16 actionBackCd;
     };
 }
 namespace DB
@@ -136,14 +144,12 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkillCondition)
-        SPECIALDEF(8)
+        SPECIALDEF(6)
         (
          UInt16, id,
          std::string, name,
          UInt16, cond,
          UInt8, prob,
-         UInt16, cd,
-         UInt16, actionCd,
          UInt16, distance,
          UInt8, priority
         )
@@ -195,17 +201,29 @@ namespace DB
          //std::string, skill
         )
         SPECIALEND()
+
         SPECIALBEGIN(GData::DBFighterBaseSkill)
-        SPECIALDEF(5)
+        SPECIALDEF(3)
         (
          UInt32, id,
          UInt8 , levelLimit,
-         UInt32, skillCondId,
-         UInt32, skillScopeId,
-         UInt32, skillEffectId
+         UInt32, skillId
         )
         SPECIALEND()
 
+        SPECIALBEGIN(GData::DBSkill)
+        SPECIALDEF(8)
+        (
+         UInt32, id,
+         std::string , name,
+         UInt32, skillCondId,
+         UInt32, skillScopeId,
+         UInt32, skillEffectId,
+         UInt16, cd,
+         UInt16, actionCd,
+         UInt16, actionBackCd
+        )
+        SPECIALEND()
 
 }
 #endif

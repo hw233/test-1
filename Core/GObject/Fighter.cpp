@@ -65,11 +65,11 @@ namespace GObject
         return fVarSystem;
     }
 
-    void Fighter::SetBaseSkill(UInt8 level , UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId)
+    void Fighter::SetBaseSkill(UInt8 level ,UInt16 skillId)
     { 
         if(level > 200)
             return ;
-        m_skills[level] = FighterSkill(skillCondId,skillScopeId,skillEffectId);
+        m_skills[level] = skillId;
     } 
 
     void Fighter::SetSkill(std::string skill)
@@ -80,7 +80,7 @@ namespace GObject
         for(UInt8 i = 0; i < tk.count(); ++i)
         {
             UInt32 skillId = atoi(tk[i].c_str());
-            m_baseSkills.push_back(FighterSkill(skillId/10000, skillId%10000/100, skillId%100))  ;
+            m_baseSkills.push_back(skillId)  ;
         }
     } 
 }

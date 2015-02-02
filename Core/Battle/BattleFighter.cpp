@@ -27,6 +27,7 @@ namespace Battle
                     m_fighters[i]->setNumber(i+1);
             }
         }
+
         SetGroundX(pointX);
         SetGroundY(pointY);
         _st.clear();
@@ -51,7 +52,8 @@ namespace Battle
         //运动行为
         //preActionList.push_back(ActionBase(0,0,0));
         //普通攻击
-        preActionList.push_back(ActionBase(2,0,2));
+        if(f!=NULL)
+            preActionList.push_back(ActionBase(2));
     } 
 
     void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
@@ -103,10 +105,10 @@ namespace Battle
         //BuildLocalStream(e_run);
     } 
 
-    UInt16 BattleFighter::BeActed(ActionPackage  bAction)
+    UInt16 BattleFighter::BeActed(BattleAction *  bAction)
     { 
         //TODO
-        UInt32 attack = bAction.GetAttack();
+        UInt32 attack = bAction->GetAttack();
         UInt32 defend = GetDefendNear();
         UInt32 hpSub = attack - defend;
         hpSub = 700;
@@ -192,8 +194,9 @@ namespace Battle
 
         if(1)  //XXX
         { 
-            _actionType = GData::skillEffectManager[_ab._effect]->skillType;  //XXX
-            _actionLast =  GData::skillConditionManager[_ab._condition]->actionCd; //行进时间一秒
+            _actionType = GData::skillManager[_ab._skillId]->GetSkillEffect()->skillType;  //XXX
+            _actionLast =  GData::skillManager[_ab._skillId]->GetActionCd(); //行进时间一秒
+            _actionBackLast =  GData::skillManager[_ab._skillId]->GetActionBackCd(); //行进时间一秒
         }
 
         //BuildLocalStream();
@@ -224,18 +227,20 @@ namespace Battle
     { 
         UInt8 priority = 0;
         ActionSort::iterator result ;
-        ActionBase res(0,0,0);
+        ActionBase res(0);//,0,0);
         if(advance == static_cast<UInt16>(-1))
             return res;
         for(ActionSort::iterator it = preActionList.begin(); it != preActionList.end(); ++it)
         {   
-            if(GData::skillConditionManager[it->_condition]->MeetCondition(advance,2*GetSpeed(),priority)) //XXX
+            if(advance < GetSpeed()*2 * GData::skillManager[it->_skillId]->GetActionCd())
+                continue;
+            if(GData::skillManager[it->_skillId]->GetSkillCondition()->MeetCondition(advance,priority)) //XXX
                 result = it;
         }   
-        if(priority != 0)
+        if(priority != 0 && GData::skillManager[res._skillId])
         { 
             res = *result;
-            res._cd = GData::skillConditionManager[res._condition]->actionCd;
+            res._cd = GData::skillManager[res._skillId]->GetCd();
             preActionList.erase(result);
             preActionCD.push_back(res);
         } 
@@ -292,6 +297,11 @@ namespace Battle
         //    attack = _attack_near;
 
         //return  ActionPackage(attack, _hit, _wreck, _critical, this,_nowTime);  //未加入目标对象
+    } 
+
+    ImagePackage BattleFighter::MakeImageEffect()
+    { 
+        return ImagePackage(2,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
     } 
     BattleFighter * BattleFighter::getMyFighters(UInt8 index)   //找第几个活着的 (0开始)
     { 

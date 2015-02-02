@@ -3,6 +3,11 @@
 #define COUNTRY_H_
 #include "Server/WorkerRunner.h"
 #include "MsgHandler/CountryMsgHandler.h"
+namespace Script
+{ 
+    class GameActionLua;
+    class BattleFormula;
+} 
 namespace GObject
 {
     class Country
@@ -14,9 +19,16 @@ namespace GObject
             bool Init();
             void UnInit();
             std::string GetLogName();
+
+            inline Script::BattleFormula* GetBattleFormula()
+            { 
+                return m_BattleFormula;
+            } 
         
         private:
             UInt8       m_ThreadID;
+
+            Script::BattleFormula* m_BattleFormula;
     };
 }
 #endif // COUNTRY_H_
