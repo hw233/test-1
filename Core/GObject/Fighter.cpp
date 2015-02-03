@@ -83,4 +83,15 @@ namespace GObject
             m_baseSkills.push_back(skillId)  ;
         }
     } 
+    UInt8 Fighter::Enchant(UInt8 part, UInt8 type)
+    { 
+        UInt32 val = GetFVar()->GetFVar(part + FVAR_WEAPON_ENCHANT );
+        if(val%10 ==9 && type == 0 )
+            return 2;
+        if(val/10 >= 20)
+            return 3;
+
+        ++val;
+        return 0;
+    } 
 }

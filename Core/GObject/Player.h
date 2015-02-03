@@ -176,6 +176,9 @@ namespace GObject
             UInt8 GetBattleSide() { return _battleSide;}
 
 
+            //业务逻辑
+            UInt8 Enchant(UInt8 number);
+
     private:
             //IDTYPE _id;
             std::string _accounts;

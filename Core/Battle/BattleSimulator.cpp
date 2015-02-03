@@ -86,7 +86,7 @@ namespace Battle
         {
             std::cout << "回合数:: " << static_cast<UInt32>(i) << std::endl <<std::endl;
             actCount += doImage(i);
-            actCount += doObjectMove();
+            actCount += doObjectMove(i);
             for(UInt8 j = 0; j < 20; ++j)
             {
                 /*
@@ -131,6 +131,9 @@ namespace Battle
             }
             actCount += doAttack(i);
         }
+
+        actCount += ClearObjectPackage();
+
         _packet.data<UInt16>(offset) = actCount;
         _packet << Stream::eos;
         battleReport.addReport(_id,_packet);
@@ -237,7 +240,7 @@ namespace Battle
         return count;
     } 
 
-    UInt8 BattleSimulator::doObjectMove()
+    UInt8 BattleSimulator::doObjectMove(UInt16 time)
     { 
         std::list<ObjectPackage>& lst = GetObjectpackage();
         if(!lst.size())
@@ -248,7 +251,9 @@ namespace Battle
         { 
             if(it->CanExit())
             { 
+                it->BuildStream(_packet);
                 it = lst.erase(it);
+                ++count;
                 continue;
             } 
 
@@ -258,32 +263,34 @@ namespace Battle
                 if(it->CheckFighterInSCope(_fighters[!fgt->GetSideInBS()][i])) 
                 { 
                     UInt16 param = _fighters[!fgt->GetSideInBS()][i]->BeActed(&(*it));
+                    it->InsertIntoPackage(time,_fighters[!fgt->GetSideInBS()][i], param);
 
-                    _packet << static_cast<UInt8>(it->GetHappenTime());
-                    _packet << fgt->GetBSNumber();
-                    _packet << static_cast<UInt8>(2);
-                    _packet << static_cast<UInt16>(it->GetSkillId()) << static_cast<UInt8>(1);
-                    _packet << _fighters[!fgt->GetSideInBS()][i]->GetBSNumber();
-                    _packet << static_cast<UInt16>(param);
-
-                    std::cout << " 回合数：" << static_cast<UInt32>(it->GetHappenTime());
-                    std::cout << std::endl;
-                    std::cout << " 技能释放者编号: " << static_cast<UInt32>(fgt->GetBSNumber());
-                    std::cout << std::endl;
-                    std::cout << " 技能编号："  << static_cast<UInt32>(it->GetSkillId()) << " 前进 " << static_cast<UInt32>(it->GetPosX()) << " , " << static_cast<UInt32>(it->GetPosY());
-                    std::cout << std::endl;
-                    std::cout << " 被击者：" << static_cast<UInt32>(_fighters[!fgt->GetSideInBS()][i]->GetBSNumber()) << " 位置: " << static_cast<UInt32>(_fighters[!fgt->GetSideInBS()][i]->getPosX()) <<" , "<< static_cast<UInt32>(_fighters[!fgt->GetSideInBS()][i]->getPosY());
-                    std::cout << std::endl;
-                    std::cout << " 伤害: " << static_cast<UInt32>(param);
-                    std::cout << std::endl;
-                    std::cout << std::endl;
-                    ++count;
+                   // _packet << static_cast<UInt8>(it->GetHappenTime());
+                   // _packet << fgt->GetBSNumber();
+                   // _packet << static_cast<UInt8>(2);
+                   // _packet << static_cast<UInt16>(it->GetSkillId()) << static_cast<UInt8>(1);
+                   // _packet << _fighters[!fgt->GetSideInBS()][i]->GetBSNumber();
+                   // _packet << static_cast<UInt16>(param);
                 } 
             } 
             it->GoNext();
             ++it;
         } 
 
+        return count;
+    } 
+    UInt8 BattleSimulator::ClearObjectPackage()
+    { 
+        std::list<ObjectPackage>& lst = GetObjectpackage();
+        if(!lst.size())
+            return 0;
+        std::list<ObjectPackage>::iterator it = lst.begin(); 
+        UInt8 count = 0;
+        for(;it != lst.end();)
+        {
+            count += it->BuildStream(_packet);
+            it = lst.erase(it);
+        }
         return count;
     } 
 }

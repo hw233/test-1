@@ -76,5 +76,20 @@ void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
     }
 }
 
+void OnEnchantReq(GameMsgHdr& hdr, const void * data)
+{ 
+   MSG_QUERY_CONN_PLAYER(player) ;
+   BinaryReader br(data,hdr.msgHdr.bodyLen);
+   UInt8 opt = 0;
+   br >> opt;
+   UInt16 fighterId;
+   br >> fighterId;
+   Fighter* fgt = player->findFighter(fighterId);
+   if(!fgt)
+       return ;
+   UInt8 part = 0;
+   br >> part;
+   res = fgt->Enchant(part,type);
+} 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

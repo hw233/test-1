@@ -41,7 +41,8 @@ namespace Battle
             //AfterAction
             UInt8 doAttack(UInt16 time);
             UInt8 doImage(UInt16 time);
-            UInt8 doObjectMove();
+            UInt8 doObjectMove(UInt16 time);
+            UInt8 ClearObjectPackage();
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

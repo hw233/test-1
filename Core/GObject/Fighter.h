@@ -60,6 +60,8 @@ namespace GObject
             void SetBaseSkill(UInt8 level ,UInt16 skillId); // UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId);
 
             void SetSkill(std::string skill);
+
+            UInt8 Enchant(UInt8 part,UInt8 type);
     private:
             UInt32 _id;
             Player * _owner;

@@ -369,7 +369,9 @@ namespace REQ
     /**跨服战操作 */
     const UInt8 SERVER_ARENA_OP     = 0xE8;
     /**聊天 */
-    const UInt8 CHAT                = 0x20;// 0xF0
+
+    //强化
+    const UInt8 ENCHART             = 0x20;// 0xF0
     /**私聊 */
     const UInt8 WHISPER             = 0x21;// 0xF1
     /**寻找玩家 */

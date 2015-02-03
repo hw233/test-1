@@ -45,7 +45,8 @@ namespace GObject
             void enumerate(Visitor<ItemBase>& visitor);
             ItemBase * AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
             ItemBase * AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
-            ItemBase* AddItemFromDB(UInt32 id, UInt32 num, bool bind);
+            ItemBase * AddItemFromDB(UInt32 id, UInt32 num, bool bind);
+
 
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;

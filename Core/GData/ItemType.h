@@ -113,16 +113,16 @@ namespace GData
 	{
 		ItemClass	subClass;
 		UInt32		price;
-		UInt16		reqLev;
-		UInt16		vLev;
-		UInt8		quality;
+		//UInt16		reqLev;
+		//UInt16		vLev;
+		//UInt8		quality;
 		UInt16		maxQuantity;
 		UInt8		bindType;
-		UInt16		energy;
-		UInt32		trumpExp;
-        UInt16      data;
-        UInt8       career;
-        float       salePriceUp;
+		//UInt16		energy;
+		//UInt32		trumpExp;
+        //UInt16      data;
+        //UInt8       career;
+        //float       salePriceUp;
 
 		ItemBaseType(UInt32 id = 0, const std::string& name = "") : ObjectBaseT<>(id, name)	{}
 		virtual ~ItemBaseType() { }	//RTTI
@@ -148,49 +148,6 @@ namespace GData
 	//宝石
 	
 	//装备
-	struct ItemEquipType : public ItemBaseType
-	{
-		const AttrExtra*	attrExtra;
-        bool fix;
-		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name), fix(false)
-		{
-			const AttrExtraItem * attr = attrExtraManager[attrId];
-			if(attr != NULL)
-				attrExtra = *attr;
-			else
-				attrExtra = NULL;
-		}
-        void setAttr(const AttrExtra* attr, bool fix = false)
-        {
-            if (this->fix)
-                delete attrExtra;
-            attrExtra = attr;
-            this->fix = fix;
-        }
-		virtual ~ItemEquipType()
-        {
-            if (fix && attrExtra)
-                delete attrExtra;
-        }
-	};
-
-	struct ItemWeaponType : public ItemEquipType
-	{
-		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemEquipType(id, name, attrId) {}
-	};
-
-	struct ItemTrumpType : public ItemEquipType
-	{
-		ItemTrumpType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemEquipType(id, name, attrId) {}
-	};
-
-	struct ItemEquipSetType:
-		public ObjectBaseT<>
-	{
-		const AttrExtra* attrExtra[4];
-
-		ItemEquipSetType(UInt32 id = 0, const std::string& name = "") : ObjectBaseT<>(id, name)	{}
-	};
 	typedef ObjectListT<ItemBaseType> ItemBaseTypeManager;
 	typedef ObjectMapT<ItemBaseType, std::string> ItemBaseTypeNameManager;
 

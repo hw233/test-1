@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include <math.h>
+#include "Common/Stream.h"
 #define FIELD_WIDTH 1440
 #define FIELD_HIGH  9*60
 #define STEP 60
@@ -16,6 +17,16 @@ namespace Battle
     class BattleFighter;
     class BattleObject;
     //行为动作
+    struct BattleActionStream
+    {
+        UInt16 _curtime;
+        BattleObject* _bo;
+        UInt16 _prarm ;
+        BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
+        UInt16 GetCurTime(){return _curtime;}
+        BattleObject* GetBattleObject(){ return _bo;}
+        UInt16 GetParam(){ return _prarm;}
+    };
     class BattleAction
     {
         public:
@@ -175,14 +186,15 @@ namespace Battle
             void setObjectTime(UInt8 count ) { _count = count;}
 
             bool CheckFighterInSCope(BattleObject* bo);  //非指向性
-            //{ 
-            //    UInt16 advance = getDistance(bo->getPosX(), bo->getPosY());
-            //    if(advance < bo->getRad()+_rad)
-            //        return true;
-            //    return false;
-            //} 
-
+            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt16 param)
+            { 
+                vec_struct.push_back(BattleActionStream(curtime, bo, param));
+            } 
+            UInt8 BuildStream(Stream& st);
+        public:
+            std::vector< BattleActionStream >  vec_struct;
         private:
+
             UInt16 _skillId;
             UInt32 _attack ;
             UInt32 _critical ;
@@ -203,6 +215,7 @@ namespace Battle
             UInt16 _rad;
 
             UInt8 _count;
+
     };
 }
 #endif // BATTLEACTION_H_
