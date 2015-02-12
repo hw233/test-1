@@ -23,7 +23,7 @@ function fighter_base()
         BEGIN {
             print "INSERT INTO `fighter_base` VALUES";
         } {
-            printf("(%u,\x27%s\x27,%d,%d,%d,%u,%u,%u,%u,%u,%u,%u)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12);
+            printf("(%u,\x27%s\x27,%d,%d,%d,%u,%u,\x27%s\x27,%u,%u,%u,%u,%u,%u,%u,%u,%u)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

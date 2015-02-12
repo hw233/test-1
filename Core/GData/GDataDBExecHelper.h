@@ -120,6 +120,13 @@ namespace GData
         UInt16 actionCd;
         UInt16 actionBackCd;
     };
+
+    struct DBMap  
+    {
+        UInt16 id;
+        UInt8 floor;
+        std::string info;
+    };
 }
 namespace DB
 {
@@ -218,7 +225,7 @@ namespace DB
          UInt32, magdef,
          UInt32, critical,
          UInt32, criticalDef,
-         UInt32, hp,
+         UInt32, hit,
          UInt32, evade
          //std::string, skill
         )
@@ -258,6 +265,15 @@ namespace DB
          UInt8, count,
          UInt8, side,
          UInt8, type
+        )
+        SPECIALEND()
+
+        SPECIALBEGIN(GData::DBMap)
+        SPECIALDEF(3)
+        (
+         UInt16, id,
+         UInt8, floor,
+         std::string,  info
         )
         SPECIALEND()
 

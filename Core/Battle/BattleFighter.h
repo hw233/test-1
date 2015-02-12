@@ -119,7 +119,14 @@ namespace Battle
             void setNumber(UInt8 num){ _number = num;}
             UInt8 getNumber(){ return _number; }
 
-            void setMainFighter(BattleFighter * bf){m_mainFighter = bf;}
+            void setMainFighter(BattleFighter * bf){
+                m_mainFighter = bf;
+                setHP(m_mainFighter->getHP());
+                for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
+                { 
+                    attrBase[i] = m_mainFighter->GetBattleAttr(i);
+                } 
+            }
 
             void PutBattleFighters(BattleSimulator& bsim);
             BattleFighter* getMyFighters(UInt8 index);
@@ -189,6 +196,7 @@ namespace Battle
                     case 2:
                         return attrSub[index];
                 } 
+                return 0;
             } 
 
             void SetBattleAttr(UInt8 index , UInt32 val, UInt8 type)

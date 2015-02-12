@@ -1,7 +1,7 @@
 #!/bin/bash
 
-H=192.168.88.250
-U=kingxin
+H=127.0.0.1
+U=jacob
 P=kingxin
 PT=3306
 

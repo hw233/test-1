@@ -23,7 +23,7 @@ function skillEffect()
         BEGIN {
             print "INSERT INTO `skillEffect` VALUES";
         } {
-            printf("(%u,\x27%s\x27,%d,%u,%.2f,%u,%.2f)",$1,$2,$3,$4,$5,$6,$7);
+            printf("(%u,\x27%s\x27,%d,%u,%u,%.2f,%u,%.2f)",$1,$2,$3,$4,$5,$6,$7,$8);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

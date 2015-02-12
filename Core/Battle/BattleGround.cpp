@@ -4,6 +4,8 @@
 #include "GObject/Player.h"
 #include "Battle/BattleSimulator.h"
 #include "Battle/BattleReport.h"
+#include "Common/StringTokenizer.h"
+#include "GData/Map.h"
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
 namespace Battle
@@ -31,8 +33,31 @@ namespace Battle
             {6, 4}, 
             {8, 4}, 
         };
+
+
+        std::vector<std::string > vec = GData::map.GetMapInfo(mapId);
+        UInt8 flag = 0;
+        _y = vec.size();
+        if(_y)
+        { 
+            StringTokenizer st(vec[0],",");
+            _x = st.count()*2 + 1;
+        } 
+
         _mapGround = new UInt8[_x*_y];
         memset(_mapGround , 0 ,_x*_y*sizeof(UInt8));
+        
+        for(UInt8 i = 0; i < vec.size(); ++i)
+        { 
+            flag = !flag;
+            StringTokenizer st(vec[i],",");
+            for(UInt8 j = 0; j < st.count(); ++j)
+            { 
+                UInt8 value = static_cast<UInt8>(::atoi(st[j].c_str()));
+               _mapGround[j*2+flag + i*_x] = value;
+               std::cout << "坐标：" << static_cast<UInt32>(j*2+flag)<<" , " << static_cast<UInt32>(i)<<std::endl;
+            } 
+        } 
 
         for(UInt8 i = 0; i < 15 ; ++i)
         {

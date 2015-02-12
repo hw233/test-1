@@ -28,7 +28,7 @@ namespace Battle
             }
         }
 
-        if(f)
+        if(f) //战将属性  小兵属性延后
         { 
             setHP(f->GetFighterAttr(e_attr_max));
             for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
@@ -36,21 +36,12 @@ namespace Battle
                 attrBase[i] = f->GetFighterAttr(i);
             } 
         } 
-        else
-        {
-            setHP(m_mainFighter->getHP());
-            for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
-            { 
-                attrBase[i] = m_mainFighter->GetBattleAttr(i);
-            } 
-            
-        }
 
         SetGroundX(pointX);
         SetGroundY(pointY);
         _st.clear();
 
-//        setHP(1000);
+        //        setHP(1000);
         _battleIndex = 0;
     } 
     BattleFighter::~BattleFighter()
@@ -114,11 +105,11 @@ namespace Battle
             }
         } 
         setPos(x,y);
-       // if(1 ||GetBSNumber() == 0 || GetBSNumber() == 7)
-       // { 
-       //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
-       // } 
-            
+        // if(1 ||GetBSNumber() == 0 || GetBSNumber() == 7)
+        // { 
+        //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
+        // } 
+
         //BuildLocalStream(e_run);
     } 
 

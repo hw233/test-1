@@ -12,6 +12,7 @@
 #include "GData/ExpTable.h"
 #include "GData/SkillTable.h"
 #include "GObject/Fighter.h"
+#include "GData/Map.h"
 
 namespace GData
 {
@@ -66,6 +67,12 @@ namespace GData
         if (!LoadSkillBuff())  
         {
             fprintf(stderr, "Load LoadSkillBuff Error !\n");
+            std::abort();
+        }
+
+        if (!LoadMapInfo())  
+        {
+            fprintf(stderr, "Load LoadMapInfo Error !\n");
             std::abort();
         }
 
@@ -271,7 +278,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillBuff dbbuff;
-        if(execu->Prepare("SELECT `id`,`name`,`attrIds`,`valueP`,`value`,`count`,`side`,`type` FROM `skillBuff`", dbbuff) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`attrId`,`valueP`,`value`,`count`,`side`,`type` FROM `skillBuff`", dbbuff) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
@@ -290,6 +297,20 @@ namespace GData
                 sb->value.push_back(::atoi(st2[i].c_str()));
 
             skillBuffManager.add(sb);
+        }
+        return true;
+    } 
+
+    bool GDataManager::LoadMapInfo()
+    { 
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBMap dbmap;
+        if(execu->Prepare("SELECT `id`,`floor`,`info` FROM `map`", dbmap) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            map.loadMapInfo(dbmap.id , dbmap.info);
         }
         return true;
     } 
