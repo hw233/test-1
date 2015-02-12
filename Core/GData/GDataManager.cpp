@@ -265,6 +265,34 @@ namespace GData
         }
         return true;
     } 
+
+    bool GDataManager::LoadSkillBuff()
+    { 
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSkillBuff dbbuff;
+        if(execu->Prepare("SELECT `id`,`name`,`attrIds`,`valueP`,`value`,`count`,`side`,`type` FROM `skillBuff`", dbbuff) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            SkillBuff* sb = new Skill(dbbuff.id, dbbuff.name);
+            
+            StringTokenizer st(dbbuff.attrIds);
+            for(UInt8 i = 0; i < st.count(); ++i)
+                sb->attrIds.push_back(st[i]);
+
+            StringTokenizer st1(dbbuff.valueP);
+            for(UInt8 i = 0; i < st1.count(); ++i)
+                sb->valueP.push_back(st1[i]);
+
+            StringTokenizer st2(dbbuff.value);
+            for(UInt8 i = 0; i < st2.count(); ++i)
+                sb->value.push_back(st2[i]);
+
+            skillBuffManager.add(sb);
+        }
+        return true;
+    } 
 }
 
 

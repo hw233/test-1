@@ -213,6 +213,8 @@ namespace Battle
                 return A_SUB_B(attrBase[index]+attrAdd[index] , attrSub(index));
             } 
 
+            void AddBuff(UInt16 buffId);
+
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续

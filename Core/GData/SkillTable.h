@@ -73,6 +73,20 @@ namespace GData
             // float defendP;   //附加防御百分比增加
     };
 
+    class SkillBuff : public ObjectBaseT<UInt16>
+    { 
+        public:
+            SkillBuff(UInt16 id , const std::string& name)
+                : ObjectBaseT<UInt16>(id,name) { } 
+        public:
+            std::vector<UInt8> attrIds;
+            std::vector<UInt8> valueP;
+            std::vector<UInt16> value;
+            UInt8 count;
+            UInt8 side;
+            UInt8 type;
+    } 
+
 
     typedef ObjectMapT<SkillCondition, UInt16> SkillConditionManager;
 #define skillConditionManager SkillConditionManager::Instance()
@@ -83,6 +97,8 @@ namespace GData
     typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;   
 #define skillEffectManager SkillEffectManager::Instance()
 
+    typedef ObjectMapT<SkillBuff, UInt16> SkillBuffManager;   
+#define skillBuffManager SkillBUffManager::Instance()
 
     class Skill : public ObjectBaseT<UInt16>
     {

@@ -96,6 +96,18 @@ namespace GData
         UInt32 skillId;
     };
 
+    struct DBSkillBuff  
+    {
+        UInt32 id;
+        UInt8  name;
+        std::string attrIds;
+        std::string valueP;
+        std::string value;
+        UInt8 count;
+        UInt8 side;
+        UInt8 type;
+    };
+
     struct DBSkill  
     {
         UInt32 id;
@@ -230,6 +242,20 @@ namespace DB
          UInt16, cd,
          UInt16, actionCd,
          UInt16, actionBackCd
+        )
+        SPECIALEND()
+
+        SPECIALBEGIN(GData::DBSkillBuff)
+        SPECIALDEF(8)
+        (
+         UInt32, id,
+         UInt8,  name,
+         std::string, attrIds,
+         std::string, valueP,
+         std::string, value,
+         UInt8, count,
+         UInt8, side,
+         UInt8, type
         )
         SPECIALEND()
 

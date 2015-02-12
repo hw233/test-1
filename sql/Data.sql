@@ -66,8 +66,6 @@ CREATE TABLE `skillCondition` (
       `name` varchar(255) NOT NULL,
       `cond` int(10) NOT NULL DEFAULT '0',
       `prob` tinyint(3) unsigned NOT NULL DEFAULT '0',
-      `cd` int(10) NOT NULL DEFAULT '0',
-      `actionCd` int(10) NOT NULL DEFAULT '0',
       `distance` int(10) NOT NULL DEFAULT '0',
       `priority` tinyint(3) unsigned NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`name`)
@@ -137,6 +135,40 @@ CREATE TABLE `fighter_base_skill` (
       PRIMARY KEY (`id`,`levelLimit`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `skillBuff`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `skillEffect` (
+      `id` int(10) NOT NULL DEFAULT '0',
+      `name` varchar(255) NOT NULL,
+      `attrIds` varchar(255) NOT NULL,
+      `valueP` varchar(255) NOT NULL,
+      `value` varchar(255) NOT NULL,
+      `count` tinyint(3) NOT NULL DEFAULT '0', 
+      `side` tinyint(3) NOT NULL DEFAULT '0',  
+      `type` tinyint(3) NOT NULL DEFAULT '0',  
+      PRIMARY KEY (`id`,`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `skill`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `skill` (
+      `id` int(10) NOT NULL DEFAULT '0',
+      `name` varchar(255) NOT NULL,
+      `skillCondId` int(10) NOT NULL DEFAULT '0',
+      `skillScopeId` int(10) NOT NULL DEFAULT '0',
+      `skillEffectId` int(10) NOT NULL DEFAULT '0',
+      `cd` int(10) NOT NULL DEFAULT '0',
+      `actionCostCd` int(10) NOT NULL DEFAULT '0',
+      `actionBackCd` int(10) NOT NULL DEFAULT '0',
+      PRIMARY KEY (`id`,`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
 
 
 

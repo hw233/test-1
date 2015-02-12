@@ -23,7 +23,7 @@ function skillCondition()
         BEGIN {
             print "INSERT INTO `skillCondition` VALUES";
         } {
-            printf("(%u,\x27%s\x27,%u,%d,%u,%u,%u,%d)",$1,$2,$3,$4,$5,$6,$7,$8);
+            printf("(%u,\x27%s\x27,%u,%d,%u,%d)",$1,$2,$3,$4,$5,$6);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
