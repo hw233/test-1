@@ -21,6 +21,7 @@ namespace Battle
 #define  ACTION_WAIT 0  //动作延迟起作用
 #define  ACTION_HAPPEN 1  //动作立即起作用
 #define  MYFIGHTERMAX 10
+#define  A_SUB_B(x,y) (x)>(y)?(x)-(y):0
     enum 
     {
         e_none = 0, //待机
@@ -34,6 +35,19 @@ namespace Battle
         e_be_attacked = 8 , //被攻击
         e_run_attack = 9 ,   //跑攻 (骑兵专用)
         e_object_image = 10
+    };
+
+    enum
+    {
+        e_attr_attack = 0,
+        e_attr_magatk = 1,
+        e_attr_defend = 2,
+        e_attr_magdef = 3,
+        e_attr_critical = 4,
+        e_attr_criticalDef = 5,
+        e_attr_hit = 6,
+        e_attr_evade = 7,
+        e_attr_max
     };
 
     struct ActionBase
@@ -148,19 +162,57 @@ namespace Battle
 
             virtual UInt8 GetRideCount() {return 1;}
             
-            UInt32 GetAttack() { return _attack_near;}
-            UInt32 GetDistanceAttack() { return _attack_distance;}
-            UInt32 GetDefend(){ return _defend;}
-            UInt32 GetImageDefend(){ return _defend_image;}
-            UInt32 GetHit() { return _hit;}
-            UInt32 GetEvade() {return _evade;}
-            UInt32 GetCritical() { return _critical;}
-            UInt32 GetDefendCritical() { return _defend_critical;}
+            UInt32 GetAttack() { return GetTotalAttr(e_attr_attack);}
+
+            UInt32 GetDefend(){ return GetTotalAttr(e_attr_defend);}
+            UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magatk);}
+            UInt32 GetHit() { return GetTotalAttr(e_attr_hit);}
+            UInt32 GetEvade() {return GetTotalAttr(e_attr_evade);}
+            UInt32 GetCritical() { return GetTotalAttr(e_attr_critical);}
+            UInt32 GetDefendCritical() { return GetTotalAttr(e_attr_criticalDef);}
 
             UInt32 GetWreck() { return _wreck;}
             UInt32 GetParry(){ return _parry;}
 
             ImagePackage MakeImageEffect();
+
+            UInt32 GetBattleAttr(UInt8 index, UInt8 type =0)
+            { 
+                if(index >= e_attr_max)
+                    return 0;
+                switch(type)
+                { 
+                    case 0:
+                        return attrBase[index];
+                    case 1:
+                        return attrAdd[index];
+                    case 2:
+                        return attrSub[index];
+                } 
+            } 
+
+            void SetBattleAttr(UInt8 index , UInt32 val, UInt8 type)
+            { 
+                if(index >= e_attr_max)
+                    return; 
+                switch(type)
+                { 
+                    case 0:
+                        attrBase[index] = val;
+                    case 1:
+                        attrAdd[index] = val;
+                    case 2:
+                        attrSub[index] = val;
+                } 
+            } 
+
+            UInt32 GetTotalAttr(UInt8 index)
+            { 
+                if(index >= e_attr_max)
+                    return 0;
+                return A_SUB_B(attrBase[index]+attrAdd[index] , attrSub(index));
+            } 
+
         protected:
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
@@ -191,16 +243,16 @@ namespace Battle
             //霸体 
             UInt8 _stoic;
             UInt8 _stoicLev;
-            
-            UInt32 _attack_near;
-            UInt32 _attack_distance;
-            UInt32 _attack_image;
-            UInt32 _defend;
-            UInt32 _defend_image;
-            UInt32 _critical; //暴击 
-            UInt32 _defend_critical; //抗暴
-            UInt32 _hit;  //命中
-            UInt32 _evade;  //闪避
+
+            //UInt32 _attack_near;
+            //UInt32 _attack_distance;
+            //UInt32 _attack_image;
+            //UInt32 _defend;
+            //UInt32 _defend_image;
+            //UInt32 _critical; //暴击 
+            //UInt32 _defend_critical; //抗暴
+            //UInt32 _hit;  //命中
+            //UInt32 _evade;  //闪避
 
             UInt32 _wreck; //破击
             UInt32 _parry;  //格挡
@@ -220,6 +272,9 @@ namespace Battle
 
             UInt8 _sideInBS;
 
+            UInt32 baseAttr[e_attr_max];
+            UInt32 baseAdd[e_attr_max];
+            UInt32 baseSub[e_attr_max];
     };
 
 }

@@ -33,6 +33,7 @@ namespace GObject
             UInt8 GetTypeId(){return _typeId;}
             void SetChildTypeId(UInt8 type) { _childTypeId = type;}
 
+            UInt8 GetChildTypeId(){return _childTypeId;}
             //Get
             inline UInt32 getId() { return _id; }
             inline Player * GetOwner() { return _owner; }
@@ -45,16 +46,24 @@ namespace GObject
             UInt8 GetSide();//{ if(_owner) return _owner->GetBattleSide(); return 0;}
             FVarSystem* GetFVar();
 
+            UInt32 GetVar(UInt32 num);
+            void SetVar(UInt32 num, UInt32 val);
+
             void SetRad(UInt16 rad) { _bodySize = rad;} 
             UInt16 GetRad() { return _bodySize;}
 
-            void SetBaseAttr(UInt32 attack , UInt32 defend, UInt32 magatk, UInt32 magdef, UInt32 critical, UInt32 evade) 
+            void SetSpeed(UInt16 speed){ _speed = speed;}
+
+            void SetBaseAttr(UInt32 hp,UInt32 attack , UInt32 defend, UInt32 magatk, UInt32 magdef, UInt32 critical,UInt32 criticalDef,UInt32 hit UInt32 evade) 
             { 
+                _hp = hp;
                 _attack = attack;
                 _defend = defend;
                 _magatk = magatk;
                 _magdef = magdef;
                 _critical = critical;
+                _criticalDef = critical;
+                _hit = hit;
                 _evade = evade;
             } 
             void SetBaseSkill(UInt8 level ,UInt16 skillId); // UInt16 skillCondId, UInt16 skillScopeId, UInt16 skillEffectId);
@@ -62,6 +71,35 @@ namespace GObject
             void SetSkill(std::string skill);
 
             UInt8 Enchant(UInt8 part,UInt8 type);
+
+            void BuildFighterInfo(Stream& st);
+
+
+            UInt32 GetFighterAttr(UInt8 index)
+            { 
+                switch(index)
+                { 
+                    case e_attr_attack:
+                        return _attack;
+                    case e_attr_magatk:
+                        return _magatk;
+                    case e_attr_defend:
+                        return _defend;
+                    case e_attr_magdef:
+                        return _magdef;
+                    case e_attr_critical:
+                        return _critical;
+                    case e_attr_criticalDef:
+                        return _criticalDef;
+                    case e_attr_hit:
+                        return _hit;
+                    case e_attr_evade:
+                        return _evade;
+                    case e_attr_max:
+                        return _hp;
+                } 
+            } 
+
     private:
             UInt32 _id;
             Player * _owner;
@@ -74,13 +112,17 @@ namespace GObject
             ItemArmor * _armor[5];
             FVarSystem* fVarSystem;
 
+            UInt16 _speed;  //行动速度
             UInt16 _bodySize;  //模型体积半径
 
+            UInt32 _hp;
             UInt32 _attack;
             UInt32 _defend;
             UInt32 _magatk;
             UInt32 _magdef;
             UInt32 _critical;
+            UInt32 _criticalDef;
+            UInt32 _hit;
             UInt32 _evade;
 
             UInt8 _typeId;

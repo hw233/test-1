@@ -94,4 +94,24 @@ namespace GObject
         ++val;
         return 0;
     } 
+
+    UInt32 Fighter::GetVar(UInt32 num)
+    { 
+       return GetFVar()->GetFVar(num) ;
+    } 
+    
+    void Fighter::SetVar(UInt32 num, UInt32 val)
+    { 
+        GetFVar()->SetFVar(num,val);
+    } 
+    void Fighter::BuildFighterInfo(Stream& st)
+    { 
+       st << static_cast<UInt16>(getId());
+       st << static_cast<UInt8>(0);
+       for(UInt8 i = 0; i < 6; ++i) 
+       { 
+           st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)%10);
+           st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)/10);
+       } 
+    } 
 }

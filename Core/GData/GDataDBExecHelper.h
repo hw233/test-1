@@ -75,12 +75,16 @@ namespace GData
         UInt8 color;
         UInt8 typeId;
         UInt8 childType;
+        UInt16 speed;
         UInt16 bodySize;
+        UInt32 hp;
         UInt32 attack;
         UInt32 defend;
         UInt32 magatk;
         UInt32 magdef;
         UInt32 critical;
+        UInt32 criticalDef;
+        UInt32 hit;
         UInt32 evade;
     //    std::string skill;
     };
@@ -191,12 +195,16 @@ namespace DB
          UInt8, color,
          UInt8, typeId,
          UInt8, childType,
+         UInt16, speed,
          UInt16, bodySize,
+         UInt32, hp,
          UInt32, attack,
          UInt32, defend,
          UInt32, magatk,
          UInt32, magdef,
          UInt32, critical,
+         UInt32, criticalDef,
+         UInt32, hp,
          UInt32, evade
          //std::string, skill
         )

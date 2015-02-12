@@ -21,11 +21,29 @@ namespace Battle
         {
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
             {
-                m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,NULL,0,0);
+                m_fighters[i] =  BattleSimulator::CreateFighter(f->GetChildTypeId(),_formula,NULL,0,0);
                 m_fighters[i]->setMainFighter(this);
                 if( m_fighters[i])
                     m_fighters[i]->setNumber(i+1);
             }
+        }
+
+        if(f)
+        { 
+            setHp(f->GetFighterAttr(e_attr_max));
+            for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
+            { 
+                attrBase[i] = f->GetFighterAttr(i);
+            } 
+        } 
+        else
+        {
+            setHp(m_mainFighter->getHP());
+            for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
+            { 
+                attrBase[i] = f->GetBattleAttr(i);
+            } 
+            
         }
 
         SetGroundX(pointX);

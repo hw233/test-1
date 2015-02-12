@@ -216,7 +216,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBFighterBase dbfb;
-        if(execu->Prepare("SELECT `id`,`name`,`color`,`typeId`,`childType`,`bodySize`,`attack`,`defend`,`magatk`,`magdef`,`critical`,`evade` FROM `fighter_base`", dbfb) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`color`,`typeId`,`childType`,`speed`,`bodySize`,`hp`,`attack`,`defend`,`magatk`,`magdef`,`critical`,`criticalDef`,`hit`,`evade` FROM `fighter_base`", dbfb) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -227,8 +227,9 @@ namespace GData
             fgt->SetColor(dbfb.color);
             fgt->SetTypeId(dbfb.typeId);
             fgt->SetChildTypeId(dbfb.childType);
+            fgt->SetSpeed(dbfb.speed);
             fgt->SetRad(dbfb.bodySize);
-            fgt->SetBaseAttr(dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical,dbfb.evade);
+            fgt->SetBaseAttr(dbfb.hp,dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical, dbfb.criticalDef, dbfb.hit, dbfb.evade);
             //fgt->setSkills(dbfb.skill);
             GObject::globalFighters.add(fgt);
         }    

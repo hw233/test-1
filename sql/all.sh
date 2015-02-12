@@ -5,4 +5,4 @@ for i in $b
 do
     . `pwd`/$i
 done
-rm -f $a
+#rm -f $a
