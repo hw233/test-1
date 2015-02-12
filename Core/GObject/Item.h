@@ -26,15 +26,10 @@ namespace GObject
             inline ItemClass	getClass() const { return _itemBaseType->subClass; }
             inline UInt16 GetTypeId() const { return _itemBaseType->getId(); }
             inline const std::string& getName() const   { return _itemBaseType->getName();	 }
-            inline UInt8		getQuality() const { return _itemBaseType->quality; }
-            inline UInt16		getReqLev() const { return _itemBaseType->reqLev; }
             inline UInt32		getPrice() const { return _itemBaseType->price; }
-            inline UInt16		getValueLev() const { return _itemBaseType->vLev; }
 
             inline UInt16		getMaxQuantity() const	{ return _itemBaseType->maxQuantity; }
             inline UInt8		getBindType() const	{ return _itemBaseType->bindType; }
-            inline UInt16       getEnergy() const { return _itemBaseType->energy; }
-            inline UInt8        GetCareer() const { return _itemBaseType->career; }
 
             bool GetBindStatus() const { return m_BindStatus; }
             inline bool  SetBindStatus(bool bindType)
@@ -78,72 +73,6 @@ namespace GObject
             UInt32  m_SellTime;  //出售物品时间
     };
 
-    //装备
-    class ItemEquip : public ItemBase
-    {
-        public:
-            ItemEquip(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
-                : ItemBase(id, itemEquipType), _itemEquipData(itemEquipData)
-            {
-            }
-
-            virtual ~ItemEquip() {}
-
-        public:
-            inline ItemEquipData& getItemEquipData() { return _itemEquipData; }
-
-            inline const GData::AttrExtra * getAttrExtra() { return static_cast<const GData::ItemEquipType*>(_itemBaseType)->attrExtra; }
-
-            inline UInt16 getAttack()
-            {
-                const GData::AttrExtra* attrExtra = getAttrExtra();
-                if (attrExtra)
-                    return attrExtra->attack;
-                return 0;
-            }
-            inline UInt16 getImgAttack()
-            {
-                const GData::AttrExtra* attrExtra = getAttrExtra();
-                if (attrExtra)
-                    return attrExtra->magic_attack;
-                return 0;
-            }
-            inline UInt16 getDefend()
-            {
-                const GData::AttrExtra* attrExtra = getAttrExtra();
-                if (attrExtra)
-                    return attrExtra->defend;
-                return 0;
-            }
-            inline UInt16 getImgDefend()
-            {
-                const GData::AttrExtra* attrExtra = getAttrExtra();
-                if (attrExtra)
-                    return attrExtra->magic_defend;
-                return 0;
-            }
-
-            void DoEquipBind(bool = false);
-
-        public:
-            ItemEquipData _itemEquipData;
-    };
-
-    class ItemWeapon : public ItemEquip  
-    {
-        public:
-            ItemWeapon(UInt32 id, const GData::ItemBaseType* itemArmorType, ItemEquipData& itemEquipData)
-                : ItemEquip(id, itemArmorType, itemEquipData)
-            { }
-    };
-
-    class ItemArmor : public ItemEquip  
-    {
-        public:
-            ItemArmor(UInt32 id, const GData::ItemBaseType* itemArmorType, ItemEquipData& itemEquipData)
-                : ItemEquip(id, itemArmorType, itemEquipData)
-            { }
-    };
 }
 
 #endif

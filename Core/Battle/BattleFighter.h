@@ -210,7 +210,7 @@ namespace Battle
             { 
                 if(index >= e_attr_max)
                     return 0;
-                return A_SUB_B(attrBase[index]+attrAdd[index] , attrSub(index));
+                return A_SUB_B(attrBase[index]+attrAdd[index] , attrSub[index]);
             } 
 
             void AddBuff(UInt16 buffId);
@@ -274,9 +274,9 @@ namespace Battle
 
             UInt8 _sideInBS;
 
-            UInt32 baseAttr[e_attr_max];
-            UInt32 baseAdd[e_attr_max];
-            UInt32 baseSub[e_attr_max];
+            UInt32 attrBase[e_attr_max];
+            UInt32 attrAdd[e_attr_max];
+            UInt32 attrSub[e_attr_max];
     };
 
 }

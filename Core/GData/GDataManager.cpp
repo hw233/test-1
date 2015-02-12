@@ -28,6 +28,11 @@ namespace GData
             std::abort();
         }
 
+        if (!LoadFighterBase())  
+        {
+            fprintf(stderr, "Load LoadFighterBase Error !\n");
+            std::abort();
+        }
         if (!LoadItemTypeData())  
         {
             fprintf(stderr, "Load ItemTypeData Error !\n");
@@ -57,9 +62,10 @@ namespace GData
             std::abort();
         }
 
-        if (!LoadFighterBase())  
+
+        if (!LoadSkillBuff())  
         {
-            fprintf(stderr, "Load LoadFighterBase Error !\n");
+            fprintf(stderr, "Load LoadSkillBuff Error !\n");
             std::abort();
         }
 
@@ -100,24 +106,24 @@ namespace GData
             ItemBaseType * wt;
             switch(idt.subClass)
             {
-                case Item_Weapon:
-                    {
-                        wt = new ItemWeaponType(idt.typeId, idt.name, idt.attrExtra);
-                        if (IsEquipId(idt.typeId))
-                        {
-                            GObject::ItemEquipData ied;
-                            npcWeapons.add(new GObject::ItemWeapon(idt.typeId, wt, ied));
-                        }
-                    }
-                    break;
-                case Item_Armor1:
-                case Item_Armor2:
-                case Item_Armor3:
-                case Item_Armor4:
-                case Item_Armor5:
-                    {
-                        wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
-                    }
+               // case Item_Weapon:
+               //     {
+               //         wt = new ItemWeaponType(idt.typeId, idt.name, idt.attrExtra);
+               //         if (IsEquipId(idt.typeId))
+               //         {
+               //             GObject::ItemEquipData ied;
+               //             npcWeapons.add(new GObject::ItemWeapon(idt.typeId, wt, ied));
+               //         }
+               //     }
+               //     break;
+               // case Item_Armor1:
+               // case Item_Armor2:
+               // case Item_Armor3:
+               // case Item_Armor4:
+               // case Item_Armor5:
+               //     {
+               //         wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
+               //     }
                 default:
                     {
                         wt = new ItemNormalType(idt.typeId, idt.name);
@@ -126,16 +132,8 @@ namespace GData
             }
             wt->subClass = static_cast<ItemClass>(idt.subClass);
             wt->price = idt.coin;
-            wt->reqLev = idt.reqLev;
-            wt->vLev = idt.vLev;
-            wt->quality = idt.quality;
             wt->maxQuantity = idt.maxQuantity;
             wt->bindType = idt.bindType;
-            wt->energy = idt.energy;
-            wt->trumpExp = idt.trumpExp;
-            wt->data = idt.data;
-            wt->career = idt.career;
-            wt->salePriceUp = idt.salePriceUp;
             itemBaseTypeManager.add(wt);
             itemBaseTypeNameManager.add(wt->getName(), wt);
         }
@@ -216,7 +214,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBFighterBase dbfb;
-        if(execu->Prepare("SELECT `id`,`name`,`color`,`typeId`,`childType`,`speed`,`bodySize`,`hp`,`attack`,`defend`,`magatk`,`magdef`,`critical`,`criticalDef`,`hit`,`evade` FROM `fighter_base`", dbfb) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`color`,`typeId`,`childType`,`speed`,`bodySize`,`skills`,`hp`,`attack`,`defend`,`magatk`,`magdef`,`critical`,`criticalDef`,`hit`,`evade` FROM `fighter_base`", dbfb) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -230,7 +228,9 @@ namespace GData
             fgt->SetSpeed(dbfb.speed);
             fgt->SetRad(dbfb.bodySize);
             fgt->SetBaseAttr(dbfb.hp,dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical, dbfb.criticalDef, dbfb.hit, dbfb.evade);
-            //fgt->setSkills(dbfb.skill);
+
+            fgt->SetSkill(dbfb.skills);
+
             GObject::globalFighters.add(fgt);
         }    
 
@@ -275,19 +275,19 @@ namespace GData
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            SkillBuff* sb = new Skill(dbbuff.id, dbbuff.name);
+            SkillBuff* sb = new SkillBuff(dbbuff.id, dbbuff.name);
             
-            StringTokenizer st(dbbuff.attrIds);
+            StringTokenizer st(dbbuff.attrIds,",");
             for(UInt8 i = 0; i < st.count(); ++i)
-                sb->attrIds.push_back(st[i]);
+                sb->attrIds.push_back(::atoi(st[i].c_str()));
 
-            StringTokenizer st1(dbbuff.valueP);
+            StringTokenizer st1(dbbuff.valueP,",");
             for(UInt8 i = 0; i < st1.count(); ++i)
-                sb->valueP.push_back(st1[i]);
+                sb->valueP.push_back(::atoi(st1[i].c_str()));
 
-            StringTokenizer st2(dbbuff.value);
+            StringTokenizer st2(dbbuff.value,",");
             for(UInt8 i = 0; i < st2.count(); ++i)
-                sb->value.push_back(st2[i]);
+                sb->value.push_back(::atoi(st2[i].c_str()));
 
             skillBuffManager.add(sb);
         }

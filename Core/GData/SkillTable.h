@@ -85,7 +85,7 @@ namespace GData
             UInt8 count;
             UInt8 side;
             UInt8 type;
-    } 
+    } ;
 
 
     typedef ObjectMapT<SkillCondition, UInt16> SkillConditionManager;
@@ -98,7 +98,7 @@ namespace GData
 #define skillEffectManager SkillEffectManager::Instance()
 
     typedef ObjectMapT<SkillBuff, UInt16> SkillBuffManager;   
-#define skillBuffManager SkillBUffManager::Instance()
+#define skillBuffManager SkillBuffManager::Instance()
 
     class Skill : public ObjectBaseT<UInt16>
     {

@@ -112,12 +112,17 @@ CREATE TABLE `fighter_base` (
       `color` tinyint(3) NOT NULL DEFAULT '0',
       `typeId` tinyint(3) NOT NULL DEFAULT '0',
       `childType` tinyint(3) NOT NULL DEFAULT '0',
+      `speed`  int(10) NOT NULL DEFAULT '0',
       `bodySize`  int(10) NOT NULL DEFAULT '0',
+      `skills`  int(10) NOT NULL DEFAULT '0',
+      `hp` int(10) NOT NULL DEFAULT '0',
       `attack` int(10) NOT NULL DEFAULT '0',
       `defend` int(10) NOT NULL DEFAULT '0',
       `magatk` int(10) NOT NULL DEFAULT '0',
       `magdef` int(10) NOT NULL DEFAULT '0',
       `critical` int(10) NOT NULL DEFAULT '0',
+      `criticalDef` int(10) NOT NULL DEFAULT '0',
+      `hit` int(10) NOT NULL DEFAULT '0',
       `evade` int(10) NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;

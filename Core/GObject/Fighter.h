@@ -10,6 +10,19 @@ namespace GObject
     class Player;
     class FVarSystem;
 
+    enum
+    {
+        e_attr_attack = 0,
+        e_attr_magatk = 1,
+        e_attr_defend = 2,
+        e_attr_magdef = 3,
+        e_attr_critical = 4,
+        e_attr_criticalDef = 5,
+        e_attr_hit = 6,
+        e_attr_evade = 7,
+        e_attr_max
+    };
+
     class Fighter
     {
         public:
@@ -54,7 +67,7 @@ namespace GObject
 
             void SetSpeed(UInt16 speed){ _speed = speed;}
 
-            void SetBaseAttr(UInt32 hp,UInt32 attack , UInt32 defend, UInt32 magatk, UInt32 magdef, UInt32 critical,UInt32 criticalDef,UInt32 hit UInt32 evade) 
+            void SetBaseAttr(UInt32 hp,UInt32 attack , UInt32 defend, UInt32 magatk, UInt32 magdef, UInt32 critical,UInt32 criticalDef,UInt32 hit, UInt32 evade) 
             { 
                 _hp = hp;
                 _attack = attack;
@@ -70,7 +83,6 @@ namespace GObject
 
             void SetSkill(std::string skill);
 
-            UInt8 Enchant(UInt8 part,UInt8 type);
 
             void BuildFighterInfo(Stream& st);
 
@@ -98,6 +110,7 @@ namespace GObject
                     case e_attr_max:
                         return _hp;
                 } 
+                return 0;
             } 
 
     private:

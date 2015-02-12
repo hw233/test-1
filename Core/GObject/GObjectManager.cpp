@@ -249,45 +249,6 @@ namespace GObject
         lc.finalize();
         return true;
     }
-
-    ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )
-    {
-        if(id == 0)
-            return NULL;
-        std::map<UInt32, ItemEquip *>::iterator it = equips.find(id);
-        if(it == equips.end())
-        {
-            return NULL;
-        }
-        ItemEquip * base = it->second;
-        equips.erase(it);
-        return base;
-    }
-    ItemWeapon * GObjectManager::fetchWeapon( UInt32 id )
-    {
-        ItemEquip * equip = fetchEquipment(id);
-        if(equip == NULL)
-            return NULL;
-        if(equip->GetItemType().subClass != static_cast<UInt8>(Item_Weapon))
-        {
-            delete equip;
-            return NULL;
-        }
-        return static_cast<ItemWeapon *>(equip);
-    }
-    ItemArmor * GObjectManager::fetchArmor( UInt32 id )
-    {
-        ItemEquip * equip = fetchEquipment(id);
-        if(equip == NULL)
-            return NULL;
-        if(equip->GetItemType().subClass < static_cast<UInt8>(Item_Armor1) || equip->GetItemType().subClass > static_cast<UInt8>(Item_Armor5))
-        {
-            delete equip;
-            return NULL;
-        }
-        return static_cast<ItemArmor *>(equip);
-    }
-
     bool GObjectManager::loadAccountPwd()
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());

@@ -21,6 +21,7 @@
 
 #include "Memcached.h"
 #include "GObject/Player.h"
+#include "GObject/Fighter.h"
 
 struct NullReq
 {
@@ -78,18 +79,19 @@ void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
 
 void OnEnchantReq(GameMsgHdr& hdr, const void * data)
 { 
-   MSG_QUERY_CONN_PLAYER(player) ;
+   MSG_QUERY_PLAYER(player) ;
    BinaryReader br(data,hdr.msgHdr.bodyLen);
    UInt8 opt = 0;
    br >> opt;
    UInt16 fighterId;
    br >> fighterId;
-   Fighter* fgt = player->findFighter(fighterId);
-   if(!fgt)
-       return ;
    UInt8 part = 0;
    br >> part;
-   res = fgt->Enchant(part,type);
+   UInt8 res = player->GetPackage()->Enchant(fighterId,part,opt);
+   Stream st(REQ::ENCHART);
+   st << static_cast<UInt8>(res);
+   st << Stream::eos;
+   player->send(st);
 } 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

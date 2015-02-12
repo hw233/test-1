@@ -4,6 +4,7 @@
 #include "BattleField.h"
 #include "Common/Stream.h"
 #include "Common/URandom.h"
+#include "Battle/BattleAction.h"
 namespace Script
 {
     class BattleFormula;

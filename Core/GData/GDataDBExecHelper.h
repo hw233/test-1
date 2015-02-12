@@ -77,6 +77,7 @@ namespace GData
         UInt8 childType;
         UInt16 speed;
         UInt16 bodySize;
+        std::string skills;
         UInt32 hp;
         UInt32 attack;
         UInt32 defend;
@@ -99,7 +100,7 @@ namespace GData
     struct DBSkillBuff  
     {
         UInt32 id;
-        UInt8  name;
+        std::string  name;
         std::string attrIds;
         std::string valueP;
         std::string value;
@@ -200,7 +201,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBFighterBase)
-        SPECIALDEF(12)
+        SPECIALDEF(17)
         (
          UInt32, id,
          std::string, name,
@@ -209,6 +210,7 @@ namespace DB
          UInt8, childType,
          UInt16, speed,
          UInt16, bodySize,
+         std::string, skills,
          UInt32, hp,
          UInt32, attack,
          UInt32, defend,
@@ -249,7 +251,7 @@ namespace DB
         SPECIALDEF(8)
         (
          UInt32, id,
-         UInt8,  name,
+         std::string,  name,
          std::string, attrIds,
          std::string, valueP,
          std::string, value,

@@ -30,7 +30,7 @@ namespace Battle
 
         if(f)
         { 
-            setHp(f->GetFighterAttr(e_attr_max));
+            setHP(f->GetFighterAttr(e_attr_max));
             for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
             { 
                 attrBase[i] = f->GetFighterAttr(i);
@@ -38,10 +38,10 @@ namespace Battle
         } 
         else
         {
-            setHp(m_mainFighter->getHP());
+            setHP(m_mainFighter->getHP());
             for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
             { 
-                attrBase[i] = f->GetBattleAttr(i);
+                attrBase[i] = m_mainFighter->GetBattleAttr(i);
             } 
             
         }
@@ -49,9 +49,8 @@ namespace Battle
         SetGroundX(pointX);
         SetGroundY(pointY);
         _st.clear();
-        _attack_near = 100;
 
-        setHP(1000);
+//        setHP(1000);
         _battleIndex = 0;
     } 
     BattleFighter::~BattleFighter()

@@ -47,6 +47,7 @@ namespace GObject
             ItemBase * AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
             ItemBase * AddItemFromDB(UInt32 id, UInt32 num, bool bind);
 
+            UInt8 Enchant(UInt16 fighterId, UInt8 part,UInt8 type);
 
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;

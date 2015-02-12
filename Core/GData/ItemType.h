@@ -154,8 +154,8 @@ namespace GData
 	extern ItemBaseTypeManager itemBaseTypeManager;
 	extern ItemBaseTypeNameManager itemBaseTypeNameManager;
 
-	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
-	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
+//	typedef ObjectListT<ItemEquipSetType> ItemEquipSetTypeManager;
+//	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
 
 #define ITEM_BIND_CHECK(bindType, bind)	\
 	if(!bind && bindType == 1) bind = true;

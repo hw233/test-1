@@ -228,11 +228,11 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 	if(thrd >= MAX_THREAD_NUM)
 		return;
 
-    if ((cmd == REQ::CHAT || cmd == REQ::WHISPER) &&  len > 200)
-    {
-        pendClose();
-        return;
-    }
+    //if ((cmd == REQ::CHAT || cmd == REQ::WHISPER) &&  len > 200)
+    //{
+    //    pendClose();
+    //    return;
+    //}
 
     _chk ^= 0x33;
     if (cmd != REP::KEEP_ALIVE)
