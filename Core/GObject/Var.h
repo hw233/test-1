@@ -28,6 +28,7 @@ namespace GObject
         VAR_TEAL    = 1,
         VAR_COUPON  = 2,
         VAR_GOLD    = 3,
+        VAR_EXP    = 4,
         VAR_MAX
     };
 

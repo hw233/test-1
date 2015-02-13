@@ -61,8 +61,7 @@ namespace Battle
 
             virtual UInt16 BeActed(BattleAction * battleAction){ makeDamage(battleAction->GetAttack()); return 0;}   //用于非战斗对象
             //virtual BattleField * GetField(){ return _field;}
-            UInt32 GetDefendNear() {return defend_near;}
-            UInt32 GetDefendDistance(){ return defend_distance;}
+            virtual UInt32 GetDefend() {return defend_near;}
             UInt8 AppendFighterStream(Stream & st){if(!_st.size()) return 0; st << _st; _st.reset(); return 1;}
             virtual UInt16 GetRad(){return 1;}
             virtual UInt8 GetSide(){return 0;}
@@ -72,6 +71,7 @@ namespace Battle
             virtual void InsertFighterInfo(Stream& st,UInt8 flag = 0){}
             virtual void SetMinXY(UInt16 ,UInt16 ){}
             virtual UInt8 GetBSNumber(){return 0;}
+            virtual void AddBuff(UInt16 buffId){}
         protected:
             UInt8 _cls;
             UInt32 _hp;

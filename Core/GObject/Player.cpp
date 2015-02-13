@@ -155,8 +155,14 @@ namespace GObject
     void Player::makePlayerInfo(Stream& st)
     {
         st << name ; 
+        st << GetVar(VAR_EXP);
         st << GetVar(VAR_TEAL);
-        st << GetVar(VAR_COUPON);
         st << GetVar(VAR_GOLD);
+
+        std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+        for(;it != _fighters.end();++it)
+        { 
+            (it->second)->MakeFighterInfo(st);
+        } 
     }
 }

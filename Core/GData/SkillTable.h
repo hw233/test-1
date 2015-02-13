@@ -63,6 +63,8 @@ namespace GData
         public:
             UInt8 skillType;
 
+            UInt16 buffId;
+
             UInt16 damage;   //基础伤害
             float damageP;   //伤害百分比
 

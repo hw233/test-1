@@ -113,24 +113,6 @@ namespace GData
             ItemBaseType * wt;
             switch(idt.subClass)
             {
-               // case Item_Weapon:
-               //     {
-               //         wt = new ItemWeaponType(idt.typeId, idt.name, idt.attrExtra);
-               //         if (IsEquipId(idt.typeId))
-               //         {
-               //             GObject::ItemEquipData ied;
-               //             npcWeapons.add(new GObject::ItemWeapon(idt.typeId, wt, ied));
-               //         }
-               //     }
-               //     break;
-               // case Item_Armor1:
-               // case Item_Armor2:
-               // case Item_Armor3:
-               // case Item_Armor4:
-               // case Item_Armor5:
-               //     {
-               //         wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
-               //     }
                 default:
                     {
                         wt = new ItemNormalType(idt.typeId, idt.name);
@@ -197,7 +179,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillEffect dbskeffect;
-        if(execu->Prepare("SELECT `id`,`name`,`skillType`,`damage`,`damageP`,`trerapy`,`trerapyP` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`skillType`,`buffId`,`damage`,`damageP`,`trerapy`,`trerapyP` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -205,7 +187,7 @@ namespace GData
             if(!se)
                 return false;
             se->skillType = dbskeffect.skillType;
-            //se->actionCd = dbskeffect.actionCd;
+            se->buffId = dbskeffect.buffId;
             se->damage = dbskeffect.damage;
             se->damageP = dbskeffect.damageP;
             se->trerapy = dbskeffect.trerapy;

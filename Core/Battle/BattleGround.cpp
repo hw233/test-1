@@ -42,6 +42,8 @@ namespace Battle
         { 
             StringTokenizer st(vec[0],",");
             _x = st.count()*2 + 1;
+            _y = 10;
+            _x = 20;
         } 
 
         _mapGround = new UInt8[_x*_y];
@@ -54,13 +56,15 @@ namespace Battle
             for(UInt8 j = 0; j < st.count(); ++j)
             { 
                 UInt8 value = static_cast<UInt8>(::atoi(st[j].c_str()));
-               _mapGround[j*2+flag + i*_x] = value;
-               std::cout << "坐标：" << static_cast<UInt32>(j*2+flag)<<" , " << static_cast<UInt32>(i)<<std::endl;
+                //_mapGround[j*2+flag + i*_x] = value;
+                std::cout << "坐标：" << static_cast<UInt32>(j*2+flag)<<" , " << static_cast<UInt32>(i)<<std::endl;
             } 
         } 
 
         for(UInt8 i = 0; i < 15 ; ++i)
         {
+            if(point[i][0] + point[i][1]*_x >= _x*_y)
+                continue;
            _mapGround[point[i][0] + point[i][1]*_x] = 1;
         }
         _mapFighters = new BattleObject* [_x*_y];
@@ -93,8 +97,8 @@ namespace Battle
             UInt8 nowx = currentBf->GetGroundX();
             UInt8 nowy = currentBf->GetGroundY();
             UInt8 ride  = currentBf->GetRide() ;
-            UInt8 destx = _x - currentBf->GetEnterPosX();;
-            UInt8 desty = _y - currentBf->GetEnterPosY();
+            UInt8 destx = _x/2;// - currentBf->GetEnterPosX();;
+            UInt8 desty = _y/2;// - currentBf->GetEnterPosY();
             UInt8 minDistance = -1 ;
 
             for(UInt8 j = (nowy > ride)?(nowy - ride):0; j < _y && j < (nowy + ride) ; ++j)
@@ -116,15 +120,15 @@ namespace Battle
             }
             if(currentBf->GetGroundX() == resx && currentBf->GetGroundY() == resy)
             {
-                //COUNT << "战将编号"  << static_cast<UInt32>(currentBf->GetBattleIndex()) << " 失去目标" << std::endl;
+                std::cout << "战将编号"  << static_cast<UInt32>(currentBf->GetBattleIndex()) << " 失去目标" << static_cast<UInt32>(resx) << " , " << static_cast<UInt32>(resy) << std::endl;
                 return ;
             }
 
             currentBf->SetGroundX(resx);
             currentBf->SetGroundY(resy);
 
-            //COUNT << "战将编号:"  << static_cast<UInt32>(currentBf->GetBattleIndex());
-            //COUNT <<" 无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
+            std::cout << "战将编号:"  << static_cast<UInt32>(currentBf->GetBattleIndex());
+            std::cout <<" 无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(resx) << static_cast<UInt8>(resy) << static_cast<UInt8>(0); //无战斗发生
         }
@@ -133,14 +137,14 @@ namespace Battle
             UInt8 res = 0;
             UInt8 max = 0;
             UInt8 maxD = 0;
-            //COUNT << std::endl;
+            std::cout << std::endl;
             TestCoutBattleS(currentBf);
-            //COUNT << "可有选择:" << std::endl;
+            std::cout << "可有选择:" << std::endl;
             for(UInt8 i = 0 ; i < targetVec.size() ; ++i)
             {
                 UInt8 cur = priority[currentBf->getClass()-1][targetVec[i].bo->getClass()-1] ;
                 //克制关系
-                //COUNT <<"方案:"<< static_cast<UInt32>(i) << "  地点 :"  << static_cast<UInt32>(targetVec[i].x) <<"  "<< static_cast<UInt32>(targetVec[i].y) <<" 距离:"<< static_cast<UInt32>(targetVec[i].step) << " 权值："<< static_cast<UInt32>(cur) <<std::endl;
+                std::cout <<"方案:"<< static_cast<UInt32>(i) << "  地点 :"  << static_cast<UInt32>(targetVec[i].x) <<"  "<< static_cast<UInt32>(targetVec[i].y) <<" 距离:"<< static_cast<UInt32>(targetVec[i].step) << " 权值："<< static_cast<UInt32>(cur) <<std::endl;
 
                 if(cur >= max)
                 {
@@ -151,7 +155,7 @@ namespace Battle
                         res = i;
                         max = cur;
                         maxD = targetVec[i].step;
-                        //COUNT << "maxDistance：" << static_cast<UInt32>(maxD) << std::endl;
+                        std::cout << "maxDistance：" << static_cast<UInt32>(maxD) << std::endl;
                     }
                 }
             }
@@ -159,8 +163,8 @@ namespace Battle
             currentBf->SetGroundX(targetVec[res].x);
             currentBf->SetGroundY(targetVec[res].y);
 
-            //COUNT <<"选择方案"<< static_cast<UInt32>(res) << ":移动到"<<static_cast<UInt32>(targetVec[res].x)<< "," << static_cast<UInt32>(targetVec[res].y) <<std::endl;
-            //COUNT << "攻击" <<std::endl;
+            std::cout <<"选择方案"<< static_cast<UInt32>(res) << ":移动到"<<static_cast<UInt32>(targetVec[res].x)<< "," << static_cast<UInt32>(targetVec[res].y) <<std::endl;
+            std::cout << "攻击" <<std::endl;
 
 
             //Stream
@@ -178,7 +182,7 @@ namespace Battle
 
             //cout
             TestCoutBattleS(targetVec[res].bo);
-            //COUNT << std::endl;
+            std::cout << std::endl;
         }
         memset(_mapFlag,0,_x*_y*sizeof(UInt8));
         targetVec.clear();
@@ -268,7 +272,7 @@ namespace Battle
         bsim.start(); 
         result = bsim.GetWin();
         BattleReport = bsim.getId();
-        //COUNT << "发生战斗" << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果:" << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        std::cout << "发生战斗" << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果:" << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
         //result = 0;
         //BattleReport = 111;
         //bo->setHP(0);
@@ -281,7 +285,7 @@ namespace Battle
         bf->SetEnterPos(x,y);
         bf->SetBattleIndex(++_maxID);
         bf->InsertFighterInfo(_pack,1);
-        //COUNT << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
+        //std::cout << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
         return bf;
     } 
 
@@ -337,7 +341,7 @@ namespace Battle
                 } 
             } 
             ++Round;
-            //COUNT << "回合：" << static_cast<UInt32>(Round) << std::endl;
+            std::cout << "回合：" << static_cast<UInt32>(Round) << std::endl;
         }while(count < (map_player.size() - 1) && Round < 200);
 
         _pack.data<UInt16>(offset) = actCount;
@@ -387,7 +391,7 @@ namespace Battle
             _pack << count ;
             std::vector<GObject::Player *> vec = it->second;
 
-            //COUNT << std::endl << "势力：" << static_cast<UInt32>(it->first) <<std::endl;
+            std::cout << std::endl << "势力：" << static_cast<UInt32>(it->first) <<std::endl;
             for(UInt8 i = 0; i < vec.size(); ++i)
             {
                 //for(UInt8 j = 0; j < 6 ; ++j)
@@ -401,7 +405,7 @@ namespace Battle
                 }
             }
             _pack.data<UInt8>(offset) = count;
-            //COUNT << "  人数"<< static_cast<UInt32>(count);
+            std::cout << "  人数"<< static_cast<UInt32>(count);
         }
     } 
 
@@ -413,12 +417,12 @@ namespace Battle
             { 
                 if(_mapFighters[i+j*_x] &&( bf == NULL || _mapFighters[i+j*_x] == bf))
                 {
-                    //COUNT << "战将编号" << static_cast<UInt32>(_mapFighters[i+j*_x]->GetBattleIndex());
-                    //COUNT << "玩家Side:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetSide());
-                    //COUNT << "  x:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundX());
-                    //COUNT << "  y:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundY());
-                    //COUNT << " 血量：" << static_cast<UInt32>(_mapFighters[i+j*_x]->getHP()) ;
-                    //COUNT << std::endl;
+                    std::cout << "战将编号" << static_cast<UInt32>(_mapFighters[i+j*_x]->GetBattleIndex());
+                    std::cout << "玩家Side:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetSide());
+                    std::cout << "  x:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundX());
+                    std::cout << "  y:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundY());
+                    std::cout << " 血量：" << static_cast<UInt32>(_mapFighters[i+j*_x]->getHP()) ;
+                    std::cout << std::endl;
                 }
             } 
         } 

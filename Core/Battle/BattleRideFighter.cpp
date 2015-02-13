@@ -87,20 +87,20 @@ namespace Battle
                         if(myY > ((width * ss->rady + width)*minNumber + ss->y))
                             minY = myY - ((width * ss->rady + width)*minNumber);
 
-                        std::cout << " 战将编号：" << static_cast<UInt32>(GetBSNumber());
-                        std::cout << std::endl;
-                        std::cout << " 施放技能 半月斩 ";
-                        std::cout << std::endl;
+                        //COUNT << " 战将编号：" << static_cast<UInt32>(GetBSNumber());
+                        //COUNT << std::endl;
+                        //COUNT << " 施放技能 半月斩 ";
+                        //COUNT << std::endl;
                         for(UInt8 i = 0 ; i < ss->radx ; ++i)
                         {
                             ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
                             op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
                             GetField()->InsertObjectPackage(op);
 
-                            std::cout << " 范围 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width - 25) << " 到 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width + 25);
-                            std::cout << std::endl;
+                            //COUNT << " 范围 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width - 25) << " 到 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width + 25);
+                            //COUNT << std::endl;
                         }
-                        std::cout << std::endl;
+                        //COUNT << std::endl;
                     }
 
                 } 
@@ -175,9 +175,9 @@ namespace Battle
             case e_run:
                 if(1)
                 {
-                    std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
-                    std::cout<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
+                    //COUNT<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    //COUNT<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
+                    //COUNT<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
                 }
                 if(!isRunSend)
                 {
@@ -208,12 +208,12 @@ namespace Battle
                             _st << _target->GetBSNumber();
                             _st << static_cast<UInt16>(param);
 
-                            std::cout<< " 回合数：" << static_cast<UInt32>(_nowTime);
-                            std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                            std::cout<< " 进攻战将编号：" << static_cast<UInt32>(_target->GetBSNumber());
-                            std::cout<< " 己方坐标: " << static_cast<UInt32>(getPosX()) << "," << static_cast<UInt32>(getPosY());
-                            std::cout<< " 敌方坐标: " << static_cast<UInt32>(_target->getPosX()) << "," << static_cast<UInt32>(_target->getPosY()) ;
-                            std::cout << " 对方血量: " << static_cast<UInt32>(_target->getHP()) << std::endl;
+                            //COUNT<< " 回合数：" << static_cast<UInt32>(_nowTime);
+                            //COUNT<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                            //COUNT<< " 进攻战将编号：" << static_cast<UInt32>(_target->GetBSNumber());
+                            //COUNT<< " 己方坐标: " << static_cast<UInt32>(getPosX()) << "," << static_cast<UInt32>(getPosY());
+                            //COUNT<< " 敌方坐标: " << static_cast<UInt32>(_target->getPosX()) << "," << static_cast<UInt32>(_target->getPosY()) ;
+                            //COUNT << " 对方血量: " << static_cast<UInt32>(_target->getHP()) << std::endl;
                             _actionType = e_none;
 
                             //COUNT << std::endl;

@@ -50,6 +50,14 @@ namespace Battle
         e_attr_max
     };
 
+    struct BattleBuff
+    {
+        UInt16 buffId;
+        UInt8 count;
+        std::vector<UInt16> value;
+        BattleBuff(UInt16 buffId1, UInt8 count1):buffId(buffId1),count(count1){}
+    };
+
     struct ActionBase
     {
         ActionBase(UInt16 skillId /*UInt16 condition ,UInt16 scope, UInt16 effect*/):/*_condition(condition),_scpoe(scope),_effect(effect),*/_skillId(skillId),_cd(0),_priority(0) { } 
@@ -176,7 +184,7 @@ namespace Battle
             UInt32 GetHit() { return GetTotalAttr(e_attr_hit);}
             UInt32 GetEvade() {return GetTotalAttr(e_attr_evade);}
             UInt32 GetCritical() { return GetTotalAttr(e_attr_critical);}
-            UInt32 GetDefendCritical() { return GetTotalAttr(e_attr_criticalDef);}
+            UInt32 GetCriticalDef() { return GetTotalAttr(e_attr_criticalDef);}
 
             UInt32 GetWreck() { return _wreck;}
             UInt32 GetParry(){ return _parry;}
@@ -222,6 +230,7 @@ namespace Battle
             } 
 
             void AddBuff(UInt16 buffId);
+            void CheckBuff();
 
         protected:
             UInt8 _crick;  //硬直
@@ -285,6 +294,8 @@ namespace Battle
             UInt32 attrBase[e_attr_max];
             UInt32 attrAdd[e_attr_max];
             UInt32 attrSub[e_attr_max];
+
+            std::list<BattleBuff> bufflst;
     };
 
 }

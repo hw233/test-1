@@ -156,10 +156,10 @@ namespace Battle
                 st << static_cast<UInt16>(_fighters[i][j]->getPosX());
                 st << static_cast<UInt16>(_fighters[i][j]->getPosY());
                 st << static_cast<UInt16>(_fighters[i][j]->getHP());
-                std::cout << " 入场战将分部" << std::endl;
-                std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
-                std::cout << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
-                std::cout << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
+                //std::cout << " 入场战将分部" << std::endl;
+                //std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
+                //std::cout << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
+                //std::cout << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
             } 
         } 
     } 

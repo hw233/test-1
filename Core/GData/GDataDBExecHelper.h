@@ -61,6 +61,7 @@ namespace GData
         std::string name; 
         UInt8 skillType;
 
+        UInt16 buffId;
         UInt16 damage;
         float damageP;
 
@@ -193,11 +194,13 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkillEffect)
-        SPECIALDEF(7)
+        SPECIALDEF(8)
         (
          UInt16, id,
          std::string, name,
          UInt8, skillType,
+
+         UInt16, buffId,
 
          UInt16, damage,
          float, damageP,

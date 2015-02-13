@@ -83,10 +83,6 @@ namespace GObject
 
             void SetSkill(std::string skill);
 
-
-            void BuildFighterInfo(Stream& st);
-
-
             UInt32 GetFighterAttr(UInt8 index)
             { 
                 switch(index)
@@ -113,6 +109,9 @@ namespace GObject
                 return 0;
             } 
 
+            void MakeFighterInfo(Stream& st);
+
+            std::vector<UInt16> m_baseSkills;
     private:
             UInt32 _id;
             Player * _owner;
@@ -142,7 +141,6 @@ namespace GObject
             UInt8 _childTypeId;
             UInt8 _color; 
             std::map<UInt8,UInt16> m_skills;  //仅global使用
-            std::vector<UInt16> m_baseSkills;
 };
 typedef GGlobalObjectManagerT<Fighter, UInt32> GlobalFighters;
 extern GlobalFighters globalFighters;

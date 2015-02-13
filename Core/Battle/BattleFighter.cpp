@@ -17,6 +17,16 @@ namespace Battle
         _nowTime = -1;
 
         m_mainFighter = NULL;
+
+        if(f) //战将属性  小兵属性延后
+        { 
+            setHP(f->GetFighterAttr(e_attr_max));
+            for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
+            { 
+                attrBase[i] = f->GetFighterAttr(i);
+            } 
+        } 
+
         if( f != NULL)
         {
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
@@ -27,15 +37,6 @@ namespace Battle
                     m_fighters[i]->setNumber(i+1);
             }
         }
-
-        if(f) //战将属性  小兵属性延后
-        { 
-            setHP(f->GetFighterAttr(e_attr_max));
-            for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
-            { 
-                attrBase[i] = f->GetFighterAttr(i);
-            } 
-        } 
 
         SetGroundX(pointX);
         SetGroundY(pointY);
@@ -61,7 +62,10 @@ namespace Battle
         //preActionList.push_back(ActionBase(0,0,0));
         //普通攻击
         if(f!=NULL)
-            preActionList.push_back(ActionBase(2));
+        {
+            for(UInt8 i = 0; i < f->m_baseSkills.size(); ++i)
+                preActionList.push_back(ActionBase(f->m_baseSkills[i]));
+        }
     } 
 
     void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
@@ -117,9 +121,8 @@ namespace Battle
     { 
         //TODO
         UInt32 attack = bAction->GetAttack();
-        UInt32 defend = GetDefendNear();
+        UInt32 defend = GetDefend();
         UInt32 hpSub = attack - defend;
-        hpSub = 700;
         makeDamage(hpSub);
 
         return hpSub;
@@ -357,5 +360,65 @@ namespace Battle
             return m_mainFighter->GetField();
         return _field;
     }
+
+    void BattleFighter::AddBuff(UInt16 buffId)
+    { 
+        const GData::SkillBuff * sb = GData::skillBuffManager[buffId];
+        UInt8 count = sb->count;
+        UInt8 type = sb->type;
+        BattleBuff bb = BattleBuff(buffId, count);
+        if(sb->attrIds.size() > sb->valueP.size() || sb->attrIds.size() > sb->value.size())
+            return ;
+        for(UInt8 i = 0; i < sb->attrIds.size(); ++i )
+        { 
+            UInt8 attrId = sb->attrIds[i];
+            UInt8 valueP = sb->valueP[i];
+            UInt16 value = sb->value[i];
+            UInt32 val = GetBattleAttr(attrId);
+            UInt32 valAdd = val * valueP /100 + value; 
+
+            SetBattleAttr(attrId, valAdd , type+1);
+            bb.value.push_back(valAdd);
+        } 
+        bufflst.push_back(bb);
+    } 
+    void BattleFighter::CheckBuff()
+    { 
+        if(!bufflst.size())
+            return ;
+        std::list<BattleBuff>::iterator it = bufflst.begin();
+        for(;it != bufflst.end();)
+        { 
+            UInt8 count = (*it).count;
+            if(!count)
+            {
+                const GData::SkillBuff * sb = GData::skillBuffManager[it->buffId];
+                if(sb)
+                {
+                    UInt8 type = sb->type;
+                    for(UInt8 i = 0; i < sb->attrIds.size(); ++i)
+                    { 
+                        UInt8 attrId = sb->attrIds[i];
+                        UInt32 val = GetBattleAttr(attrId, type + 1) ;
+                        if(it->value.size() > i)
+                        { 
+                            if(val > it->value[i])
+                                val -= it->value[i];
+                        } 
+                        else
+                            val = 0;
+                        SetBattleAttr(attrId, val, type + 1);
+                    } 
+                }
+                it = bufflst.erase(it);
+                continue;
+            }
+            else
+            { 
+                --it->count;
+            } 
+            ++it;
+        } 
+    } 
 
 }
