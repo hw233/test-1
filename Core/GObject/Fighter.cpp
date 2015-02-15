@@ -102,6 +102,7 @@ namespace GObject
            st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)%10);
            st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)/10);
        } 
+       st << static_cast<UInt8>(m_baseSkills.size());
        for(UInt8 i = 0; i < m_baseSkills.size(); ++i)
        { 
            st << static_cast<UInt16>(m_baseSkills[i]);
