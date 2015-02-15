@@ -76,50 +76,27 @@ namespace Battle
         GetBSEnterInfo(_packet);
 
         BattleFighter * bf[2] = {NULL,NULL};
-        //UInt8 act = 0;
         UInt8 index = 1;
-        //UInt32 curTime = 0;
         UInt16 actCount = 0;
         size_t offset = _packet.size();
         _packet << actCount; 
         for(UInt8 i = 0; i < _limitTime ; ++i)
-        //while(curTime <= _limitTime && GetWin() == 2  )
         {
-            //COUNT << "回合数:: " << static_cast<UInt32>(i) << std::endl <<std::endl;
+            std::cout << "回合数:: " << static_cast<UInt32>(i) << std::endl <<std::endl;
             actCount += doImage(i);
             actCount += doObjectMove(i);
             for(UInt8 j = 0; j < 20; ++j)
             {
-                /*
-                if(act == 0)
-                { 
-                    actCount += doImage(curTime);
-                    actCount += doObjectMove();
-                } 
-                if(act > 20)
-                {
-                    actCount += doAttack(curTime);
-                    ++curTime;
-                    act = 0;
-                    continue;
-                }
-                */
                 index = !index;
                 bf[index] = getMyFighters(index,j/2);
 
-
                 if(!bf[0] && !bf[1])          
                 {
-                    //actCount += doAttack(curTime);
-                    //++curTime;
-                    //act = 0;
-                    //continue;
                     break;
                 }
 
                 if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
                 {
-                    //++act;
                     continue;
                 }
 
@@ -128,8 +105,7 @@ namespace Battle
                 bf[index]->Action();
 
                 actCount += bf[index]->AppendFighterStream(_packet);
-                ////COUNT << "战报id: " << static_cast<UInt32>(_id) << "包大小：" << static_cast<UInt32>(_packet.size()) << std::endl;
-                //++act;
+                std::cout << "战报id: " << static_cast<UInt32>(_id) << "包大小：" << static_cast<UInt32>(_packet.size()) << std::endl;
             }
             actCount += doAttack(i);
         }
@@ -234,9 +210,9 @@ namespace Battle
             _packet << static_cast<UInt8>(2);
             _packet << static_cast<UInt16>(skillId);
 
-            //COUNT << " 回合数" << static_cast<UInt32>(bAction.GetHappenTime());
-            //COUNT << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
-            //COUNT << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
+            std::cout << " 回合数" << static_cast<UInt32>(bAction.GetHappenTime());
+            std::cout << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
+            std::cout << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
 
             UInt16 buffId = se->buffId;
             const GData::SkillBuff * sb = GData::skillBuffManager[buffId];
@@ -262,8 +238,8 @@ namespace Battle
                 //XXX 差法术协议
                 _packet << bo->GetBSNumber();
                 _packet << static_cast<UInt16>(param);
-                //COUNT << " 战将编号:" << static_cast<UInt32>(bo->GetBSNumber());
-                //COUNT << " 受伤数值:" << static_cast<UInt32>(param) << std::endl;
+                std::cout << " 战将编号:" << static_cast<UInt32>(bo->GetBSNumber());
+                std::cout << " 受伤数值:" << static_cast<UInt32>(param) << std::endl;
                 ++count;
             }
         } 
