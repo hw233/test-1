@@ -65,9 +65,12 @@ namespace Battle
             case e_image_attack:
             case e_image_therapy:
                 { 
+                    const GData::Skill * s = GData::skillManager[_ab._skillId];
+                    if(!s)
+                        return ;
                     ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
                     GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
-                    GetField()->InsertTimeBattleAction(_nowTime+3,ip);
+                    GetField()->InsertTimeBattleAction(_nowTime+s->GetActionCd(),ip);
                 } 
                 break;
             case e_attack_counter:
@@ -156,7 +159,7 @@ namespace Battle
             UInt8 direction = GetBattleDirection();
             if(res == 1)
                 direction = 2;
-            BattleFighter * target = static_cast<BattleFighter* >(GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY(),direction));
+            BattleFighter * target = static_cast<BattleFighter* >(GetField()->GetTargetForRide(!GetSideInBS(),getPosX(),getPosY(),direction));
             if(target)
                 _target = target;
         }
@@ -164,9 +167,6 @@ namespace Battle
 
     void BattleRideFighter::BuildLocalStream(UInt8 wait, UInt8 param)
     {
-        //_st.clear();
-        //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
-        //_st << static_cast<UInt8>(getPosX());
         UInt8 type = _actionType ;
         if(wait)
             type = wait;

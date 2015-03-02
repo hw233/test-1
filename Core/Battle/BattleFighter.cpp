@@ -27,6 +27,7 @@ namespace Battle
             } 
         } 
 
+        //属性
         if( f != NULL)
         {
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
@@ -42,7 +43,7 @@ namespace Battle
         SetGroundY(pointY);
         _st.clear();
 
-        //        setHP(1000);
+        //setHP(1000);
         _battleIndex = 0;
     } 
     BattleFighter::~BattleFighter()
@@ -131,62 +132,6 @@ namespace Battle
     void BattleFighter::Action()
     { 
         return ;
-
-        //_st.reset();
-        //UpdateActionList();
-        ////硬直
-        //if(_crick)
-        //{
-        //    --_crick;
-        //    return ;
-        //}
-        ////动作行为
-        //if(_actionLast)
-        //{ 
-        //    --_actionLast;
-        //    return ;
-        //} 
-
-        ////if(_actionType == e_run_attack)
-        //BattleObject * bo = targetList.front();
-        //if(bo && getPosX() > STEP && getPosX() < (FIELD_WIDTH - STEP) )
-        //{
-        //    GoForward(bo->getPosX(), bo->getPosY(), 1);
-        //}
-        //else
-        //{
-        //    GetActionFromField();
-        //}
-
-
-        //switch(_actionType)
-        //{ 
-        //    case e_none:
-        //        GetActionFromField();
-        //        break;
-        //    case e_run:
-        //        {
-        //        }
-        //        break;
-        //    case e_attack_near:
-        //    case e_attack_middle:
-        //    case e_attack_distant:
-        //    case e_image_attack:
-        //    case e_image_therapy:
-        //        {
-        //            std::list<BattleObject *>::iterator it = targetList.begin();
-        //            for(;it!=targetList.end();++it)
-        //            { 
-        //                (*it)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-        //                (*it)->AppendFighterStream(_st);
-        //            } 
-        //        }
-        //        break;
-        //    case e_attack_counter:
-        //        break;
-        //    default:
-        //        break;
-        //} 
     } 
 
     void BattleFighter::GetActionFromField()
@@ -209,13 +154,6 @@ namespace Battle
             _actionLast =  GData::skillManager[_ab._skillId]->GetActionCd(); //行进时间一秒
             _actionBackLast =  GData::skillManager[_ab._skillId]->GetActionBackCd(); //行进时间一秒
         }
-
-        //BuildLocalStream();
-        //_st << static_cast<UInt8>(_actionType);  //动作类型
-        //_st << static_cast<UInt8>(_actionLast);  //动作持续帧数(*8)
-        //_st << static_cast<UInt8>(ACTION_WAIT);   //延迟起作用
-        //_st << static_cast<UInt8>(getPosX());    //产生动作的对象坐标
-        //_st << static_cast<UInt8>(getPosY());
 
     } 
 
@@ -259,55 +197,10 @@ namespace Battle
     } 
     void BattleFighter::BuildLocalStream(UInt8 wait , UInt8 param)
     { 
-        //_st.reset();
-        //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
-        //_st << static_cast<UInt8>(getPosX());
-        //_st << static_cast<UInt8>(getPosY());
-        ////TODO 被击
-        //_st << _actionType;
-        //switch(_actionType)
-        //{
-        //    case e_run:
-        //    case e_attack_near:
-        //    case e_attack_middle:
-        //    case e_attack_distant:
-        //    case e_image_attack:
-        //    case e_image_therapy:
-        //        {
-        //            _st << static_cast<UInt8>(wait);  //是否延迟
-        //            _st << static_cast<UInt8>(_actionLast); //动作持续
-        //            _st << static_cast<UInt8>(targetList.size());  //动作作用对象个数
-        //            std::list<BattleObject *>::iterator it = targetList.begin();
-        //            for(;it!=targetList.end();++it)
-        //            { 
-        //                _st << (*it)->getPosX();
-        //                _st << (*it)->getPosY();
-        //            } 
-        //        }
-        //    case e_be_attacked:
-        //        _st << static_cast<UInt32>(param);
-        //        break;
-        //    default :
-        //        break;
-        //}
     } 
     ActionPackage BattleFighter::MakeActionEffect()   //实现动作效果  伤害 法术等
     { 
         return  ActionPackage( this,_nowTime);  //未加入目标对象
-
-        //UInt8 aEffect = _ab._effect;
-        //const GData::SkillEffect * se = GData::skillEffectManager[aEffect];
-        //if(!se)
-        //    return ActionPackage(_actionType, _hit, _wreck, _critical, this,_nowTime);
-        //UInt32 attack ;
-        //if(_actionType == e_attack_near)  //近战
-        //    attack =  _attack_near ;
-        //else if( _actionType == e_attack_distant)  //远攻
-        //    attack =  _attack_distance ;
-        //else if( _actionType == e_image_attack || _actionType == e_image_therapy )  //魔法
-        //    attack = _attack_near;
-
-        //return  ActionPackage(attack, _hit, _wreck, _critical, this,_nowTime);  //未加入目标对象
     } 
 
     ImagePackage BattleFighter::MakeImageEffect()
@@ -379,6 +272,7 @@ namespace Battle
 
             SetBattleAttr(attrId, valAdd , type+1);
             bb.value.push_back(valAdd);
+            GetAttack();
         } 
         bufflst.push_back(bb);
     } 

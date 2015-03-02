@@ -278,6 +278,9 @@ namespace GData
             for(UInt8 i = 0; i < st2.count(); ++i)
                 sb->value.push_back(::atoi(st2[i].c_str()));
 
+            sb->SetCount(dbbuff.count);
+            sb->SetSide(dbbuff.side);
+            sb->SetType(dbbuff.type);
             skillBuffManager.add(sb);
         }
         return true;

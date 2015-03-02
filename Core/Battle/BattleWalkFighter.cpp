@@ -67,7 +67,7 @@ namespace Battle
     { 
         if(!_target || !_target->getHP())
         {
-            _target = GetField()->GetTarget(GetSideInBS(),getPosX(),getPosY(),1);
+            _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
             BuildLocalStream(e_run);
         }
         SetBattleTargetPos(_target->getPosX(),_target->getPosY());

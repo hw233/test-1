@@ -24,7 +24,7 @@ namespace Battle
 
     }
 
-    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY,UInt8 direction)
+    BattleObject * BattleField::GetTargetForRide(UInt8 side, UInt16 posX ,UInt16 posY,UInt8 direction)
     { 
         if(side > 1)
             return NULL;
@@ -59,6 +59,39 @@ namespace Battle
                 { 
                     maxy = advanceY;
                     maxx = advanceX;
+                    res = i;
+                } 
+            }
+        } 
+
+        if(res < _fighters[side].size())
+        { 
+            return _fighters[side][res];
+        } 
+        return NULL;
+    } 
+    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY)
+    { 
+        if(side > 1)
+            return NULL;
+        UInt16 max = -1;
+        UInt8 res = -1;
+        for(UInt8 i = 0; i < _fighters[side].size(); ++i)
+        { 
+            if(!_fighters[side][i])
+                continue;
+            if(_fighters[side][i]->getClass() > eFighter)
+                return NULL;
+            UInt16 x = _fighters[side][i]->getPosX();
+            UInt16 y = _fighters[side][i]->getPosY();
+
+            UInt16 advanceY = SUB(y,posY);
+            UInt16 advanceX = SUB(x,posX);
+            UInt16 dis = sqrt(advanceY*advanceY + advanceX*advanceX);
+            if(dis <= max)
+            {
+                { 
+                    max = dis;
                     res = i;
                 } 
             }
@@ -106,6 +139,8 @@ namespace Battle
 
     UInt16 BattleField::getDistance(BattleObject * bf , UInt16 x2 , UInt16 y2 ,UInt16 rad)
     { 
+        if( !bf )
+            return -1;
         UInt16 x1 = bf->getPosX()*1.0;
         UInt16 y1 = bf->getPosY()*1.0;
         UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
@@ -169,7 +204,13 @@ namespace Battle
         if(!_fighters[side].size())
             return ;
 
+        const GData::SkillEffect * se = GData::skillManager[skillId]->GetSkillEffect();
+        if(se && se->skillType == e_image_therapy)
+            side = !side;
+
         const GData::SkillScope* ss =GData::skillManager[skillId]->GetSkillScope();
+        if(!ss)
+            return ;
 
         switch(ss->area)
         {
@@ -201,7 +242,7 @@ namespace Battle
                 } 
             case 3:  //目标扩散型 先找到目标，然后以x为半径攻击
                 { 
-                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY(),0);
+                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY());
                     if(!bo)
                         return ;
                     for(UInt8 i = 0; i < _fighters[side].size(); ++i)
@@ -216,7 +257,7 @@ namespace Battle
                 } 
             case 4:  
                 { 
-                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY(),0);
+                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY());
                     if(!bo)
                         return ;
                     for(UInt8 i = 0; i < _fighters[side].size(); ++i)
@@ -262,7 +303,7 @@ namespace Battle
             case 6:
                 {
                     
-                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY(),0);
+                    BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY());
                     if(!bo)
                         return ;
                     for(UInt8 i = 0; i < _fighters[side].size(); ++i)
@@ -288,6 +329,7 @@ namespace Battle
         } 
         return vec;
     } 
+
     BattleFighter * BattleField::getMyFighters(UInt8 side, UInt8 index)
     { 
         UInt8 count = 0;
@@ -330,4 +372,5 @@ namespace Battle
     { 
         return FieldObject;
     } 
+
 }

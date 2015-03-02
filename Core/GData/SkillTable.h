@@ -80,6 +80,9 @@ namespace GData
         public:
             SkillBuff(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
+            void SetCount(UInt8 count1){ count = count1;}
+            void SetSide(UInt8 side1){ side = side1;}
+            void SetType(UInt8 type1){ type = type1;}
         public:
             std::vector<UInt8> attrIds;
             std::vector<UInt8> valueP;

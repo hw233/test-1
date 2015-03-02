@@ -84,21 +84,17 @@ namespace Battle
         {
             std::cout << "回合数:: " << static_cast<UInt32>(i) << std::endl <<std::endl;
             actCount += doImage(i);
-            actCount += doObjectMove(i);
+            actCount += doObjectMove(i);  //每回合
             for(UInt8 j = 0; j < 20; ++j)
             {
                 index = !index;
                 bf[index] = getMyFighters(index,j/2);
 
                 if(!bf[0] && !bf[1])          
-                {
                     break;
-                }
 
                 if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
-                {
                     continue;
-                }
 
                 bf[index]->CheckBuff();
                 bf[index]->SetNowTime(i);
@@ -114,6 +110,7 @@ namespace Battle
 
         _packet.data<UInt16>(offset) = actCount;
         _packet << Stream::eos;
+
         battleReport.addReport(_id,_packet);
     } 
 
@@ -233,7 +230,8 @@ namespace Battle
                 BattleObject* bo = bAction.GetObject(j);
                 if(!bo)
                     continue;
-                bo->AddBuff(buffId);
+                if(buffId && count && side)
+                    bo->AddBuff(buffId);
                 UInt16 param = bo->BeActed(&bAction);
                 //XXX 差法术协议
                 _packet << bo->GetBSNumber();

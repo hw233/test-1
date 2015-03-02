@@ -80,7 +80,8 @@ namespace Battle
             }
             */
 
-            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY,UInt8 direction = 2);
+            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY);
+            BattleObject * GetTargetForRide(UInt8 side , UInt16 posX , UInt16 posY,UInt8 direction = 2);
             void GetTargetList(UInt8 side, BattleFighter* bf, std::vector<BattleObject *>& vec, UInt16 , UInt8 flag = 0);
 
             inline UInt16 GetTimeActionLimit() { return _timeActionLimit;}
@@ -101,6 +102,7 @@ namespace Battle
             void GetBSEnterInfo(Stream& st);
             BattleFighter *getMyFighters(UInt8 side, UInt8 index);
             std::list<ObjectPackage>& GetObjectpackage();
+
         protected:
 
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
@@ -109,6 +111,7 @@ namespace Battle
             std::vector<BattleFighter* > _fighters[2];
             UInt16 _fieldDistance;
             UInt16 _timeActionLimit ;
+
             std::map<UInt16,std::vector<ActionPackage> > FieldAttack;  //攻击
 
             std::map<UInt16,std::vector<ImagePackage> > FieldImage;  //延迟性buff (定时炸弹类型的行为)

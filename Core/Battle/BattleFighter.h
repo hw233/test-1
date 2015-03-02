@@ -215,10 +215,13 @@ namespace Battle
                 { 
                     case 0:
                         attrBase[index] = val;
+                        break;
                     case 1:
                         attrAdd[index] = val;
+                        break;
                     case 2:
                         attrSub[index] = val;
+                        break;
                 } 
             } 
 

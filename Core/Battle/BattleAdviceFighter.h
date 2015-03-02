@@ -1,15 +1,15 @@
 
-#ifndef BATTLESHOOTFIGHTER_H_
-#define BATTLESHOOTFIGHTER_H_
+#ifndef BATTLEADVICEFIGHTER_H_
+#define BATTLEADVICEFIGHTER_H_
 
 #include "BattleFighter.h"
 namespace Battle
 {
-    class BattleShootFighter:
+    class BattleAdviceFighter:
         public BattleFighter
     {
         public:
-            BattleShootFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
+            BattleAdviceFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
                 BattleFighter(3,bf,f,pointX,pointY),_target(NULL)
         { 
 
@@ -24,7 +24,7 @@ namespace Battle
     };
 }
 
-#endif // BATTLESHOOTFIGHTER_H_
+#endif // BATTLEADVICEFIGHTER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 
