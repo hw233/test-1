@@ -24,6 +24,17 @@ namespace GData
         UInt32      attrExtra;      // 属性附加
         float       salePriceUp;    // 交易价格上限 
     };
+
+    struct DBItemType2
+    {
+        UInt32      typeId;         // 物品编号
+        std::string name;           // 名字
+        UInt8       subClass;       // 物品类型 -
+        UInt32      maxQuantity;       // 最大叠加数
+        UInt32      coin;           // 价格(铜)
+        //UInt32      attrExtra;      // 属性附加
+    };
+
     struct DBExp  
     {
         UInt8 lvl; 
@@ -152,6 +163,19 @@ namespace DB
          float,      salePriceUp
         )
         SPECIALEND()
+
+  SPECIALBEGIN(GData::DBItemType2)
+        SPECIALDEF(5)
+        (
+         UInt32,     typeId,
+         std::string,name,
+         UInt8,      subClass,
+         UInt32,     maxQuantity,
+         UInt32,     coin
+        // UInt32,     attrExtra,
+        )
+        SPECIALEND()
+
 
         SPECIALBEGIN(GData::DBExp)   
         SPECIALDEF(2)

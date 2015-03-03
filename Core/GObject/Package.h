@@ -42,12 +42,17 @@ namespace GObject
                 iter = m_Items.find(ItemKey(id, bind));
                 return iter->second; 
             }
+
             void enumerate(Visitor<ItemBase>& visitor);
+
             ItemBase * AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
-            ItemBase * AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
+            //ItemBase * AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
             ItemBase * AddItemFromDB(UInt32 id, UInt32 num, bool bind);
 
             UInt8 Enchant(UInt16 fighterId, UInt8 part,UInt8 type);
+
+            UInt32 DelItem(UInt32 id, UInt32 num, bool bind);
+            UInt32 DelAllItem(UInt32 id, UInt32 num);
 
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;

@@ -15,6 +15,7 @@ namespace GData
         public:
             static bool LoadExpData(); 
             static bool LoadItemTypeData();
+            static bool LoadItemTypeData2();
             static bool LoadSkillConditionData();
             static bool LoadSkillScopeData();
             static bool LoadSkillEffectData();

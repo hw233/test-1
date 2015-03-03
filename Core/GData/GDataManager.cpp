@@ -34,7 +34,7 @@ namespace GData
             fprintf(stderr, "Load LoadFighterBase Error !\n");
             std::abort();
         }
-        if (!LoadItemTypeData())  
+        if (!LoadItemTypeData2())  
         {
             fprintf(stderr, "Load ItemTypeData Error !\n");
             std::abort();
@@ -98,12 +98,13 @@ namespace GData
         return true;
     }
 
-    bool GDataManager::LoadItemTypeData()
+    bool GDataManager::LoadItemTypeData2()
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
-        DBItemType idt;
-        if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `vLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `trumpExp`, `data`, `enchant`, `attrId`, `salePriceUp` FROM `item_template`", idt) != DB::DB_OK)
+        DBItemType2 idt;
+        //if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `vLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `trumpExp`, `data`, `enchant`, `attrId`, `salePriceUp` FROM `item_template`", idt) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`, `name`, `subClass`,`maxQuantity`, `coin` FROM `item_template`", idt) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
@@ -119,10 +120,10 @@ namespace GData
                     }
                     break;
             }
-            wt->subClass = static_cast<ItemClass>(idt.subClass);
-            wt->price = idt.coin;
+            wt->subClass = static_cast<ItemClass>(idt.subClass);  //物品类型
+            wt->price = idt.coin;   // 出售价格
             wt->maxQuantity = idt.maxQuantity;
-            wt->bindType = idt.bindType;
+            //wt->bindType = idt.bindType;
             itemBaseTypeManager.add(wt);
             itemBaseTypeNameManager.add(wt->getName(), wt);
         }

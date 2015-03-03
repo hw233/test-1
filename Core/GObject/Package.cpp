@@ -6,12 +6,12 @@ namespace GObject
 {
     ItemBase* Package::AddItemFromDB(UInt32 id, UInt32 num, bool bind)
     {
-        assert(!IsEquipId(id));
+       // assert(!IsEquipId(id));
         const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
         if(itemType == NULL) return NULL;
         ItemBase * item = new(std::nothrow) ItemBase(id, itemType);
         if (item == NULL) return NULL;
-        ITEM_BIND_CHECK(itemType->bindType,bind);
+        //ITEM_BIND_CHECK(itemType->bindType,bind);
         item->SetBindStatus(bind);
         item->IncItem(num);
         {
@@ -31,8 +31,49 @@ namespace GObject
         if(val/10 >= 20)
             return 3;
 
+        //XXX 扣除道具
         ++val;
         fgt->SetVar(part + FVAR_WEAPON_ENCHANT , val);
+        return 0;
+    } 
+
+    ItemBase * Package::AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 fromWhere = 0)
+    { 
+       ItemBase* item = m_Items[ItemKey(typeId, bind)];
+       if(!item)
+           return NULL;
+       item->IncItem(num);
+       return item;
+    } 
+
+    UInt32 Package::DelItem(UInt32 id, UInt32 num, bool bind)
+    { 
+       ItemBase* item = m_Items[ItemKey(id, bind)];
+       if(!item)
+           return 0;
+       UInt32 count = item->Count();
+
+       if(count < num)
+           return count;
+       else
+           item->DecItem(num);
+       return num ;
+    } 
+
+    UInt32 Package::DelAllItem(UInt32 id, UInt32 num)
+    { 
+        UInt32 count = DelItem(id, num,1);  //绑定
+        if(count == num)
+            return num;
+        else
+        {
+            UInt32 count1 = DelItem(id,num - count,0);//非绑定
+            if(count1 + count == num)
+            {
+                DelItem(id,count,1);
+                return num;
+            }
+        }
         return 0;
     } 
 }
