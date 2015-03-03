@@ -37,11 +37,16 @@ namespace GObject
         return 0;
     } 
 
-    ItemBase * Package::AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 fromWhere = 0)
+    ItemBase * Package::AddItem(UInt32 typeId, UInt32 num, bool bind , bool silence , UInt16 fromWhere )
     { 
        ItemBase* item = m_Items[ItemKey(typeId, bind)];
        if(!item)
-           return NULL;
+       {
+           const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+           if(itemType == NULL) return NULL;
+           item = new(std::nothrow) ItemBase(typeId, itemType);
+           m_Items[ItemKey(typeId, bind)] = item;
+       }
        item->IncItem(num);
        return item;
     } 
