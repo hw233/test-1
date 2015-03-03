@@ -96,7 +96,10 @@ namespace GObject
     void Fighter::MakeFighterInfo(Stream& st)
     { 
        st << static_cast<UInt16>(getId());
-       st << static_cast<UInt8>(0);
+       st << static_cast<UInt8>(0);  //状态
+       st << static_cast<UInt8>(0);  //品质
+       st << static_cast<UInt8>(0);  //星级
+       st << static_cast<UInt32>(0);  //星级经验
        for(UInt8 i = 0; i < 6; ++i) 
        { 
            st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)%10);
