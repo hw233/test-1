@@ -5,6 +5,29 @@
 
 namespace REQ
 {
+    //强化
+    const UInt8 ENCHART             = 0x20;// 0xF0
+    /**战报请求 */
+    const UInt8 BATTLE_REPORT_REQ        = 0x80;// 0xC0
+    /**登陆 */
+    const UInt8 LOGIN               = 0xE0;// 0x10
+    /**创建角色 */
+    const UInt8 CREATE_ROLE         = 0xE1;// 0x11
+    /**新手引导步骤 */
+    const UInt8 NEW_HAND_STEP       = 0xE3;// 0x13
+    /**请求玩家信息 */
+    const UInt8 USER_INFO           = 0xE4;// 0x14
+    /**BUFFER信息改变 */
+    //创建帐号
+    const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15
+
+    const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15
+
+
+
+
+
+
     /**保持连接 */
     const UInt8 KEEP_ALIVE          = 0x00;
     /**自动重连 */
@@ -47,21 +70,6 @@ namespace REQ
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择 */
     const UInt8 CAMPS_CHOICE        = 0xF1;// 0x0D
-    /**登陆 */
-    const UInt8 LOGIN               = 0xE0;// 0x10
-    /**创建角色 */
-    const UInt8 CREATE_ROLE         = 0xE1;// 0x11
-    /**新手引导步骤 */
-    const UInt8 NEW_HAND_STEP       = 0xE3;// 0x13
-    /**请求玩家信息 */
-    const UInt8 USER_INFO           = 0xE4;// 0x14
-    /**BUFFER信息改变 */
-    
-    //创建帐号
-    const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15
-
-    const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15
-
     /**回流用户7日活动指令 */
     const UInt8 RF7DAY              = 0x15;
     /** ??? */
@@ -298,8 +306,6 @@ namespace REQ
     const UInt8 STORE_LIST          = 0xDC;// 0xB0
     /**商城购买 */
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
-    /**请求交易列表信息 */
-    const UInt8 BATTLE_REPORT_REQ        = 0x80;// 0xC0
     /**根据交易ID请求交易内容 */
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
     /**发起交易 */
@@ -370,8 +376,6 @@ namespace REQ
     const UInt8 SERVER_ARENA_OP     = 0xE8;
     /**聊天 */
 
-    //强化
-    const UInt8 ENCHART             = 0x20;// 0xF0
     /**私聊 */
     const UInt8 WHISPER             = 0x21;// 0xF1
     /**寻找玩家 */

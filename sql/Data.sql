@@ -173,6 +173,17 @@ CREATE TABLE `skill` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `map`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `map` (
+      `id` int(10) NOT NULL DEFAULT '0',
+      `floor` tinyint(3) NOT NULL DEFAULT '0', 
+      `info` varchar(255) NOT NULL,
+      PRIMARY KEY (`id`,`floor`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 
 

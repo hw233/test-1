@@ -29,6 +29,7 @@
 //Fighter
 //BattleSimulator
 //Function
+//Chat
 
 #define IDTYPE UInt64   //LIBO
 namespace Battle
@@ -175,9 +176,13 @@ namespace GObject
             void SetBattleSide(UInt8 side) { _battleSide = side; }
             UInt8 GetBattleSide() { return _battleSide;}
 
+            //Chat
+            void SetRecChat(UInt8 v){ recChat = v;}
+            UInt8 GetRecChat(){ return recChat;}
 
             //业务逻辑
             UInt8 Enchant(UInt8 number);
+
 
     private:
             //IDTYPE _id;
@@ -198,6 +203,8 @@ namespace GObject
             PlayerData _playerData;
             std::string name;
 
+            //聊天 Chat
+            UInt8 recChat;    //是否接收信息
 
             //战斗相关
             UInt32 _battleId ; //战斗ID
