@@ -183,6 +183,7 @@ namespace GObject
             //业务逻辑
             UInt8 Enchant(UInt8 number);
 
+            //void LoadFriend(Player* friendOne){ _friends.push_back(friendOne);}
 
     private:
             //IDTYPE _id;
@@ -199,7 +200,7 @@ namespace GObject
             //功能类
             VarSystem* m_pVars;
             Package* m_Package;
-            FriendManager * m_friendMgr;
+            FriendManager * m_friendMgr;  //好友
             PlayerData _playerData;
             std::string name;
 
@@ -212,7 +213,9 @@ namespace GObject
 
             //散仙相关
             std::map<UInt32, Fighter *> _fighters;
+
 };
+
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
 extern GlobalPlayers globalPlayers;
 extern GlobalPlayers globalOnlinePlayers;

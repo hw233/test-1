@@ -87,6 +87,12 @@ namespace GObject
         UInt32 armor4;
         UInt32 armor5;
     };
+
+    struct DBFriend
+    {
+        UInt64 playerId;
+        UInt64 friendId;
+    };
 }
 namespace DB
 {
@@ -183,6 +189,13 @@ namespace DB
     )
     SPECIALEND()
 
+    SPECIALBEGIN(GObject::DBFriend)
+    SPECIALDEF(2)
+    (
+     UInt64 , playerId,
+     UInt64 , friendId
+    )
+    SPECIALEND()
 
 }
 

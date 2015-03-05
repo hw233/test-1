@@ -81,4 +81,13 @@ namespace GObject
         }
         return 0;
     } 
+    UInt32 Package::GetPackageSize()
+    { 
+        UInt32 size = 0;
+        for(item_elem_iter it= m_Items.begin(); it != m_Items.end(); ++it)
+        { 
+            size = (it->second)->Size();
+        } 
+        return size;
+    } 
 }

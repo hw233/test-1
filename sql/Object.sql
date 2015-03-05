@@ -38,7 +38,7 @@ CREATE TABLE `gvar` (
 
 DROP TABLE IF EXISTS `var`; 
 CREATE TABLE `var` (
-    `playerId` int(10) unsigned NOT NULL,
+    `playerId` bigint(10) unsigned NOT NULL,
     `id` smallint(5) NOT NULL,
     `data` int(10) unsigned NOT NULL,
     `over` int(10) unsigned NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE `var` (
 
 DROP TABLE IF EXISTS `player_id`; 
 CREATE TABLE `player_id` (
-    `id` int(10) unsigned NOT NULL DEFAULT 0,
+    `id` bigint(10) unsigned NOT NULL DEFAULT 0,
     `phoneId` bigint(20) unsigned NOT NULL DEFAULT 0,
     `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
     `password` varchar(255) NOT NULL DEFAULT '',   /*密码*/
@@ -58,7 +58,7 @@ CREATE TABLE `player_id` (
 
 DROP TABLE IF EXISTS `fvar`; 
 CREATE TABLE `fvar` (
-    `playerId` int(10) unsigned NOT NULL,
+    `playerId` bigint(10) unsigned NOT NULL,
     `fighterId` int(10) unsigned NOT NULL,
     `id` smallint(5) NOT NULL,
     `data` int(10) unsigned NOT NULL,
@@ -68,8 +68,8 @@ CREATE TABLE `fvar` (
 
 DROP TABLE IF EXISTS `fighter`; 
 CREATE TABLE `fighter` (
+    `playerId` bigint(10) unsigned NOT NULL,
     `fighterId` int(10) unsigned NOT NULL,
-    `playerId` int(10) unsigned NOT NULL,
     `experience` bigint(20) unsigned NOT NULL DEFAULT '0',
     `weapon` int(10) unsigned NOT NULL DEFAULT '0',
     `armor1` int(10) unsigned NOT NULL DEFAULT '0',
@@ -80,5 +80,14 @@ CREATE TABLE `fighter` (
     `addTime` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`fighterId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `friends`; 
+CREATE TABLE `friends` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `friendId` bigint(20) unsigned NOT NULL,
+    PRIMARY KEY (`playerId`,`friendId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 

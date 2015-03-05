@@ -18,6 +18,7 @@
 #include "GObject/Player2Id.h"
 #include "GObject/Fighter.h"
 #include "FVar.h"
+#include "GObject/Friend.h"
 namespace GObject
 {
     URandom GRND(time(0)); 
@@ -62,6 +63,12 @@ namespace GObject
         if(!loadFighterVar())
         {
             fprintf(stderr, "loadFighterVar error!\n");
+            std::abort();
+        }
+
+        if(!loadFriend())
+        {
+            fprintf(stderr, "loadFriend error!\n");
             std::abort();
         }
     } 
@@ -262,6 +269,35 @@ namespace GObject
         {
             lc.advance();
             player2Id.InsertAccount(ap.accounts,ap.password);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadFriend()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Friend");
+        lc.reset(1000);
+        DBFriend ap;
+        if(execu->Prepare("SELECT `playerId`,`friendId` FROM `friend`", ap) != DB::DB_OK)
+            return false;
+        IDTYPE last_id = 0;
+        Player* pl = NULL;
+        while(execu->Next() == DB::DB_OK)
+        {
+            if(ap.playerId != last_id)
+            {
+                last_id = ap.playerId;
+                pl = globalPlayers[last_id];
+            }
+            if(pl == NULL) continue;
+            Player* friendOne = globalPlayers[ap.friendId];
+            if(!friendOne)
+                continue ;
+            pl->GetFriendManager()->AddFriend(friend_normal,friendOne);
+            lc.advance();
         }
         lc.finalize();
         return true;
