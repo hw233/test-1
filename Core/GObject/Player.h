@@ -14,6 +14,7 @@
 #include "Server/WorldServer.h"
 //#include "Player.h"
 #include "Battle/BattleGround.h"
+#include "ChatHold.h"
 
 //VAR
 //Package
@@ -59,6 +60,7 @@ namespace GObject
     class VarSystem;
     class FriendManager ;
     class Fighter;
+    class ChatHold;
     class Player :
         public GObjectBaseT<Player,IDTYPE>
     {
@@ -185,6 +187,10 @@ namespace GObject
 
             //void LoadFriend(Player* friendOne){ _friends.push_back(friendOne);}
 
+            ChatHold* GetChatHold();
+
+            Clan* GetClan(){ return clan;}
+
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -203,6 +209,8 @@ namespace GObject
             FriendManager * m_friendMgr;  //好友
             PlayerData _playerData;
             std::string name;
+            ChatHold * chatHold;
+            Clan * clan;
 
             //聊天 Chat
             UInt8 recChat;    //是否接收信息

@@ -1,6 +1,8 @@
 #include "Player.h"
 #include "Fighter.h"
+#include "ChatHold.h"
 
+#define P_CHAT_MAX 10
 namespace GObject
 {
     //GlobalNamedPlayers globalPlayers;
@@ -11,8 +13,10 @@ namespace GObject
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1)
     {
         m_pVars = new VarSystem(id);
-         m_Package = new Package(this); 
-         m_friendMgr = new FriendManager(this);
+        m_Package = new Package(this); 
+        m_friendMgr = new FriendManager(this);
+        chatHold = NULL;
+        clan = NULL;
     }
     Player::~Player()
     { 
@@ -165,4 +169,13 @@ namespace GObject
             (it->second)->MakeFighterInfo(st);
         } 
     }
+
+    ChatHold* Player::GetChatHold()
+    { 
+        if(!chatHold)
+        { 
+            chatHold = new ChatHold(P_CHAT_MAX);
+        } 
+        return chatHold;
+    } 
 }

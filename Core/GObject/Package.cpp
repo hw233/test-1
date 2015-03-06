@@ -90,4 +90,14 @@ namespace GObject
         } 
         return size;
     } 
+
+    void Package::GetStream(Stream& st) 
+    { 
+       item_elem_iter it =  m_Items.begin();
+       for(;it != m_Items.end(); ++it)
+       { 
+            st << static_cast<UInt16>(it->second->getId());
+            st << static_cast<UInt16>(it->second->Count());
+       } 
+    } 
 }

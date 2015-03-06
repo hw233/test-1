@@ -5,6 +5,7 @@
 #include "GData/GDataManager.h"
 #include "GObject/GGlobalObjectManager.h"
 #include "Common/URandom.h"
+#include "Common/Stream.h"
 
 
 namespace GObject
@@ -54,6 +55,8 @@ namespace GObject
             UInt32 DelItem(UInt32 id, UInt32 num, bool bind);
             UInt32 DelAllItem(UInt32 id, UInt32 num);
             UInt32 GetPackageSize();
+
+            void  GetStream(Stream& st);
 
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;

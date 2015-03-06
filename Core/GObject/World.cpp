@@ -6,10 +6,16 @@
 #include "GObject/GVar.h"
 #include "Battle/BattleManager.h"
 #include "Player.h"
+#include "ChatHold.h"
+
+#define W_CHAT_MAX 20
+
 namespace GObject
 {
     bool World::Init()
     {
+        chatHold = new ChatHold(W_CHAT_MAX);
+
         std::string path = cfg.scriptPath + "World/main.lua";
         TimeUtil::TimeAdd(GVAR.GetVar(GVAR_TIMEADD));
         {
@@ -85,4 +91,5 @@ namespace GObject
         }
         Battle::battleManager.StartGround(BattleId);
     } 
+
 }
