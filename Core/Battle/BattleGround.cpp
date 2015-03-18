@@ -369,19 +369,17 @@ namespace Battle
             _astar.GetRoute(&Path);
             std::reverse(Path.begin(),Path.end());
 
-            TargetInfo info = GetGoalPointInfo(Path,ride);
-            if(info.size < _target.size && info.bo != _target.bo )  //比较距离
-            {
+             TargetInfo info = GetGoalPointInfo(Path,ride);
+             if(info.size < _target.size && info.bo != _target.bo )  //比较距离
+             {
                 _target = info;
                 vecScoord.pop_back();
              }
-            /*
              else if( priority[currentBf->getClass()-1][_target.bo->getClass()-1] < priority[currentBf->getClass()-1][info.bo->getClass()-1])    //比较优先级
              {
                 _target = info;
                 vecScoord.pop_back();
              }
-             */
              else
              {
                  vecScoord.pop_back();
