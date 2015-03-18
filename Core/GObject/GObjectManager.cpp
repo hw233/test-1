@@ -281,7 +281,7 @@ namespace GObject
         LoadingCounter lc("Loading Friend");
         lc.reset(1000);
         DBFriend ap;
-        if(execu->Prepare("SELECT `playerId`,`friendId` FROM `friend`", ap) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`,`friendId` FROM `friends`", ap) != DB::DB_OK)
             return false;
         IDTYPE last_id = 0;
         Player* pl = NULL;

@@ -14,8 +14,8 @@
 #include "Server/WorldServer.h"
 //#include "Player.h"
 #include "Battle/BattleGround.h"
-#include "ChatHold.h"
-
+#include "GObject/ChatHold.h"
+#include "GObject/Clan.h"
 //VAR
 //Package
 //Friend
@@ -61,6 +61,7 @@ namespace GObject
     class FriendManager ;
     class Fighter;
     class ChatHold;
+    class Clan;
     class Player :
         public GObjectBaseT<Player,IDTYPE>
     {
@@ -190,6 +191,9 @@ namespace GObject
             ChatHold* GetChatHold();
 
             Clan* GetClan(){ return clan;}
+            void SetClan(Clan *c ) { clan = c; } 
+            //Mutex& GetMutex() { return mutex;}
+            std::string getSource() { return NULL;}
 
     private:
             //IDTYPE _id;
