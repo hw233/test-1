@@ -255,13 +255,14 @@ namespace Battle
             std::cout << std::endl;
             TestCoutBattleS(currentBf);
             //战斗
-            currentBf->SetGroundX(_target.ax);
-            currentBf->SetGroundY(_target.ay);
-
+            std::cout <<"从     "<<static_cast<UInt32>(currentBf->GetGroundX())<<" , "<< static_cast<UInt32>(currentBf->GetGroundY())<<std::endl;
             std::cout <<"移动到  "<<static_cast<UInt32>(_target.ax)<< "," << static_cast<UInt32>(_target.ay) <<std::endl;
             std::cout << "攻击目标  " <<static_cast<UInt32>(_target.gx)<<","<<static_cast<UInt32>(_target.gy)<<std::endl;
 
             //Stream
+            currentBf->SetGroundX(_target.ax);
+            currentBf->SetGroundY(_target.ay);
+
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(_target.gx) << static_cast<UInt8>(_target.gy);
             _pack << static_cast<UInt8>(1);
@@ -372,13 +373,13 @@ namespace Battle
              TargetInfo info = GetGoalPointInfo(Path,ride);
              if(info.size < _target.size && info.bo != _target.bo )  //比较距离
              {
-                _target = info;
-                vecScoord.pop_back();
+                     _target = info;
+                     vecScoord.pop_back();
              }
              else if( priority[currentBf->getClass()-1][_target.bo->getClass()-1] < priority[currentBf->getClass()-1][info.bo->getClass()-1])    //比较优先级
              {
-                _target = info;
-                vecScoord.pop_back();
+                     _target = info;
+                     vecScoord.pop_back();
              }
              else
              {
@@ -402,7 +403,7 @@ namespace Battle
             np = path[0];
             sz = 0;
         }
-        else if( path.size() > 2 && path.size() <=  ride+2)
+        else if( path.size() > static_cast<UInt32>(2) && path.size() <=  static_cast<UInt32>(ride+2))
         {
              GObject::ASCOORD tmp = path[ride-2];
              np = tmp;
