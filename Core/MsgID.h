@@ -7,6 +7,10 @@ namespace REQ
 {
     //强化
     const UInt8 ENCHART             = 0x20;// 0xF0
+
+    /*背包信息*/
+    const UInt8 PACKAGE_INFO = 0x30;// 0xE0
+    
     /**战报请求 */
     const UInt8 BATTLE_REPORT_REQ        = 0x80;// 0xC0
     /**登陆 */

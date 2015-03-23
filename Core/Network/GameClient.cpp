@@ -127,12 +127,12 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 		0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, // 0x00
 		2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x10
 		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x20
-		1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x30
+		0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x30
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, // 0x40
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, // 0x50
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, // 0x60
 		1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, // 0x70
-		1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, // 0x80
+		4, 4, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, // 0x80
 		0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, // 0x90
 		0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, // 0xA0
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0xB0
@@ -154,6 +154,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 	{
 	case 0:
 		{
+            return WORKER_THREAD_COUNTRY_1;
 			if(player == NULL)
 				return MAX_THREAD_NUM;
 			UInt8 thid = player->getThreadId();
@@ -172,6 +173,8 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 			return MAX_THREAD_NUM;
 		return WORKER_THREAD_LOGIN;
 		break;
+    case 4:
+        return WORKER_BATTLE;
 	default:
 		break;
 	}

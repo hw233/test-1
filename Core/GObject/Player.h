@@ -15,6 +15,7 @@
 //#include "Player.h"
 #include "Battle/BattleGround.h"
 #include "ChatHold.h"
+#include "Clan.h"
 
 //VAR
 //Package
@@ -102,7 +103,7 @@ namespace GObject
             {send(&st[0], st.size());}
 
             //thread
-            UInt8 getThreadId(){ return 1;}
+            UInt8 getThreadId(){ return 0;}
 
             template <typename MsgType>
                 inline void send(MsgType& msg)
@@ -190,6 +191,7 @@ namespace GObject
             ChatHold* GetChatHold();
 
             Clan* GetClan(){ return clan;}
+            void SetClan(Clan* cl) { clan = cl;}
 
     private:
             //IDTYPE _id;

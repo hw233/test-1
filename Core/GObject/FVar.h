@@ -32,12 +32,19 @@ namespace GObject
         FVAR_ARMOR4_ENCHANT = 5,    //戒指强化值
         FVAR_ARMOR5_ENCHANT = 6,    //项链强化值
 
-        FVAR_SKILL0_LEVEL ,    //武器阶数 
-        FVAR_SKILL1_LEVEL ,    //胸甲阶数
-        FVAR_SKILL2_LEVEL ,    //护头阶数
-        FVAR_SKILL3_LEVEL ,    //绑腿阶数
-        FVAR_SKILL4_LEVEL ,    //戒指阶数
-        FVAR_SKILL5_LEVEL ,    //项链阶数
+        FVAR_WEAPON_ROAD = 7,    //武器强化之路
+        FVAR_ARMOR1_ROAD = 8,    //胸甲强化之路
+        FVAR_ARMOR2_ROAD = 9,    //护头强化之路
+        FVAR_ARMOR3_ROAD = 10,   //绑腿强化之路
+        FVAR_ARMOR4_ROAD = 11,   //戒指强化之路
+        FVAR_ARMOR5_ROAD = 12,   //项链强化之路
+
+        FVAR_SKILL0_LEVEL = 13,    //技能等级 
+        FVAR_SKILL1_LEVEL = 14,    //技能等级
+        FVAR_SKILL2_LEVEL = 15,    //技能等级
+        FVAR_SKILL3_LEVEL = 16,    
+        FVAR_SKILL4_LEVEL = 17,    //
+        FVAR_SKILL5_LEVEL = 18,    //
 
         FVAR_HP ,        //最大血量
         FVAR_ATTACK ,    //物理攻击力

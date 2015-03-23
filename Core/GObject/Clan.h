@@ -1,7 +1,7 @@
 
 #ifndef CLAN_H_
 #define CLAN_H_
-#include "Common/Config.h"
+#include "Config.h"
 
 #define CLAN_MAX 60
 namespace GObject

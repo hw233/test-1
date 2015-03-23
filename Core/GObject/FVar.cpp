@@ -64,7 +64,7 @@ namespace GObject
         UInt32 oldVal = m_FVars[id];
         if(oldVal != 0 )
             m_FVars[id] = 0;
-        DB7().PushUpdateData("delete from fvar where `playerId` = %u and fighterId = %u and `id` = %u ",playerId,fighterId, id);
+        DB7().PushUpdateData("delete from fvar where `playerId` = %" I64_FMT "u and fighterId = %u and `id` = %u ",playerId,fighterId, id);
 
     }
 
@@ -160,13 +160,13 @@ namespace GObject
 
     void FVarSystem::ReplaceDB(UInt32 id)
     {
-        DB7().PushUpdateData("REPLACE INTO `fvar` (`playerId`,`fighterId` ,`id`, `data`, `over`) VALUES (%u,%u, %u, %u, %u)" ,playerId,fighterId ,id, m_FVars[id], m_OverTime[id]);
+        DB7().PushUpdateData("REPLACE INTO `fvar` (`playerId`,`fighterId` ,`id`, `data`, `over`) VALUES (%" I64_FMT "u,%u, %u, %u, %u)" ,playerId,fighterId ,id, m_FVars[id], m_OverTime[id]);
     }
 
     void FVarSystem::UpdateDB(UInt32 id)
     {
-        DB7().PushUpdateData("update `fvar` set data = %u where playerId = %u and fighterId = %u and id = %u" , m_FVars[id],playerId,fighterId ,id);
-        DB7().PushUpdateData("update `fvar` set over = %u where playerId = %u and fighterId = %u and id = %u" , m_OverTime[id],playerId,fighterId ,id);
+        DB7().PushUpdateData("update `fvar` set data = %u where playerId = %" I64_FMT "u and fighterId = %u and id = %u" , m_FVars[id],playerId,fighterId ,id);
+        DB7().PushUpdateData("update `fvar` set over = %u where playerId = %" I64_FMT "u and fighterId = %u and id = %u" , m_OverTime[id],playerId,fighterId ,id);
     }
 }
 
