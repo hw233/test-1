@@ -20,7 +20,15 @@ void Player2Id::InsertAccount( const std::string& accounts , const std::string& 
 
 IDTYPE Player2Id::getPlayerId(const std::string& phoneId ,const std::string& accounts)
 { 
-    std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
+    //std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
+    std::map<MapKey , IDTYPE>::iterator it = _map.begin();//find(MapKey(phoneId,accounts));
+    MapKey mk = MapKey(phoneId,accounts);
+    while(it != _map.end())
+    { 
+        if(it->first == mk )
+            break;
+        ++it ;
+    } 
     if(it == _map.end())
         return 0;
     return it->second;

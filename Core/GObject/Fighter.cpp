@@ -99,11 +99,12 @@ namespace GObject
        st << static_cast<UInt8>(0);  //状态
        st << static_cast<UInt8>(0);  //品质
        st << static_cast<UInt8>(0);  //星级
-       st << static_cast<UInt32>(0);  //星级经验
+       st << static_cast<UInt8>(0);  //星级经验
        for(UInt8 i = 0; i < 6; ++i) 
        { 
            st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)%10);
            st << static_cast<UInt8>(GetVar(FVAR_WEAPON_ENCHANT+i)/10);
+           st << static_cast<UInt16>(GetEquipmentUpgradeLoad(i));
        } 
        st << static_cast<UInt8>(m_baseSkills.size());
        for(UInt8 i = 0; i < m_baseSkills.size(); ++i)
@@ -111,5 +112,37 @@ namespace GObject
            st << static_cast<UInt16>(m_baseSkills[i]);
            st << static_cast<UInt8>(GetVar(FVAR_SKILL0_LEVEL+i));
        } 
+    } 
+    void Fighter::updateEuipmentLoad(UInt8 index)
+    { 
+        static UInt32 chance[] = {7000,8000,8600,9200,10000};
+        UInt32 load = 1;
+        UInt8 level = 1;
+        while(level < 10)
+        { 
+            UInt32 rand = uRand(10000);
+            for(UInt8 i = 0; i < 5; ++i)
+            { 
+                if(rand < chance[i])
+                {
+                    level += (i+1);
+                    if(level >= 10)
+                        level = 10;
+                    break;
+                }
+            } 
+            load |= (1 << (level - 1));
+        } 
+        SetVar(FVAR_WEAPON_ROAD + index , load);
+    } 
+    UInt32 Fighter::GetEquipmentUpgradeLoad(UInt8 index) 
+    { 
+        UInt32 value = GetVar(FVAR_WEAPON_ROAD + index);
+        if(!value)
+        {
+            updateEuipmentLoad(index);
+            value = GetVar(FVAR_WEAPON_ROAD + index);
+        }
+        return value; 
     } 
 }

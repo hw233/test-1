@@ -16,11 +16,20 @@ class Player2Id
         MapKey(const std::string p , const std::string a):phone(p),accounts(a) { } 
         bool  operator < (const MapKey key) const 
         { 
-            return phone < key.phone && accounts != key.accounts;
+            if(!phone.empty())
+                return phone < key.phone;
+            if(!accounts.empty())
+                return accounts < key.accounts ;
+            return false;
+            //return phone < key.phone && (accounts != key.accounts || !accounts.empty());
         } 
         bool  operator == (const MapKey key) const 
         { 
-            return phone == key.phone || accounts == key.accounts;
+            if(!phone.empty())
+                return phone == key.phone;
+            if(!accounts.empty())
+                return accounts == key.accounts;
+            return false;
         } 
     };
 public:

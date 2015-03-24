@@ -6,7 +6,6 @@
 
 MSG_HANDLER_DECLARE(WorldMsgHandler)
 
-MSG_REG(GameMsgHdr, OnBattleReportReq);
 //MSG_REG(GameMsgHdr, OnBattleReportReq2);
 //MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 //MSG_REG_2(GameMsgHdr, 0x150, OnWorldCupResult);

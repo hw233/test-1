@@ -111,6 +111,10 @@ namespace GObject
 
             void MakeFighterInfo(Stream& st);
 
+            //强化更新
+            void updateEuipmentLoad(UInt8 index);
+            UInt32 GetEquipmentUpgradeLoad(UInt8 index);
+
             std::vector<UInt16> m_baseSkills;
     private:
             UInt32 _id;

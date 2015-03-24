@@ -14,8 +14,9 @@
 #include "Server/WorldServer.h"
 //#include "Player.h"
 #include "Battle/BattleGround.h"
-#include "GObject/ChatHold.h"
-#include "GObject/Clan.h"
+#include "ChatHold.h"
+#include "Clan.h"
+
 //VAR
 //Package
 //Friend
@@ -103,7 +104,7 @@ namespace GObject
             {send(&st[0], st.size());}
 
             //thread
-            UInt8 getThreadId(){ return 1;}
+            UInt8 getThreadId(){ return 0;}
 
             template <typename MsgType>
                 inline void send(MsgType& msg)
@@ -194,6 +195,7 @@ namespace GObject
             void SetClan(Clan *c ) { clan = c; } 
             //Mutex& GetMutex() { return mutex;}
             std::string getSource() { return NULL;}
+            UInt8 getVipLevel() const { return 1;}
 
     private:
             //IDTYPE _id;
@@ -234,6 +236,9 @@ extern GlobalPlayers globalOnlinePlayers;
 
 typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
 extern GlobalNamedPlayers globalNamedPlayers;
+
+typedef std::vector<Player* > GlobalPlayerVec;  
+extern GlobalPlayerVec globalPlayerVec;
 //extern GlobalNamedPlayers globalAccountsPlayers;
 }
 #endif // PLAYER_H_

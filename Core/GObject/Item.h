@@ -73,6 +73,11 @@ namespace GObject
             UInt32  m_SellTime;  //出售物品时间
     };
 
+    class Item_Special:
+        public ItemBase
+    {
+         
+    };
 }
 
 #endif

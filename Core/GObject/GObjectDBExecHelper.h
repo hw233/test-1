@@ -93,6 +93,13 @@ namespace GObject
         UInt64 playerId;
         UInt64 friendId;
     };
+
+    struct DBItem
+    {
+        UInt32 itemId;
+        UInt64 playerId;
+        UInt32 count;
+    };
 }
 namespace DB
 {
@@ -194,6 +201,15 @@ namespace DB
     (
      UInt64 , playerId,
      UInt64 , friendId
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBItem)
+    SPECIALDEF(3)
+    (
+     UInt32 , itemId,
+     UInt64 , playerId,
+     UInt32 , count
     )
     SPECIALEND()
 

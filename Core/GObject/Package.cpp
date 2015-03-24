@@ -2,11 +2,12 @@
 #include "Fighter.h"
 #include "Player.h"
 #include "FVar.h"
+#include "Common/URandom.h"
 namespace GObject
 {
     ItemBase* Package::AddItemFromDB(UInt32 id, UInt32 num, bool bind)
     {
-       // assert(!IsEquipId(id));
+        // assert(!IsEquipId(id));
         const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
         if(itemType == NULL) return NULL;
         ItemBase * item = new(std::nothrow) ItemBase(id, itemType);
@@ -20,49 +21,114 @@ namespace GObject
         return item;
     }
 
-    UInt8 Package::Enchant(UInt16 fighterId,UInt8 part, UInt8 type)
+    UInt32 Package::Enchant(UInt16 fighterId,UInt8 part)
     { 
         GObject::Fighter* fgt = m_Owner->findFighter(fighterId);
         if(!fgt)
             return 1;
         UInt32 val = fgt->GetVar(part + FVAR_WEAPON_ENCHANT );
-        if(val%10 ==9 && type == 0 )
-            return 2;
-        if(val/10 >= 20)
+        UInt8 enchant = val % 10;
+        if(enchant >= 9)
             return 3;
 
         //XXX 扣除道具
-        ++val;
+
+        UInt8 AddLevel = 1;
+        {
+            UInt32 value = fgt->GetEquipmentUpgradeLoad(part);
+            //UInt8 rand = (value >> (enchant - 1)*3) & 7;
+            //while(value & (1 << (enchant+(++AddLevel))) && (enchant+AddLevel) < 9);
+            for(; AddLevel < 9 - enchant ; ++AddLevel)
+            {
+               if(value &(1 << (enchant+AddLevel)) ) 
+                   break;
+            }
+        }
+
+        {
+           if(enchant + AddLevel > 9) 
+               val += (9 - enchant);
+           else
+               val += AddLevel;
+        }
+
         fgt->SetVar(part + FVAR_WEAPON_ENCHANT , val);
-        return 0;
+        return m_Owner->GetVar(VAR_ENCHANT_CD);
     } 
+
+    UInt32 Package::UpGrade(UInt16 fighterId, UInt8 part)
+    { 
+        GObject::Fighter* fgt = m_Owner->findFighter(fighterId);
+        if(!fgt)
+            return 1;
+        UInt32 val = fgt->GetVar(part + FVAR_WEAPON_ENCHANT );
+        UInt8 enchant = val % 10;
+        UInt8 grade = val / 10;
+        if(enchant != 9) 
+            return 3;
+        if( grade >= 20)
+            return 3;
+
+        //XXX 扣除道具
+
+        UInt32 load  = 0;
+
+        {
+            fgt->updateEuipmentLoad(part);
+            load = fgt->GetEquipmentUpgradeLoad(part);
+            ++val;
+        }
+
+        fgt->SetVar(part + FVAR_WEAPON_ENCHANT , val);
+        return load;
+
+    } 
+
+    UInt32 Package::EnchantFromClient(UInt16 fighterId,UInt8 part, UInt8 type)
+    { 
+        UInt32 result = 0;
+        if(!type)
+        {
+            for(UInt8 i = 0;i < 8; ++i)
+            { 
+                if(part & (1<<i))
+                {
+                    result = Enchant(fighterId, i);
+                }
+            } 
+        }
+        else
+            result = UpGrade(fighterId, part - 1);
+        return result;
+    } 
+
 
     ItemBase * Package::AddItem(UInt32 typeId, UInt32 num, bool bind , bool silence , UInt16 fromWhere )
     { 
-       ItemBase* item = m_Items[ItemKey(typeId, bind)];
-       if(!item)
-       {
-           const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
-           if(itemType == NULL) return NULL;
-           item = new(std::nothrow) ItemBase(typeId, itemType);
-           m_Items[ItemKey(typeId, bind)] = item;
-       }
-       item->IncItem(num);
-       return item;
+        ItemBase* item = m_Items[ItemKey(typeId, bind)];
+        if(!item)
+        {
+            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+            if(itemType == NULL) return NULL;
+            item = new(std::nothrow) ItemBase(typeId, itemType);
+            m_Items[ItemKey(typeId, bind)] = item;
+        }
+        item->IncItem(num);
+        return item;
     } 
 
     UInt32 Package::DelItem(UInt32 id, UInt32 num, bool bind)
     { 
-       ItemBase* item = m_Items[ItemKey(id, bind)];
-       if(!item)
-           return 0;
-       UInt32 count = item->Count();
+        ItemBase* item = m_Items[ItemKey(id, bind)];
+        if(!item)
+            return 0;
+        UInt32 count = item->Count();
 
-       if(count < num)
-           return count;
-       else
-           item->DecItem(num);
-       return num ;
+        if(count < num)
+            return count;
+        else
+            item->DecItem(num);
+        return num ;
     } 
 
     UInt32 Package::DelAllItem(UInt32 id, UInt32 num)
@@ -93,11 +159,21 @@ namespace GObject
 
     void Package::GetStream(Stream& st) 
     { 
-       item_elem_iter it =  m_Items.begin();
-       for(;it != m_Items.end(); ++it)
-       { 
-            st << static_cast<UInt16>(it->second->getId());
-            st << static_cast<UInt16>(it->second->Count());
-       } 
+        item_elem_iter it =  m_Items.begin();
+        /*
+           st << static_cast<UInt8>(m_Items.size());
+           for(;it != m_Items.end(); ++it)
+           { 
+           st << static_cast<UInt32>(it->second->getId());
+           st << static_cast<UInt16>(it->second->Count());
+           } 
+           */
+        UInt32 num = 2;
+        st << static_cast<UInt8>(num);
+        for(UInt8 i = 0; i < num ;++i)
+        {
+            st << static_cast<UInt32>(i+1);
+            st << static_cast<UInt16>(i+1);
+        }
     } 
 }

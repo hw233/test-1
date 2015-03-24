@@ -10,8 +10,6 @@
 #define localtime_r(t, tm) localtime_s(tm, t)
 #endif
 
-#include "GObject/GVar.h"
-
 class TimeUtil
 {
     public:

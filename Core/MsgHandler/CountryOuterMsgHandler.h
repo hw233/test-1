@@ -23,6 +23,7 @@
 #include "GObject/Player.h"
 #include "GObject/Fighter.h"
 
+#include "Battle/BattleReport.h"
 struct NullReq
 {
     UInt32 ticket;
@@ -79,19 +80,45 @@ void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
 
 void OnEnchantReq(GameMsgHdr& hdr, const void * data)
 { 
-   MSG_QUERY_PLAYER(player) ;
-   BinaryReader br(data,hdr.msgHdr.bodyLen);
-   UInt8 opt = 0;
-   br >> opt;
-   UInt16 fighterId;
-   br >> fighterId;
-   UInt8 part = 0;
-   br >> part;
-   UInt8 res = player->GetPackage()->Enchant(fighterId,part,opt);
-   Stream st(REQ::ENCHART);
-   st << static_cast<UInt8>(res);
-   st << Stream::eos;
-   player->send(st);
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+    UInt16 fighterId;
+    br >> fighterId;
+    UInt8 part = 0;
+    br >> part;
+    UInt32 result = player->GetPackage()->EnchantFromClient(fighterId,part,opt);
+    Stream st(REQ::ENCHART);
+    st << static_cast<UInt8>(opt);
+    if(opt)
+        st << static_cast<UInt8>(part);
+    st << result; 
+    st << Stream::eos;
+    player->send(st);
 } 
+void OnPackageInfo(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    Stream st(REQ::PACKAGE_INFO);
+    player->GetPackage()->GetStream(st);
+    st << Stream::eos;
+    player->send(st);
+} 
+
+struct BattleReportReq 
+{
+    UInt32 _reportId;
+    MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
+};
+void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
+{
+    MSG_QUERY_PLAYER(player);
+    std::vector<UInt8> *r = Battle::battleReport[brr._reportId];
+    if(r == NULL)
+        return;
+    player->send(&(*r)[0], r->size());
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

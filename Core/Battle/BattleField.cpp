@@ -132,6 +132,12 @@ namespace Battle
         UInt16 y2 = bo->getPosY()*1.0;
         UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
         UInt16 ady = y1>y2?(y1-y2):(y2-y1)*1.0;
+        if(ady >= 34 + (bf->GetRad()+bo->GetRad()))
+            return -1;
+        if(adx <= (bf->GetRad()+bo->GetRad()))
+            return 0;
+        return adx - (bf->GetRad()+bo->GetRad());
+
         if(static_cast<UInt16>(sqrt((adx*adx + ady*ady))) <= (bf->GetRad()+bo->GetRad()))
             return 0;
         return  (static_cast<UInt16>(sqrt(adx*adx + ady*ady)) - bf->GetRad() - bo->GetRad());
@@ -145,6 +151,14 @@ namespace Battle
         UInt16 y1 = bf->getPosY()*1.0;
         UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
         UInt16 ady = y1>y2?(y1-y2):(y2-y1)*1.0;
+
+        if(ady >= 34 + bf->GetRad()+rad)
+            return -1;
+        if(adx <= bf->GetRad()+ rad)
+            return 0;
+        return adx - bf->GetRad()- rad;
+
+
         if(static_cast<UInt16>(sqrt((adx*adx + ady*ady))) <= (bf->GetRad()+rad))
             return 0;
         return  (static_cast<UInt16>(sqrt(adx*adx + ady*ady)) - bf->GetRad() - rad);

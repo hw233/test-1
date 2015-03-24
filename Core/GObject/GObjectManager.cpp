@@ -71,6 +71,12 @@ namespace GObject
             fprintf(stderr, "loadFriend error!\n");
             std::abort();
         }
+
+        if(!loadItem())
+        {
+            fprintf(stderr, "loadItem error!\n");
+            std::abort();
+        }
     } 
     bool GObjectManager::loadAllPlayers()
     { 
@@ -116,6 +122,7 @@ namespace GObject
             //if(dbpd.accounts.empty())
             //    globalAccountsPlayers.add(dbpd.accounts, pl); //帐号
             globalNamedPlayers.add(pl->GetName(), pl);
+            globalPlayerVec.push_back(pl);
         }
 
         lc.prepare("Loading player vars:");
@@ -248,7 +255,7 @@ namespace GObject
             if(fgt2 == NULL)
                 continue;
             fgt2->SetExp(fighterInfo.experience);
-            fgt2->GetFVar()->SetFVar(FVAR_WEAPON_ENCHANT,100);
+            //fgt2->GetFVar()->SetFVar(FVAR_WEAPON_ENCHANT,100);
 
 
             pl->addFighter(fgt2, false, true);
@@ -302,4 +309,68 @@ namespace GObject
         lc.finalize();
         return true;
     }
+
+    bool GObjectManager::loadItem()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Item");
+        lc.reset(1000);
+        DBItem item;
+        if(execu->Prepare("SELECT `itemId`,`playerId`,`count` FROM `item`", item) != DB::DB_OK)
+            return false;
+        Player* pl = NULL;
+        while(execu->Next() == DB::DB_OK)
+        {
+            //if(ap.playerId != last_id)
+            {
+                pl = globalPlayers[item.playerId];
+            }
+            if(pl == NULL) continue;
+            pl->GetPackage()->AddItemFromDB(item.itemId, item.count);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+    //关于equipment的提取，
+    /*
+       ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )
+       {
+       if(id == 0)
+       return NULL;
+       std::map<UInt32, ItemEquip *>::iterator it = equips.find(id);
+       if(it == equips.end())
+       {
+       return NULL;
+       }
+       ItemEquip * base = it->second;
+       equips.erase(it);
+       return base;
+       }
+       ItemWeapon * GObjectManager::fetchWeapon( UInt32 id )
+       {
+       ItemEquip * equip = fetchEquipment(id);
+       if(equip == NULL)
+       return NULL;
+       if(equip->GetItemType().subClass != static_cast<UInt8>(Item_Weapon))
+       {
+       delete equip;
+       return NULL;
+       }
+       return static_cast<ItemWeapon *>(equip);
+       }
+       ItemArmor * GObjectManager::fetchArmor( UInt32 id )
+       {
+       ItemEquip * equip = fetchEquipment(id);
+       if(equip == NULL)
+       return NULL;
+       if(equip->GetItemType().subClass < static_cast<UInt8>(Item_Armor1) || equip->GetItemType().subClass > static_cast<UInt8>(Item_Armor5))
+       {
+       delete equip;
+       return NULL;
+       }
+       return static_cast<ItemArmor *>(equip);
+       }
+       */
 }

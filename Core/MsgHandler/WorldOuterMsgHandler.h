@@ -11,10 +11,10 @@
 #include "Server/OidGenerator.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
-#include "Battle/BattleReport.h"
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
 #include "GObject/Player.h"
+#include "Battle/BattleReport.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -25,7 +25,7 @@ struct BattleReportReq
     MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
 };
 
-void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
+void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq& brr)
 {
     MSG_QUERY_PLAYER(player);
     std::vector<UInt8> *r = Battle::battleReport[brr._reportId];

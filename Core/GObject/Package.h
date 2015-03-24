@@ -48,9 +48,11 @@ namespace GObject
 
             ItemBase * AddItem(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
             //ItemBase * AddEquip(UInt32 typeId, bool bind = false, bool silence = false, UInt16 fromWhere = 0);
-            ItemBase * AddItemFromDB(UInt32 id, UInt32 num, bool bind);
+            ItemBase * AddItemFromDB(UInt32 id, UInt32 num, bool bind = 0);
 
-            UInt8 Enchant(UInt16 fighterId, UInt8 part,UInt8 type);
+            UInt32 Enchant(UInt16 fighterId, UInt8 part);
+            UInt32 EnchantFromClient(UInt16 fighterId, UInt8 part,UInt8 type);
+            UInt32 UpGrade(UInt16 fighterId, UInt8 part);
 
             UInt32 DelItem(UInt32 id, UInt32 num, bool bind);
             UInt32 DelAllItem(UInt32 id, UInt32 num);

@@ -1,5 +1,6 @@
 #include "Friend.h"
-#include "Player.h"
+#include "Config.h"
+#include <algorithm>
 namespace GObject
 {
     void FriendManager::AddFriend(eFriendType index ,Player* friendOne)
@@ -157,27 +158,43 @@ namespace GObject
        pl->GetFriendManager()->PushInSet(friend_apply,m_owner);
 
    }
+
+   bool MyGreater(Player* p1, Player* p2)
+   {
+       if((p1->isOnline()+p1->getVipLevel()) > (p2->isOnline()+p2->getVipLevel()))
+       {
+           return true;
+       }
+       return false;
+   }
    
    //好友推荐
    void FriendManager::RecommandFriend()
    {
-       //从在线的玩家中  按照规则随机出一些玩家
        UInt8 num = GetFriendNum(friend_normal);
        if(num >= FRIEND_MAX)
        {
            cout<<"玩家的好友列表已满 不能推荐了"<<endl;
            return;
        }
+       //先对这个set进行排序 vip等级 在线与否 为权值
+       std::sort(globalPlayerVec.begin(),globalPlayerVec.end(),MyGreater);
 
-
+       for( auto it = globalPlayerVec.begin(); it != globalPlayerVec.end();++it)
+       {
+           if( GetFriendNum(friend_recommand) >= FRIEND_RECOMMAND_MAX )
+               break;
+           if( (*it) == m_owner )
+               continue;
+           PushInSet(friend_recommand,*it);
+       }
    }
    
    //刷新推荐
    void FriendManager::RefreshRecommandFriend()
    {
-       //将原来的全部删掉  重新产生新的
        _friends[friend_recommand].clear();
-
+       RecommandFriend();
    }
 
    //好友推荐中  一键申请加好友
@@ -194,4 +211,5 @@ namespace GObject
    {
        return _friends[type].size();
    }
+
 }

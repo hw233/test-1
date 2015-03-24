@@ -12,4 +12,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     
     MSG_REG_2(GameMsgHdr, REQ::ENCHART, OnEnchantReq);
 
+    MSG_REG_2(GameMsgHdr, REQ::PACKAGE_INFO, OnPackageInfo);
+
+    MSG_REG(GameMsgHdr, OnBattleReportReq);
 MSG_HANDLER_END()

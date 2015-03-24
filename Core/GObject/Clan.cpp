@@ -1,4 +1,5 @@
 #include "Clan.h"
+#include "Player.h"
 
 #define C_CHAT_MAX 10
 namespace GObject

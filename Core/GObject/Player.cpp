@@ -9,6 +9,7 @@ namespace GObject
     GlobalPlayers globalPlayers;
     GlobalPlayers globalOnlinePlayers;
     GlobalNamedPlayers globalNamedPlayers;
+    GlobalPlayerVec globalPlayerVec;
     //GlobalNamedPlayers globalAccountsPlayers;
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1)
     {
@@ -162,6 +163,7 @@ namespace GObject
         st << GetVar(VAR_EXP);
         st << GetVar(VAR_TEAL);
         st << GetVar(VAR_GOLD);
+        st << GetVar(VAR_TOTAL_GOLD);
         std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
         st << static_cast<UInt8>(_fighters.size());
         for(;it != _fighters.end();++it)

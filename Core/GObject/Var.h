@@ -29,6 +29,8 @@ namespace GObject
         VAR_COUPON  = 2,
         VAR_GOLD    = 3,
         VAR_EXP    = 4,
+        VAR_TOTAL_GOLD = 5,
+        VAR_ENCHANT_CD = 6,
         VAR_MAX
     };
 
