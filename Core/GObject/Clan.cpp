@@ -6,7 +6,7 @@ namespace GObject
 {
     Clan::Clan(Player* creater, std::string name):_creater(creater),_name(name) { } 
     
-    void LoadClanInfo(Player* leader, std::string announcement, UInt8 personMax)
+    void Clan::LoadClanInfo(Player* leader, std::string announcement, UInt8 personMax)
     { 
         _leader = leader;
         _announcement = announcement;
