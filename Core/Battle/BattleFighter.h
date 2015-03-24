@@ -121,7 +121,7 @@ namespace Battle
 
             UInt8 GetRide(){ return 3 ;} //TODO
             UInt8 GetClass(){ return _fighter->GetClass();}
-            UInt8 GetDistance(){ return 1;}  
+            UInt8 GetDistance(){ return 1;}   //攻击距离BattleGround
             UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
 
             void setNumber(UInt8 num){ _number = num;}

@@ -25,7 +25,7 @@ namespace Battle
     class BattleSimulator : public BattleField 
     {
         public:
-            BattleSimulator(BattleFighter * bf, BattleFighter * bo,bool rpt = false,UInt32 limitTime = 80);
+            BattleSimulator(BattleFighter * bf, BattleFighter * bo,UInt8 distance = 1 , bool rpt = false,UInt32 limitTime = 80);
             virtual ~BattleSimulator() {};
             inline int getId() {return _id;} 
 
@@ -51,6 +51,7 @@ namespace Battle
             Script::BattleFormula * _formula; 
             Stream _packet;
             UInt32 _limitTime;
+            UInt8 _distance;
     };
 }
 #endif // BATTLESIMULATOR_H_

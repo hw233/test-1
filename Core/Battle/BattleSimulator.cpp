@@ -11,7 +11,7 @@
 #define ADVANCE_M 220
 namespace Battle
 {
-    BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo , bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime)
+    BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance, bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
     { 
         _fgt[0] = bf;
         bf->SetSideInBS(0); 
@@ -94,6 +94,8 @@ namespace Battle
                     break;
 
                 if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
+                    continue;
+                if(_distance > bf[index]->GetDistance())
                     continue;
 
                 bf[index]->CheckBuff();
