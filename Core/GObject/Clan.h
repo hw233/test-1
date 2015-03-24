@@ -2,7 +2,6 @@
 #ifndef CLAN_H_
 #define CLAN_H_
 #include "Config.h"
-#include "Player.h"
 
 #define CLAN_MAX 60
 
@@ -13,7 +12,7 @@ namespace GObject
     class Clan
     {
         public:
-            Clan(Player* creater, std::string name):_name(name),_creater(creater),_personMax(30){}
+            //Clan(Player* creater, std::string name):_name(name),_creater(creater),_personMax(30){}
             void LoadPlayer(Player* pl);
             ChatHold * GetChatHold();
 
@@ -25,10 +24,11 @@ namespace GObject
 
             std::string _name;
             std::string _announcement;
-            UInt8 _personMax;
 
             Player* _creater;
             Player* _leader;
+
+            UInt8 _personMax;
     };
 }
 #endif // CLAN_H_
