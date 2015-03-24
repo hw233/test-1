@@ -24,6 +24,7 @@ struct BattleReportReq
     UInt32 _reportId;
     MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
 };
+
 void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
 {
     MSG_QUERY_PLAYER(player);

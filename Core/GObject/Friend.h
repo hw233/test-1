@@ -2,7 +2,9 @@
 #define FRIEND_H_
 #include "Player.h"
 
-#define FRIEND_MAX  100  //每个列表中好友的上限
+#define FRIEND_MAX  20            //每个列表中好友的上限
+#define FRIEND_RECOMMAND_MAX 5    //一次推荐好友的上限
+
 namespace GObject
 {
     enum eFriendType
@@ -11,7 +13,8 @@ namespace GObject
         friend_close,
         friend_clan,
         friend_black, 
-        friend_apply,  //好友申请列表
+        friend_apply,       //好友申请列表
+        friend_recommand,   //好友推荐列表
         friend_max
     };
     class Player;
@@ -33,6 +36,10 @@ namespace GObject
             void PushInSet( eFriendType type , Player* pl);
             void PopOutSet( eFriendType type , Player* pl);
             void ApplyAddFriend(Player* pl);
+            void RecommandFriend();
+            void RefreshRecommandFriend();
+            void ApplyFriendOneKey();
+            void RefuseAddFriend(Player* pl);   //拒绝加好友
         private:
             std::set<Player *> _friends[friend_max];
             Player* m_owner;

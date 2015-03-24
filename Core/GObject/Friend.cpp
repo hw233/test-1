@@ -68,7 +68,7 @@ namespace GObject
         {
             if( (*it)->GetName() == name )
             {
-                _friends[type].erase(*it);
+                PopOutSet(type,*it);
                 return true;
             }
         }
@@ -83,7 +83,7 @@ namespace GObject
         {
             if( (*it)->GetId() == playerId )
             {
-                _friends[type].erase(*it);
+                PopOutSet(type,*it);
                 return true;
             }
         }
@@ -115,7 +115,7 @@ namespace GObject
        PopOutSet(friend_apply,pl);
    }
 
-   void FriendManager::DelApplyAddFriendOneKey()
+   void FriendManager::DelApplyAddFriendOneKey()  //一键删除申请列表
    {
        for(auto it = _friends[friend_apply].begin(); it != _friends[friend_apply].end(); ++it)
        {
@@ -134,6 +134,7 @@ namespace GObject
            return;
        }
         _friends[type].insert(pl);
+        //更新数据库
    }
 
    void FriendManager::PopOutSet( eFriendType type , Player* pl)
@@ -146,6 +147,7 @@ namespace GObject
            std::cout<<"未找到不能删除"<<std::endl;
        }
        _friends[type].erase(pl);
+       //更新数据库
    }
 
    void FriendManager::ApplyAddFriend(Player* pl)   //申请加好友
@@ -155,5 +157,41 @@ namespace GObject
        pl->GetFriendManager()->PushInSet(friend_apply,m_owner);
 
    }
+   
+   //好友推荐
+   void FriendManager::RecommandFriend()
+   {
+       //从在线的玩家中  按照规则随机出一些玩家
+       UInt8 num = GetFriendNum(friend_normal);
+       if(num >= FRIEND_MAX)
+       {
+           cout<<"玩家的好友列表已满 不能推荐了"<<endl;
+           return;
+       }
 
+
+   }
+   
+   //刷新推荐
+   void FriendManager::RefreshRecommandFriend()
+   {
+       //将原来的全部删掉  重新产生新的
+       _friends[friend_recommand].clear();
+
+   }
+
+   //好友推荐中  一键申请加好友
+   void FriendManager::ApplyFriendOneKey()
+   {
+       for(auto it = _friends[friend_recommand].begin(); it != _friends[friend_recommand].end();++it)
+       {
+           (*it)->GetFriendManager()->PushInSet(friend_apply,m_owner);
+           m_owner->GetFriendManager()->PopOutSet(friend_recommand,*it);
+       }
+   }
+
+   UInt8 FriendManager::GetFriendNum( eFriendType type)
+   {
+       return _friends[type].size();
+   }
 }
