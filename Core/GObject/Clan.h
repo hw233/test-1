@@ -13,7 +13,7 @@ namespace GObject
     class Clan
     {
         public:
-            Clan(Player* creater, std::string name);//:_name(name),_creater(creater),_personMax(30){}
+            Clan(UInt32 id, std::string name, Player* creater);//:_name(name),_creater(creater),_personMax(30){}
             void LoadPlayer(Player* pl);
             void LoadClanInfo(Player* leader, std::string announcement, UInt8 personMax );
             ChatHold * GetChatHold();
@@ -21,20 +21,23 @@ namespace GObject
             std::string GetName(){ return _name;}
             std::string GetAnnouncement() { return _announcement;}
             Player* GetCreater(){return _creater;}
+//          void SetLeader(Player* leader){ _leader = leader;}
             Player* GetLeader(){ return _leader;}
 
             UInt8 GetPersonMax(){ return _personMax;}
 
             UInt8 Apply(Player* pl);
-            UInt8 Allow(Player* pl);
-
-
+            UInt8 Allow(Player* pl, UInt8 type = 0);
+            UInt8 DelMember(Player* pl);
+            std::vector<Player*>::iterator HasMember(Player* pl);
+            UInt8 ChangePosition(Player* opter, Player* pl, UInt8 pos);
 
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;
             ChatHold * chatHold;
 
+            UInt32 _id;
             std::string _name;
             std::string _announcement;
 

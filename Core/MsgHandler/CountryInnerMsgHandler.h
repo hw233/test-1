@@ -26,7 +26,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	player->Login();
 
 	Stream st(REP::LOGIN);
-	st << static_cast<UInt32>(0) << player->GetName() << Stream::eos;
+	st << static_cast<UInt32>(0) << player->getId() << Stream::eos;
 	TcpConnection conn = NETWORK()->GetConn(player->GetSessionID());
 	if(conn.get() == NULL)
 	{
@@ -36,8 +36,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
-	//DBLOG1().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %" I64_FMT "u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
+	//DBLOG1().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %" I64_FMT "u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip))}
 }
 #endif // _COUNTRYINNERMSGHANDLER_H_
-
 

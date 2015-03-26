@@ -114,8 +114,8 @@ struct UserLogonRepStruct
 {
     UInt32 _result;
     IDTYPE _playerId ;
-    std::string _name;
-    MESSAGE_DEF3(REP::LOGIN, UInt32, _result, IDTYPE, _playerId,std::string, _name);
+    //std::string _name;
+    MESSAGE_DEF2(REP::LOGIN, UInt32, _result, IDTYPE, _playerId/*,std::string, _name*/);
 };
 void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 { 

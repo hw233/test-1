@@ -9,6 +9,7 @@ namespace GObject
     GlobalPlayers globalPlayers;
     GlobalPlayers globalOnlinePlayers;
     GlobalNamedPlayers globalNamedPlayers;
+    GlobalClans globalClan;
     //GlobalNamedPlayers globalAccountsPlayers;
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1)
     {
@@ -38,9 +39,9 @@ namespace GObject
         m_pVars->LoadVar(id, val, overTime);
     }
 
-    void Player::SetVar(UInt32 id, UInt32 val)
+    void Player::SetVar(UInt32 id, UInt32 val,UInt8 flag)
     {
-        m_pVars->SetVar(id,val);
+        m_pVars->SetVar(id,val,flag);
     }
 
     void Player::DelVar(UInt32 id )

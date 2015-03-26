@@ -38,7 +38,7 @@ namespace GObject
         return m_Vars[id];
     }
 
-    void VarSystem::SetVar(UInt32 id, UInt32 data, UInt32 now)
+    void VarSystem::SetVar(UInt32 id, UInt32 data, UInt8 flag , UInt32 now)
     {
         if(id >= VAR_MAX) return;
         UInt32 oldVal = m_Vars[id];
@@ -46,7 +46,7 @@ namespace GObject
         bool bUpdateDB = CheckReset(id , now);
         m_Vars[id] = data;
         bUpdateDB = bUpdateDB || (oldVal != m_Vars[id]);
-        if(bUpdateDB) UpdateDB(id);
+        if(bUpdateDB && !flag) UpdateDB(id);
     }
     void VarSystem::DelVar(UInt32 id)
     {

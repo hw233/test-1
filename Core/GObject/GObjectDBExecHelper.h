@@ -100,6 +100,26 @@ namespace GObject
         UInt64 playerId;
         UInt32 count;
     };
+
+    struct DBClan
+    {
+        UInt32 clanId;
+        std::string name;
+        std::string announcement;
+        UInt64 creater; 
+        UInt64 leader; 
+        UInt8 level;
+        UInt32 contribute;
+        UInt8 personMax;
+    };
+    struct DBClanPlayer
+    {
+        UInt32 clanId;
+        UInt64 playerId; 
+        UInt8 position;
+        UInt32 contribute;
+        UInt32 enterTime;
+    };
 }
 namespace DB
 {
@@ -210,6 +230,31 @@ namespace DB
      UInt32 , itemId,
      UInt64 , playerId,
      UInt32 , count
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBClan)
+    SPECIALDEF(8)
+    (
+        UInt32, clanId,
+        std::string, name,
+        std::string, announcement,
+        UInt64, creater,
+        UInt64, leader,
+        UInt8, level,
+        UInt32, contribute,
+        UInt8, personMax
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBClanPlayer)
+    SPECIALDEF(5)
+    (
+        UInt32, clanId,
+        UInt64, playerId,
+        UInt8, position,
+        UInt32, contribute,
+        UInt32, enterTime
     )
     SPECIALEND()
 

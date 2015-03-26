@@ -72,7 +72,7 @@ namespace GObject
             UInt32 GetVar(UInt32 id);
             Int32 GetVarS(Int32 id);
             void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
-            void SetVar(UInt32 id, UInt32 val);
+            void SetVar(UInt32 id, UInt32 val,UInt8 flag = 0);
             void DelVar(UInt32 id);
             void AddVar(UInt32 id, UInt32 val);
             void AddVarS(UInt32 id, Int32 val);
@@ -192,6 +192,8 @@ namespace GObject
 
             Clan* GetClan(){ return clan;}
             void SetClan(Clan* cl) { clan = cl;}
+            UInt8 GetClanPos(){ return _clanPos;}
+            void SetClanPos(UInt8 clanPos){ _clanPos = clanPos;}
 
     private:
             //IDTYPE _id;
@@ -203,6 +205,9 @@ namespace GObject
             char m_openid[256+1];
             char m_openkey[256+1];
             char m_clientIp[256+1];
+
+            //Clan
+            UInt8 _clanPos;
 
 
             //功能类
@@ -233,6 +238,9 @@ extern GlobalPlayers globalOnlinePlayers;
 typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
 extern GlobalNamedPlayers globalNamedPlayers;
 //extern GlobalNamedPlayers globalAccountsPlayers;
+
+typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;
+extern GlobalClans globalClan;
 }
 #endif // PLAYER_H_
 

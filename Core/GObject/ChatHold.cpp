@@ -21,8 +21,8 @@ namespace GObject
                 break;
 
             // 聊天信息流    
-            Player* pl = it->pl;
-            std::string context = it->context;
+            //Player* pl = it->pl;
+            //std::string context = it->context;
         }
     } 
 }

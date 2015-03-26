@@ -57,7 +57,7 @@ namespace Battle
             { 
                 UInt8 value = static_cast<UInt8>(::atoi(st[j].c_str()));
                 //_mapGround[j*2+flag + i*_x] = value;
-                std::cout << "坐标：" << static_cast<UInt32>(j*2+flag)<<" , " << static_cast<UInt32>(i)<<std::endl;
+                std::cout << "坐标：" << static_cast<UInt32>(j*2+flag)<<" , " << static_cast<UInt32>(i) << "地形" << static_cast<UInt32>(value)<<std::endl;
             } 
         } 
 

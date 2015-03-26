@@ -97,4 +97,31 @@ CREATE TABLE `item` (
     PRIMARY KEY (`itemId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `clan`; 
+CREATE TABLE `clan` (
+    `clanId` int(10) unsigned NOT NULL DEFAULT '0',
+    `name` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `announcement` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `creater` bigint(20) unsigned NOT NULL,
+    `leader` bigint(20) unsigned NOT NULL,
+    `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `contribute` int(10) unsigned NOT NULL DEFAULT '0',
+    `personMax` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`clanId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `clan_player`; 
+CREATE TABLE `clan_player` (
+    `clanId` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL,
+    `position` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `contribute` int(10) unsigned NOT NULL DEFAULT '0',
+    `enterTime` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`clanId`,`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
+
 
