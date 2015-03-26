@@ -33,6 +33,8 @@ void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq& brr)
         return;
     player->send(&(*r)[0], r->size());
 }
+
+
 /*
 void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
 {

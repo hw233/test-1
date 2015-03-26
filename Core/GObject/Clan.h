@@ -8,6 +8,7 @@ using namespace std;
 #include "ChatHold.h"
 
 #define CLAN_MAX 60
+#define APPLICANTMAX 60
 
 namespace GObject
 {
@@ -16,14 +17,26 @@ namespace GObject
     class Clan
     {
         public:
-            //Clan(Player* creater, std::string name):_name(name),_creater(creater),_personMax(30){}
+            Clan(Player* creater, std::string name);//:_name(name),_creater(creater),_personMax(30){}
             void LoadPlayer(Player* pl);
+            void LoadClanInfo(Player* leader, std::string announcement, UInt8 personMax );
             ChatHold * GetChatHold();
 
             std::string GetName(){ return _name;}
+            std::string GetAnnouncement() { return _announcement;}
+            Player* GetCreater(){return _creater;}
+            Player* GetLeader(){ return _leader;}
+
+            UInt8 GetPersonMax(){ return _personMax;}
+
+            UInt8 Apply(Player* pl);
+            UInt8 Allow(Player* pl);
+
+
 
         private:
-            std::vector<GObject::Player* > _players;
+            std::vector<Player* > _players;
+            std::vector<Player* > _applicant;
             ChatHold * chatHold;
 
             std::string _name;

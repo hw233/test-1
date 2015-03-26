@@ -28,12 +28,14 @@ namespace GData
             fprintf(stderr, "Load LoadExpData Error !\n");
             std::abort();
         }
-
+        
+        /*
         if (!LoadFighterBase())  
         {
             fprintf(stderr, "Load LoadFighterBase Error !\n");
             std::abort();
         }
+        */
         if (!LoadItemTypeData2())  
         {
             fprintf(stderr, "Load ItemTypeData Error !\n");

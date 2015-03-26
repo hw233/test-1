@@ -167,7 +167,7 @@ namespace GObject
 
             //login
             //inline void setId(IDTYPE id){ _id = id;}
-            //inline IDTYPE getId(){ return _id;}
+            inline IDTYPE getId(){ return _id;}
 
             inline void SetAccounts(std::string accounts) { _accounts = accounts;}
             inline std::string GetAccounts(){return _accounts;}
@@ -196,6 +196,8 @@ namespace GObject
             //Mutex& GetMutex() { return mutex;}
             std::string getSource() { return NULL;}
             UInt8 getVipLevel() const { return 1;}
+            UInt8 GetSex() const { return 1;}
+            UInt8 GetLevel() const { return 1;}
 
     private:
             //IDTYPE _id;

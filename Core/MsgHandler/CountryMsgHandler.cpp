@@ -15,4 +15,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG_2(GameMsgHdr, REQ::PACKAGE_INFO, OnPackageInfo);
 
     MSG_REG(GameMsgHdr, OnBattleReportReq);
+
+    MSG_REG(GameMsgHdr, OnFriendListReq);
+
+    MSG_REG_2(GameMsgHdr, REQ::FRIEND_ACTION,OnFriendActionReq);
 MSG_HANDLER_END()

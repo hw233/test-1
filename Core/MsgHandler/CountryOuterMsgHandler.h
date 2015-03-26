@@ -24,6 +24,8 @@
 #include "GObject/Fighter.h"
 
 #include "Battle/BattleReport.h"
+#include "GObject/Friend.h"
+
 struct NullReq
 {
     UInt32 ticket;
@@ -118,6 +120,96 @@ void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
     if(r == NULL)
         return;
     player->send(&(*r)[0], r->size());
+}
+
+
+void OnFriendActionReq( GameMsgHdr& hdr,const void *data)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+
+    brd >> opt;
+    std::string name = "";
+    switch(opt)
+    {
+        //查找好友
+        case 0x00:
+            {
+                brd>>name;
+                bool res = player->GetFriendManager()->FindFriendByName(name);
+                Stream st(REQ::FRIEND_ACTION);
+                st<<static_cast<UInt8>(res);
+                if( res == true )
+                {
+                    GObject::Player* pl = GObject::globalNamedPlayers[name];
+                    pl->GetSelfInfoStream(st);
+                }
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        //请求加好友
+        case 0x01:
+            {
+                brd>> name;
+                player->GetFriendManager()->ApplyAddFriend(name);
+            }
+            break;
+        //删除关系
+        case 0x02:
+            {
+                UInt8 listNum = 0;
+                brd>>listNum;
+                brd>>name;
+                bool res = player->GetFriendManager()->DelFriendByName(listNum,name);
+                Stream st(REQ::FRIEND_ACTION);
+                st<<static_cast<UInt8>(res);
+                st<<Stream::eos;
+                player->send(st);
+            }
+            break;
+        //推荐好友
+        case 0x03:
+            {
+                UInt8 type =0;
+                brd >> type;
+                if( type == 0 )
+                {
+                    player->GetFriendManager()->RecommandFriend();
+                }
+                else
+                {
+                    player->GetFriendManager()->RefreshRecommandFriend();
+                }
+            }
+            break;
+        //同意加好友
+        case 0x04:
+            {
+                brd >> name;
+                player->GetFriendManager()->AgreeAddFriend(name);
+            }
+            break;
+        default:
+            break;
+    }
+
+}
+
+struct FriendListReq
+{
+    MESSAGE_DEF(REQ::FRIEND_LIST) ;
+};
+
+void OnFriendListReq(GameMsgHdr& hdr,FriendListReq&)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    Stream st(REQ::FRIEND_LIST);
+    player->GetFriendManager()->GetAllFriendStream(st);
+    st << Stream::eos;
+    player->send(st);
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

@@ -81,7 +81,11 @@ namespace GObject
     }
     
     void Player::GetSelfInfoStream(Stream &st)
-    { 
+    {
+        st<<static_cast<UInt8>(GetSex());
+        st<<GetName();
+        st<<static_cast<UInt8>(GetLevel());
+        st<<static_cast<UInt32>(10000);
         //st << GetVar(VAR_GOLD);
     } 
     
