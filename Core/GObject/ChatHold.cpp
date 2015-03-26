@@ -22,7 +22,7 @@ namespace GObject
 
             // 聊天信息流    
             //Player* pl = it->pl;
-            std::string context = it->context;
+            //std::string context = it->context;
         }
     } 
 }

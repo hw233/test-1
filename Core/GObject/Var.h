@@ -31,6 +31,8 @@ namespace GObject
         VAR_EXP    = 4,
         VAR_TOTAL_GOLD = 5,
         VAR_ENCHANT_CD = 6,
+        VAR_CLAN_CONT = 7, //帮派贡献
+        VAR_CLAN_ENTER = 8, //进入帮派的时间
         VAR_MAX
     };
 
@@ -74,7 +76,7 @@ namespace GObject
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);
-            void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
+            void SetVar(UInt32 id, UInt32 data, UInt8 flag = 0, UInt32 now = 0);
             void DelVar(UInt32 id);
             void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
             void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
