@@ -14,6 +14,7 @@ namespace GObject
 
         _friends[index].insert(friendOne);
     }
+
     void FriendManager::GetFriendStream(eFriendType index ,Stream & st)
     { 
         if(index >= friend_max )
@@ -146,6 +147,12 @@ namespace GObject
        {
            std::cout<<"已达上限不能再添加了"<<std::endl;
            return;
+       }
+       auto it = _friends[type].find(pl);
+       if( it != _friends[type].end() )
+       {
+           std::cout<<"已在列表中拉"<<std::endl;
+           return ;
        }
         _friends[type].insert(pl);
         //更新数据库

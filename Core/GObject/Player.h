@@ -196,7 +196,8 @@ namespace GObject
             UInt8 getVipLevel() const { return 1;}
             UInt8 GetSex() const { return 1;}
             UInt8 GetLevel() const { return 1;}
-
+            
+            Clan* GetClan() const { return clan;}
             void SetClan(Clan* cl) { clan = cl;}
             UInt8 GetClanPos(){ return _clanPos;}
             void SetClanPos(UInt8 clanPos){ _clanPos = clanPos;}

@@ -23,7 +23,7 @@ function fighter_base_skill()
         BEGIN {
             print "INSERT INTO `fighter_base_skill` VALUES";
         } {
-            printf("(%u,%d,%u,%u,%u)",$1,$2,$3,$4,$5);
+            printf("(%u,%d,%d)",$1,$2,$3);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
