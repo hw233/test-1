@@ -3,9 +3,14 @@ Player2Id player2Id;
 void Player2Id::InsertId(const std::string& phoneId , const std::string& accounts,const IDTYPE& playerId)
 { 
     struct MapKey mk = MapKey(phoneId,accounts);
-    std::map<MapKey ,IDTYPE>::iterator it = _map.find(mk);
-    if(it != _map.end())
-        return ;
+    std::map<MapKey ,IDTYPE>::iterator it = _map.begin();
+    for( ;it != _map.end();++it)
+    {
+        if( it->first == mk )
+        {
+            return;
+        }
+    }
     _map.insert(std::map<MapKey,IDTYPE >::value_type (mk,playerId));
 } 
 
@@ -21,17 +26,27 @@ void Player2Id::InsertAccount( const std::string& accounts , const std::string& 
 IDTYPE Player2Id::getPlayerId(const std::string& phoneId ,const std::string& accounts)
 { 
     //std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
-    std::map<MapKey , IDTYPE>::iterator it = _map.begin();//find(MapKey(phoneId,accounts));
+    //std::map<MapKey , IDTYPE>::iterator it = _map.begin();//find(MapKey(phoneId,accounts));
     MapKey mk = MapKey(phoneId,accounts);
-    while(it != _map.end())
-    { 
-        if(it->first == mk )
-            break;
-        ++it ;
-    } 
-    if(it == _map.end())
-        return 0;
-    return it->second;
+    std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
+    if( it != _map.end())
+    {
+        return it->second;
+    }
+    //std::map<MapKey ,IDTYPE>::iterator it = _map.begin();
+    /*
+    while( it != _map.end())
+    {
+        std::cout<<"the id is "<< (it->first)<<"  "<<(it->second)<<std::endl;
+        if( it->first == mk )
+        {
+            std::cout<<"the id = "<<it->second<<std::endl;
+            return it->second;
+        }
+        ++it;
+    }
+    */
+    return 0;
 } 
 
 UInt8 Player2Id::CheckAccount(const std::string& accounts, const std::string& password)

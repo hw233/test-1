@@ -96,6 +96,11 @@ namespace GObject
    {
        if( pl == NULL || type < 0 || type > friend_max )
            return;
+       if( pl == m_owner)
+       {
+           std::cout<<"不能添加自己"<<std::endl;
+           return;
+       }
        if( _friends[type].size() > FRIEND_MAX )
        {
            std::cout<<"已达上限不能再添加了"<<std::endl;
