@@ -47,7 +47,7 @@ CREATE TABLE `var` (
 
 DROP TABLE IF EXISTS `player_id`; 
 CREATE TABLE `player_id` (
-    `id` bigint(10) unsigned NOT NULL DEFAULT 0,
+    `id` bigint(20) unsigned NOT NULL,
     `phoneId` varchar(255) NOT NULL DEFAULT '',
     `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
     /*PRIMARY KEY (`phoneId`,`accounts`)*/

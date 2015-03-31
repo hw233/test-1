@@ -29,8 +29,18 @@ namespace REQ
     
     /*好友列表请求*/
     const UInt8 FRIEND_LIST         = 0x40;
-    /*好友操作*/
-    const UInt8 FRIEND_ACTION       = 0x41;
+    /*好友查找*/
+    const UInt8 FRIEND_FIND         = 0x41; //
+    /*好友申请*/
+    const UInt8 FRIEND_APPLY        = 0x42;
+    /*好友添加*/
+    const UInt8 FRIEND_ADD          = 0x43;
+    /*好友删除*/
+    const UInt8 FRIEND_DELETE       = 0x44;
+    /*好友推荐*/
+    const UInt8 FRIEND_RECOMMAND    = 0x45;
+
+
 
 
 

@@ -90,6 +90,7 @@ namespace GObject
 
     struct DBFriend
     {
+        UInt8  type;
         UInt64 playerId;
         UInt64 friendId;
     };
@@ -217,8 +218,9 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBFriend)
-    SPECIALDEF(2)
+    SPECIALDEF(3)
     (
+     UInt8  , type,
      UInt64 , playerId,
      UInt64 , friendId
     )

@@ -298,7 +298,7 @@ namespace GObject
         LoadingCounter lc("Loading Friend");
         lc.reset(1000);
         DBFriend ap;
-        if(execu->Prepare("SELECT `playerId`,`friendId` FROM `friends`", ap) != DB::DB_OK)
+        if(execu->Prepare("SELECT `type`,`playerId`,`friendId` FROM `friends`", ap) != DB::DB_OK)
             return false;
         IDTYPE last_id = 0;
         Player* pl = NULL;
@@ -313,7 +313,7 @@ namespace GObject
             Player* friendOne = globalPlayers[ap.friendId];
             if(!friendOne)
                 continue ;
-            pl->GetFriendManager()->AddFriend(friend_normal,friendOne);
+            pl->GetFriendManager()->AddFriend(ap.type,friendOne);
             lc.advance();
         }
         lc.finalize();

@@ -21,19 +21,17 @@ namespace GObject
     {
         public:
             FriendManager(Player *pl):m_owner(pl){}
-            void AddFriend(eFriendType index , Player* friendOne);
+            void AddFriend(UInt8 index , Player* friendOne);
             void GetFriendStream(eFriendType index , Stream &st);
             void GetAllFriendStream(Stream &st);
 
             bool FindFriendByName(const std::string& name); 
             bool FindFriendById(UInt64 playerId);
-            bool DelFriendByName(UInt8 index,std::string& name);//删除好友
+            bool DelFriendByName(std::string& name);//删除好友
             bool DelFriendById(eFriendType type,UInt64 playerId);
             void AgreeAddFriend(std::string& name); //同意加好友
-            //void AgreeAddFriendOneKey();
 
             void DelApplyAddFriend(std::string& name);
-            //void DelApplyAddFriendOneKey();
 
             void PushInSet( eFriendType type , Player* pl);
             void PopOutSet( eFriendType type , Player* pl);
@@ -41,8 +39,7 @@ namespace GObject
             void ApplyAddFriend(std::string& name);
             void RecommandFriend();
 
-            void RefreshRecommandFriend();
-            //void ApplyFriendOneKey();
+            void RefuseFriend(std::string& name);
             
             UInt8 GetFriendNum(eFriendType type);
         private:

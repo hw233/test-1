@@ -162,9 +162,10 @@ namespace GObject
             return NULL;
         return fgt;
     }
+
     void Player::makePlayerInfo(Stream& st)
     {
-        st << name ; 
+        st << GetName() ; 
         st << GetVar(VAR_EXP);
         st << GetVar(VAR_TEAL);
         st << GetVar(VAR_GOLD);

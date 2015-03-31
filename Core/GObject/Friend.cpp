@@ -5,14 +5,14 @@
 
 namespace GObject
 {
-    void FriendManager::AddFriend(eFriendType index ,Player* friendOne)
+    void FriendManager::AddFriend(UInt8 index ,Player* friendOne)
     {
         if(m_owner == friendOne)
             return ;
         if(index >= friend_max ) 
             return ;
-
-        _friends[index].insert(friendOne);
+        eFriendType type = (eFriendType)index;
+        _friends[type].insert(friendOne);
     }
 
     void FriendManager::GetFriendStream(eFriendType index ,Stream & st)
@@ -53,72 +53,36 @@ namespace GObject
 
     }
 
-    bool FriendManager::FindFriendById(UInt64 playerId)
+    bool FriendManager::DelFriendByName(std::string& name)
     {
-        Player* pl = globalPlayers[playerId];
-        if( pl == NULL )
-        {
-            return false;
-        }
-        return true;
-    }
-   
-
-    bool FriendManager::DelFriendByName(UInt8 index ,std::string& name)
-    {
-        eFriendType type = (eFriendType)index;
-        if( type < 0 || type > 3 )
-            return false;
-
-        for(auto it = _friends[type].begin(); it != _friends[type].end();++it)
+        for(auto it = _friends[friend_normal].begin(); it != _friends[friend_normal].end();++it)
         {
             if( (*it)->GetName() == name )
             {
-                PopOutSet(type,*it);
+                PopOutSet(friend_normal,*it);
                 return true;
             }
         }
         return false;
     }
     
-    /*
-    bool FriendManager::DelFriendById(eFriendType type ,UInt64 playerId)
-    {
-        if( type < 0 || type > 3 || playerId <= 0 )
-            return false;
-        for(std::set<Player *>::iterator it = _friends[type].begin(); it != _friends[type].end();++it)
-        {
-            if( (*it)->GetId() == playerId )
-            {
-                PopOutSet(type,*it);
-                return true;
-            }
-        }
-        return false;
-    }
-    */
-
     void FriendManager::AgreeAddFriend(std::string& name)
     {
         Player* pl = globalNamedPlayers[name];
         if( pl == NULL )
             return;
+        if( GetFriendNum(friend_normal) >= FRIEND_MAX || pl->GetFriendManager()->GetFriendNum(friend_normal) >= FRIEND_MAX )
+        {
+            std::cout<<"其中之一列表已满 不可添加"<<endl;
+            return;
+        }
         //从申请列表中删掉
         PopOutSet(friend_apply,pl);
-        //放到好友列列表中
+        //放到好友列表中
         PushInSet(friend_normal,pl);
+        //gei pl fa xiao xin shuo m_owner yi tong yi
+        pl->GetFriendManager()->PushInSet(friend_normal,m_owner);
    }
-
-
-    /*
-   void FriendManager::AgreeAddFriendOneKey()   //一键同意
-   {
-       for(auto it = _friends[friend_apply].begin(); it != _friends[friend_apply].end(); ++it)
-       {
-          AgreeAddFriend(friend_apply,*it);
-       }
-   }
-   */
 
    void FriendManager::DelApplyAddFriend(std::string& name)
    {
@@ -127,17 +91,6 @@ namespace GObject
             return;
        PopOutSet(friend_apply,pl);
    }
-
-   /*
-   void FriendManager::DelApplyAddFriendOneKey()  //一键删除申请列表
-   {
-       for(auto it = _friends[friend_apply].begin(); it != _friends[friend_apply].end(); ++it)
-       {
-           DelApplyAddFriend(*it);
-       }
-   }
-   */
-
 
    void FriendManager::PushInSet( eFriendType type , Player* pl)
    {
@@ -156,9 +109,7 @@ namespace GObject
        }
         _friends[type].insert(pl);
         //更新数据库
-        /*
-	          DBLOG1().PushUpdateData("insert into friends (type,playerId,friendId) values(%u, %" I64_FMT "u, %" _I64_FMT"u )", type, m_owner->getId(),pl->getId());
-        */
+	    DB7().PushUpdateData("insert into friends (type,playerId,friendId) values(%u, %" I64_FMT "u, %"I64_FMT"u )", type, m_owner->getId(),pl->getId());
    }
 
    void FriendManager::PopOutSet( eFriendType type , Player* pl)
@@ -172,9 +123,7 @@ namespace GObject
        }
        _friends[type].erase(pl);
        //更新数据库
-       /*
-	   DBLOG1().PushUpdateData("delete from friends where type = %u AND (playerId = %"_I64_FMT"u AND friendId = %"_I64_FMT"u)", type, m_owner->getId(),pl->getId());
-       */
+	   DB7().PushUpdateData("delete from friends where type = %u AND (playerId = %"I64_FMT"u AND friendId = %"I64_FMT"u)", type, m_owner->getId(),pl->getId());
    }
 
    void FriendManager::ApplyAddFriend(std::string& name)   //申请加好友
@@ -183,6 +132,11 @@ namespace GObject
        if( pl == NULL )
            return;
        pl->GetFriendManager()->PushInSet(friend_apply,m_owner);
+       //发申请者信息给被申请者
+       Stream st(REQ::FRIEND_APPLY);
+       m_owner->GetSelfInfoStream(st);
+       st<<Stream::eos;
+       pl->send(st);
 
    }
 
@@ -198,6 +152,7 @@ namespace GObject
    //好友推荐
    void FriendManager::RecommandFriend()
    {
+       _friends[friend_recommand].clear();
        UInt8 num = GetFriendNum(friend_normal);
        if(num >= FRIEND_MAX)
        {
@@ -216,7 +171,7 @@ namespace GObject
            PushInSet(friend_recommand,*it);
        }
        
-       Stream st(REQ::FRIEND_ACTION);
+       Stream st(REQ::FRIEND_RECOMMAND);
        st<<static_cast<UInt8>(_friends[friend_recommand].size());
        for( auto it = _friends[friend_recommand].begin(); it!=_friends[friend_recommand].end();++it)
        {
@@ -227,24 +182,11 @@ namespace GObject
        m_owner->send(st);
    }
    
-   //刷新推荐
-   void FriendManager::RefreshRecommandFriend()
-   {
-       _friends[friend_recommand].clear();
-       RecommandFriend();
-   }
 
-   //好友推荐中  一键申请加好友
-   /*
-   void FriendManager::ApplyFriendOneKey()
+   void FriendManager::RefuseFriend(std::string& name)
    {
-       for(auto it = _friends[friend_recommand].begin(); it != _friends[friend_recommand].end();++it)
-       {
-           (*it)->GetFriendManager()->PushInSet(friend_apply,m_owner);
-           m_owner->GetFriendManager()->PopOutSet(friend_recommand,*it);
-       }
+       DelApplyAddFriend(name);
    }
-   */
 
    UInt8 FriendManager::GetFriendNum( eFriendType type)
    {
