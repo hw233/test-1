@@ -1,7 +1,7 @@
 #include "Clan.h"
 #include "Player.h"
 
-#define C_CHAT_MAX 10
+#define C_CHAT_MAX 30
 namespace GObject
 {
     Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_creater(creater) { } 

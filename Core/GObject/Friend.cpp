@@ -26,4 +26,12 @@ namespace GObject
         for(UInt8 i = 0; i < friend_max; ++i)
             GetFriendStream((eFriendType)i,st);
     } 
+
+    bool FriendManager::HasFriend(Player* pl)
+    { 
+        std::set<Player *>::iterator it = _friends[friend_normal].find(pl);
+        if(it != _friends[friend_normal].end())
+            return true;
+        return false;
+    } 
 }

@@ -19,6 +19,7 @@
 #include "GObject/Fighter.h"
 #include "FVar.h"
 #include "GObject/Friend.h"
+#include "Mail.h"
 namespace GObject
 {
     URandom GRND(time(0)); 
@@ -30,6 +31,10 @@ namespace GObject
         UInt32 maxId = 0;
         execu->Extract("SELECT max(`id`&0xffffffffff) FROM `player_id`", maxId);
         IDGenerator::gPlayerOidGenerator.Init(maxId);
+
+        //std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        execu->Extract("SELECT max(`id`) FROM `mail`", maxId);
+        IDGenerator::gMailOidGenerator.Init(maxId);
         return true;
     }
     void GObjectManager::loadAllData()
@@ -85,6 +90,11 @@ namespace GObject
         if(!loadClanPlayer())
         {
             fprintf(stderr, "loadClanPlayer error!\n");
+            std::abort();
+        }
+        if(!loadMail())
+        {
+            fprintf(stderr, "loadMail error!\n");
             std::abort();
         }
     } 
@@ -395,6 +405,30 @@ namespace GObject
             player->SetClanPos(clanp.position);
             player->SetVar(VAR_CLAN_CONT, clanp.contribute, 1);
             player->SetVar(VAR_CLAN_ENTER, clanp.enterTime, 1);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadMail()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Mail");
+        lc.reset(1000);
+        DBMail mailInfo;
+        if(execu->Prepare("SELECT `id`,`playerId`,`contextId`,`items`,`option`,`overTime` FROM `mail`", mailInfo) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Player* pl = globalPlayers[mailInfo.playerId];
+            if(!pl)
+                continue;
+            Mail * mail = new Mail();
+            mail->LoadMailInfo(mailInfo.id, pl, mailInfo.contextId, mailInfo.items, mailInfo.option, mailInfo.overTime);
+            globalMails.add(mailInfo.id, mail);
+            pl->AddMail(mailInfo.id,0);
             lc.advance();
         }
         lc.finalize();

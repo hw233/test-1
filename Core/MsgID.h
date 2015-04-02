@@ -5,12 +5,21 @@
 
 namespace REQ
 {
+    //聊天
+    const UInt8 CHAT            = 0x06;
     //强化
     const UInt8 ENCHART             = 0x20;// 0xF0
 
     /*背包信息*/
     const UInt8 PACKAGE_INFO = 0x30;// 0xE0
     
+    //Mail
+    const UInt8 MAIL             = 0x50;// 
+    const UInt8 MAIL_GET             = 0x51;// 
+    const UInt8 MAIL_DELETE             = 0x52;// 
+    const UInt8 MAIL_GET_ALL             = 0x53;// 
+    const UInt8 MAIL_DELETE_ALL             = 0x54;// 
+
     /**战报请求 */
     const UInt8 BATTLE_REPORT_REQ        = 0x80;// 0xC0
     /**登陆 */
@@ -281,17 +290,17 @@ namespace REQ
     /*结拜系统*/
     const UInt8 BROTHER             = 0x5E;
     /**邮件ID列表 */
-    const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
-    /**邮件信息列表 */
-    const UInt8 MAIL_LIST           = 0x41;// 0xA0
-    /**邮件内容 */
-    const UInt8 MAIL_CONTENT        = 0x42;// 0xA1
-    /**邮件删除 */
-    const UInt8 MAIL_DELETE         = 0x43;// 0xA2
-    /**邮件发送 */
-    const UInt8 MAIL_SEND           = 0x44;// 0xA3
-    /**邮件信息改变 */
-    const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
+    //const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
+    ///**邮件信息列表 */
+    //const UInt8 MAIL_LIST           = 0x41;// 0xA0
+    ///**邮件内容 */
+    //const UInt8 MAIL_CONTENT        = 0x42;// 0xA1
+    ///**邮件删除 */
+    //const UInt8 MAIL_DELETE         = 0x43;// 0xA2
+    ///**邮件发送 */
+    //const UInt8 MAIL_SEND           = 0x44;// 0xA3
+    ///**邮件信息改变 */
+    //const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
     /** 全服乱斗 */
     const UInt8 RACE_BATTLE         = 0x4A;
     /**活跃度领取奖励 */
@@ -488,6 +497,23 @@ namespace REQ
 
 namespace REP
 {
+    const UInt8 CHAT            = 0x06;
+    //强化
+    const UInt8 ENCHART             = 0x20;// 0xF0
+
+    /*背包信息*/
+    const UInt8 PACKAGE_INFO = 0x30;// 0xE0
+ 
+    const UInt8 MAIL             = 0x50;// 
+    const UInt8 MAIL_GET             = 0x51;// 
+    const UInt8 MAIL_DELETE             = 0x52;// 
+    const UInt8 MAIL_GET_ALL             = 0x53;// 
+    const UInt8 MAIL_DELETE_ALL             = 0x54;// 
+
+
+
+
+
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00
     const UInt8 RECONNECT           = 0x01;// 帐号被封
     const UInt8 ENTER_ARENA         = 0x02;
@@ -655,7 +681,7 @@ namespace REP
     const UInt8 MAIL_ID_LIST        = 0x40;// 0xA6
     const UInt8 MAIL_LIST           = 0x41;// 0xA0
     const UInt8 MAIL_CONTENTS       = 0x42;// 0xA1
-    const UInt8 MAIL_DELETE         = 0x43;// 0xA2
+    //const UInt8 MAIL_DELETE         = 0x43;// 0xA2
     const UInt8 MAIL_SEND           = 0x44;// 0xA3
     const UInt8 MAIL_NEW            = 0x45;// 0xA4
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
@@ -729,7 +755,7 @@ namespace REP
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
     const UInt8 SERVER_ARENA_LB     = 0xEB;
 
-    const UInt8 CHAT                = 0x20;// 0xF0
+    //const UInt8 CHAT                = 0x20;// 0xF0
     const UInt8 CHAT_PRIVATE        = 0x21;// 0xF1
     const UInt8 FIND_USER           = 0x22;// 0xF2
     const UInt8 FLAUNT_GOOD         = 0x23;// 0xF3

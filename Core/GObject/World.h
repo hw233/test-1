@@ -20,7 +20,7 @@ namespace Script
 }
 namespace GObject
 {
-    class ChatHold;
+    //class ChatHold;
     class World
         :public WorkerRunner<WorldMsgHandler>
     {
@@ -40,7 +40,7 @@ namespace GObject
         private:
             Script::BattleFormula * _battleFormula;
             Script::WorldScript * _worldScript;
-            ChatHold* chatHold;
+            //ChatHold* chatHold;
     };
 }
 #endif // WORLD_H_

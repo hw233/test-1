@@ -120,6 +120,15 @@ namespace GObject
         UInt32 contribute;
         UInt32 enterTime;
     };
+    struct DBMail
+    {
+        UInt32 id;
+        UInt64 playerId; 
+        UInt16 contextId;
+        std::string items;
+        UInt8 option;
+        UInt32 overTime;
+    };
 }
 namespace DB
 {
@@ -258,6 +267,17 @@ namespace DB
     )
     SPECIALEND()
 
+    SPECIALBEGIN(GObject::DBMail)
+    SPECIALDEF(6)
+    (
+        UInt32, id,
+        UInt64, playerId,
+        UInt16, contextId,
+        std::string, items,
+        UInt8, option,
+        UInt32, overTime
+    )
+    SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

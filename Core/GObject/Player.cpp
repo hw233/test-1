@@ -1,6 +1,9 @@
 #include "Player.h"
 #include "Fighter.h"
 #include "ChatHold.h"
+#include "Mail.h"
+#include "Common/StringTokenizer.h"
+#include "MsgID.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -134,6 +137,12 @@ namespace GObject
     void Player::Login()
     { 
         //TODO
+        Mail* mail = new Mail(IDGenerator::gPlayerOidGenerator.ID(),this,1,"1,1",0,static_cast<UInt32>(-1));
+        if(mail)
+        { 
+            globalMails.add(mail->GetId(), mail);
+            AddMail(mail->GetId());
+        } 
     } 
     void Player::PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId)
     { 
@@ -179,5 +188,146 @@ namespace GObject
             chatHold = new ChatHold(P_CHAT_MAX);
         } 
         return chatHold;
+    } 
+
+    void Player::ChatForWorld(std::string text)
+    { 
+        // 聊天协议添加
+        //NETWORK()->Broadcast(st);
+    } 
+
+    void Player::ChatForClan(std::string text)
+    { 
+        if(!GetClan())
+            return ;
+
+        GetClan()->GetChatHold()->InsertChat(this,text);
+    } 
+    void Player::ChatForFriend(IDTYPE playerId, std::string text)
+    { 
+        Player* pl = globalPlayers[playerId];
+        if(!pl)
+            return ;
+        if(!GetFriendManager()->HasFriend(pl))
+            return ;
+
+        pl->GetChatHold()->InsertChat(this, text);
+    } 
+
+    void Player::AddMail(UInt32 id, UInt8 update)
+    { 
+        Mail* mail = globalMails[id];
+        if(!mail || mail->GetOwner()!= this)
+            return ;
+        _mailList.push_back(id);
+        if(update)
+        { 
+            //DB2().PushUpdateData("delete from var where `playerId` = %" I64_FMT "u  and `id` = %u ",m_PlayerID, id);
+            DB2().PushUpdateData("REPLACE INTO `mail`(`id`,`playerId`,`contextId`,`items`,`option`,`overTime`) VALUES( %u, %" I64_FMT "u, %u, '%s',%u,%u)", mail->GetId(), getId(), mail->GetContextId(), mail->GetItems().c_str(),mail->GetOption(),mail->GetOverTime());
+        } 
+    } 
+    
+    UInt8 Player::ReciveMail(UInt32 id, UInt8 flag)
+    { 
+        Mail* mail = globalMails[id];
+        if(!mail || mail->GetOwner()!= this)
+            return 1;
+
+        std::string items = mail->GetItems();
+        StringTokenizer st(items,",");
+        if(200 + GetVar(VAR_PACKAGE_SIZE) + st.count()/2 > GetPackage()->GetPackageSize())
+            return 2;
+        for(UInt8 i = 0; i < st.count()/2; ++i)
+        { 
+            GetPackage()->AddItem(::atoi(st[i*2].c_str()), ::atoi(st[i*2+1].c_str()));
+        } 
+
+        globalMails.remove(mail->GetId());
+        if(!flag)
+            _mailList.remove(mail->GetId());
+        delete mail;
+
+        DB3().PushUpdateData("DELETE from `mail` WHERE `id` = '%u' ", id);
+
+        //
+        //mail->SetOption(1);
+
+        //DB3().PushUpdateData("update `mail` set `option` = 1 WHERE `id` = '%u' ", id);
+
+        //globalMails.remove(mail->GetId());
+        //_mailList.remove(mail->GetId());
+        //
+        //delete mail;
+        return 0;
+    } 
+
+    UInt8 Player::DeleteMail(UInt32 id,UInt8 flag)
+    { 
+        Mail* mail = globalMails[id];
+        if(!mail || mail->GetOwner()!= this)
+            return 1;
+        
+        globalMails.remove(mail->GetId());
+        if(!flag)
+            _mailList.remove(mail->GetId());
+        delete mail;
+        DB3().PushUpdateData("DELETE from `mail` WHERE `id` = '%u' ", id);
+        return 0;
+    } 
+
+    UInt8 Player::ReciveMail()
+    { 
+        std::list<UInt32>::iterator it = _mailList.begin();
+        UInt8 res = 0;
+        for(;it!=_mailList.end();++it)
+        {
+            res = ReciveMail(*it,1);
+            if(res)
+            {
+                _mailList.remove(*it);
+                break;
+            }
+        }
+        Stream st(REP::MAIL_GET_ALL);
+        st << static_cast<UInt8>(res);
+        st << Stream::eos;
+        send(st);
+        return 0;
+    } 
+
+    UInt8 Player::DeleteMail()
+    { 
+        std::list<UInt32>::iterator it = _mailList.begin();
+        for(;it!=_mailList.end();++it)
+        {
+            DeleteMail(*it,1);
+        }
+        _mailList.clear();
+        Stream st(REP::MAIL_DELETE_ALL);
+        st << static_cast<UInt8>(0);
+        st << Stream::eos;
+        send(st);
+        return 0;
+    } 
+
+    void Player::ListMail(Stream& st)
+    { 
+        std::list<UInt32>::iterator it = _mailList.begin();
+        st << static_cast<UInt16>(_mailList.size());
+        for(;it!=_mailList.end();++it)
+        { 
+            Mail* mail = globalMails[*it];
+            if(!mail || mail->GetOwner() != this)
+                continue ;
+            st << static_cast<UInt32>(mail->GetId());
+            st << static_cast<UInt16>(mail->GetContextId());
+            std::string items = mail->GetItems();
+            StringTokenizer token(items,",");
+            for(UInt8 i = 0; i < token.count()/2;++i)
+            { 
+                st << static_cast<UInt32>(::atoi(token[2*i].c_str()));
+                st << static_cast<UInt16>(::atoi(token[2*i+1].c_str()));
+            } 
+        } 
     } 
 }

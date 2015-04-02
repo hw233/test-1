@@ -34,6 +34,20 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	}
 	conn->send(&st[0], st.size());
 
+    if(1)
+    {
+        Stream st(REP::USER_INFO);
+        player->makePlayerInfo(st);
+        st << Stream::eos;
+        conn->send(&st[0],st.size());
+    }
+    if(1)
+    { 
+        Stream st(REP::MAIL);
+        player->ListMail(st);
+        st << Stream::eos;
+        player->send(st);
+    } 
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
 	//DBLOG1().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %" I64_FMT "u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip))}

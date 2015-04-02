@@ -19,6 +19,8 @@ namespace GObject
             void AddFriend(eFriendType index , Player* friendOne);
             void GetFriendStream(eFriendType index , Stream &st);
             void GetAllFriendStream(Stream &st);
+
+            bool HasFriend(Player* pl);
         private:
             std::set<Player *> _friends[friend_max];
             Player* m_owner;

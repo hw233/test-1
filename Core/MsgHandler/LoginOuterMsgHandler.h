@@ -170,10 +170,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         //char domain[256] = "";
         if (player)
         {
-            UInt8 flag = 0;
             //strncpy (domain, player->getDomain(), 256);
             //player->setClientIp(clientIp);
             GObject::globalOnlinePlayers.add(player);
+            UInt8 flag = 0;
             GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
             GLOBAL().PushMsg(imh, &flag);
         }
@@ -356,6 +356,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         //TODO
 
         UInt32 fgtId = nu._class;
+        pl->SetName(newname);
 
         GObject::Fighter * fgt2 = GObject::globalFighters[fgtId];
         GObject::Fighter * fgt = NULL;
@@ -404,6 +405,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     st << static_cast<UInt64>(playerId);
     st << Stream::eos;
     cl->send(&st[0],st.size());
+    if(!res &&pl)
+    { 
+        UInt8 flag = 0;
+        GameMsgHdr imh(0x201, pl->getThreadId(), pl, 1);
+        GLOBAL().PushMsg(imh, &flag);
+    } 
 }
 
 struct CreateAccountStruct
@@ -452,7 +459,7 @@ void IdentifyAccount( LoginMsgHdr& hdr, IdentifyAccountStruct& nu )
 {
     TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
     if(conn.get() == NULL)
-       return;
+        return;
     Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());  
     if(!cl)
         return ;
