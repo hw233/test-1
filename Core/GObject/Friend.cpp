@@ -237,4 +237,11 @@ namespace GObject
        }
        return false;
    }
+   bool FriendManager::HasFriend(Player* pl)
+   {
+       std::set<Player *>::iterator it = _friends[friend_normal].find(pl);
+       if(it != _friends[friend_normal].end())
+           return true;
+       return false;
+   }
 }
