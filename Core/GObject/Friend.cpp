@@ -30,12 +30,13 @@ namespace GObject
     void FriendManager::GetAllFriendStream(Stream & st)
     {
         UInt8 totalNum = 0;
-        for(UInt8 i = 0; i < friend_max ; ++i)
+        for(UInt8 i = 0; i < friend_max-1 ; ++i)
         {
             st << static_cast<UInt8>( _friends[i].size());
             totalNum += _friends[i].size();
 
         }
+        st<<static_cast<UInt8>(m_owner->GetFriendMax());
         st<<static_cast<UInt8>(totalNum);
         for(UInt8 i = 0; i < friend_max; ++i)
         {
@@ -55,15 +56,16 @@ namespace GObject
 
     bool FriendManager::DelFriendByName(std::string& name)
     {
+        bool res = false;
         for(auto it = _friends[friend_normal].begin(); it != _friends[friend_normal].end();++it)
         {
             if( (*it)->GetName() == name )
             {
                 PopOutSet(friend_normal,*it);
-                return true;
+                res = true;
             }
         }
-        return false;
+        return res;
     }
     
     void FriendManager::AgreeAddFriend(std::string& name)
@@ -71,7 +73,7 @@ namespace GObject
         Player* pl = globalNamedPlayers[name];
         if( pl == NULL )
             return;
-        if( GetFriendNum(friend_normal) >= FRIEND_MAX || pl->GetFriendManager()->GetFriendNum(friend_normal) >= FRIEND_MAX )
+        if( GetFriendNum(friend_normal) >= m_owner->GetFriendMax() || pl->GetFriendManager()->GetFriendNum(friend_normal) >= pl->GetFriendMax() )
         {
             std::cout<<"其中之一列表已满 不可添加"<<endl;
             return;
@@ -79,9 +81,18 @@ namespace GObject
         //从申请列表中删掉
         PopOutSet(friend_apply,pl);
         //放到好友列表中
-        PushInSet(friend_normal,pl);
-        //gei pl fa xiao xin shuo m_owner yi tong yi
+        bool isIn = IsInList(friend_normal,pl);
+        if( !isIn )
+        {
+            PushInSet(friend_normal,pl);
+        }
+
         pl->GetFriendManager()->PushInSet(friend_normal,m_owner);
+
+        Stream st(REQ::FRIEND_ADD);
+        m_owner->GetSelfInfoStream(st);
+        st<<Stream::eos;
+        pl->send(st);
    }
 
    void FriendManager::DelApplyAddFriend(std::string& name)
@@ -101,13 +112,13 @@ namespace GObject
            std::cout<<"不能添加自己"<<std::endl;
            return;
        }
-       if( _friends[type].size() > FRIEND_MAX )
+       if( type == friend_normal && _friends[type].size() > m_owner->GetFriendMax() )
        {
-           std::cout<<"已达上限不能再添加了"<<std::endl;
+           std::cout<<"好友列表已满"<<std::endl;
            return;
        }
-       auto it = _friends[type].find(pl);
-       if( it != _friends[type].end() )
+       bool isIn = IsInList(type,pl);
+       if(isIn)
        {
            std::cout<<"已在列表中拉"<<std::endl;
            return ;
@@ -121,8 +132,8 @@ namespace GObject
    {
        if( pl == NULL || type < 0 || type > friend_max )
            return;
-       auto it = _friends[type].find(pl);
-       if( it == _friends[type].end() )
+       bool isIn = IsInList(type,pl);
+       if( !isIn )
        {
            std::cout<<"未找到不能删除"<<std::endl;
        }
@@ -136,13 +147,25 @@ namespace GObject
        Player* pl = globalNamedPlayers[name];
        if( pl == NULL )
            return;
+       if( pl->GetFriendManager()->IsInList(friend_apply,m_owner))
+       {
+           std::cout<<"被申请者表里已经有这个申请者了"<<std::endl;
+           return;
+       }
+
+       bool isIn = IsInList(friend_normal,pl);
+       bool isInlist  = pl->GetFriendManager()->IsInList(friend_normal,m_owner);
+       if( isIn & isInlist )
+       {
+           std::cout<<"已经是你的好友了"<<std::endl;
+           return;
+       }
        pl->GetFriendManager()->PushInSet(friend_apply,m_owner);
        //发申请者信息给被申请者
        Stream st(REQ::FRIEND_APPLY);
        m_owner->GetSelfInfoStream(st);
        st<<Stream::eos;
        pl->send(st);
-
    }
 
    bool MyGreater(Player* p1, Player* p2)
@@ -157,9 +180,10 @@ namespace GObject
    //好友推荐
    void FriendManager::RecommandFriend()
    {
+	   DB7().PushUpdateData("delete from friends where type = %u",friend_recommand);
        _friends[friend_recommand].clear();
        UInt8 num = GetFriendNum(friend_normal);
-       if(num >= FRIEND_MAX)
+       if(num >= m_owner->GetFriendMax())
        {
            cout<<"玩家的好友列表已满 不能推荐了"<<endl;
            return;
@@ -172,6 +196,8 @@ namespace GObject
            if( GetFriendNum(friend_recommand) >= FRIEND_RECOMMAND_MAX )
                break;
            if( (*it) == m_owner )
+               continue;
+           if(IsInList(friend_normal,*it))
                continue;
            PushInSet(friend_recommand,*it);
        }
@@ -198,4 +224,17 @@ namespace GObject
        return _friends[type].size();
    }
 
+   bool FriendManager::IsInList(eFriendType type,Player *pl)
+   {
+       if( pl == NULL || type < friend_normal || type >= friend_max)
+       {
+           return false;
+       }
+       auto it = _friends[type].find(pl);
+       if( it != _friends[type].end() )
+       {
+           return true;
+       }
+       return false;
+   }
 }

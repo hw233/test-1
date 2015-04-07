@@ -4,7 +4,7 @@
 #include "LoadWorker.h"
 #include "Common/URandom.h"
 
-#define FRIEND_MAX  20            //每个列表中好友的上限
+//#define FRIEND_MAX  20            //好友的上限
 #define FRIEND_RECOMMAND_MAX 5    //一次推荐好友的上限
 
 namespace GObject
@@ -42,6 +42,8 @@ namespace GObject
             void RefuseFriend(std::string& name);
             
             UInt8 GetFriendNum(eFriendType type);
+
+            bool IsInList(eFriendType type,Player *pl);
         private:
             std::set<Player *> _friends[friend_max];
             Player* m_owner;

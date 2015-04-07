@@ -78,6 +78,13 @@ void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
         st << Stream::eos;
         conn->send(&st[0],st.size());
     }
+    //好友信息
+    {
+        Stream st(REQ::FRIEND_LIST);
+        pl->GetFriendManager()->GetAllFriendStream(st);
+        st<< Stream::eos;
+        conn->send(&st[0],st.size());
+    }
 }
 
 void OnEnchantReq(GameMsgHdr& hdr, const void * data)

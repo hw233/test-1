@@ -201,6 +201,8 @@ namespace GObject
             void SetClan(Clan* cl) { clan = cl;}
             UInt8 GetClanPos(){ return _clanPos;}
             void SetClanPos(UInt8 clanPos){ _clanPos = clanPos;}
+            UInt8 GetFriendMax() const { return _friendMax;}
+            void SetFriendMax(UInt8 num) { _friendMax = num;}
 
     private:
             //IDTYPE _id;
@@ -221,6 +223,7 @@ namespace GObject
             VarSystem* m_pVars;
             Package* m_Package;
             FriendManager * m_friendMgr;  //好友
+            UInt8 _friendMax;    //好友上限
             PlayerData _playerData;
             std::string name;
             ChatHold * chatHold;

@@ -12,7 +12,7 @@ namespace GObject
     GlobalPlayerVec globalPlayerVec;
     GlobalClans globalClan;
     //GlobalNamedPlayers globalAccountsPlayers;
-    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1)
+    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10)
     {
         m_pVars = new VarSystem(id);
         m_Package = new Package(this); 
@@ -83,10 +83,18 @@ namespace GObject
     
     void Player::GetSelfInfoStream(Stream &st)
     {
+        
         st<<static_cast<UInt8>(GetSex());
         st<<GetName();
         st<<static_cast<UInt8>(GetLevel());
-        st<<static_cast<UInt32>(10000);
+        if( isOnline() )  //如果在线 
+        {
+            st<<static_cast<UInt32>(0);
+        }
+        else     //不在线
+        {
+            st<<static_cast<UInt32>(GetVar(VAR_OFF_LINE));
+        }
         //st << GetVar(VAR_GOLD);
     } 
     
