@@ -407,6 +407,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
     cl->send(&st[0],st.size());
     if(!res &&pl)
     { 
+        pl->setOnline(true);
         UInt8 flag = 0;
         GameMsgHdr imh(0x201, pl->getThreadId(), pl, 1);
         GLOBAL().PushMsg(imh, &flag);

@@ -41,6 +41,12 @@ namespace Battle
 
 namespace GObject
 {
+    enum 
+    {
+        e_chat_world,
+        e_chat_friend,
+        e_chat_clan
+    };
     class Fighter;
     struct lineup
     {

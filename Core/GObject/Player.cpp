@@ -14,6 +14,16 @@ namespace GObject
     GlobalNamedPlayers globalNamedPlayers;
     GlobalClans globalClan;
     //GlobalNamedPlayers globalAccountsPlayers;
+
+    bool enum_send_chat(Player *pl , void * ptr)
+    { 
+        Stream * st = reinterpret_cast<Stream * >(ptr);
+        if(pl->GetRecChat(e_chat_world))
+            return true;
+        pl->send(*st);
+        return true;
+    } 
+
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1)
     {
         m_pVars = new VarSystem(id);
@@ -179,6 +189,9 @@ namespace GObject
         { 
             (it->second)->MakeFighterInfo(st);
         } 
+        
+        std::cout << "获得玩家信息：" << GetName() << std::endl;
+
     }
 
     ChatHold* Player::GetChatHold()
@@ -194,6 +207,12 @@ namespace GObject
     { 
         // 聊天协议添加
         //NETWORK()->Broadcast(st);
+        Stream st(REP::CHAT);
+        st << static_cast<UInt8>(0);
+        st << GetName();
+        st << text;
+        globalPlayers.enumerate(enum_send_chat,&st);
+        //WORLD()->GetChatHold()->InsertChat(this, text);
     } 
 
     void Player::ChatForClan(std::string text)
@@ -201,6 +220,12 @@ namespace GObject
         if(!GetClan())
             return ;
 
+        Stream st(REP::CHAT);
+        st << static_cast<UInt8>(e_chat_world);
+        st << GetName();
+        st << text;
+        st << Stream::eos;
+        GetClan()->Boradcast(st,0);
         GetClan()->GetChatHold()->InsertChat(this,text);
     } 
     void Player::ChatForFriend(IDTYPE playerId, std::string text)
@@ -210,14 +235,15 @@ namespace GObject
             return ;
         if(!GetFriendManager()->HasFriend(pl))
             return ;
+        if(pl->GetRecChat(e_chat_friend))
+            return ;
 
         pl->GetChatHold()->InsertChat(this, text);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(1);
+        st << static_cast<UInt8>(e_chat_friend);
         st << GetName();
         st << text;
         st << Stream::eos;
-
         pl->send(st);
     } 
 

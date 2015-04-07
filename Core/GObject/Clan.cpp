@@ -96,4 +96,21 @@ namespace GObject
             return 1;
         return 0;
     } 
+
+    void Clan::Boradcast(Stream st, UInt8 index)
+    { 
+        for(UInt8 i = 0; i < _players.size(); ++i)
+        {
+            switch(index)
+            { 
+                case 0:
+                    {
+                        if(!_players[i]->GetRecChat(e_chat_clan))
+                        return ;
+                    }
+                    break;
+            } 
+            _players[index]->send(st);
+        }
+    } 
 }

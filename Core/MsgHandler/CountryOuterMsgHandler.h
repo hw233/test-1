@@ -131,7 +131,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
     br >> type >> opt;
     if(opt)
     { 
-        player->SetRecChat(type,opt-1);
+        player->SetRecChat(type,opt == 1);
         return ;
     } 
 
