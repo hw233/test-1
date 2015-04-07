@@ -17,6 +17,7 @@ namespace REQ
     const UInt8 MAIL             = 0x50;// 
     const UInt8 MAIL_GET             = 0x51;// 
     const UInt8 MAIL_DELETE             = 0x52;// 
+    const UInt8 MAIL_NOTICE             = 0x52;// 
     const UInt8 MAIL_GET_ALL             = 0x53;// 
     const UInt8 MAIL_DELETE_ALL             = 0x54;// 
 
@@ -507,6 +508,7 @@ namespace REP
     const UInt8 MAIL             = 0x50;// 
     const UInt8 MAIL_GET             = 0x51;// 
     const UInt8 MAIL_DELETE             = 0x52;// 
+    const UInt8 MAIL_NOTICE             = 0x52;// 
     const UInt8 MAIL_GET_ALL             = 0x53;// 
     const UInt8 MAIL_DELETE_ALL             = 0x54;// 
 

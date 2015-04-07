@@ -137,7 +137,7 @@ namespace GObject
     void Player::Login()
     { 
         //TODO
-        Mail* mail = new Mail(IDGenerator::gPlayerOidGenerator.ID(),this,1,"1,1",0,static_cast<UInt32>(-1));
+        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,"1,1",0,static_cast<UInt32>(-1));
         if(mail)
         { 
             globalMails.add(mail->GetId(), mail);
@@ -212,6 +212,13 @@ namespace GObject
             return ;
 
         pl->GetChatHold()->InsertChat(this, text);
+        Stream st(REP::CHAT);
+        st << static_cast<UInt8>(1);
+        st << GetName();
+        st << text;
+        st << Stream::eos;
+
+        pl->send(st);
     } 
 
     void Player::AddMail(UInt32 id, UInt8 update)
@@ -224,6 +231,20 @@ namespace GObject
         { 
             //DB2().PushUpdateData("delete from var where `playerId` = %" I64_FMT "u  and `id` = %u ",m_PlayerID, id);
             DB2().PushUpdateData("REPLACE INTO `mail`(`id`,`playerId`,`contextId`,`items`,`option`,`overTime`) VALUES( %u, %" I64_FMT "u, %u, '%s',%u,%u)", mail->GetId(), getId(), mail->GetContextId(), mail->GetItems().c_str(),mail->GetOption(),mail->GetOverTime());
+
+            Stream st(REP::MAIL_NOTICE);
+            st << static_cast<UInt32>(mail->GetId());
+            st << static_cast<UInt16>(mail->GetContextId());
+            std::string items = mail->GetItems();
+            StringTokenizer token(items,",");
+            for(UInt8 i = 0; i < token.count()/2;++i)
+            { 
+                st << static_cast<UInt32>(::atoi(token[2*i].c_str()));
+                st << static_cast<UInt16>(::atoi(token[2*i+1].c_str()));
+            } 
+            st << static_cast<UInt32>(mail->GetOverTime());
+            st << Stream::eos;
+            send(st);
         } 
     } 
     
@@ -235,7 +256,7 @@ namespace GObject
 
         std::string items = mail->GetItems();
         StringTokenizer st(items,",");
-        if(200 + GetVar(VAR_PACKAGE_SIZE) + st.count()/2 > GetPackage()->GetPackageSize())
+        if(200 + GetVar(VAR_PACKAGE_SIZE) <  st.count()/2 + GetPackage()->GetPackageSize())
             return 2;
         for(UInt8 i = 0; i < st.count()/2; ++i)
         { 
@@ -278,15 +299,16 @@ namespace GObject
     UInt8 Player::ReciveMail()
     { 
         std::list<UInt32>::iterator it = _mailList.begin();
-        UInt8 res = 0;
-        for(;it!=_mailList.end();++it)
+        UInt8 res = 1;
+        for(;it!=_mailList.end();)
         {
             res = ReciveMail(*it,1);
-            if(res)
+            if(!res)
             {
-                _mailList.remove(*it);
-                break;
+                it = _mailList.erase(it);
             }
+            else
+                break;
         }
         Stream st(REP::MAIL_GET_ALL);
         st << static_cast<UInt8>(res);
@@ -313,7 +335,9 @@ namespace GObject
     void Player::ListMail(Stream& st)
     { 
         std::list<UInt32>::iterator it = _mailList.begin();
-        st << static_cast<UInt16>(_mailList.size());
+        size_t offset = st.size();
+        UInt16 count = 0;
+        st << static_cast<UInt16>(count);//(_mailList.size());
         for(;it!=_mailList.end();++it)
         { 
             Mail* mail = globalMails[*it];
@@ -323,11 +347,22 @@ namespace GObject
             st << static_cast<UInt16>(mail->GetContextId());
             std::string items = mail->GetItems();
             StringTokenizer token(items,",");
-            for(UInt8 i = 0; i < token.count()/2;++i)
+            if(token.count() < 2)
             { 
-                st << static_cast<UInt32>(::atoi(token[2*i].c_str()));
-                st << static_cast<UInt16>(::atoi(token[2*i+1].c_str()));
+                st << static_cast<UInt32>(0);
+                st << static_cast<UInt16>(0);
             } 
+            else
+            {
+                for(UInt8 i = 0; i < token.count()/2;++i)
+                { 
+                    st << static_cast<UInt32>(::atoi(token[2*i].c_str()));
+                    st << static_cast<UInt16>(::atoi(token[2*i+1].c_str()));
+                } 
+            }
+            st << static_cast<UInt32>(mail->GetOverTime());
+            ++count;
         } 
+        st.data<UInt16>(offset) = count;
     } 
 }

@@ -134,9 +134,10 @@ void OnChat(GameMsgHdr& hdr, const void * data)
         player->SetRecChat(type,opt-1);
         return ;
     } 
+
+    br >> context;
     if(type ==1)
         br >>  playerId;
-    br >> context;
 
     switch(type)
     { 
@@ -174,7 +175,7 @@ void OnMailGet(GameMsgHdr& hdr, const void * data)
     br >> id;
     UInt8 res = player->ReciveMail(id);
 
-    Stream st(REP::MAIL);
+    Stream st(REP::MAIL_GET);
     st << static_cast<UInt8>(res);
     if(!res)
         st << static_cast<UInt32>(id);
