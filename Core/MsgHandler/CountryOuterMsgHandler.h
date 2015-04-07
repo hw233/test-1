@@ -98,7 +98,7 @@ void OnEnchantReq(GameMsgHdr& hdr, const void * data)
     UInt8 part = 0;
     br >> part;
     UInt32 result = player->GetPackage()->EnchantFromClient(fighterId,part,opt);
-    Stream st(REQ::ENCHART);
+    Stream st(REP::ENCHART);
     st << static_cast<UInt8>(opt);
     if(opt)
         st << static_cast<UInt8>(part);
@@ -110,7 +110,7 @@ void OnEnchantReq(GameMsgHdr& hdr, const void * data)
 void OnPackageInfo(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;
-    Stream st(REQ::PACKAGE_INFO);
+    Stream st(REP::PACKAGE_INFO);
     player->GetPackage()->GetStream(st);
     st << Stream::eos;
     player->send(st);
@@ -232,6 +232,92 @@ void OnFriendListReq(GameMsgHdr& hdr,FriendListReq&)
     player->send(st);
 }
 
+void OnChat(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 opt = 0;
+    UInt64 playerId = 0;
+    std::string context;
+    br >> type >> opt;
+    if(opt)
+    { 
+        player->SetRecChat(type,opt == 1);
+        return ;
+    } 
+
+    br >> context;
+    if(type ==1)
+        br >>  playerId;
+
+    switch(type)
+    { 
+        case 0:
+            {
+                player->ChatForWorld(context);
+                break;
+            }
+        case 1:
+            {
+                player->ChatForFriend(playerId, context);
+                break;
+            }
+        case 2:
+            {
+                player->ChatForClan(context);
+                break;
+            }
+    } 
+} 
+
+void OnMail(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    Stream st(REP::MAIL);
+    player->ListMail(st);
+    st << Stream::eos;
+    player->send(st);
+} 
+void OnMailGet(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt32 id = 0;
+    br >> id;
+    UInt8 res = player->ReciveMail(id);
+
+    Stream st(REP::MAIL_GET);
+    st << static_cast<UInt8>(res);
+    if(!res)
+        st << static_cast<UInt32>(id);
+    st << Stream::eos;
+    player->send(st);
+} 
+void OnMailGetAll(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    player->ReciveMail();
+} 
+void OnMailDelete(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt32 id = 0;
+    br >> id;
+    UInt8 res = player->DeleteMail(id);
+    Stream st(REP::MAIL_DELETE);
+    st << static_cast<UInt8>(res);
+    if(!res)
+        st << static_cast<UInt32>(id);
+    st << Stream::eos;
+    player->send(st);
+} 
+void OnMailDeleteAll(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    player->DeleteMail();
+} 
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

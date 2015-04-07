@@ -33,7 +33,8 @@ namespace GObject
         VAR_ENCHANT_CD = 6,
         VAR_CLAN_CONT = 7, //帮派贡献
         VAR_CLAN_ENTER = 8, //进入帮派的时间
-        VAR_OFF_LINE = 9 ,//最近一次在线时间
+        VAR_PACKAGE_SIZE = 9,
+        VAR_OFF_LINE = 10 ,//最近一次在线时间
         VAR_MAX
     };
 

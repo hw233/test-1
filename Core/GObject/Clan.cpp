@@ -1,7 +1,7 @@
 #include "Clan.h"
 #include "Player.h"
 
-#define C_CHAT_MAX 10
+#define C_CHAT_MAX 30
 namespace GObject
 {
     Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_creater(creater) { } 
@@ -95,5 +95,22 @@ namespace GObject
         if(opter->GetClanPos() <= pl->GetClanPos())
             return 1;
         return 0;
+    } 
+
+    void Clan::Boradcast(Stream st, UInt8 index)
+    { 
+        for(UInt8 i = 0; i < _players.size(); ++i)
+        {
+            switch(index)
+            { 
+                case 0:
+                    {
+                        if(!_players[i]->GetRecChat(e_chat_clan))
+                        return ;
+                    }
+                    break;
+            } 
+            _players[index]->send(st);
+        }
     } 
 }

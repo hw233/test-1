@@ -121,6 +121,16 @@ CREATE TABLE `clan_player` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `mail`; 
+CREATE TABLE `mail` (
+    `id` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL,
+    `contextId` int(10) unsigned NOT NULL DEFAULT '0',
+    `items` varchar(255) NOT NULL,
+    `option` tinyint(3) NOT NULL DEFAULT '0',
+    `overTime` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

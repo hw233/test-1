@@ -6,6 +6,7 @@
 using namespace std;
 #include "Player.h"
 #include "ChatHold.h"
+#include "Common/Stream.h"
 
 #define CLAN_MAX 60
 #define APPLICANTMAX 60
@@ -36,6 +37,7 @@ namespace GObject
             std::vector<Player*>::iterator HasMember(Player* pl);
             UInt8 ChangePosition(Player* opter, Player* pl, UInt8 pos);
 
+            void Boradcast(Stream st, UInt8 index);
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;

@@ -14,7 +14,7 @@ namespace GObject
 {
     bool World::Init()
     {
-        chatHold = new ChatHold(W_CHAT_MAX);
+        //chatHold = new ChatHold(W_CHAT_MAX);
 
         std::string path = cfg.scriptPath + "World/main.lua";
         TimeUtil::TimeAdd(GVAR.GetVar(GVAR_TIMEADD));

@@ -28,7 +28,6 @@ namespace GObject
             bool FindFriendByName(const std::string& name); 
             bool FindFriendById(UInt64 playerId);
             bool DelFriendByName(std::string& name);//删除好友
-            bool DelFriendById(eFriendType type,UInt64 playerId);
             void AgreeAddFriend(std::string& name); //同意加好友
 
             void DelApplyAddFriend(std::string& name);
@@ -44,6 +43,7 @@ namespace GObject
             UInt8 GetFriendNum(eFriendType type);
 
             bool IsInList(eFriendType type,Player *pl);
+            bool HasFriend(Player* pl);
         private:
             std::set<Player *> _friends[friend_max];
             Player* m_owner;

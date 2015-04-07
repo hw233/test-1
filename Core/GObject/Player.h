@@ -41,6 +41,12 @@ namespace Battle
 
 namespace GObject
 {
+    enum 
+    {
+        e_chat_world,
+        e_chat_friend,
+        e_chat_clan
+    };
     class Fighter;
     struct lineup
     {
@@ -181,8 +187,8 @@ namespace GObject
             UInt8 GetBattleSide() { return _battleSide;}
 
             //Chat
-            void SetRecChat(UInt8 v){ recChat = v;}
-            UInt8 GetRecChat(){ return recChat;}
+            void SetRecChat(UInt8 type, UInt8 v){ recChat |= (!!v << type);}
+            UInt8 GetRecChat(UInt8 type){ return recChat&(1<<type);}
 
             //业务逻辑
             UInt8 Enchant(UInt8 number);
@@ -204,6 +210,18 @@ namespace GObject
             UInt8 GetFriendMax() const { return _friendMax;}
             void SetFriendMax(UInt8 num) { _friendMax = num;}
 
+            void ChatForWorld(std::string text);
+            void ChatForClan(std::string text);
+            void ChatForFriend(IDTYPE playerId, std::string text);
+
+            void AddMail(UInt32 id, UInt8 update = 1);
+            UInt8 ReciveMail(UInt32 id,UInt8 flag = 0);
+            UInt8 DeleteMail(UInt32 id,UInt8 flag = 0);
+
+            UInt8 DeleteMail();
+            UInt8 ReciveMail();
+
+            void ListMail(Stream& st);
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -239,6 +257,7 @@ namespace GObject
             //散仙相关
             std::map<UInt32, Fighter *> _fighters;
 
+            std::list<UInt32> _mailList;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
