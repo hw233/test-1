@@ -38,6 +38,9 @@ namespace GObject
             UInt8 ChangePosition(Player* opter, Player* pl, UInt8 pos);
 
             void Boradcast(Stream st, UInt8 index);
+            void SetLevel(UInt8 lev){ _level = lev;}
+            UInt8 GetLevel(){return _level;}
+            void GetClanInfo(Stream& st);
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;
@@ -46,6 +49,8 @@ namespace GObject
             UInt32 _id;
             std::string _name;
             std::string _announcement;
+
+            UInt8 _level;
 
             Player* _creater;
             Player* _leader;

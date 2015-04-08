@@ -113,4 +113,12 @@ namespace GObject
             _players[index]->send(st);
         }
     } 
+    void Clan::GetClanInfo(Stream& st)
+    { 
+        st << GetName();
+        st << GetLevel();
+        st << static_cast<UInt8>(_players.size());
+        st << static_cast<UInt8>(_personMax);
+        st << _announcement;
+    } 
 }

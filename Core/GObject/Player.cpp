@@ -165,7 +165,8 @@ namespace GObject
         { 
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
-        } 
+        }
+        SendClanListinfo();
     } 
     void Player::PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId)
     { 
@@ -404,5 +405,31 @@ namespace GObject
             ++count;
         } 
         st.data<UInt16>(offset) = count;
+    } 
+    bool GetClanListInfo(Clan* cl, Stream& st)
+    { 
+        if(!cl)
+            return true;
+        cl->GetClanInfo(st);
+        return true;
+    } 
+    void Player::SendClanListinfo()
+    { 
+        Stream st(REP::CLAN_LIST);
+        //UInt8 count = 0;
+        //size_t offect = st.size();
+        st << static_cast<UInt16>(globalClan.size());
+        globalClan.enumerate(GetClanListInfo, st);
+        //GlobalClans::iterator it = globalClan.begin();
+        //for(;it != globalClan.end(); ++it)
+        //{
+        //    Clan* clan = *(it->second);
+        //    if(!clan)
+        //        continue;
+        //    clan->GetClanInfo(st);
+        //    ++count;
+        //}
+        //st.data<UInt16>(offect) = count;
+        st << Stream::eos;
     } 
 }

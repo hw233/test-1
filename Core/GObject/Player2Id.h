@@ -25,9 +25,9 @@ class Player2Id
         } 
         bool  operator == (const MapKey key) const 
         { 
-            if(!phone.empty())
+            if(!phone.empty() && !key.phone.empty())
                 return phone == key.phone;
-            if(!accounts.empty())
+            if(!accounts.empty() && !key.accounts.empty())
                 return accounts == key.accounts;
             return false;
         } 

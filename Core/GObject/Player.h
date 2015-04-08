@@ -222,6 +222,10 @@ namespace GObject
             UInt8 ReciveMail();
 
             void ListMail(Stream& st);
+
+           
+            //Clan
+            void SendClanListinfo();
     private:
             //IDTYPE _id;
             std::string _accounts;
