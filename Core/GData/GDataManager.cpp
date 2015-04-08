@@ -28,12 +28,14 @@ namespace GData
             fprintf(stderr, "Load LoadExpData Error !\n");
             std::abort();
         }
-
+        
+        
         if (!LoadFighterBase())  
         {
             fprintf(stderr, "Load LoadFighterBase Error !\n");
             std::abort();
         }
+       
         if (!LoadItemTypeData2())  
         {
             fprintf(stderr, "Load ItemTypeData Error !\n");
@@ -180,7 +182,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillEffect dbskeffect;
-        if(execu->Prepare("SELECT `id`,`name`,`skillType`,`buffId`,`damage`,`damageP`,`trerapy`,`trerapyP` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`skillType`,buffId,`damage`,`damageP`,`trerapy`,`trerapyP` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -188,7 +190,7 @@ namespace GData
             if(!se)
                 return false;
             se->skillType = dbskeffect.skillType;
-            se->buffId = dbskeffect.buffId;
+            se->buffId   = dbskeffect.buffId;
             se->damage = dbskeffect.damage;
             se->damageP = dbskeffect.damageP;
             se->trerapy = dbskeffect.trerapy;

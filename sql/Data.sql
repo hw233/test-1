@@ -95,10 +95,11 @@ CREATE TABLE `skillEffect` (
       `id` int(10) NOT NULL DEFAULT '0',
       `name` varchar(255) NOT NULL,
       `skillType` tinyint(3) unsigned NOT NULL DEFAULT '0',
+      `buffId` tinyint(3) unsigned NOT NULL DEFAULT '0',
       `damage` int(10) NOT NULL DEFAULT '0',
       `damageP` float(10,2) NOT NULL COMMENT '伤害百分比',
       `trerapy` int(10) NOT NULL DEFAULT '0',
-      `trerapyP` float(10,2) NOT NULL COMMENT '治疗增幅百分比',
+      `trerapyP` float(10,2) NOT NULL COMMENT '治疗增幅分比',
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -114,7 +115,7 @@ CREATE TABLE `fighter_base` (
       `childType` tinyint(3) NOT NULL DEFAULT '0',
       `speed`  int(10) NOT NULL DEFAULT '0',
       `bodySize`  int(10) NOT NULL DEFAULT '0',
-      `skills`  int(10) NOT NULL DEFAULT '0',
+      `skills`  varchar(255) NOT NULL,
       `hp` int(10) NOT NULL DEFAULT '0',
       `attack` int(10) NOT NULL DEFAULT '0',
       `defend` int(10) NOT NULL DEFAULT '0',
@@ -134,9 +135,7 @@ DROP TABLE IF EXISTS `fighter_base_skill`;
 CREATE TABLE `fighter_base_skill` (
       `id` int(10) NOT NULL DEFAULT '0',  /*武将ID*/
       `levelLimit` tinyint(3) NOT NULL DEFAULT '0',  /*技能开启等级*/
-      `skillCondId` int(10) NOT NULL DEFAULT '0',
-      `skillScopeId` int(10) NOT NULL DEFAULT '0',
-      `skillEffectId` int(10) NOT NULL DEFAULT '0',
+      `skillId` int(10) NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`levelLimit`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -144,16 +143,16 @@ CREATE TABLE `fighter_base_skill` (
 DROP TABLE IF EXISTS `skillBuff`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `skillEffect` (
+CREATE TABLE `skillBuff` (
       `id` int(10) NOT NULL DEFAULT '0',
       `name` varchar(255) NOT NULL,
-      `attrIds` varchar(255) NOT NULL,
+      `attrId` varchar(255) NOT NULL,
       `valueP` varchar(255) NOT NULL,
       `value` varchar(255) NOT NULL,
-      `count` tinyint(3) NOT NULL DEFAULT '0', 
-      `side` tinyint(3) NOT NULL DEFAULT '0',  
-      `type` tinyint(3) NOT NULL DEFAULT '0',  
-      PRIMARY KEY (`id`,`name`)
+      `count` tinyint(3) NOT NULL, 
+      `side` tinyint(3) NOT NULL,  
+      `type` tinyint(3) NOT NULL,  
+      PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

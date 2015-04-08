@@ -2,6 +2,10 @@
 #ifndef CLAN_H_
 #define CLAN_H_
 #include "Config.h"
+#include "iostream"
+using namespace std;
+#include "Player.h"
+#include "ChatHold.h"
 #include "Common/Stream.h"
 
 #define CLAN_MAX 60

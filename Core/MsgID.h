@@ -22,7 +22,7 @@ namespace REQ
     const UInt8 MAIL_DELETE_ALL             = 0x54;// 
 
     /**战报请求 */
-    const UInt8 BATTLE_REPORT_REQ        = 0x80;// 0xC0
+    const UInt8 BATTLE_REPORT_REQ   = 0x80;// 0xC0
     /**登陆 */
     const UInt8 LOGIN               = 0xE0;// 0x10
     /**创建角色 */
@@ -33,9 +33,24 @@ namespace REQ
     const UInt8 USER_INFO           = 0xE4;// 0x14
     /**BUFFER信息改变 */
     //创建帐号
-    const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15
+    const UInt8 CREATE_ACCOUNT      = 0xE5;// 0x15
 
-    const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15
+    const UInt8 IDENTIFY_ACCOUNT    = 0xE6;// 0x15
+    
+    /*好友列表请求*/
+    const UInt8 FRIEND_LIST         = 0x40;
+    /*好友查找*/
+    const UInt8 FRIEND_FIND         = 0x41; //
+    /*好友申请*/
+    const UInt8 FRIEND_APPLY        = 0x42;
+    /*好友添加*/
+    const UInt8 FRIEND_ADD          = 0x43;
+    /*好友删除*/
+    const UInt8 FRIEND_DELETE       = 0x44;
+    /*好友推荐*/
+    const UInt8 FRIEND_RECOMMAND    = 0x45;
+
+
 
 
 
@@ -313,9 +328,9 @@ namespace REQ
     /**仙界传奇*/
     const UInt8 SERVERWAR_ARENA_OP  = 0x4E;
     /**关系列表请求 */
-    const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
+    //const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     /**关系列表操作 */
-    const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
+    //const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
     /**商城信息请求 */
     const UInt8 STORE_LIST          = 0xDC;// 0xB0
     /**商城购买 */
@@ -698,7 +713,7 @@ namespace REP
     /**仙界传奇*/
     const UInt8 SERVERWAR_ARENA_OP  = 0x4E;
 
-    const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
+    //const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
 
     const UInt8 STORE_LIST          = 0xDC;// 0xB0

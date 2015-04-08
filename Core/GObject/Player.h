@@ -68,6 +68,7 @@ namespace GObject
     class FriendManager ;
     class Fighter;
     class ChatHold;
+    class Clan;
     class Player :
         public GObjectBaseT<Player,IDTYPE>
     {
@@ -172,7 +173,7 @@ namespace GObject
 
             //login
             //inline void setId(IDTYPE id){ _id = id;}
-            //inline IDTYPE getId(){ return _id;}
+            inline IDTYPE getId(){ return _id;}
 
             inline void SetAccounts(std::string accounts) { _accounts = accounts;}
             inline std::string GetAccounts(){return _accounts;}
@@ -196,10 +197,19 @@ namespace GObject
 
             ChatHold* GetChatHold();
 
-            Clan* GetClan(){ return clan;}
+            //Mutex& GetMutex() { return mutex;}
+            std::string getSource() { return NULL;}
+            UInt8 getVipLevel() const { return 1;}
+            UInt8 GetSex() const { return 1;}
+            UInt8 GetLevel() const { return 1;}
+            
+            Clan* GetClan() const { return clan;}
             void SetClan(Clan* cl) { clan = cl;}
             UInt8 GetClanPos(){ return _clanPos;}
             void SetClanPos(UInt8 clanPos){ _clanPos = clanPos;}
+            UInt8 GetFriendMax() const { return _friendMax;}
+            void SetFriendMax(UInt8 num) { _friendMax = num;}
+
             void ChatForWorld(std::string text);
             void ChatForClan(std::string text);
             void ChatForFriend(IDTYPE playerId, std::string text);
@@ -231,6 +241,7 @@ namespace GObject
             VarSystem* m_pVars;
             Package* m_Package;
             FriendManager * m_friendMgr;  //好友
+            UInt8 _friendMax;    //好友上限
             PlayerData _playerData;
             std::string name;
             ChatHold * chatHold;
@@ -255,6 +266,9 @@ extern GlobalPlayers globalOnlinePlayers;
 
 typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
 extern GlobalNamedPlayers globalNamedPlayers;
+
+typedef std::vector<Player* > GlobalPlayerVec;  
+extern GlobalPlayerVec globalPlayerVec;
 //extern GlobalNamedPlayers globalAccountsPlayers;
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;

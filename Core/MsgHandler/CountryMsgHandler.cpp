@@ -16,6 +16,17 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG(GameMsgHdr, OnBattleReportReq);
 
+    MSG_REG(GameMsgHdr, OnFriendListReq);
+
+    MSG_REG(GameMsgHdr, OnFriendFindReq);
+
+    MSG_REG(GameMsgHdr, OnFriendApplyReq);
+
+    MSG_REG(GameMsgHdr, OnFriendAddReq);
+
+    MSG_REG(GameMsgHdr, OnFriendDeleteReq);
+
+    MSG_REG(GameMsgHdr, OnFriendRecommandReq);
     MSG_REG_2(GameMsgHdr, REQ::CHAT, OnChat);
 
     MSG_REG_2(GameMsgHdr, REQ::MAIL, OnMail);

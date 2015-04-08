@@ -47,10 +47,9 @@ CREATE TABLE `var` (
 
 DROP TABLE IF EXISTS `player_id`; 
 CREATE TABLE `player_id` (
-    `id` bigint(10) unsigned NOT NULL DEFAULT 0,
-    `phoneId` bigint(20) unsigned NOT NULL DEFAULT 0,
+    `id` bigint(20) unsigned NOT NULL,
+    `phoneId` varchar(255) NOT NULL DEFAULT '',
     `accounts` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
-    `password` varchar(255) NOT NULL DEFAULT '',   /*密码*/
     /*PRIMARY KEY (`phoneId`,`accounts`)*/
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -83,9 +82,10 @@ CREATE TABLE `fighter` (
 
 DROP TABLE IF EXISTS `friends`; 
 CREATE TABLE `friends` (
+    `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `playerId` bigint(20) unsigned NOT NULL,
     `friendId` bigint(20) unsigned NOT NULL,
-    PRIMARY KEY (`playerId`,`friendId`)
+    PRIMARY KEY (`type`,`playerId`,`friendId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

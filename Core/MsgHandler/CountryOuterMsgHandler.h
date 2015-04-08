@@ -24,6 +24,8 @@
 #include "GObject/Fighter.h"
 
 #include "Battle/BattleReport.h"
+#include "GObject/Friend.h"
+
 struct NullReq
 {
     UInt32 ticket;
@@ -76,6 +78,13 @@ void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
         st << Stream::eos;
         conn->send(&st[0],st.size());
     }
+    //好友信息
+    {
+        Stream st(REQ::FRIEND_LIST);
+        pl->GetFriendManager()->GetAllFriendStream(st);
+        st<< Stream::eos;
+        conn->send(&st[0],st.size());
+    }
 }
 
 void OnEnchantReq(GameMsgHdr& hdr, const void * data)
@@ -96,7 +105,8 @@ void OnEnchantReq(GameMsgHdr& hdr, const void * data)
     st << result; 
     st << Stream::eos;
     player->send(st);
-} 
+}
+
 void OnPackageInfo(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;
@@ -118,6 +128,108 @@ void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
     if(r == NULL)
         return;
     player->send(&(*r)[0], r->size());
+}
+
+struct FriendFindReq
+{
+    std::string _name;
+    MESSAGE_DEF1(REQ::FRIEND_FIND,std::string,_name);
+};
+
+void OnFriendFindReq(GameMsgHdr& hdr,FriendFindReq& ffr)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    Stream st(REQ::FRIEND_FIND);
+    bool res = player->GetFriendManager()->FindFriendByName(ffr._name);
+    st<<static_cast<UInt8>(res);
+    if ( res )
+    {
+       GObject::Player* pl = GObject::globalNamedPlayers[ffr._name];
+       pl->GetSelfInfoStream(st);
+
+    }
+    st<<Stream::eos;
+    player->send(st);
+}
+
+struct FriendApplyReq
+{
+    std::string _name;
+    MESSAGE_DEF1(REQ::FRIEND_APPLY,std::string,_name);
+};
+
+void OnFriendApplyReq( GameMsgHdr& hdr,FriendApplyReq& far)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    if( !player )
+        return;
+    player->GetFriendManager()->ApplyAddFriend(far._name);
+}
+
+struct FriendDelReq
+{
+    std::string _name;
+    MESSAGE_DEF1(REQ::FRIEND_DELETE,std::string,_name);
+};
+
+void OnFriendDeleteReq( GameMsgHdr& hdr,FriendDelReq& fdr)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    if( !player )
+        return;
+    Stream  st(REQ::FRIEND_DELETE);
+    bool res = player->GetFriendManager()->DelFriendByName(fdr._name);
+    st<<(static_cast<UInt8>(res));
+    st<<Stream::eos;
+    player->send(st);
+}
+
+struct FriendRecommandReq
+{
+    MESSAGE_DEF( REQ::FRIEND_RECOMMAND);
+};
+
+void OnFriendRecommandReq(GameMsgHdr& hdr,FriendRecommandReq& frr)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    if( !player )
+        return;
+    player->GetFriendManager()->RecommandFriend();
+}
+
+struct FriendAddReq
+{
+    UInt8 _type;  //0 不同意  1 同意
+    std::string _name;
+    MESSAGE_DEF2( REQ::FRIEND_ADD,UInt8,_type,std::string ,_name);
+};
+
+void OnFriendAddReq( GameMsgHdr& hdr,FriendAddReq& far)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    if( !player )
+        return;
+    if( far._type == 0 )
+        player->GetFriendManager()->RefuseFriend(far._name);
+    else
+        player->GetFriendManager()->AgreeAddFriend(far._name);
+}
+
+
+struct FriendListReq
+{
+    MESSAGE_DEF(REQ::FRIEND_LIST) ;
+};
+
+void OnFriendListReq(GameMsgHdr& hdr,FriendListReq&)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    Stream st(REQ::FRIEND_LIST);
+    player->GetFriendManager()->GetAllFriendStream(st);
+    st << Stream::eos;
+    player->send(st);
 }
 
 void OnChat(GameMsgHdr& hdr, const void * data)

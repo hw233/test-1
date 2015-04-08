@@ -5,6 +5,7 @@
 #include "MsgHandler/MsgTypes.h"
 #include "Server/GlobalObject.h"
 #include "Server/Cfg.h"
+#include "GObject/Var.h"
 #include "MsgID.h"
 #include <event2/buffer.h>
 #include "MsgHandler/JsonParser.h"
@@ -291,6 +292,9 @@ void GameClient::onDisconnected()
 
 	if(pl == NULL)
 		return;
+    pl->setOnline(false);
+    UInt32 now = TimeUtil::Now();
+    pl->SetVar(GObject::VAR_OFF_LINE,now);
 
 	GameMsgHdr hdr(0xFF, WORKER_THREAD_LOGIN, pl, 0);
 
