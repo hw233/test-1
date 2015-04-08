@@ -224,7 +224,7 @@ namespace GObject
             char m_clientIp[256+1];
 
             //Clan
-            UInt8 _clanPos;
+            UInt8 _clanPos;  //职位
 
 
             //功能类
