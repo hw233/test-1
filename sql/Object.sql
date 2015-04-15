@@ -133,5 +133,16 @@ CREATE TABLE `mail` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `govern_offlinegain` ;
+CREATE TABLE `govern_offlinegain` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `itemId` int(10) unsigned NOT NULL DEFAULT '0',
+    `itemNum` bigint(20) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY(`playerId`,`itemId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
 
 

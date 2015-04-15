@@ -34,6 +34,8 @@ namespace GObject
         private:
             static void World_Midnight_Check( World * );
             static void World_Test( World * );
+            static void World_Govern_SendInfo(World *); //每一小时发一组怪物id以及胜负 给客户端 
+            static void World_Govern_SendAward(World *);//每2min客户端自己给玩家发送一次奖励
 
         public:
 

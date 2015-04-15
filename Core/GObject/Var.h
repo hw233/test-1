@@ -35,6 +35,8 @@ namespace GObject
         VAR_CLAN_ENTER = 8, //进入帮派的时间
         VAR_PACKAGE_SIZE = 9,
         VAR_OFF_LINE = 10 ,//最近一次在线时间
+        VAR_GOVERN_SPEEDUP_CNT = 11, //治理加速次数
+        VAR_GOVERN_SPEEDUP_TIME = 12, //加速的时间
         VAR_MAX
     };
 
@@ -76,6 +78,8 @@ namespace GObject
                 REGISTER_VAR(VAR_COUPON , CYCLE_NONE);
                 REGISTER_VAR(VAR_GOLD , CYCLE_NONE);
                 REGISTER_VAR(VAR_OFF_LINE,CYCLE_NONE);
+                REGISTER_VAR(VAR_GOVERN_SPEEDUP_CNT,CYCLE_DAY);
+                REGISTER_VAR(VAR_GOVERN_SPEEDUP_TIME,CYCLE_NONE);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

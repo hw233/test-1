@@ -194,7 +194,10 @@ CREATE TABLE `chance` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
-
-
-
+DROP TABLE `monster`;
+CREATE TABLE `monster`(
+    `id` int(10) NOT NULL DEFAULT '0',
+    `name` varchar(255) NOT NULL,
+    `level` tinyint(3) NOT NULL DEFAULT '0',
+    PRIMARY KEY(`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;

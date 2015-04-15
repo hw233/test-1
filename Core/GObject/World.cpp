@@ -7,11 +7,14 @@
 #include "Battle/BattleManager.h"
 #include "Player.h"
 #include "ChatHold.h"
+#include <time.h>
 
 #define W_CHAT_MAX 20
 
 namespace GObject
 {
+    
+    UInt8 time = 0;
     bool World::Init()
     {
         //chatHold = new ChatHold(W_CHAT_MAX);
@@ -31,6 +34,17 @@ namespace GObject
         AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
 
         AddTimer(86400 * 1000, World_Test, this, 10* 1000);
+        
+        
+        time_t n = now;
+        tm* tt=localtime(&n);
+        UInt8 min = tt->tm_min;
+
+        AddTimer(60*60*1000, World_Govern_SendInfo,this, (60-min)*60*1000);
+
+        UInt8 sec = tt->tm_sec;
+        AddTimer(2*60*1000, World_Govern_SendAward, this, ((TIME_TAB-min%TIME_TAB)*60+sec)* 1000);
+
         return true; 
     }
     void World::UnInit() 
@@ -90,6 +104,34 @@ namespace GObject
             Battle::battleManager.EnterBattleGround(BattleId,pl,i);
         }
         Battle::battleManager.StartGround(BattleId);
-    } 
+    }
+
+    void World::World_Govern_SendInfo(World* world)
+    {
+        for(auto it = GObject::globalOnlinePlayerSet.begin() ; it != GObject::globalOnlinePlayerSet.end() ; ++it)
+        {
+            (*it)->GetGovernManager()->SendGovernResult(0);
+        }
+    }
+
+    void World::World_Govern_SendAward(World* world)
+    {
+        for(auto it = GObject::globalPlayerVec.begin() ; it != GObject::globalPlayerVec.end() ; ++it)
+        {
+            if((*it)->isOnline())
+            {
+                time_t now = TimeUtil::Now();
+                tm* tt=localtime(&now);
+                UInt8 min = tt->tm_min;
+                UInt8 time = (( min%TIME_TAB == 0 )? (min/TIME_TAB):(min/TIME_TAB+1));
+                (*it)->GetGovernManager()->SendOnlineGovernAward(time);
+            }
+            else
+            {
+                (*it)->GetGovernManager()->SendOfflineGovernAward();
+
+            }
+        }
+    }
 
 }

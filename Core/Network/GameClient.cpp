@@ -131,7 +131,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 		0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x30
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, // 0x40
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, // 0x50
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, // 0x60
+		0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, // 0x60
 		1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, // 0x70
 		4, 4, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, // 0x80
 		0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, // 0x90
@@ -295,6 +295,8 @@ void GameClient::onDisconnected()
     pl->setOnline(false);
     UInt32 now = TimeUtil::Now();
     pl->SetVar(GObject::VAR_OFF_LINE,now);
+    pl->GetGovernManager()->Clear();
+    GObject::globalOnlinePlayerSet.erase(pl);
 
 	GameMsgHdr hdr(0xFF, WORKER_THREAD_LOGIN, pl, 0);
 

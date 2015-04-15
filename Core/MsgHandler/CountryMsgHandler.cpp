@@ -27,12 +27,25 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG(GameMsgHdr, OnFriendDeleteReq);
 
     MSG_REG(GameMsgHdr, OnFriendRecommandReq);
+
     MSG_REG_2(GameMsgHdr, REQ::CHAT, OnChat);
 
     MSG_REG_2(GameMsgHdr, REQ::MAIL, OnMail);
+
     MSG_REG_2(GameMsgHdr, REQ::MAIL_GET, OnMailGet);
+
     MSG_REG_2(GameMsgHdr, REQ::MAIL_DELETE, OnMailDelete);
+
     MSG_REG_2(GameMsgHdr, REQ::MAIL_GET_ALL, OnMailGetAll);
+
     MSG_REG_2(GameMsgHdr, REQ::MAIL_DELETE_ALL, OnMailDeleteAll);
+
+    MSG_REG(GameMsgHdr, OnReplaceFighter);
+
+    //MSG_REG_2(GameMsgHdr, REQ::GOVERN_GAIN, OnGovernGain);
+
+    MSG_REG(GameMsgHdr, OnGovernSpeedUp);
+
+    MSG_REG(GameMsgHdr, OnGovernInfo);
 
 MSG_HANDLER_END()

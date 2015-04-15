@@ -39,7 +39,6 @@ namespace GObject
             void RecommandFriend();
 
             void RefuseFriend(std::string& name);
-            
             UInt8 GetFriendNum(eFriendType type);
 
             bool IsInList(eFriendType type,Player *pl);

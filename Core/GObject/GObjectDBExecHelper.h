@@ -130,6 +130,14 @@ namespace GObject
         UInt8 option;
         UInt32 overTime;
     };
+
+    struct DBGovernOffline
+    {
+        UInt64 playerId;
+        UInt32 itemId;
+        UInt32 itemNum;
+    };
+
 }
 namespace DB
 {
@@ -280,6 +288,16 @@ namespace DB
         UInt32, overTime
     )
     SPECIALEND()
+    
+    SPECIALBEGIN(GObject::DBGovernOffline)
+    SPECIALDEF(3)
+    (
+        UInt64, playerId,
+        UInt32, itemId,
+        UInt32, itemNum
+    )
+    SPECIALEND()
+    
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

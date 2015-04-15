@@ -20,6 +20,7 @@
 #include "FVar.h"
 #include "GObject/Friend.h"
 #include "Mail.h"
+
 namespace GObject
 {
     URandom GRND(time(0)); 
@@ -97,7 +98,13 @@ namespace GObject
             fprintf(stderr, "loadMail error!\n");
             std::abort();
         }
+        if(!loadGovernOfflineGain())
+        {
+            fprintf(stderr, "loadGovern OfflienGain error!\n");
+            std::abort();
+        }
     } 
+
     bool GObjectManager::loadAllPlayers()
     { 
         IDTYPE last_id;
@@ -430,6 +437,28 @@ namespace GObject
             mail->LoadMailInfo(mailInfo.id, pl, mailInfo.contextId, mailInfo.items, mailInfo.option, mailInfo.overTime);
             globalMails.add(mailInfo.id, mail);
             pl->AddMail(mailInfo.id,0);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+
+    bool GObjectManager::loadGovernOfflineGain()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Govern offline items");
+        lc.reset(1000);
+        DBGovernOffline governInfo;
+        if(execu->Prepare("SELECT `playerId`,`itemId`,`itemNum` FROM `govern_offlinegain`",governInfo) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Player* pl = globalPlayers[governInfo.playerId];
+            if(!pl)
+                continue;
+            pl->GetGovernManager()->loadGovernOfflineGain(governInfo.itemId,governInfo.itemNum);
             lc.advance();
         }
         lc.finalize();

@@ -16,6 +16,7 @@
 #include "Battle/BattleGround.h"
 #include "ChatHold.h"
 #include "Clan.h"
+#include "Govern.h"
 
 //VAR
 //Package
@@ -69,6 +70,8 @@ namespace GObject
     class Fighter;
     class ChatHold;
     class Clan;
+    class GovernManager; //治理
+
     class Player :
         public GObjectBaseT<Player,IDTYPE>
     {
@@ -222,6 +225,8 @@ namespace GObject
             UInt8 ReciveMail();
 
             void ListMail(Stream& st);
+
+            GovernManager* GetGovernManager() const { return m_governManager;}
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -258,6 +263,9 @@ namespace GObject
             std::map<UInt32, Fighter *> _fighters;
 
             std::list<UInt32> _mailList;
+
+            //治理相关
+            GovernManager* m_governManager;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
@@ -273,6 +281,9 @@ extern GlobalPlayerVec globalPlayerVec;
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;
 extern GlobalClans globalClan;
+
+typedef std::set<Player*> GlobalOnlinePlayerSet;
+extern GlobalOnlinePlayerSet globalOnlinePlayerSet;
 }
 #endif // PLAYER_H_
 

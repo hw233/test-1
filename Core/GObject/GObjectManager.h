@@ -29,7 +29,8 @@ namespace GObject
             static bool loadItem(); 
             static bool loadClan(); 
             static bool loadClanPlayer(); 
-            static bool loadMail(); 
+            static bool loadMail();
+            static bool loadGovernOfflineGain();  //加载治理离线时的奖励信息
 
             static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
             static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现

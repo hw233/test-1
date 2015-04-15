@@ -46,13 +46,14 @@ namespace GObject
         FVAR_SKILL4_LEVEL = 17,    //
         FVAR_SKILL5_LEVEL = 18,    //
 
-        FVAR_HP ,        //最大血量
-        FVAR_ATTACK ,    //物理攻击力
-        FVAR_DEFEND ,    //物理防御力
-        FVAR_MGCATK ,    //魔法攻击力
-        FVAR_MGCDEF ,    //魔法防御力
-        FVAR_CRITICAL ,    //暴击
-        FVAR_EVADE ,    //闪避
+        FVAR_HP           = 19,    //最大血量
+        FVAR_ATTACK       = 20,    //物理攻击力
+        FVAR_DEFEND       = 21,    //物理防御力
+        FVAR_MGCATK       = 22,    //魔法攻击力
+        FVAR_MGCDEF       = 23,    //魔法防御力
+        FVAR_CRITICAL     = 24,    //暴击
+        FVAR_EVADE        = 25,    //闪避
+        FVAR_AFFAIRS_STATUS = 26,  //内政的状态  0 空闲  1 治理 2 开垦 3 
 
         FVAR_MAX
     };
@@ -98,6 +99,7 @@ namespace GObject
             REGISTER_FVAR(FVAR_MGCDEF, FCYCLE_NONE);
             REGISTER_FVAR(FVAR_CRITICAL, FCYCLE_NONE);
             REGISTER_FVAR(FVAR_EVADE, FCYCLE_NONE);
+            REGISTER_FVAR(FVAR_AFFAIRS_STATUS, FCYCLE_NONE);
         }
 
         UInt32 GetFVar(UInt32 id, UInt32 now = 0);

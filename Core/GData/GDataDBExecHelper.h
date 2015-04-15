@@ -139,6 +139,13 @@ namespace GData
         UInt8 floor;
         std::string info;
     };
+
+    struct DBMonster
+    {
+        UInt32 id;
+        std::string name;
+        UInt8 lev;
+    };
 }
 namespace DB
 {
@@ -304,5 +311,13 @@ namespace DB
         )
         SPECIALEND()
 
+       SPECIALBEGIN(GData::DBMonster)
+       SPECIALDEF(3)
+       (
+          UInt32, id,
+          std::string, name,
+          UInt8, lev
+       )
+       SPECIALEND()
 }
 #endif

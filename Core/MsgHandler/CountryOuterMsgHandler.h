@@ -121,6 +121,7 @@ struct BattleReportReq
     UInt32 _reportId;
     MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
 };
+
 void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
 {
     MSG_QUERY_PLAYER(player);
@@ -317,7 +318,44 @@ void OnMailDeleteAll(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;
     player->DeleteMail();
-} 
+}
+
+struct ReplaceFighterReq
+{
+    UInt16 fighterId;
+    MESSAGE_DEF1(REQ::GOVERN_REPLACE,UInt16,fighterId);
+};
+
+void OnReplaceFighter(GameMsgHdr& hdr,ReplaceFighterReq& rfr)
+{
+    MSG_QUERY_PLAYER(player) ;
+    GObject::Fighter* ft = player->findFighter(rfr.fighterId);
+    if( ft == NULL )
+        return;
+    player->GetGovernManager()->ReplaceFighter(ft);
+}
+
+struct GovernSpeedUpReq
+{
+    MESSAGE_DEF(REQ::GOVERN_SPEEDUP);
+};
+
+void OnGovernSpeedUp(GameMsgHdr& hdr, GovernSpeedUpReq& gsr)
+{
+    MSG_QUERY_PLAYER(player);
+    player->GetGovernManager()->SpeedUp();
+}
+
+struct GovernInfoReq
+{
+    MESSAGE_DEF(REQ::GOVERN_INFO);
+};
+
+void OnGovernInfo(GameMsgHdr& hdr, GovernInfoReq& gir)
+{
+    MSG_QUERY_PLAYER(player);
+    player->GetGovernManager()->SendGovernInfo();
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

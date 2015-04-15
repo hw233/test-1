@@ -173,6 +173,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             //strncpy (domain, player->getDomain(), 256);
             //player->setClientIp(clientIp);
             GObject::globalOnlinePlayers.add(player);
+            GObject::globalOnlinePlayerSet.insert(player);
             UInt8 flag = 0;
             GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
             GLOBAL().PushMsg(imh, &flag);

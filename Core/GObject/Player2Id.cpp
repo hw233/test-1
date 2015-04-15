@@ -28,24 +28,20 @@ IDTYPE Player2Id::getPlayerId(const std::string& phoneId ,const std::string& acc
     //std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
     //std::map<MapKey , IDTYPE>::iterator it = _map.begin();//find(MapKey(phoneId,accounts));
     MapKey mk = MapKey(phoneId,accounts);
-    std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
-    if( it != _map.end())
-    {
-        return it->second;
-    }
-    //std::map<MapKey ,IDTYPE>::iterator it = _map.begin();
-    /*
+    //std::map<MapKey , IDTYPE>::iterator it = _map.find(MapKey(phoneId,accounts));
+    //if( it != _map.end())
+    //{
+    //    return it->second;
+    //}
+    std::map<MapKey ,IDTYPE>::iterator it = _map.begin();
     while( it != _map.end())
     {
-        std::cout<<"the id is "<< (it->first)<<"  "<<(it->second)<<std::endl;
         if( it->first == mk )
         {
-            std::cout<<"the id = "<<it->second<<std::endl;
             return it->second;
         }
         ++it;
     }
-    */
     return 0;
 } 
 

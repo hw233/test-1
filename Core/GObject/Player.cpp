@@ -14,6 +14,8 @@ namespace GObject
     GlobalNamedPlayers globalNamedPlayers;
     GlobalPlayerVec globalPlayerVec;
     GlobalClans globalClan;
+    GlobalOnlinePlayerSet globalOnlinePlayerSet;
+
     //GlobalNamedPlayers globalAccountsPlayers;
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10)
     {
@@ -22,6 +24,7 @@ namespace GObject
         m_friendMgr = new FriendManager(this);
         chatHold = NULL;
         clan = NULL;
+        m_governManager = new GovernManager(this);
     }
 
     bool enum_send_chat(Player *pl , void * ptr)

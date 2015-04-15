@@ -13,6 +13,8 @@
 #include "GData/SkillTable.h"
 #include "GObject/Fighter.h"
 #include "GData/Map.h"
+#include "GObject/Monster.h"
+#include "Common/LoadingCounter.h"
 
 namespace GData
 {
@@ -75,6 +77,11 @@ namespace GData
         if (!LoadMapInfo())  
         {
             fprintf(stderr, "Load LoadMapInfo Error !\n");
+            std::abort();
+        }
+        if (!LoadMonster())  
+        {
+            fprintf(stderr, "Load LoadMonster Error !\n");
             std::abort();
         }
 
@@ -302,6 +309,26 @@ namespace GData
         }
         return true;
     } 
+
+
+    bool GDataManager::LoadMonster()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Monster");
+        lc.reset(1000);
+        DBMonster monsterInfo;
+        if(execu->Prepare("SELECT `id`,`name`,`level` FROM `monster`", monsterInfo) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.name,monsterInfo.lev);
+            GObject::monsterTable.InsertMonster(mon);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
 }
 
 
