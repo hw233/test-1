@@ -47,5 +47,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG(GameMsgHdr, OnGovernSpeedUp);
 
     MSG_REG(GameMsgHdr, OnGovernInfo);
+    MSG_REG_2(GameMsgHdr, REQ::CLAN_CREATE, OnClanCreate);
+    MSG_REG_2(GameMsgHdr, REQ::CLAN_FLASH, OnClanFlash);
+    MSG_REG_2(GameMsgHdr, REQ::CLAN_OPTION, OnClanOption);
 
 MSG_HANDLER_END()

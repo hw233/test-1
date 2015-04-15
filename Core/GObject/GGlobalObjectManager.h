@@ -114,6 +114,7 @@ public:
 				return;
 		}
 	}
+    
 	template<typename _CBT, typename _PT , typename _PT2>
 	void enumerate(_CBT cb, _PT param , _PT2 param2)
 	{

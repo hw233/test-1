@@ -106,7 +106,9 @@ namespace GObject
     {
         UInt32 clanId;
         std::string name;
+        UInt8 picIndex;
         std::string announcement;
+        std::string announcement2;
         UInt64 creater; 
         UInt64 leader; 
         UInt8 level;
@@ -138,6 +140,12 @@ namespace GObject
         UInt32 itemNum;
     };
 
+    struct DBClanApply
+    {
+        UInt32 clanId;
+        UInt64 playerId; 
+        UInt32 time;
+    };
 }
 namespace DB
 {
@@ -253,11 +261,13 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBClan)
-    SPECIALDEF(8)
+    SPECIALDEF(10)
     (
         UInt32, clanId,
         std::string, name,
+        UInt8, picIndex,
         std::string, announcement,
+        std::string, announcement2,
         UInt64, creater,
         UInt64, leader,
         UInt8, level,
@@ -297,7 +307,15 @@ namespace DB
         UInt32, itemNum
     )
     SPECIALEND()
-    
+
+    SPECIALBEGIN(GObject::DBClanApply)
+    SPECIALDEF(3)
+    (
+        UInt32, clanId,
+        UInt64, playerId,
+        UInt32, time
+    )
+    SPECIALEND()
 }
 
 #endif // _GOBJECTDBEXECHELPER_H_

@@ -19,19 +19,20 @@ namespace GObject
     {
         public:
             Clan(UInt32 id, std::string name, Player* creater);//:_name(name),_creater(creater),_personMax(30){}
-            void LoadPlayer(Player* pl);
-            void LoadClanInfo(Player* leader, std::string announcement, UInt8 personMax );
+            void LoadPlayer(Player* pl,UInt8 flag = 0);
+            void LoadClanInfo(Player* leader, std::string announcement, std::string announcement2, UInt8 personMax );
             ChatHold * GetChatHold();
 
             std::string GetName(){ return _name;}
             std::string GetAnnouncement() { return _announcement;}
+            std::string GetAnnouncement2() { return _announcement2;}
             Player* GetCreater(){return _creater;}
 //          void SetLeader(Player* leader){ _leader = leader;}
             Player* GetLeader(){ return _leader;}
 
             UInt8 GetPersonMax(){ return _personMax;}
 
-            UInt8 Apply(Player* pl);
+            UInt8 Apply(Player* pl,UInt8 update = 0);
             UInt8 Allow(Player* pl, UInt8 type = 0);
             UInt8 DelMember(Player* pl);
             std::vector<Player*>::iterator HasMember(Player* pl);
@@ -41,6 +42,12 @@ namespace GObject
             void SetLevel(UInt8 lev){ _level = lev;}
             UInt8 GetLevel(){return _level;}
             void GetClanInfo(Stream& st);
+            void GetClanInfo2(Stream& st);
+            UInt32 GetId(){ return _id;}
+            void SetPicIndex(UInt8 picIndex){_picIndex = picIndex;}
+            UInt8 GetPicIndex(){return _picIndex;}
+            UInt8 GetPosCount(UInt8 pos);
+            UInt8 IsTheFounder(Player * pl){ return !(pl == _creater);}
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;
@@ -48,7 +55,9 @@ namespace GObject
 
             UInt32 _id;
             std::string _name;
+            UInt8 _picIndex;
             std::string _announcement;
+            std::string _announcement2;
 
             UInt8 _level;
 
