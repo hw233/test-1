@@ -9,32 +9,32 @@
 
 namespace GObject
 {
-    struct ASCOORD
+    struct Ascoord
     {
 	    int _x;
 	    int _y;
 
-	    ASCOORD()
+	    Ascoord()
 	    {
 	    }
 	
-	    ASCOORD(int x,int y):
+	    Ascoord(int x,int y):
 		    _x(x),
 		    _y(y)
 	    {
 	    }
 
-	    inline bool operator == (const ASCOORD& coord)const
+	    inline bool operator == (const Ascoord& coord)const
 	    {
 		    return this->_x == coord._x && this->_y == coord._y;
 	    }
 
-	    inline bool operator != (const ASCOORD& coord)const
+	    inline bool operator != (const Ascoord& coord)const
 	    {
 		    return this->_x != coord._x || this->_y != coord._y;
 	    }
 
-	    inline void operator += (const ASCOORD& coord)
+	    inline void operator += (const Ascoord& coord)
 	    {
 		    this->_x += coord._x ;
 		    this->_y += coord._y;
@@ -46,14 +46,14 @@ namespace GObject
 	    UInt16 _h;
 	    UInt16 _g;
 
-	    ASCOORD _coord;
-	    ASCOORD _parentCoord;
+	    Ascoord _coord;
+	    Ascoord _parentCoord;
 
 	    StepData()
 	    {
 	    }
 
-	    StepData(const ASCOORD& coord):
+	    StepData(const Ascoord& coord):
 		    _coord(coord)
 	    {
 	    }
@@ -68,46 +68,46 @@ namespace GObject
 
 	    bool ComputeRoute();
 
-	    bool GetRoute(std::vector<ASCOORD>* list);
+	    bool GetRoute(std::vector<Ascoord>* list);
 
-	    void SetObstacle(const ASCOORD& coord);
+	    void SetObstacle(const Ascoord& coord);
 
-	    void CancleObstacle(const ASCOORD& coord);
+	    void CancleObstacle(const Ascoord& coord);
 
 	    void ClearObstacles();
 
-	    bool IsObstacle(const ASCOORD& coord);
+	    bool IsObstacle(const Ascoord& coord);
 	
-	    void  SetStart(const ASCOORD& coord)  {m_start  = coord;}
-	    void  SetTarget(const ASCOORD& coord) {m_target = coord;}
-	    const ASCOORD& GetStart()            {return m_start;}
-	    const ASCOORD& GetTarget()           {return m_target;}
+	    void  SetStart(const Ascoord& coord)  {m_start  = coord;}
+	    void  SetTarget(const Ascoord& coord) {m_target = coord;}
+	    const Ascoord& GetStart()            {return m_start;}
+	    const Ascoord& GetTarget()           {return m_target;}
         void  SetMap(UInt8* map);
 
     private:
         UInt8*  m_map;
 
-	    ASCOORD m_target;
-	    ASCOORD m_start;
+	    Ascoord m_target;
+	    Ascoord m_start;
 
         UInt8   m_row;
         UInt8   m_col;
 
 	    UInt8   m_numSurround;
 	    UInt8   m_gAdd[6];
-	    ASCOORD m_surround[6];  //正六边形
+	    Ascoord m_surround[6];  //正六边形
 	
 	    std::list<StepData> m_openList;
 	    std::list<StepData> m_closeList;
 	
 	    bool popBestStep(StepData* pSD); 
-	    bool isInList(std::list<StepData>& list, const ASCOORD& coord);
-	    bool judgeSurround(const ASCOORD& coord,const ASCOORD& parentCoord, UInt8 G);
+	    bool isInList(std::list<StepData>& list, const Ascoord& coord);
+	    bool judgeSurround(const Ascoord& coord,const Ascoord& parentCoord, UInt8 G);
 
-	    StepData* findFromList(std::list<StepData>& list, const ASCOORD& coord);
+	    StepData* findFromList(std::list<StepData>& list, const Ascoord& coord);
 
-	    UInt8 computeH(const ASCOORD& coord) {return abs(m_target._x-coord._x)*10 + abs(m_target._y-coord._y)*10;}
-        void getAround(ASCOORD& coord);
+	    UInt8 computeH(const Ascoord& coord) {return abs(m_target._x-coord._x)*10 + abs(m_target._y-coord._y)*10;}
+        void getAround(Ascoord& coord);
     };
 }
 #endif

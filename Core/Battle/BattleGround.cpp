@@ -59,6 +59,7 @@ namespace Battle
             for(UInt8 j = 0; j < st.count(); ++j)
             { 
                 UInt8 value = static_cast<UInt8>(::atoi(st[j].c_str()));
+                _mapGround[j*2+flag + i*_x] = value;
                 std::cout << "坐标：" << static_cast<UInt32>(j*2+flag)<<" , " << static_cast<UInt32>(i) << "地形" << static_cast<UInt32>(value)<<std::endl;
             } 
         } 
@@ -283,6 +284,18 @@ namespace Battle
         currentBf = NULL;
     }
 
+
+    bool MoreFit(attackInfo info1, attackInfo info2)
+    {
+        if( info1.pri > info2.pri )
+            return true;
+        else if( info1.size < info2.size)
+            return true;
+        else
+            return false;
+
+    }
+
     void BattleGround::GetNearPos(UInt8 ride, const UInt8& x,const UInt8& y,UInt8 flag)
     {
         static UInt8 priority [4][4] = {
@@ -292,11 +305,11 @@ namespace Battle
             {1,2,3,4}
         };
         //在行动力力加攻击范围所达的距离内寻找要攻击的目标坐标  放入数组中
-        std::vector<GObject::ASCOORD> vecScoord;
+        std::vector<GObject::Ascoord> vecScoord;
         UInt8 i=0;
         UInt8 j=0;
         UInt8 distance = currentBf->GetDistance()*2;
-        if(distance > 5)
+        if( distance > 5 )
             return;
 		UInt8 scale = ride + distance ;
         for(j = y > scale ? (y-scale):0 ; j < y+scale ; ++j)
@@ -320,103 +333,63 @@ namespace Battle
                    continue;
                if( step != 2 )
                    step = 2;
-               vecScoord.push_back(GObject::ASCOORD(i,j));
+               vecScoord.push_back(GObject::Ascoord(i,j));
             }
         }
-        std::reverse(vecScoord.begin(),vecScoord.end());
         //然后对每一个攻击目标用A*算法求最优的路径
-		_astar.SetStart(GObject::ASCOORD(x,y));
-
-
-        //假定最优的是第一个的
-        while(!vecScoord.empty())
+		_astar.SetStart(GObject::Ascoord(x,y));
+        std::vector<attackInfo> vecInfo;
+        for( auto it =vecScoord.begin();it != vecScoord.end() ; ++it)
         {
-            
-            GObject::ASCOORD coord = vecScoord.back();  
-            _astar.SetTarget(coord);
-            std::vector<GObject::ASCOORD> Path;
-            Path.clear();
+            GObject::Ascoord target = (*it);
+            _astar.SetTarget(target);
+            std::vector<GObject::Ascoord> path;
             _astar.ComputeRoute();
-            _astar.GetRoute(&Path);
-            std::reverse(Path.begin(),Path.end());
-            if( Path.size() < 2)
-            {
-                
-                vecScoord.pop_back();
-                continue;
-            }
-            else
-            {
-                _target = GetGoalPointInfo(Path,ride);
-                vecScoord.pop_back();
-                break;
-            }
+            _astar.GetRoute(&path);
+            struct attackInfo info;
+            info.size = path.size();
+            info.pri  = priority[currentBf->getClass()-1][_mapFighters[target._x+target._y*_x]->getClass()-1];
+            info.target = target;
+            vecInfo.push_back(info);
         }
-        if(vecScoord.empty())
+        if( !vecInfo.empty())
         {
-            _target = TargetInfo(static_cast<BattleFighter *>(NULL),0,0,0,0,0xFF);
-            return;
-        }
-
-        //从这一堆中找到最优的点
-        while(!vecScoord.empty())
-        {
-            GObject::ASCOORD coord = vecScoord.back();  
-            _astar.SetTarget(coord);
-            std::vector<GObject::ASCOORD> Path;
-            Path.clear();
-            _astar.ComputeRoute();
-            _astar.GetRoute(&Path);
-            std::reverse(Path.begin(),Path.end());
-
-             TargetInfo info = GetGoalPointInfo(Path,ride);
-             if(info.size < _target.size && info.bo != _target.bo )  //比较距离
-             {
-                     _target = info;
-                     vecScoord.pop_back();
-             }
-             else if( priority[currentBf->getClass()-1][_target.bo->getClass()-1] < priority[currentBf->getClass()-1][info.bo->getClass()-1])    //比较优先级
-             {
-                     _target = info;
-                     vecScoord.pop_back();
-             }
-             else
-             {
-                 vecScoord.pop_back();
-             }
-        }
-    }
-
-
-    TargetInfo BattleGround:: GetGoalPointInfo(std::vector<GObject::ASCOORD> path, UInt8 ride)
-    {
-        UInt8 sz = 0xFF;
-        GObject::ASCOORD gp = path[path.size()-1];
-        GObject::ASCOORD np;
-        if( path.size() < 2)
-        {
-
-        }
-        else if(path.size() == 2 )
-        {
-            np = path[0];
-            sz = 0;
-        }
-        else if( path.size() > static_cast<UInt32>(2) && path.size() <=  static_cast<UInt32>(ride+2))
-        {
-             GObject::ASCOORD tmp = path[ride-2];
-             np = tmp;
-             sz = path.size()-2;
+            std::sort(vecInfo.begin(),vecInfo.end(),MoreFit);
+            GObject::Ascoord target = vecInfo.front().target;
+            _target = makeTarget(target,ride);
         }
         else
         {
-            GObject::ASCOORD tmp = path[ride];
-            np = tmp;
-            sz = ride;
+            _target = TargetInfo();  //默认的  全是零
         }
-        return TargetInfo(static_cast<BattleFighter *>(_mapFighters[gp._x + gp._y*_x]),np._x,np._y,gp._x,gp._y,sz);
     }
 
+    TargetInfo BattleGround::makeTarget(GObject::Ascoord target,UInt8 ride)
+    {
+        GObject::Ascoord start = _astar.GetStart();
+        _astar.SetTarget(target);
+        std::vector<GObject::Ascoord> path;
+        _astar.ComputeRoute();
+        _astar.GetRoute(&path);
+        UInt8 range = currentBf->GetDistance()*2 + ride; 
+
+        BattleFighter* ft = static_cast<BattleFighter*>(_mapFighters[target._x + target._y*_x]);
+        if( path.size()  == 2 )
+        {
+           //站在现有位置就可以攻击到目标
+           return TargetInfo(ft,start._x,start._y,target._x,target._y);
+        }
+        else if( static_cast<UInt8>(path.size()) > range+1 )  //攻击路径比较长  
+        {
+            GObject::Ascoord goal = path[ride];
+            return TargetInfo(ft,goal._x,goal._y,target._x,target._y);
+        }
+        else
+        {
+            GObject::Ascoord goal = path[path.size()-currentBf->GetDistance()*2];
+            return TargetInfo(ft,goal._x,goal._y,target._x,target._y);
+        }
+    }
     /* 
     void BattleGround::GetNearPos(UInt8 ride ,const UInt8& x ,const UInt8& y , UInt8 flag)
     { 
@@ -503,7 +476,9 @@ namespace Battle
     void BattleGround::Fight(BattleFighter *bf , BattleFighter * bo, UInt8& result, UInt32& BattleReport)
     { 
         //TODO   连接BattleSimulator
-        BattleSimulator bsim(bf,bo);
+        //添加一个实际的攻击距离
+        UInt8 distance = GetFactAttackDis();
+        BattleSimulator bsim(bf,bo,distance);
         bsim.start(); 
         result = bsim.GetWin();
         BattleReport = bsim.getId();
@@ -664,5 +639,26 @@ namespace Battle
             } 
         } 
     } 
+
+    UInt8 BattleGround::GetFactAttackDis()
+    {
+        if( _target.bo == NULL )
+            return 1;
+        //TODO  如果是弓兵 判断攻击点和目标点连线上是否有障碍物
+        UInt8 dis = currentBf->GetDistance();
+        UInt8 ax  = _target.ax;
+        UInt8 ay  = _target.ay;
+        UInt8 gx  = _target.gx;
+        UInt8 gy  = _target.gy;
+        UInt8 factDis = sqrt((ax-gx)*(ax-gx)+(ay-gy)*(ay-gy));
+        if(dis >= factDis)
+        {
+            return factDis;
+        }
+        else
+        {
+            return dis;
+        }
+    }
 
 }

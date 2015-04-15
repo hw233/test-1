@@ -8,30 +8,30 @@ namespace GObject
 	    for(UInt8 i = 0 ; i<6 ; ++i)
         {
 		    m_gAdd[i] = 10;
-            m_surround[i] = ASCOORD(0,0);
+            m_surround[i] = Ascoord(0,0);
         }
 	    ClearObstacles();
     }
 
-    void AStar::getAround(ASCOORD& coord)
+    void AStar::getAround(Ascoord& coord)
     {
         if(coord._y%2 == 0 )
         {
-            m_surround[0] = ASCOORD(coord._x-1,coord._y);
-            m_surround[1] = ASCOORD(coord._x+1,coord._y);
-            m_surround[2] = ASCOORD(coord._x,coord._y+1);
-            m_surround[3] = ASCOORD(coord._x+1,coord._y+1);
-            m_surround[4] = ASCOORD(coord._x,coord._y-1);
-            m_surround[5] = ASCOORD(coord._x-1,coord._y-1);
+            m_surround[0] = Ascoord(coord._x-1,coord._y);
+            m_surround[1] = Ascoord(coord._x+1,coord._y);
+            m_surround[2] = Ascoord(coord._x,coord._y+1);
+            m_surround[3] = Ascoord(coord._x+1,coord._y+1);
+            m_surround[4] = Ascoord(coord._x,coord._y-1);
+            m_surround[5] = Ascoord(coord._x-1,coord._y-1);
         }
         else
         {
-            m_surround[0] = ASCOORD(coord._x-1,coord._y);
-            m_surround[1] = ASCOORD(coord._x+1,coord._y);
-            m_surround[2] = ASCOORD(coord._x-1,coord._y+1);
-            m_surround[3] = ASCOORD(coord._x,coord._y+1);
-            m_surround[4] = ASCOORD(coord._x-1,coord._y-1);
-            m_surround[5] = ASCOORD(coord._x,coord._y-1);
+            m_surround[0] = Ascoord(coord._x-1,coord._y);
+            m_surround[1] = Ascoord(coord._x+1,coord._y);
+            m_surround[2] = Ascoord(coord._x-1,coord._y+1);
+            m_surround[3] = Ascoord(coord._x,coord._y+1);
+            m_surround[4] = Ascoord(coord._x-1,coord._y-1);
+            m_surround[5] = Ascoord(coord._x,coord._y-1);
         }
     }
 
@@ -58,7 +58,7 @@ namespace GObject
 		    popBestStep(&sd);
 		    m_closeList.push_back(sd);
 
-		    ASCOORD coord;
+		    Ascoord coord;
 		
 		    for(UInt8 i = 0 ; i<m_numSurround ; ++i)
 		    {
@@ -75,7 +75,7 @@ namespace GObject
     
 
     //G值  即起点到当前节点的消耗
-    bool AStar::judgeSurround(const ASCOORD& coord,const ASCOORD& parentCoord,UInt8 G)
+    bool AStar::judgeSurround(const Ascoord& coord,const Ascoord& parentCoord,UInt8 G)
     {
 	    if(coord._x>=0 && coord._x< m_col && coord._y>=0 && coord._y< m_row && !isInList(m_closeList,coord) /*&& !IsObstacle(coord)*/)
 	    {
@@ -144,7 +144,7 @@ namespace GObject
     }
    
     //判断是否在列表中
-    bool AStar::isInList(std::list<StepData>& list,const ASCOORD& coord)
+    bool AStar::isInList(std::list<StepData>& list,const Ascoord& coord)
     {
 	    std::list<StepData>::iterator       i   = list.begin();
 	    std::list<StepData>::const_iterator end = list.end();
@@ -161,7 +161,7 @@ namespace GObject
 
 
     //从列表中找到某一点
-    StepData* AStar::findFromList(std::list<StepData>& list, const ASCOORD& coord)
+    StepData* AStar::findFromList(std::list<StepData>& list, const Ascoord& coord)
     {
 	    std::list<StepData>::iterator       i   = list.begin();
 	    std::list<StepData>::const_iterator end = list.end();
@@ -178,7 +178,7 @@ namespace GObject
     }
     
     //找到这条路径
-    bool AStar::GetRoute(std::vector<ASCOORD> *list)
+    bool AStar::GetRoute(std::vector<Ascoord> *list)
     {
 	    list->clear();
 
@@ -224,7 +224,7 @@ namespace GObject
 	    return true;
     }
 
-    bool AStar::IsObstacle(const ASCOORD& coord)
+    bool AStar::IsObstacle(const Ascoord& coord)
     {
         return m_map[coord._x + coord._y * m_row ] != 0 ;
     }

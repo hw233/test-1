@@ -55,12 +55,20 @@ namespace Battle
         BattleFighter * bo;
         UInt8 ax;  //进攻点 一个行动力
         UInt8 ay;  
-        UInt8 gx;  //要攻击的目标点
+        UInt8 gx;  //目标点
         UInt8 gy;  
         UInt8 size;  //攻击路径的长度
-        TargetInfo():bo(NULL),ax(0),ay(0),gx(0),gy(0),size(0xFF) {}
-        TargetInfo(BattleFighter * bf,UInt8 x1,UInt8 y1,UInt8 x2,UInt8 y2,UInt8 s):bo(bf),ax(x1),ay(y1),gx(x2),gy(y2),size(s) {}
-        void clear(){bo = NULL; ax=0; ay =0;gx=0;gy=0;size=0xFF;}
+        TargetInfo():bo(NULL),ax(0),ay(0),gx(0),gy(0) {}
+        TargetInfo(BattleFighter * bf,UInt8 x1,UInt8 y1,UInt8 x2,UInt8 y2):bo(bf),ax(x1),ay(y1),gx(x2),gy(y2) {}
+        void clear(){bo = NULL; ax=0; ay =0;gx=0;gy=0;}
+    };
+
+
+    struct attackInfo
+    {
+       UInt8 size; //路径的长度
+       UInt8 pri;  //优先级
+       GObject::Ascoord target;
     };
 
     class BattleGround
@@ -102,7 +110,9 @@ namespace Battle
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
-            TargetInfo GetGoalPointInfo(std::vector<GObject::ASCOORD> path,UInt8 ride);
+            TargetInfo GetGoalAscoordInfo(std::vector<GObject::Ascoord> path,UInt8 ride);
+            UInt8 GetFactAttackDis();
+            TargetInfo makeTarget(GObject::Ascoord traget,UInt8 ride);
         private:
             UInt32 _id;
             UInt8 _x;
