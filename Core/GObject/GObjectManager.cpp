@@ -35,6 +35,9 @@ namespace GObject
         //std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
         execu->Extract("SELECT max(`id`) FROM `mail`", maxId);
         IDGenerator::gMailOidGenerator.Init(maxId);
+
+        execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
+        IDGenerator::gClanOidGenerator.Init(maxId);
         return true;
     }
     void GObjectManager::loadAllData()
@@ -361,7 +364,7 @@ namespace GObject
         LoadingCounter lc("Loading Clan");
         lc.reset(1000);
         DBClan clan;
-        if(execu->Prepare("SELECT `clanId`,`name`,`announcement`,`creater`,`leader`,`level`,`contribute`,`personMax` FROM `clan`", clan) != DB::DB_OK)
+        if(execu->Prepare("SELECT `clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax` FROM `clan`", clan) != DB::DB_OK)
             return false;
         Player* creater = NULL;
         Player* leader = NULL;
@@ -376,7 +379,9 @@ namespace GObject
             leader = globalPlayers[clan.leader];
             if(!leader)
                 continue;
-            pclan->LoadClanInfo(leader, clan.announcement, clan.personMax);
+            pclan->LoadClanInfo(leader, clan.announcement,clan.announcement2, clan.personMax);
+            pclan->SetLevel(clan.level);
+            pclan->SetPicIndex(clan.picIndex);
             globalClan.add(clan.clanId, pclan);
             
             lc.advance();
@@ -401,6 +406,8 @@ namespace GObject
             //if(ap.playerId != last_id)
             if(last_clanId != clanp.clanId)
                 clan = globalClan[clanp.clanId];
+            if(!clan)
+                continue;
             Player* player = globalPlayers[clanp.playerId];
             clan->LoadPlayer(player);
             player->SetClanPos(clanp.position);
@@ -436,6 +443,33 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadClanApply()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading ClanApply");
+        lc.reset(1000);
+        DBClanApply clanApply;
+        if(execu->Prepare("SELECT `clanId`,`playerId`,`time` FROM `player_apply_clan`", clanApply) != DB::DB_OK)
+            return false;
+        Clan * clan = NULL;
+        UInt32 last_clanId = 0;
+        while(execu->Next() == DB::DB_OK)
+        {
+            //if(ap.playerId != last_id)
+            if(last_clanId != clanApply.clanId)
+                clan = globalClan[clanApply.clanId];
+            if(!clan)
+                continue;
+            Player* player = globalPlayers[clanApply.playerId];
+            if(!player)
+                continue;
+            clan->Apply(player,1);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
     //关于equipment的提取，
     /*
        ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )

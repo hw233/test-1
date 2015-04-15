@@ -101,7 +101,9 @@ DROP TABLE IF EXISTS `clan`;
 CREATE TABLE `clan` (
     `clanId` int(10) unsigned NOT NULL DEFAULT '0',
     `name` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `picIndex` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `announcement` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
+    `announcement2` varchar(255) NOT NULL DEFAULT '',   /*帐号*/
     `creater` bigint(20) unsigned NOT NULL,
     `leader` bigint(20) unsigned NOT NULL,
     `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -132,6 +134,13 @@ CREATE TABLE `mail` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `player_apply_clan`; 
+CREATE TABLE `player_apply_clan` (
+    `clanId` int(10) unsigned NOT NULL DEFAULT '0',
+    `playerId` bigint(20) unsigned NOT NULL,
+    `time` int(10) unsigned NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

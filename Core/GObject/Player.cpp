@@ -4,6 +4,7 @@
 #include "Mail.h"
 #include "Common/StringTokenizer.h"
 #include "MsgID.h"
+#include "Server/OidGenerator.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -166,7 +167,14 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
-        SendClanListinfo();
+        SendClanListinfo(REP::CLAN_LIST);
+        if(GetClan())
+        {
+            Stream st(REP::CLAN_INFO);
+            GetClan()->GetClanInfo2(st);
+            st << Stream::eos;
+            send(st);
+        }
     } 
     void Player::PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId)
     { 
@@ -373,12 +381,15 @@ namespace GObject
         return 0;
     } 
 
-    void Player::ListMail(Stream& st)
+    void Player::ListMail(Stream& st, UInt16 index)
     { 
         std::list<UInt32>::iterator it = _mailList.begin();
+        if(index >= _mailList.size())
+            return ;
         size_t offset = st.size();
         UInt16 count = 0;
         st << static_cast<UInt16>(count);//(_mailList.size());
+        std::advance(it,index);
         for(;it!=_mailList.end();++it)
         { 
             Mail* mail = globalMails[*it];
@@ -403,23 +414,25 @@ namespace GObject
             }
             st << static_cast<UInt32>(mail->GetOverTime());
             ++count;
+            if(count >= MAIL_LIST_MAX)
+                break;
         } 
         st.data<UInt16>(offset) = count;
     } 
-    bool GetClanListInfo(Clan* cl, Stream& st)
+    bool GetClanListInfo(Clan* cl, Stream* st)
     { 
         if(!cl)
             return true;
-        cl->GetClanInfo(st);
+        cl->GetClanInfo(*st);
         return true;
     } 
-    void Player::SendClanListinfo()
+    void Player::SendClanListinfo(const UInt8 StreamHand)
     { 
-        Stream st(REP::CLAN_LIST);
+        Stream st(StreamHand);
         //UInt8 count = 0;
         //size_t offect = st.size();
         st << static_cast<UInt16>(globalClan.size());
-        globalClan.enumerate(GetClanListInfo, st);
+        globalClan.enumerate(GetClanListInfo, &st);
         //GlobalClans::iterator it = globalClan.begin();
         //for(;it != globalClan.end(); ++it)
         //{
@@ -431,5 +444,27 @@ namespace GObject
         //}
         //st.data<UInt16>(offect) = count;
         st << Stream::eos;
+        send(st);
+    } 
+
+    UInt8 Player::CreateClan(std::string name, UInt8 picIndex/*, std::string announcement*/)
+    { 
+        static UInt32 ClanCreateMoney = 0;
+        if(GetClan())
+            return 1;
+        UInt32 money = GetVar(VAR_TEAL);
+        if(money < ClanCreateMoney)
+            return 2;
+        Clan* clan = new Clan(IDGenerator::gPlayerOidGenerator.ID(), name, this);
+        clan->LoadClanInfo(this,"","",50);
+        clan->SetPicIndex(picIndex);
+        clan->SetLevel(1);
+        globalClan.add(clan->GetId(),clan);
+        if(!clan)
+            return 3;
+        SetClanPos(1);
+        clan->LoadPlayer(this,1);
+        DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax());
+        return 0;
     } 
 }

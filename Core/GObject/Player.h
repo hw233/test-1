@@ -34,6 +34,7 @@
 //Chat
 
 #define IDTYPE UInt64   //LIBO
+#define MAIL_LIST_MAX 10
 namespace Battle
 {
     class BattleSimulator;
@@ -221,11 +222,12 @@ namespace GObject
             UInt8 DeleteMail();
             UInt8 ReciveMail();
 
-            void ListMail(Stream& st);
+            void ListMail(Stream& st, UInt16 index = 0);
 
            
             //Clan
-            void SendClanListinfo();
+            void SendClanListinfo(const UInt8 index);
+            UInt8 CreateClan(std::string name, UInt8 picIndex/*,std::string announcement*/);
     private:
             //IDTYPE _id;
             std::string _accounts;

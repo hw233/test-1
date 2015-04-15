@@ -274,8 +274,11 @@ void OnChat(GameMsgHdr& hdr, const void * data)
 void OnMail(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt16  index = 0;
+    br >> index;
     Stream st(REP::MAIL);
-    player->ListMail(st);
+    player->ListMail(st,index);
     st << Stream::eos;
     player->send(st);
 } 
@@ -318,6 +321,70 @@ void OnMailDeleteAll(GameMsgHdr& hdr, const void * data)
     MSG_QUERY_PLAYER(player) ;
     player->DeleteMail();
 } 
+void OnClanFlash(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    player->SendClanListinfo(REP::CLAN_FLASH);
+}
 
+void OnClanCreate(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string name;
+    UInt8 index;
+    br >> name >> index;
+    player->CreateClan(name ,index);
+}
+
+void OnClanOption(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 option = 0;
+    switch(option)
+    { 
+        case 0x01:
+            {
+                UInt32 clanId = 0;
+                br >> clanId;
+                GObject::Clan* clan = GObject::globalClan[clanId];
+                if(!clan)
+                    break;
+                UInt8 res = clan->Apply(player);
+                Stream st(REP::CLAN_OPTION);
+                st << static_cast<UInt8>(1);
+                st << res;
+                st << Stream::eos;
+                player->send(st);
+                break;
+            }
+        case 0x02:
+            { 
+                std::string name;
+                UInt8 type = 0;
+                br >> name >> type;
+                if(!player->GetClan() || player->GetClanPos() > 2)
+                    break;
+                GObject::Player* pl = GObject::globalNamedPlayers[name];
+                if(!pl)
+                    break;
+                player->GetClan()->Allow(pl);
+            } 
+        case 0x03:
+            {
+                std::string name ;
+                UInt8 num;
+                br >> name >> num;
+                GObject::Player* pl = GObject::globalNamedPlayers[name];
+                if(!pl)
+                    break;
+                if(!player->GetClan() || player->GetClan() != pl->GetClan() || player->GetClanPos() > 2)
+                    break;
+                player->GetClan()->ChangePosition(player, pl, num);
+            }
+    } 
+}
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

@@ -4,16 +4,19 @@
 #define C_CHAT_MAX 30
 namespace GObject
 {
-    Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_creater(creater) { } 
+    Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_picIndex(0),_creater(creater) { } 
     
-    void Clan::LoadClanInfo(Player* leader, std::string announcement, UInt8 personMax)
+    void Clan::LoadClanInfo(Player* leader, std::string announcement,std::string announcement2, UInt8 personMax)
     { 
         _leader = leader;
         _announcement = announcement;
+        _announcement2 = announcement2;
         _personMax = personMax;
+        _players.clear();
+        _applicant.clear();
     } 
 
-    UInt8 Clan::Apply(Player* pl)
+    UInt8 Clan::Apply(Player* pl, UInt8 update)
     { 
         if(_applicant.size() >= APPLICANTMAX)
             return 1;
@@ -21,6 +24,8 @@ namespace GObject
             return 2;
 
         _applicant.push_back(pl);
+        if(!update)
+            DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
         return 0;
     } 
 
@@ -44,6 +49,7 @@ namespace GObject
                     pl->SetClan(this);
                     pl->SetClanPos(1);
                     DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
+                    DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
                 }
                 _applicant.erase(it);
                 break;
@@ -52,12 +58,17 @@ namespace GObject
         return 0;
     } 
 
-    void Clan::LoadPlayer(Player* pl)
+    void Clan::LoadPlayer(Player* pl,UInt8 flag)
     { 
         if(_players.size() >= CLAN_MAX)
             return ;
         _players.push_back(pl);
         pl->SetClan(this);
+        if(flag)
+        {
+            UInt32 now = TimeUtil::Now();
+            DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u)",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
+        }
     } 
 
     ChatHold * Clan::GetChatHold()
@@ -92,8 +103,17 @@ namespace GObject
 
     UInt8 Clan::ChangePosition(Player* opter, Player* pl, UInt8 pos)
     { 
-        if(opter->GetClanPos() <= pl->GetClanPos())
+        static UInt8 posLimit[] = {1,5,10,200,200};
+        if(pos > 5 || !pos )
+            return -1;
+        if(HasMember(pl) == _players.end())
+            return 2;
+        if(opter->GetClanPos() <= pl->GetClanPos() || opter->GetClanPos() <= pos)
             return 1;
+        if(GetPosCount(pos) < posLimit[pos - 1])
+            return 3;
+
+        pl->SetClanPos(pos);
         return 0;
     } 
 
@@ -115,10 +135,50 @@ namespace GObject
     } 
     void Clan::GetClanInfo(Stream& st)
     { 
+        st << static_cast<UInt32>(_id);
         st << GetName();
         st << GetLevel();
         st << static_cast<UInt8>(_players.size());
         st << static_cast<UInt8>(_personMax);
         st << _announcement;
+    } 
+    void Clan::GetClanInfo2(Stream& st)
+    { 
+        st << GetName();
+        st << static_cast<UInt8>(GetLevel());
+        st << _announcement;
+        st << static_cast<UInt8>(_players.size());
+        for(UInt8 i = 0; i < _players.size(); ++i)
+        { 
+            Player* pl = _players[i];
+            if(!pl)
+                continue;
+            st << pl->GetName();
+            st << pl->GetClanPos();
+            st << static_cast<UInt8>(pl->isOnline());
+            st << static_cast<UInt8>(pl->GetLevel());
+        } 
+        st << _announcement2;
+        st << static_cast<UInt8>(_applicant.size());
+        for(UInt8 i = 0; i < _applicant.size(); ++i)
+        { 
+            Player* pl = _applicant[i];
+            if(!pl)
+                continue;
+            st << pl->GetName();
+            st << static_cast<UInt32>(pl->GetVar(VAR_BATTLE_POINT));
+            st << static_cast<UInt8>(pl->GetLevel());
+        } 
+    } 
+
+    UInt8 Clan::GetPosCount(UInt8 pos)
+    { 
+        UInt8 count = 0 ;
+        for(UInt8 i = 0; i < _players.size(); ++i)
+        { 
+            if(_players[i]->GetClanPos() == pos)
+                ++ count ;
+        } 
+        return count;
     } 
 }

@@ -35,6 +35,7 @@ namespace GObject
         VAR_CLAN_ENTER = 8, //进入帮派的时间
         VAR_PACKAGE_SIZE = 9,
         VAR_OFF_LINE = 10 ,//最近一次在线时间
+        VAR_BATTLE_POINT = 11, //战斗力
         VAR_MAX
     };
 

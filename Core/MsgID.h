@@ -51,6 +51,10 @@ namespace REQ
     const UInt8 MAIL_DELETE_ALL             = 0x54;// 
 
     const UInt8 CLAN_LIST        = 0x70;
+    const UInt8 CLAN_CREATE        = 0x71;
+    const UInt8 CLAN_FLASH        = 0x72;
+    const UInt8 CLAN_OPTION       = 0x73;
+    const UInt8 CLAN_INFO       = 0x74;
 
 
 
@@ -221,7 +225,7 @@ namespace REQ
     /**挂机加速 */
     const UInt8 TASK_HOOK_ADD       = 0x9F;// 0x6F
     /**妖王再临 */
-    const UInt8 ERLKING_INFO        = 0x71;
+    //const UInt8 ERLKING_INFO        = 0x71;
     /**发起切磋请求 */
     const UInt8 LANCHCHALLENGE      = 0x72;
     /**回复切磋 */
@@ -235,7 +239,7 @@ namespace REQ
     /** */
     const UInt8 CLANCITYBATTLELIST  = 0x7A;
     /**帮派动态信息 */
-    const UInt8 CLAN_INFO           = 0x7C;
+    //const UInt8 CLAN_INFO           = 0x7C;
     /**获取战报信息请求 */
     const UInt8 CLAN_BATTLE_INFO    = 0x7D;
     /**点击NPC对话 */
@@ -267,7 +271,7 @@ namespace REQ
     /**请求自己帮派信息 */
     const UInt8 CLAN_SELF           = 0x61;// 0x91
     /**帮派创建 */
-    const UInt8 CLAN_CREATE         = 0x62;// 0x92
+    //const UInt8 CLAN_CREATE         = 0x62;// 0x92
     /**申请加入帮派 */
     const UInt8 CLAN_APPLY          = 0x63;// 0x93
     /**帮派成员操作 */
@@ -529,6 +533,10 @@ namespace REP
     const UInt8 MAIL_DELETE_ALL             = 0x54;// 
 
     const UInt8 CLAN_LIST        = 0x70;
+    const UInt8 CLAN_CREATE        = 0x71;
+    const UInt8 CLAN_FLASH        = 0x72;
+    const UInt8 CLAN_OPTION        = 0x73;
+    const UInt8 CLAN_INFO        = 0x74;
 
 
 
@@ -638,7 +646,7 @@ namespace REP
     const UInt8 ATTACK_NPC          = 0x9B;// 0x61
     const UInt8 TASK_RESPONSE_HOOK  = 0x9D;// 0x6D
 
-    const UInt8 ERLKING_INFO        = 0x71;
+    //const UInt8 ERLKING_INFO        = 0x71;
     const UInt8 LANCHCHALLENGE      = 0x72;
     const UInt8 REQUESTCHALLENGE    = 0x73;
     const UInt8 MARRYBOARD          = 0x74;
@@ -646,7 +654,7 @@ namespace REP
     const UInt8 CLAN_BATTLE         = 0x79;
     const UInt8 CLAN_OPEN           = 0x7A;
     const UInt8 CLAN_BATTLE_END     = 0x7B;
-    const UInt8 CLAN_INFO           = 0x7C;
+    //const UInt8 CLAN_INFO           = 0x7C;
     const UInt8 CLAN_DINFO_UPDATE   = 0x7D;
 
     const UInt8 DIALOG_START        = 0x50;// 0x80
@@ -669,7 +677,7 @@ namespace REP
 
     const UInt8 CLAN_REQ_LIST       = 0x60;// 0x90
     const UInt8 CLAN_REQ_USER       = 0x61;// 0x91
-    const UInt8 CLAN_CREATE         = 0x62;// 0x92
+    //const UInt8 CLAN_CREATE         = 0x62;// 0x92
     const UInt8 CLAN_JOIN_IN        = 0x63;// 0x93
     const UInt8 CLAN_MEMBER_OPERATE = 0x64;// 0x94
     const UInt8 CLAN_INFO_CHANGE    = 0x65;// 0x95
