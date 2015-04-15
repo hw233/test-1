@@ -13,15 +13,7 @@ namespace REQ
     /*背包信息*/
     const UInt8 PACKAGE_INFO = 0x30;// 0xE0
     
-    //Mail
-    const UInt8 MAIL             = 0x50;// 
-    const UInt8 MAIL_GET             = 0x51;// 
-    const UInt8 MAIL_DELETE             = 0x52;// 
-    const UInt8 MAIL_NOTICE             = 0x52;// 
-    const UInt8 MAIL_GET_ALL             = 0x53;// 
-    const UInt8 MAIL_DELETE_ALL             = 0x54;// 
-
-    /**战报请求 */
+       /**战报请求 */
     const UInt8 BATTLE_REPORT_REQ   = 0x80;// 0xC0
     /**登陆 */
     const UInt8 LOGIN               = 0xE0;// 0x10
@@ -50,6 +42,17 @@ namespace REQ
     /*好友推荐*/
     const UInt8 FRIEND_RECOMMAND    = 0x45;
 
+    //Mail
+    const UInt8 MAIL             = 0x50;// 
+    const UInt8 MAIL_GET             = 0x51;// 
+    const UInt8 MAIL_DELETE             = 0x52;// 
+    const UInt8 MAIL_NOTICE             = 0x52;// 
+    const UInt8 MAIL_GET_ALL             = 0x53;// 
+    const UInt8 MAIL_DELETE_ALL             = 0x54;// 
+
+    const UInt8 CLAN_LIST        = 0x70;
+
+
     /*治理换将*/
     const UInt8 GOVERN_REPLACE      = 0x60;
     /*离线治理获得*/
@@ -60,8 +63,6 @@ namespace REQ
     const UInt8 GOVERN_INFO         = 0x63;
     /*在线治理获得*/
     const UInt8 GOVERN_ONLINE_GAIN  = 0x64;
-
-
 
 
 
@@ -275,7 +276,7 @@ namespace REQ
     /**循环任务进度请求 */
     const UInt8 QUERYDAYTASK        = 0x8F;
     /**请求帮派列表信息 */
-    const UInt8 CLAN_LIST           = 0x60;// 0x90
+    const UInt8 _CLAN_LIST           = 0x60;// 0x90
     /**请求自己帮派信息 */
     //const UInt8 CLAN_SELF           = 0x61;// 0x91
     /**帮派创建 */
@@ -565,6 +566,7 @@ namespace REP
     /*在线治理获得*/
     const UInt8 GOVERN_ONLINE_GAIN  = 0x64;
 
+    const UInt8 CLAN_LIST        = 0x70;
 
 
 

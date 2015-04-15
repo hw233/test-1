@@ -227,6 +227,9 @@ namespace GObject
             void ListMail(Stream& st);
 
             GovernManager* GetGovernManager() const { return m_governManager;}
+           
+            //Clan
+            void SendClanListinfo();
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -239,7 +242,7 @@ namespace GObject
             char m_clientIp[256+1];
 
             //Clan
-            UInt8 _clanPos;
+            UInt8 _clanPos;  //职位
 
 
             //功能类
