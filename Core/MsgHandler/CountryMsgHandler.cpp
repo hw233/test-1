@@ -28,6 +28,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG(GameMsgHdr, OnFriendRecommandReq);
 
+    MSG_REG(GameMsgHdr, OnFriendBaseInfoReq);
+
     MSG_REG_2(GameMsgHdr, REQ::CHAT, OnChat);
 
     MSG_REG_2(GameMsgHdr, REQ::MAIL, OnMail);

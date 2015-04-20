@@ -280,8 +280,8 @@ namespace Battle
             std::cout << std::endl;
         }
         memset(_mapFlag,0,_x*_y*sizeof(UInt8));
-        _target.clear();
         currentBf = NULL;
+        _target.clear();
     }
 
 
@@ -371,6 +371,7 @@ namespace Battle
         std::vector<GObject::Ascoord> path;
         _astar.ComputeRoute();
         _astar.GetRoute(&path);
+        std::reverse(path.begin(),path.end());  //
         UInt8 range = currentBf->GetDistance()*2 + ride; 
 
         BattleFighter* ft = static_cast<BattleFighter*>(_mapFighters[target._x + target._y*_x]);
@@ -482,8 +483,10 @@ namespace Battle
         bsim.start(); 
         result = bsim.GetWin();
         BattleReport = bsim.getId();
+
         std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
-        std::cout<< "A  (" << static_cast<UInt8>(bf->GetGroundX()) << static_cast<UInt8>(bf->GetGroundY()) << " )--------------->     (" << static_cast<UInt8>(bo->GetGroundX())<<static_cast<UInt8>(bf->GetGroundY())<< "  )"<<std::endl;
+
+        std::cout<< "A  "   <<  static_cast<UInt8>(bf->GetGroundX())  <<" , "<<   static_cast<UInt8>(bf->GetGroundY()) << " --------------->     " << static_cast<UInt8>(bo->GetGroundX())<<"  ,  "<<static_cast<UInt8>(bf->GetGroundY())<<std::endl;
 
         //result = 0;
         //BattleReport = 111;

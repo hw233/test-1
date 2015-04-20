@@ -60,6 +60,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
     {
         player->GetGovernManager()->SendGovernResult(1);
     }
+
 	player->Login();
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());

@@ -5,7 +5,8 @@
 #include "Common/URandom.h"
 
 //#define FRIEND_MAX  20            //好友的上限
-#define FRIEND_RECOMMAND_MAX 5    //一次推荐好友的上限
+#define FRIEND_RECOMMAND_MAX 5      //一次推荐好友的上限
+#define FRIEND_SENDONCE_MAX 10      //一次发送的好友信息的个数
 
 namespace GObject
 {
@@ -22,7 +23,7 @@ namespace GObject
         public:
             FriendManager(Player *pl):m_owner(pl){}
             void AddFriend(UInt8 index , Player* friendOne);
-            void GetFriendStream(eFriendType index , Stream &st);
+            void SendFriendList(UInt8 type,UInt8 index);
             void GetAllFriendStream(Stream &st);
 
             bool FindFriendByName(const std::string& name); 
@@ -43,6 +44,7 @@ namespace GObject
 
             bool IsInList(eFriendType type,Player *pl);
             bool HasFriend(Player* pl);
+            void SendFriendBaseInfo();
         private:
             std::set<Player *> _friends[friend_max];
             Player* m_owner;

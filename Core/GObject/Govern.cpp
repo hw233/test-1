@@ -20,6 +20,11 @@ namespace GObject
         st<<static_cast<UInt16>(ft->getId());
         st<<Stream::eos;
         m_owner->send(st);
+
+
+        //换将的话 怪物信息得重发
+        SendGovernResult(1);
+        
     }
 
 

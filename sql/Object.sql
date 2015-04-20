@@ -139,7 +139,7 @@ CREATE TABLE `player_apply_clan` (
     `clanId` int(10) unsigned NOT NULL DEFAULT '0',
     `playerId` bigint(20) unsigned NOT NULL,
     `time` int(10) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `govern_offlinegain` ;

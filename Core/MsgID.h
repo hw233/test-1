@@ -41,6 +41,9 @@ namespace REQ
     const UInt8 FRIEND_DELETE       = 0x44;
     /*好友推荐*/
     const UInt8 FRIEND_RECOMMAND    = 0x45;
+    /*好友基础信息*/
+    const UInt8 FRIEND_BASEINFO     = 0x46;
+
 
     //Mail
     const UInt8 MAIL             = 0x50;// 
@@ -550,6 +553,8 @@ namespace REP
     const UInt8 FRIEND_DELETE       = 0x44;
     /*好友推荐*/
     const UInt8 FRIEND_RECOMMAND    = 0x45;
+    /*好友基础信息*/
+    const UInt8 FRIEND_BASEINFO     = 0x46;
 
  
     const UInt8 MAIL                = 0x50;// 

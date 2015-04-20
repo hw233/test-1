@@ -78,13 +78,6 @@ void OnPlayerInfoReq(GameMsgHdr& hdr, PlayerInfoReq &)
         st << Stream::eos;
         conn->send(&st[0],st.size());
     }
-    //好友信息
-    {
-        Stream st(REQ::FRIEND_LIST);
-        pl->GetFriendManager()->GetAllFriendStream(st);
-        st<< Stream::eos;
-        conn->send(&st[0],st.size());
-    }
 }
 
 void OnEnchantReq(GameMsgHdr& hdr, const void * data)
@@ -142,7 +135,7 @@ void OnFriendFindReq(GameMsgHdr& hdr,FriendFindReq& ffr)
     MSG_QUERY_PLAYER(player);
     if( !player )
         return;
-    Stream st(REQ::FRIEND_FIND);
+    Stream st(REP::FRIEND_FIND);
     bool res = player->GetFriendManager()->FindFriendByName(ffr._name);
     st<<static_cast<UInt8>(res);
     if ( res )
@@ -180,7 +173,7 @@ void OnFriendDeleteReq( GameMsgHdr& hdr,FriendDelReq& fdr)
     MSG_QUERY_CONN_PLAYER(conn,player);
     if( !player )
         return;
-    Stream  st(REQ::FRIEND_DELETE);
+    Stream  st(REP::FRIEND_DELETE);
     bool res = player->GetFriendManager()->DelFriendByName(fdr._name);
     st<<(static_cast<UInt8>(res));
     st<<Stream::eos;
@@ -221,16 +214,27 @@ void OnFriendAddReq( GameMsgHdr& hdr,FriendAddReq& far)
 
 struct FriendListReq
 {
-    MESSAGE_DEF(REQ::FRIEND_LIST) ;
+    UInt8 type;
+    UInt8 index;
+    MESSAGE_DEF2(REQ::FRIEND_LIST,UInt8,type,UInt8,index);
 };
 
-void OnFriendListReq(GameMsgHdr& hdr,FriendListReq&)
+void OnFriendListReq(GameMsgHdr& hdr,FriendListReq& flr)
 {
     MSG_QUERY_CONN_PLAYER(conn,player);
-    Stream st(REQ::FRIEND_LIST);
-    player->GetFriendManager()->GetAllFriendStream(st);
-    st << Stream::eos;
-    player->send(st);
+    player->GetFriendManager()->SendFriendList(flr.type,flr.index);
+}
+
+struct FriendBaseInfoReq
+{
+    MESSAGE_DEF(REQ::FRIEND_BASEINFO);
+};
+
+
+void OnFriendBaseInfoReq( GameMsgHdr& hdr,FriendBaseInfoReq& fbr)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    player->GetFriendManager()->SendFriendBaseInfo();
 }
 
 void OnChat(GameMsgHdr& hdr, const void * data)
