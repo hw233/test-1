@@ -40,6 +40,10 @@ namespace Battle
 {
     class BattleSimulator;
 }
+namespace Script
+{
+    class GameActionLua;
+}
 
 namespace GObject
 {
@@ -163,6 +167,8 @@ namespace GObject
 
             //Fighter
             void addFighter(Fighter * fgt, bool = true, bool = false); 
+            void addFighter(UInt16 fgtId, bool = true, bool = false); 
+
             Fighter * findFighter(UInt32);
             Fighter * getMainFighter();
 
@@ -225,13 +231,18 @@ namespace GObject
             UInt8 DeleteMail();
             UInt8 ReciveMail();
 
-            void ListMail(Stream& st, UInt16 index = 0);
+            UInt8 ListMail(Stream& st, UInt16 index = 0);
 
             GovernManager* GetGovernManager() const { return m_governManager;}
            
             //Clan
-            void SendClanListinfo(const UInt8 index);
+            void SendClanListinfo(Stream &st);
             UInt8 CreateClan(std::string name, UInt8 picIndex/*,std::string announcement*/);
+
+            //FindFighter
+            void SearchFighter(UInt8 count);
+            void VisitFighter(UInt16 fighterId, UInt8 count);
+
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -279,6 +290,9 @@ extern GlobalPlayers globalOnlinePlayers;
 
 typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;  
 extern GlobalNamedPlayers globalNamedPlayers;
+
+typedef GGlobalObjectManagerIStringT<Clan> GlobalNamedClans;  
+extern GlobalNamedClans globalNamedClans;
 
 typedef std::vector<Player* > GlobalPlayerVec;  
 extern GlobalPlayerVec globalPlayerVec;

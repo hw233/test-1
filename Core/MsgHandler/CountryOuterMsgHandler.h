@@ -25,6 +25,7 @@
 
 #include "Battle/BattleReport.h"
 #include "GObject/Friend.h"
+#include "GMHandler.h"
 
 struct NullReq
 {
@@ -147,8 +148,8 @@ void OnFriendFindReq(GameMsgHdr& hdr,FriendFindReq& ffr)
     st<<static_cast<UInt8>(res);
     if ( res )
     {
-       GObject::Player* pl = GObject::globalNamedPlayers[ffr._name];
-       pl->GetSelfInfoStream(st);
+        GObject::Player* pl = GObject::globalNamedPlayers[ffr._name];
+        pl->GetSelfInfoStream(st);
 
     }
     st<<Stream::eos;
@@ -279,9 +280,10 @@ void OnMail(GameMsgHdr& hdr, const void * data)
     UInt16  index = 0;
     br >> index;
     Stream st(REP::MAIL);
-    player->ListMail(st,index);
+    UInt8 res = player->ListMail(st,index);
     st << Stream::eos;
-    player->send(st);
+    if(!res)
+        player->send(st);
 } 
 void OnMailGet(GameMsgHdr& hdr, const void * data)
 { 
@@ -363,7 +365,11 @@ void OnClanFlash(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;
     BinaryReader br(data,hdr.msgHdr.bodyLen);
-    player->SendClanListinfo(REP::CLAN_FLASH);
+    Stream st(REP::CLAN_OPTION);
+    st << static_cast<UInt8>(0x01);
+    player->SendClanListinfo(st);
+    st << Stream::eos;
+    player->send(st);
 }
 
 void OnClanCreate(GameMsgHdr& hdr, const void * data)
@@ -385,6 +391,29 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
     { 
         case 0x01:
             {
+                Stream st(REP::CLAN_OPTION);
+                st << static_cast<UInt8>(0x01);
+                player->SendClanListinfo(st);
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x02:
+            {
+                std::string clanName;
+                br >> clanName;
+                GObject::Clan* clan = GObject::globalNamedClans[clanName];
+                if(!clan)
+                    break;
+                Stream st(REP::CLAN_OPTION);
+                st << static_cast<UInt8>(0x02);
+                clan->GetClanInfo(st);
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x03:
+            {
                 UInt32 clanId = 0;
                 br >> clanId;
                 GObject::Clan* clan = GObject::globalClan[clanId];
@@ -398,7 +427,37 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
                 player->send(st);
                 break;
             }
-        case 0x02:
+        case 0x04:
+            {
+                std::string announcement;
+                br >> announcement;
+                if(player->GetClan())
+                { 
+                    player->GetClan()->SetAnnouncement(announcement);
+                } 
+                Stream st(REP::CLAN_OPTION);
+                st << static_cast<UInt8>(0x04);
+                st << static_cast<UInt8>(0);
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x05:
+            {
+                std::string announcement;
+                br >> announcement;
+                if(player->GetClan())
+                { 
+                    player->GetClan()->SetAnnouncement2(announcement);
+                } 
+                Stream st(REP::CLAN_OPTION);
+                st << static_cast<UInt8>(0x05);
+                st << static_cast<UInt8>(0);
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 0x06:
             { 
                 std::string name;
                 UInt8 type = 0;
@@ -408,9 +467,10 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
                 GObject::Player* pl = GObject::globalNamedPlayers[name];
                 if(!pl)
                     break;
-                player->GetClan()->Allow(pl);
+                if(!type)
+                    player->GetClan()->Allow(pl);
             } 
-        case 0x03:
+        case 0x07:
             {
                 std::string name ;
                 UInt8 num;
@@ -424,5 +484,34 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
             }
     } 
 }
+void OnGMHandler(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    std::string gmString ;
+    br >> gmString ;
+    gmHandler.Handle(gmString, player);
+}
+
+void OnFindFighter(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 option = 0;
+    br >> option;
+    if(option == 0)
+    { 
+        UInt8 searchCount = 0;
+        br >> searchCount;
+        player->SearchFighter(searchCount);
+    } 
+    else if(option == 1)
+    { 
+        UInt16 fighterId = 0;
+        UInt8 count = 0;
+        br >> fighterId >> count;
+        player->VisitFighter(fighterId,count);
+    } 
+} 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

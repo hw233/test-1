@@ -32,6 +32,7 @@ namespace Script
         public:
             const char* GetItemName(UInt32 itemId);
             const char* GetGreatFighterName(UInt32 fgtId);
+            UInt16 GetRandFighter();
 
         public:
             template <typename R> 

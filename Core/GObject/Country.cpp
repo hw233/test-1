@@ -11,6 +11,7 @@ namespace GObject
     bool Country::Init()
     {
         std::string path = cfg.scriptPath + "main.lua";
+        m_GameActionLua = new Script::GameActionLua(TID(), path.c_str());
         path = cfg.scriptPath + "formula/main.lua";
         m_BattleFormula = new Script::BattleFormula(path.c_str()) ;
         return true; 

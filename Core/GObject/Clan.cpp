@@ -144,6 +144,7 @@ namespace GObject
     } 
     void Clan::GetClanInfo2(Stream& st)
     { 
+        st << static_cast<UInt32>(_id);
         st << GetName();
         st << static_cast<UInt8>(GetLevel());
         st << _announcement;

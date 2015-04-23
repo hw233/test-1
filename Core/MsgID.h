@@ -12,6 +12,9 @@ namespace REQ
 
     /*背包信息*/
     const UInt8 PACKAGE_INFO = 0x30;// 0xE0
+
+    /*刷将*/
+    const UInt8 FIND_FIGHTER= 0x31;// 0xE1
     
        /**战报请求 */
     const UInt8 BATTLE_REPORT_REQ   = 0x80;// 0xC0
@@ -28,6 +31,8 @@ namespace REQ
     const UInt8 CREATE_ACCOUNT      = 0xE5;// 0x15
 
     const UInt8 IDENTIFY_ACCOUNT    = 0xE6;// 0x15
+
+    const UInt8 GMHAND              = 0xEF;
     
     /*好友列表请求*/
     const UInt8 FRIEND_LIST         = 0x40;
@@ -52,9 +57,9 @@ namespace REQ
 
     const UInt8 CLAN_LIST        = 0x70;
     const UInt8 CLAN_CREATE        = 0x71;
-    const UInt8 CLAN_FLASH        = 0x72;
+    //const UInt8 CLAN_FLASH        = 0x72;
     const UInt8 CLAN_OPTION       = 0x73;
-    const UInt8 CLAN_INFO       = 0x74;
+    const UInt8 CLAN_INFO       = 0x72;
 
 
     /*治理换将*/
@@ -537,6 +542,7 @@ namespace REP
 
     /*背包信息*/
     const UInt8 PACKAGE_INFO = 0x30;// 0xE0
+    const UInt8 FIND_FIGHTER = 0x31;// 0xE0
 
     /*好友列表*/
     const UInt8 FRIEND_LIST         = 0x40;
@@ -572,9 +578,9 @@ namespace REP
 
     const UInt8 CLAN_LIST        = 0x70;
     const UInt8 CLAN_CREATE        = 0x71;
-    const UInt8 CLAN_FLASH        = 0x72;
+    //const UInt8 CLAN_FLASH        = 0x72;
     const UInt8 CLAN_OPTION        = 0x73;
-    const UInt8 CLAN_INFO        = 0x74;
+    const UInt8 CLAN_INFO        = 0x72;
 
 
 
@@ -599,6 +605,7 @@ namespace REP
     const UInt8 USER_INFO_CHANGE    = 0xE2;
     const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15 //DOEN
     const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15 //DOEN
+    const UInt8 GMHAND              = 0xEF;
     
 
     const UInt8 WALLOW_VERIFY       = 0xE2;// 0x12

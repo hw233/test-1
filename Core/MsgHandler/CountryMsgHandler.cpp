@@ -14,6 +14,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr, REQ::PACKAGE_INFO, OnPackageInfo);
 
+    MSG_REG_2(GameMsgHdr, REQ::FIND_FIGHTER, OnFindFighter);
+
     MSG_REG(GameMsgHdr, OnBattleReportReq);
 
     MSG_REG(GameMsgHdr, OnFriendListReq);
@@ -48,7 +50,9 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG(GameMsgHdr, OnGovernInfo);
     MSG_REG_2(GameMsgHdr, REQ::CLAN_CREATE, OnClanCreate);
-    MSG_REG_2(GameMsgHdr, REQ::CLAN_FLASH, OnClanFlash);
+    //MSG_REG_2(GameMsgHdr, REQ::CLAN_FLASH, OnClanFlash);
     MSG_REG_2(GameMsgHdr, REQ::CLAN_OPTION, OnClanOption);
+
+    MSG_REG_2(GameMsgHdr, REQ::GMHAND, OnGMHandler);
 
 MSG_HANDLER_END()

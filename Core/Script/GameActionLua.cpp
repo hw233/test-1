@@ -253,6 +253,12 @@ namespace Script
         return TimeUtil::SharpDay(0, now);
     }
 
+    UInt16 GameActionLua::GetRandFighter()
+    {
+        return Run<UInt16>(NULL, "GetRandFighter");
+    }
+
+
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
     //{
     //    return globalPlayers[playerId];

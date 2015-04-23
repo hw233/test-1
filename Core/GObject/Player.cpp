@@ -1,10 +1,13 @@
 #include "Player.h"
+
 #include "Fighter.h"
 #include "ChatHold.h"
 #include "Mail.h"
 #include "Common/StringTokenizer.h"
 #include "MsgID.h"
 #include "Server/OidGenerator.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -16,6 +19,7 @@ namespace GObject
     GlobalPlayerVec globalPlayerVec;
     GlobalClans globalClan;
     GlobalOnlinePlayerSet globalOnlinePlayerSet;
+    GlobalNamedClans globalNamedClans;
 
     //GlobalNamedPlayers globalAccountsPlayers;
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10)
@@ -158,8 +162,22 @@ namespace GObject
             _fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
         else  
             _fighters[fgt->getId()] = fgt;
-        DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %u,%u,0,%u)",getId(),id,now);
+        if(writedb)
+            DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %u,%u,0,%u)",getId(),id,now);
     } 
+
+    void Player::addFighter(UInt16 fgtId, bool writedb, bool load )
+    { 
+        Fighter * fgt = globalFighters[fgtId];
+        if(fgt == NULL)
+            return ;
+        Fighter * fgt2 = fgt->Clone(this);
+        if(fgt2 == NULL)
+            return ;
+        fgt2->SetExp(0);
+        addFighter(fgt2, writedb, load);
+    } 
+
 
     void Player::Login()
     { 
@@ -170,8 +188,14 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
-        SendClanListinfo(REP::CLAN_LIST);
-        if(GetClan())
+        if(0)
+        {
+            Stream st(REP::CLAN_LIST);
+           SendClanListinfo(st);
+           st << Stream::eos;
+           send(st);
+        }
+        if(0 && GetClan())
         {
             Stream st(REP::CLAN_INFO);
             GetClan()->GetClanInfo2(st);
@@ -209,6 +233,12 @@ namespace GObject
         st << GetVar(VAR_TEAL);
         st << GetVar(VAR_GOLD);
         st << GetVar(VAR_TOTAL_GOLD);
+        UInt8 buttonStatu = 0;
+
+        if(_mailList.size())
+            buttonStatu |= 1;
+
+        st << buttonStatu ;
         std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
         st << static_cast<UInt8>(_fighters.size());
         for(;it != _fighters.end();++it)
@@ -278,7 +308,7 @@ namespace GObject
         Mail* mail = globalMails[id];
         if(!mail || mail->GetOwner()!= this)
             return ;
-        _mailList.push_back(id);
+        _mailList.push_front(id);
         if(update)
         { 
             //DB2().PushUpdateData("delete from var where `playerId` = %" I64_FMT "u  and `id` = %u ",m_PlayerID, id);
@@ -384,11 +414,11 @@ namespace GObject
         return 0;
     } 
 
-    void Player::ListMail(Stream& st, UInt16 index)
+    UInt8 Player::ListMail(Stream& st, UInt16 index)
     { 
         std::list<UInt32>::iterator it = _mailList.begin();
         if(index >= _mailList.size())
-            return ;
+            return 1;
         size_t offset = st.size();
         UInt16 count = 0;
         st << static_cast<UInt16>(count);//(_mailList.size());
@@ -421,6 +451,7 @@ namespace GObject
                 break;
         } 
         st.data<UInt16>(offset) = count;
+        return 0;
     } 
     bool GetClanListInfo(Clan* cl, Stream* st)
     { 
@@ -429,9 +460,9 @@ namespace GObject
         cl->GetClanInfo(*st);
         return true;
     } 
-    void Player::SendClanListinfo(const UInt8 StreamHand)
+    void Player::SendClanListinfo(Stream &st)
     { 
-        Stream st(StreamHand);
+        //Stream st(StreamHand);
         //UInt8 count = 0;
         //size_t offect = st.size();
         st << static_cast<UInt16>(globalClan.size());
@@ -446,8 +477,6 @@ namespace GObject
         //    ++count;
         //}
         //st.data<UInt16>(offect) = count;
-        st << Stream::eos;
-        send(st);
     } 
 
     UInt8 Player::CreateClan(std::string name, UInt8 picIndex/*, std::string announcement*/)
@@ -469,5 +498,47 @@ namespace GObject
         clan->LoadPlayer(this,1);
         DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax());
         return 0;
+    } 
+
+    void Player::SearchFighter(UInt8 count)
+    { 
+        Stream st(REP::FIND_FIGHTER);
+        UInt8 num = 0;
+        st << static_cast<UInt8>(0);
+        size_t offect = st.size();
+        st << num;
+        for(UInt8 i = 0; i < count ; ++i)
+        { 
+            UInt16 fighterId = GameAction()->GetRandFighter();
+            st << fighterId;
+            
+            Fighter * fgt = findFighter(fighterId);
+            if(!fgt)
+            { 
+                GetPackage()->AddItem(fighterId,10);
+            }
+            else
+            {
+                addFighter(fighterId, true, true);
+            }
+            ++num;
+        } 
+        st.data<UInt8>(offect) = num;
+        st << Stream::eos;
+        send(st);
+    } 
+    void Player::VisitFighter(UInt16 fighterId,UInt8 count)
+    { 
+        UInt32 resultCount = 0;
+        for(UInt8 i = 0; i < count; ++i)
+        { 
+            resultCount += uRand(10);
+        } 
+        GetPackage()->AddItem(fighterId,resultCount);
+        Stream st(REP::FIND_FIGHTER);
+        st << static_cast<UInt8>(1);
+        st << static_cast<UInt8>(resultCount);
+        st << Stream::eos;
+        send(st);
     } 
 }

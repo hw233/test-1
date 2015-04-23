@@ -40,7 +40,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
         st << Stream::eos;
         player->send(st);
     }
-    if(1)
+    if(0)
     { 
         Stream st(REP::MAIL);
         player->ListMail(st);
