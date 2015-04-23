@@ -204,7 +204,7 @@ namespace Battle
         if(!currentBf)
             return ;
         //写入当前战将信息
-        GetNearPos(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
+        GetTarget(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
         if( _target.bo == NULL )
         {
             //TODO  按照原定计划行动
@@ -296,7 +296,7 @@ namespace Battle
 
     }
 
-    void BattleGround::GetNearPos(UInt8 ride, const UInt8& x,const UInt8& y,UInt8 flag)
+    void BattleGround::GetTarget(UInt8 ride, const UInt8& x,const UInt8& y,UInt8 flag)
     {
         static UInt8 priority [4][4] = {
             {1,2,3,4},
@@ -382,13 +382,111 @@ namespace Battle
         }
         else if( static_cast<UInt8>(path.size()) > range+1 )  //攻击路径比较长  
         {
-            GObject::Ascoord goal = path[ride];
-            return TargetInfo(ft,goal._x,goal._y,target._x,target._y);
+            GObject::Ascoord attack = path[ride];
+            return TargetInfo(ft,attack._x,attack._y,target._x,target._y);
         }
         else
         {
-            GObject::Ascoord goal = path[path.size()-currentBf->GetDistance()*2];
-            return TargetInfo(ft,goal._x,goal._y,target._x,target._y);
+            GObject::Ascoord attack;
+            //工兵比较特殊  为了保护自己  工兵在条件满足时  可以向后移动  再攻击
+            if( currentBf->GetClass() == 3 )
+            {
+                //TODO
+                UInt8 distance = currentBf->GetDistance();
+                //以目标点为中心 
+                UInt8 cx = currentBf->GetGroundX();
+                UInt8 cy = currentBf->GetGroundY();
+                UInt8 x = target._x;
+                UInt8 y = target._y;
+                UInt8 i = 0;
+                UInt8 j = 0;
+
+                UInt8 lx = 0;
+                UInt8 ly = 0;
+                if( cx > x && cy > y )  //目标点在自己的左上角
+                {
+                    lx = x+distance > _x ? _x : x+distance; 
+                    ly = y+distance > _y ? _y : y+distance;
+
+                    for( j = ly; j > y ; --j)
+                    {
+                        for( i = lx ; i > x; --i)
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+
+                else if( cx > x && cy < y ) //左下角
+                {
+                    lx = x+distance > _x ? _x : x+distance;
+                    ly = y-distance < 0 ? 0 : y-distance;
+                    for( j = ly; j < y ; ++j)
+                    {
+                        for( i = lx ; i > x ; --i )
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                else if( cx < x && cy > y ) //右下角
+                {
+                    lx = x - distance < 0 ? 0 : x-distance;
+                    ly = y+distance > _y ? _y : y+distance;
+                    for( j = y ; j > y ; --j)
+                    {
+                        for( i = lx ; i < x ; ++i)
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                else if( cx < x && cy < y )  // 右下角
+                {
+                    lx = x - distance < 0 ? 0: x-distance;
+                    ly = y - distance < 0 ? 0: x-distance;
+                    for( j = y ; j < y ; ++j)
+                    {
+                        for( i = lx ; i < x ; ++i)
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                   return TargetInfo();
+                }
+                
+            }
+            else
+            {
+                attack = path[path.size()-currentBf->GetDistance()*2];
+            }
+            return TargetInfo(ft,attack._x,attack._y,target._x,target._y);
         }
     }
     /* 

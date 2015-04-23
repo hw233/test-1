@@ -197,7 +197,11 @@ CREATE TABLE `chance` (
 DROP TABLE `monster`;
 CREATE TABLE `monster`(
     `id` int(10) NOT NULL DEFAULT '0',
+    `groupId` tinyint(3) NOT NULL DEFAULT '0',
     `name` varchar(255) NOT NULL,
-    `level` tinyint(3) NOT NULL DEFAULT '0',
-    PRIMARY KEY(`id`)
+    `power` tinyint(3) NOT NULL DEFAULT '0',
+    `money` int(10) NOT NULL DEFAULT '0',
+    `itemId` int(10) NOT NULL DEFAULT '0',
+    `itemNum` tinyint(3) NOT NULL DEFAULT '0',    
+    PRIMARY KEY(`id`,`groupId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;

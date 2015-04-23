@@ -143,8 +143,12 @@ namespace GData
     struct DBMonster
     {
         UInt32 id;
+        UInt8 groupId;
         std::string name;
-        UInt8 lev;
+        UInt32 power;
+        UInt16 money;
+        UInt32 itemId;
+        UInt8  itemNum;
     };
 }
 namespace DB
@@ -312,11 +316,15 @@ namespace DB
         SPECIALEND()
 
        SPECIALBEGIN(GData::DBMonster)
-       SPECIALDEF(3)
+       SPECIALDEF(7)
        (
           UInt32, id,
+          UInt8,  groupId,
           std::string, name,
-          UInt8, lev
+          UInt32, power,
+          UInt16, money,
+          UInt32, itemId,
+          UInt8,  itemNum
        )
        SPECIALEND()
 }

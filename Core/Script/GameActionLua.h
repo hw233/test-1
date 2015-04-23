@@ -32,6 +32,8 @@ namespace Script
         public:
             const char* GetItemName(UInt32 itemId);
             const char* GetGreatFighterName(UInt32 fgtId);
+            UInt16 getGovernDropMoney(UInt8 res);
+            UInt16 getGovernDropItem(UInt8 res);
 
         public:
             template <typename R> 
@@ -79,5 +81,6 @@ namespace Script
 #include "GameActionLuaImpl.inl"
 
 }
+
 
 #endif

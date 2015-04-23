@@ -43,7 +43,7 @@ namespace GObject
         AddTimer(60*60*1000, World_Govern_SendInfo,this, (60-min)*60*1000);
 
         UInt8 sec = tt->tm_sec;
-        AddTimer(2*60*1000, World_Govern_SendAward, this, ((TIME_TAB-min%TIME_TAB)*60+sec)* 1000);
+        AddTimer(2*60*1000, World_Govern_SendAward, this,((TIME_TAB-min%TIME_TAB)*60-sec)* 1000);
 
         return true; 
     }

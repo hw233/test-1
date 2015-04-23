@@ -39,6 +39,7 @@ require("items/LuckyDraw")
 require("items/Awards")
 require("items/ZhenYuan")
 require("salePriceLimit")
+require("items/GovernAward")
 --require("AirBook")
 --require("forceCommitArena")
 
