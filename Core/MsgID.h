@@ -18,6 +18,7 @@ namespace REQ
     
        /**战报请求 */
     const UInt8 BATTLE_REPORT_REQ   = 0x80;// 0xC0
+    const UInt8 BATTLE_REPORT_REQ1   = 0x81;// 0xC0
     /**登陆 */
     const UInt8 LOGIN               = 0xE0;// 0x10
     /**创建角色 */

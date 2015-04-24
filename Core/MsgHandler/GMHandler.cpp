@@ -139,6 +139,8 @@ void GMHandler::OnSendMail( GObject::Player * player, std::vector<std::string>& 
 
 void GMHandler::OnAddFighter( GObject::Player * player, std::vector<std::string>& args )
 { 
+    if(args.size() != 2)
+        return ;
     UInt16 id = atoi(args[1].c_str());
     player->addFighter(id);
 } 

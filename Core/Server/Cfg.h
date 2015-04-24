@@ -20,7 +20,8 @@ public:
     UInt32      serverIp;
     std::string ifName;
 	std::string	scriptPath;
-	std::string reportPath;
+	std::string reportPath0;
+	std::string reportPath1;
 	UInt32		serverLogId;
 	std::string announceFile;
 
@@ -120,7 +121,8 @@ public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	void setIfName(const char* iname);
 	inline void setScriptPath(const char * p) {scriptPath = p;}
-	inline void setReportPath(const char * p) {reportPath = p;}
+	inline void setReportPath0(const char * p) {reportPath0 = p;}
+	inline void setReportPath1(const char * p) {reportPath1 = p;}
 	inline void setServerLogId(UInt32 id) {/*serverLogId = id;*/}
 	inline void setAnnounceFile(const char * p) {announceFile = p;}
 	inline void setDataDatabase(const char * h, UInt16 p, const char * u, const char * pw, const char * s )
