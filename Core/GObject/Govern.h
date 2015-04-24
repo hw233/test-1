@@ -5,7 +5,8 @@
 #include"Fighter.h"
 #include"Monster.h"
 #include"Common/URandom.h"
-//#include "LoadWorker.h"
+#include "LoadWorker.h"
+#include "Script/lua_tinker.h"
 
 #define SPEEDUP_MAXTIME 3600  //一次加速的加速时间
 #define TIME_TAB 120 //刷一次怪的间隔时间
@@ -13,23 +14,26 @@
 
 namespace GObject  //治理
 {
-    /*
+
     struct ItemInfo
     {
+        ItemInfo():id(0),num(0){}
         ItemInfo(UInt32 i,UInt32 n):id(i),num(n){}
         UInt32 id;
         UInt32 num;
     };
-    */
+
     class Player;
     class Fighter;
     class Monster;
+    class GameActionLua;
 
     struct GovernInfo
     {
-        GovernInfo(UInt32 id,bool win) : monsterId(id) ,isWin(win) {}
+        GovernInfo(UInt8 g,UInt32 i,UInt8 r) : groupId(g) , monsterId(i) ,res(r) {}
+        UInt8  groupId;
         UInt32 monsterId;
-        bool isWin;
+        UInt8  res;
     };
 
     class GovernManager
@@ -41,8 +45,8 @@ namespace GObject  //治理
             void SendGovernInfo();
             void GetSpeedUpGains(UInt32 times);    //多次的收益
             void GetOneSpeedUpGain();  //一次的收益
-            bool FightWithMonster(UInt32 monsterId);
-            UInt32 RandomOneMonster();
+            UInt8 FightWithMonster(Monster* mon);
+            Monster* RandomOneMonster(UInt8 groupId);
             void SendGovernAward(UInt8 number);
             void GetGovernInfo(Stream &st, UInt8 begin);
             void OfflineGainsInfo(Stream &st);
@@ -52,6 +56,7 @@ namespace GObject  //治理
             void GiveGovernOfflineGain();
             void SendOfflineGovernAward();
             void SendOnlineGovernAward(UInt8 number);
+            void GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,std::vector<ItemInfo>&itemInfo);
         private:
             Player* m_owner;
             Fighter * m_fighter;

@@ -17,7 +17,8 @@ namespace Battle
     {
         return MAX((ABS(x,x1)),(ABS(y,y1)));
     }
-
+     
+    /*
     void BattleGround::InitMapFight(UInt8 mapId)   
     { 
         static UInt8 point[][2] = {
@@ -48,6 +49,7 @@ namespace Battle
             _y = 10;
             _x = 20;
         } 
+        _astar.SetMapSize(_x,_y);
 
         _mapGround = new UInt8[_x*_y];
         memset(_mapGround , 0 ,_x*_y*sizeof(UInt8));
@@ -80,7 +82,47 @@ namespace Battle
         return ;
 
     }
+    */
 
+
+    void BattleGround::InitMapFight(UInt8 mapId)   
+    { 
+
+
+        std::vector<std::string > vec = GData::map.GetMapInfo(mapId);
+        UInt8 flag = 0;
+        _y = vec.size();
+        if(_y)
+        { 
+            StringTokenizer st(vec[0],",");
+            _x = st.count();
+        } 
+        _astar.SetMapSize(_x,_y);
+
+        _mapGround = new UInt8[_x*_y];
+        memset(_mapGround , 0 ,_x*_y*sizeof(UInt8));
+        
+        for(UInt8 i = 0; i < vec.size(); ++i)
+        { 
+            flag = !flag;
+            StringTokenizer st(vec[i],",");
+            for(UInt8 j = 0; j < st.count(); ++j)
+            { 
+                UInt8 value = static_cast<UInt8>(::atoi(st[j].c_str()));
+                _mapGround[j+flag + i*_x] = value;
+                std::cout << "坐标：" << static_cast<UInt32>(j+flag)<<" , " << static_cast<UInt32>(i) << "地形" << static_cast<UInt32>(value)<<std::endl;
+            } 
+        } 
+
+        _mapFighters = new BattleObject* [_x*_y];
+        _mapFlag = new UInt8[_x*_y];
+        memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
+        memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
+        _pack.init(0x80);
+        _astar.SetMap(_mapGround);
+        _astar.SetMapSize(_y,_x);
+        return ;
+    }
     /*
     void BattleGround::Move()
     { 
@@ -204,7 +246,7 @@ namespace Battle
         if(!currentBf)
             return ;
         //写入当前战将信息
-        GetNearPos(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
+        GetTarget(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
         if( _target.bo == NULL )
         {
             //TODO  按照原定计划行动
@@ -219,7 +261,7 @@ namespace Battle
 
             for(UInt8 j = (nowy > ride)?(nowy - ride):0; j < _y && j < (nowy + ride) ; ++j)
             {
-                for(UInt8 i = (nowx > 2*ride)?(nowx - 2*ride):0; i < _x && j < (nowx + 2*ride) ; ++i)
+                for(UInt8 i = (nowx > ride)?(nowx - ride):0; i < _x && j < (nowx + ride) ; ++i)
                 {
                     if(!_mapGround[i+j*_x])
                         continue ;
@@ -296,8 +338,10 @@ namespace Battle
 
     }
 
-    void BattleGround::GetNearPos(UInt8 ride, const UInt8& x,const UInt8& y,UInt8 flag)
+    void BattleGround::GetTarget(UInt8 ride, const UInt8& x,const UInt8& y,UInt8 flag)
     {
+        _astar.SetFighters(_mapFighters);
+        _astar.SetCurrentBf(currentBf);
         static UInt8 priority [4][4] = {
             {1,2,3,4},
             {1,2,3,4},
@@ -308,7 +352,7 @@ namespace Battle
         std::vector<GObject::Ascoord> vecScoord;
         UInt8 i=0;
         UInt8 j=0;
-        UInt8 distance = currentBf->GetDistance()*2;
+        UInt8 distance = currentBf->GetDistance();
         if( distance > 5 )
             return;
 		UInt8 scale = ride + distance ;
@@ -372,8 +416,7 @@ namespace Battle
         _astar.ComputeRoute();
         _astar.GetRoute(&path);
         std::reverse(path.begin(),path.end());  //
-        UInt8 range = currentBf->GetDistance()*2 + ride; 
-
+        UInt8 range = currentBf->GetDistance() + ride; 
         BattleFighter* ft = static_cast<BattleFighter*>(_mapFighters[target._x + target._y*_x]);
         if( path.size()  == 2 )
         {
@@ -382,13 +425,111 @@ namespace Battle
         }
         else if( static_cast<UInt8>(path.size()) > range+1 )  //攻击路径比较长  
         {
-            GObject::Ascoord goal = path[ride];
-            return TargetInfo(ft,goal._x,goal._y,target._x,target._y);
+            GObject::Ascoord attack = path[ride];
+            return TargetInfo(ft,attack._x,attack._y,target._x,target._y);
         }
         else
         {
-            GObject::Ascoord goal = path[path.size()-currentBf->GetDistance()*2];
-            return TargetInfo(ft,goal._x,goal._y,target._x,target._y);
+            GObject::Ascoord attack;
+            //工兵比较特殊  为了保护自己  工兵在条件满足时  可以向后移动  再攻击
+            if( currentBf->GetClass() == 3 )
+            {
+                //TODO
+                UInt8 distance = currentBf->GetDistance();
+                //以目标点为中心 
+                UInt8 cx = currentBf->GetGroundX();
+                UInt8 cy = currentBf->GetGroundY();
+                UInt8 x = target._x;
+                UInt8 y = target._y;
+                UInt8 i = 0;
+                UInt8 j = 0;
+
+                UInt8 lx = 0;
+                UInt8 ly = 0;
+                if( cx > x && cy > y )  //目标点在自己的左上角
+                {
+                    lx = x+distance > _x ? _x : x+distance; 
+                    ly = y+distance > _y ? _y : y+distance;
+
+                    for( j = ly; j > y ; --j)
+                    {
+                        for( i = lx ; i > x; --i)
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+
+                else if( cx > x && cy < y ) //左下角
+                {
+                    lx = x+distance > _x ? _x : x+distance;
+                    ly = y-distance < 0 ? 0 : y-distance;
+                    for( j = ly; j < y ; ++j)
+                    {
+                        for( i = lx ; i > x ; --i )
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                else if( cx < x && cy > y ) //右下角
+                {
+                    lx = x - distance < 0 ? 0 : x-distance;
+                    ly = y+distance > _y ? _y : y+distance;
+                    for( j = y ; j > y ; --j)
+                    {
+                        for( i = lx ; i < x ; ++i)
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                else if( cx < x && cy < y )  // 右下角
+                {
+                    lx = x - distance < 0 ? 0: x-distance;
+                    ly = y - distance < 0 ? 0: x-distance;
+                    for( j = y ; j < y ; ++j)
+                    {
+                        for( i = lx ; i < x ; ++i)
+                        {
+                            if(_mapFighters[i+j*_x] == NULL )
+                            {
+                                attack._x = i;
+                                attack._y = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                   return TargetInfo();
+                }
+                
+            }
+            else
+            {
+                attack = path[path.size()-currentBf->GetDistance()];
+            }
+            return TargetInfo(ft,attack._x,attack._y,target._x,target._y);
         }
     }
     /* 
@@ -578,21 +719,17 @@ namespace Battle
     //战将进入战场
     void BattleGround::preStart()  //需要玩家手动操作
     { 
-        static UInt16 point[][2] = {
+        static UInt8 point[][2] = {
+            {1, 0}, 
+            {3, 0}, 
+            {4, 0}, 
+            {0, 1}, 
+            {1, 1}, 
             {3, 1}, 
-            {5, 1}, 
-            {7, 1}, 
+            {4, 1}, 
+            {1, 2}, 
             {2, 2}, 
             {4, 2}, 
-            {6, 2}, 
-            {8, 2}, 
-            {3, 3}, 
-            {5, 3}, 
-            {7, 3}, 
-            {2, 4}, 
-            {4, 4}, 
-            {6, 4}, 
-            {8, 4}, 
         };
         std::map<UInt8 ,std::vector<GObject::Player *> >::iterator it = map_player.begin();
         _pack << static_cast<UInt8>(1);

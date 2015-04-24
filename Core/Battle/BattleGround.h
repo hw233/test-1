@@ -73,6 +73,7 @@ namespace Battle
 
     class BattleGround
     {
+        friend class AStar;
         public:
             BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator.ID())
             {
@@ -98,7 +99,8 @@ namespace Battle
             //产生战报信息
             void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport);
             void FighterMove(BattleFighter *, UInt8 x ,UInt8 y);
-            void GetNearPos(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
+            //void GetNearPos(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
+            void GetTarget(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
             void GetTargetBo(UInt8 x ,UInt8 y ,UInt8 step = 0);
             UInt8 GetRideSub(const UInt8& posx ,const UInt8& posy);
 
@@ -110,7 +112,6 @@ namespace Battle
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
-            TargetInfo GetGoalAscoordInfo(std::vector<GObject::Ascoord> path,UInt8 ride);
             UInt8 GetFactAttackDis();
             TargetInfo makeTarget(GObject::Ascoord traget,UInt8 ride);
         private:

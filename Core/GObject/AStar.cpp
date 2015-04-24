@@ -2,7 +2,9 @@
 namespace GObject
 {
     AStar::AStar():
-	    m_numSurround(6)
+	    m_numSurround(6),
+        m_mapFighters(NULL),
+        m_currentBf(NULL)
     {
 
 	    for(UInt8 i = 0 ; i<6 ; ++i)
@@ -226,6 +228,18 @@ namespace GObject
 
     bool AStar::IsObstacle(const Ascoord& coord)
     {
-        return m_map[coord._x + coord._y * m_row ] != 0 ;
+        /*
+        bool ret = false;
+        if( m_mapFighters[coord._x+coord._y*m_row] != NULL && currentBf->GetSide() != m_mapFighters[coord._x+coord._y*m_row].GetSide())
+        {
+            ret = true;
+        }
+
+        if ( m_map[coord._x + coord._y * m_row ] == 0 )
+        {
+            ret = true;
+        }
+        */
+        return true;
     }
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "Config.h"
+#include "../Battle/BattleObject.h"
 
 namespace GObject
 {
@@ -83,6 +84,8 @@ namespace GObject
 	    const Ascoord& GetStart()            {return m_start;}
 	    const Ascoord& GetTarget()           {return m_target;}
         void  SetMap(UInt8* map);
+        void  SetFighters(Battle::BattleObject** mapfighters) { m_mapFighters = mapfighters;}
+        void  SetCurrentBf(Battle::BattleFighter* bf) { m_currentBf = bf; }
 
     private:
         UInt8*  m_map;
@@ -99,6 +102,8 @@ namespace GObject
 	
 	    std::list<StepData> m_openList;
 	    std::list<StepData> m_closeList;
+        Battle::BattleObject ** m_mapFighters;
+        Battle::BattleFighter * m_currentBf;
 	
 	    bool popBestStep(StepData* pSD); 
 	    bool isInList(std::list<StepData>& list, const Ascoord& coord);

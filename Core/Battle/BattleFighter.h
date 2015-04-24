@@ -119,7 +119,7 @@ namespace Battle
 
             BattleField * GetField();
 
-            UInt8 GetRide(){ return 3 ;} //TODO
+            UInt8 GetRide(){ return 1 ;} //TODO
             UInt8 GetClass(){ return _fighter->GetClass();}
             UInt8 GetDistance(){ return 1;}   //攻击距离BattleGround
             UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
