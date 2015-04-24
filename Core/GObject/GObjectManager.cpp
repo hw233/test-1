@@ -390,6 +390,8 @@ namespace GObject
             pclan->SetLevel(clan.level);
             pclan->SetPicIndex(clan.picIndex);
             globalClan.add(clan.clanId, pclan);
+
+            globalNamedClans.add(pclan->GetName(), pclan);
             
             lc.advance();
         }

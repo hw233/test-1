@@ -3,7 +3,6 @@
 
 #include "Common/Queue.h"
 #include "Common/Platform.h"
-
 #define IDTYPE UInt64   //LIBO
 namespace GObject
 {

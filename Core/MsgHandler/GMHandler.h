@@ -32,6 +32,8 @@ private:
 	void OnAddExp(GObject::Player *, std::vector<std::string>&);
 	void OnAddVar(GObject::Player *, std::vector<std::string>&);
 	void OnSetGVar(GObject::Player *, std::vector<std::string>&);
+	void OnSendMail(GObject::Player *, std::vector<std::string>&);
+    void OnAddFighter( GObject::Player * player, std::vector<std::string>& args );
 
 };
 

@@ -3,6 +3,7 @@
 #define FIGHTER_H_
 #include "Config.h"
 #include "GGlobalObjectManager.h"
+
 namespace GObject
 {
     class ItemWeapon;
@@ -56,7 +57,7 @@ namespace GObject
             inline ItemArmor * GetArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
             inline UInt8 GetColor(){return _color;}
 
-            UInt8 GetSide();//{ if(_owner) return _owner->GetBattleSide(); return 0;}
+            UInt8 GetSide();//{ if(_owner) return _owner->GetBattleSide();}
             FVarSystem* GetFVar();
 
             UInt32 GetVar(UInt32 num);
@@ -150,6 +151,3 @@ typedef GGlobalObjectManagerT<Fighter, UInt32> GlobalFighters;
 extern GlobalFighters globalFighters;
 }
 #endif // FIGHTER_H_
-
-/* vim: Set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-

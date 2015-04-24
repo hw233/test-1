@@ -76,7 +76,7 @@ namespace Battle
         _mapFlag = new UInt8[_x*_y];
         memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
         memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
-        _pack.init(0x80);
+        _pack.init(0x81);
         _astar.SetMap(_mapGround);
         _astar.SetMapSize(_x,_y);
         return ;
@@ -365,6 +365,8 @@ namespace Battle
             {
                if( i >=  _x )
                    continue;
+               if( _mapFighters[ i+j*_x] != NULL && _mapFighters[ i+j*_x]->GetSide() == currentBf->GetSide() )
+                   continue;
                if( (j == (y -scale) || j == (y+distance)) && ((i == (x-scale) || i == (x+scale) )  ))
                    continue;
                if(_mapFighters[ i+j*_x] == NULL )
@@ -527,7 +529,7 @@ namespace Battle
             }
             else
             {
-                attack = path[path.size()-currentBf->GetDistance()];
+                attack = path[path.size()-currentBf->GetDistance()-1];
             }
             return TargetInfo(ft,attack._x,attack._y,target._x,target._y);
         }
@@ -712,7 +714,10 @@ namespace Battle
             return 0;
         map_player[index].push_back( pl);
         pl->SetBattleId(_id);
-        pl->SetBattleSide(index);
+        UInt8 side = 0;
+        if( index % 5 >= 3 )
+            side = 1;
+        pl->SetBattleSide(side);
         return 1;
     } 
 
