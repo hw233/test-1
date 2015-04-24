@@ -12,7 +12,8 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setTcpPort", &Cfg::setTcpPort);
 	class_def<Cfg>("setIfName", &Cfg::setIfName);
 	class_def<Cfg>("setScriptPath", &Cfg::setScriptPath);
-	class_def<Cfg>("setReportPath", &Cfg::setReportPath);
+	class_def<Cfg>("setReportPath0", &Cfg::setReportPath0);
+	class_def<Cfg>("setReportPath1", &Cfg::setReportPath1);
 	class_def<Cfg>("setServerLogId", &Cfg::setServerLogId);
 	class_def<Cfg>("setAnnounceFile", &Cfg::setAnnounceFile);
 	class_def<Cfg>("setDataDatabase", &Cfg::setDataDatabase);

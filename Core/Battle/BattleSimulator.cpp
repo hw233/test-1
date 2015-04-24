@@ -11,7 +11,7 @@
 #define ADVANCE_M 220
 namespace Battle
 {
-    BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance, bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
+    BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance, bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator1.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
     { 
         _fgt[0] = bf;
         bf->SetSideInBS(0); 
@@ -113,7 +113,7 @@ namespace Battle
         _packet.data<UInt16>(offset) = actCount;
         _packet << Stream::eos;
 
-        battleReport.addReport(_id,_packet);
+        battleReport1.addReport(_id,_packet);
     } 
 
     UInt8 BattleSimulator::GetWin()

@@ -110,16 +110,31 @@ void OnPackageInfo(GameMsgHdr& hdr, const void * data)
     player->send(st);
 } 
 
-struct BattleReportReq 
+struct BattleReportReq0
 {
     UInt32 _reportId;
     MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
 };
 
-void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
+struct BattleReportReq1
+{
+    UInt32 _reportId;
+    MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ1,UInt32,_reportId);
+};
+
+void OnBattleReportReq0( GameMsgHdr& hdr, BattleReportReq0& brr)
 {
     MSG_QUERY_PLAYER(player);
-    std::vector<UInt8> *r = Battle::battleReport[brr._reportId];
+    std::vector<UInt8> *r = Battle::battleReport0[brr._reportId];
+    if(r == NULL)
+        return;
+    player->send(&(*r)[0], r->size());
+}
+
+void OnBattleReportReq1( GameMsgHdr& hdr, BattleReportReq1& brr)
+{
+    MSG_QUERY_PLAYER(player);
+    std::vector<UInt8> *r = Battle::battleReport1[brr._reportId];
     if(r == NULL)
         return;
     player->send(&(*r)[0], r->size());

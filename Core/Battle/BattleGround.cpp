@@ -704,7 +704,7 @@ namespace Battle
 
         _pack.data<UInt16>(offset) = actCount;
         _pack<<Stream::eos;
-        battleReport.addReport(_battleNum,_pack);
+        battleReport0.addReport(_battleNum,_pack);
     } 
     UInt8 BattleGround::PushPlayer(GObject::Player * pl,UInt8 index)
     { 

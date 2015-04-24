@@ -8,7 +8,8 @@ namespace IDGenerator
 	ChatFgtOidGenerator gChatFgtOidGenerator;
 	MailOidGenerator gMailOidGenerator;
 	SalesOidGenerator gSalesOidGenerator;
-	BattleOidGenerator gBattleOidGenerator;
+	BattleOidGenerator gBattleOidGenerator0;
+	BattleOidGenerator gBattleOidGenerator1;
 	ClanOidGenerator gClanOidGenerator;
 	SeedOidGenerator gSeedOidGenerator;
 	TradeOidGenerator gTradeOidGenerator;
