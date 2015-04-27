@@ -74,7 +74,7 @@ namespace Battle
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator.ID())
+            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID())
             {
                 map_player.clear();
                 _x = 20;

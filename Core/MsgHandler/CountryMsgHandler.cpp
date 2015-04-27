@@ -16,7 +16,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr, REQ::FIND_FIGHTER, OnFindFighter);
 
-    MSG_REG(GameMsgHdr, OnBattleReportReq);
+    MSG_REG(GameMsgHdr, OnBattleReportReq0);
+    MSG_REG(GameMsgHdr, OnBattleReportReq1);
 
     MSG_REG(GameMsgHdr, OnFriendListReq);
 

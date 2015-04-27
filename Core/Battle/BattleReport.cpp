@@ -13,7 +13,8 @@
 namespace Battle
 {
 
-BattleReport battleReport;
+BattleReport battleReport0(0);
+BattleReport battleReport1(1);
 
 int lastMaxId = 0;
 void BattleReport::init()
@@ -21,11 +22,15 @@ void BattleReport::init()
 	try
 	{
 		UInt32 maxid = 0;
+        std::string sql = "SELECT maxid from reportid where type = 0";
+        if(_type)
+            sql = "SELECT maxid from reportid where type = 1";
+
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor()); 
         if (execu.get() != NULL && execu->isConnected())     
         {
             GData::DBReportId dbexp;
-            if(execu->Prepare("SELECT maxid from reportid", dbexp) == DB::DB_OK)
+            if(execu->Prepare(sql.c_str(), dbexp) == DB::DB_OK)
             {
                 if(execu->Next() == DB::DB_OK)
                 {
@@ -33,17 +38,20 @@ void BattleReport::init()
                 }
                 else
                 {
-                    DB1().PushUpdateData("insert into reportid values(0)");
+                    DB1().PushUpdateData("insert into reportid values(0,%d)",_type);
                 }
             }
             if (maxid > 0)
             {
                 lastMaxId = maxid;
-	    	    IDGenerator::gBattleOidGenerator.Init(maxid);
+                if(!_type)
+                    IDGenerator::gBattleOidGenerator0.Init(maxid);
+                else
+                    IDGenerator::gBattleOidGenerator1.Init(maxid);
                 return;
             }
         }
-		DirectoryIterator dirit(cfg.reportPath);
+		DirectoryIterator dirit(_type ? cfg.reportPath1 : cfg.reportPath0);
 		DirectoryIterator end;
 		while (dirit != end)
 		{
@@ -67,7 +75,10 @@ void BattleReport::init()
 			}
 			++dirit;
 		}
-		IDGenerator::gBattleOidGenerator.Init(maxid);
+        if(!_type)
+            IDGenerator::gBattleOidGenerator0.Init(maxid);
+        else
+            IDGenerator::gBattleOidGenerator1.Init(maxid);
 	}
 	catch(...)
 	{
@@ -109,7 +120,7 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 	FastMutex::ScopedLock lk(_mutex);
 	_reports[id] = v;
 	char path[1024], path2[1024];
-	sprintf(path, "%s%u/%u", cfg.reportPath.c_str(), id / 100000, (id / 1000) % 100);
+	sprintf(path, "%s%u/%u", /*cfg.reportPath.c_str()*/ _type ? cfg.reportPath1.c_str() : cfg.reportPath0.c_str(), id / 100000, (id / 1000) % 100);
 	sprintf(path2, "%s/%u.dat", path, id);
 	File rfile(path);
 	rfile.createDirectories();
@@ -119,7 +130,7 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 	fwrite(&v[0], 1, v.size(), f);
 	fclose(f);
     if(id >static_cast<UInt32>(lastMaxId))
-        DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d", id, lastMaxId);
+        DB1().PushUpdateData("update reportid set maxid = %d where maxid=%d and type = %d", id, lastMaxId, _type);
     lastMaxId = id;
 
     RptLife rptLife = {id, TimeUtil::Now()};
@@ -130,7 +141,7 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 void BattleReport::loadReport( UInt32 id, std::vector<UInt8>& v )
 {
 	char path[1024];
-	sprintf(path, "%s%u/%u/%u.dat", cfg.reportPath.c_str(), id / 100000, (id / 1000) % 100, id);
+	sprintf(path, "%s%u/%u/%u.dat", /*cfg.reportPath.c_str()*/ _type ? cfg.reportPath1.c_str() : cfg.reportPath0.c_str(), id / 100000, (id / 1000) % 100, id);
 	FILE * f = fopen(path, "rb");
 	if(f == NULL)
 		return;

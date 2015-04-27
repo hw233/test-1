@@ -19,16 +19,32 @@
 #include <mysql.h>
 #include "Memcached.h"
 
-struct BattleReportReq 
+struct BattleReportReq0 
 {
     UInt32 _reportId;
     MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ,UInt32,_reportId);
 };
 
-void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq& brr)
+void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq0& brr)
 {
     MSG_QUERY_PLAYER(player);
-    std::vector<UInt8> *r = Battle::battleReport[brr._reportId];
+    std::vector<UInt8> *r = Battle::battleReport0[brr._reportId];
+    if(r == NULL)
+        return;
+    player->send(&(*r)[0], r->size());
+}
+
+
+struct BattleReportReq1 
+{
+    UInt32 _reportId;
+    MESSAGE_DEF1(REQ::BATTLE_REPORT_REQ1,UInt32,_reportId);
+};
+
+void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq1& brr)
+{
+    MSG_QUERY_PLAYER(player);
+    std::vector<UInt8> *r = Battle::battleReport1[brr._reportId];
     if(r == NULL)
         return;
     player->send(&(*r)[0], r->size());

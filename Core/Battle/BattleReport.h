@@ -9,6 +9,7 @@ namespace Battle
 class BattleReport
 {
 public:
+    BattleReport(UInt8 type = 0):_type(type){}
 	void init();
 	void addReport(UInt32, std::vector<UInt8>&);
 	std::vector<UInt8>* operator[](UInt32 id);
@@ -36,9 +37,11 @@ private:
     typedef RptLifeSet::iterator RptLifeSetIt;
 
     RptLifeSet _rptLife;
+    UInt8 _type ;
 };
 
-extern BattleReport battleReport;
+extern BattleReport battleReport0;
+extern BattleReport battleReport1;
 
 }
 

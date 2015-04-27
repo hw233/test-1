@@ -170,7 +170,8 @@ namespace IDGenerator
     extern ChatFgtOidGenerator gChatFgtOidGenerator;
     extern MailOidGenerator gMailOidGenerator;
     extern SalesOidGenerator gSalesOidGenerator;
-    extern BattleOidGenerator gBattleOidGenerator;
+    extern BattleOidGenerator gBattleOidGenerator0;
+    extern BattleOidGenerator gBattleOidGenerator1;
     extern ClanOidGenerator gClanOidGenerator;
     extern SeedOidGenerator gSeedOidGenerator;
     extern TradeOidGenerator gTradeOidGenerator;
