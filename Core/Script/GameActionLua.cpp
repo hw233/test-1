@@ -267,6 +267,12 @@ namespace Script
         return Run<UInt16>(NULL, "getGovenDropItem", res);
     }
 
+    UInt16 GameActionLua::GetRandFighter()
+    {
+        return Run<UInt16>(NULL, "GetRandFighter");
+    }
+
+
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
     //{
     //    return globalPlayers[playerId];

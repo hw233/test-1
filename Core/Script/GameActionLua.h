@@ -34,6 +34,7 @@ namespace Script
             const char* GetGreatFighterName(UInt32 fgtId);
             UInt16 getGovernDropMoney(UInt8 res);
             UInt16 getGovernDropItem(UInt8 res);
+            UInt16 GetRandFighter();
 
         public:
             template <typename R> 

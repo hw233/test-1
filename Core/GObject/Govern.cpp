@@ -17,9 +17,6 @@ namespace GObject
          {
              m_fighter = NULL;
          }
-         //memset(_speedUpId2Num,0,sizeof(_speedUpId2Num));
-         //memset(_offLineId2Num,0,sizeof(_offLineId2Num));
-         //memset(_vecGovernInfo,0,sizeof(_vecGovernInfo));
     }
     void GovernManager::ReplaceFighter(Fighter * ft)
     {
@@ -100,6 +97,8 @@ namespace GObject
     Monster* GovernManager::RandomOneMonster(UInt8 groupId)
     {
         //UInt32 monsterId = RandomOneMonster(groupId);
+        UInt32 rand = uRand();
+        std::cout<<rand<<std::endl;
         Monster* mon = monsterTable.GetMonster(groupId,1);
         return mon;
     }
@@ -244,7 +243,7 @@ namespace GObject
     
         if( percent != 0 )
         {
-            vecItem.push_back(ItemInfo(1,moneyNum*percent));
+            vecItem.push_back(ItemInfo(100,moneyNum*percent));
         }
     }
 
@@ -292,11 +291,14 @@ namespace GObject
     {
         if( !m_fighter )
             return;
-        //发送离线治理的奖励(登录时发送)
-        {
-            //TODO 判断背包是否已满
-        }
         //往背包中放置物品
+        if( !_offlineId2Num.empty() )
+            return;
+        for( auto it = _offlineId2Num.begin() ; it != _offlineId2Num.end(); ++it)
+        {
+            m_owner->GetPackage()->AddItem((it)->first,(it)->second,true,true,0);
+
+        }
         //发完后清理离线治理物品数据库
 	    DB7().PushUpdateData("delete from govern_offlinegain where `playerId` = %"I64_FMT"u",m_owner->getId());
 

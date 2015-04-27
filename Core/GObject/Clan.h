@@ -48,6 +48,10 @@ namespace GObject
             UInt8 GetPicIndex(){return _picIndex;}
             UInt8 GetPosCount(UInt8 pos);
             UInt8 IsTheFounder(Player * pl){ return !(pl == _creater);}
+
+            void SetAnnouncement(std::string announcement){ _announcement = announcement;}
+            void SetAnnouncement2(std::string announcement){ _announcement2 = announcement;}
+
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;

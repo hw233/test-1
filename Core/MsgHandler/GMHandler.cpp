@@ -18,6 +18,8 @@
 #include "Memcached.h"
 #include "Version.h"
 #include "GObject/GVar.h"
+#include "GObject/Mail.h"
+#include "Server/OidGenerator.h"
 
 GMHandler gmHandler;
 
@@ -25,6 +27,8 @@ GMHandler::GMHandler()
 {
 
     Reg(3, "addvar", &GMHandler::OnAddVar);
+    Reg(3, "mail", &GMHandler::OnSendMail);
+    Reg(3, "addfighter", &GMHandler::OnAddFighter);
     _printMsgPlayer = NULL;
 }
 
@@ -77,3 +81,64 @@ void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROCNP 
         gmhp.procnp = proc;
     }
 }
+bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool isFromBackstage)
+{
+	UInt8 gml = 3;
+	//if(cfg.GMCheck && !isFromBackstage)
+	//{
+	//	if(player == NULL)
+	//		return false;
+	//	gml = player->getGMLevel();
+	//	if(gml > 3)
+	//		return false;
+	//}
+	//if(txt.empty())
+	//	return false;
+	//std::string ptxt = txt;
+	//if(ptxt[0] == '#')
+	//{
+	//	if(ptxt.length() < 9)
+	//		return false;
+	//	ptxt.erase(ptxt.begin(), ptxt.begin() + 9);
+	//}
+	//if(ptxt[0] != '/')
+	//	return false;
+	//ptxt.erase(ptxt.begin());
+	StringTokenizer tk(txt, " ", StringTokenizer::TOK_IGNORE_EMPTY || StringTokenizer::TOK_TRIM);
+	if(tk.count() == 0)
+		return true;
+	std::string cmd = tk[0];
+	strlwr(&cmd[0]);
+	std::map<std::string, GMHP>::iterator it = _procMap[gml].find(cmd);
+	if(it == _procMap[gml].end())
+		return true;
+	std::vector<std::string> sl(tk.begin() + 1, tk.end());
+	if(it->second.np)
+	{
+		GMHPROCNP proc = it->second.procnp;
+		(this->*proc)(sl);
+	}
+	else
+	{
+		if(player == NULL)
+			return false;
+		GMHPROC proc = it->second.proc;
+		(this->*proc)(player, sl);
+	}
+	return true;
+}
+void GMHandler::OnSendMail( GObject::Player * player, std::vector<std::string>& args )
+{ 
+    GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),player,1,"1,1",0,static_cast<UInt32>(-1));
+    if(mail)
+    { 
+        globalMails.add(mail->GetId(), mail);
+        player->AddMail(mail->GetId());
+    }
+} 
+
+void GMHandler::OnAddFighter( GObject::Player * player, std::vector<std::string>& args )
+{ 
+    UInt16 id = atoi(args[1].c_str());
+    player->addFighter(id);
+} 

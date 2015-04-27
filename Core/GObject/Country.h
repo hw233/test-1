@@ -4,8 +4,7 @@
 #include "Server/WorkerRunner.h"
 #include "GObjectManager.h"
 #include "MsgHandler/CountryMsgHandler.h"
-
-
+#include "Script/GameActionLua.h"
 namespace Script
 {
 	class GameActionLua;

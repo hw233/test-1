@@ -24,17 +24,17 @@ namespace GObject
 
     enum VarID
     {
-        VAR_INVALID = 0,    //无效变量
-        VAR_TEAL    = 1,
-        VAR_COUPON  = 2,
-        VAR_GOLD    = 3,
-        VAR_EXP    = 4,
-        VAR_TOTAL_GOLD = 5,
-        VAR_ENCHANT_CD = 6,
-        VAR_CLAN_CONT = 7, //帮派贡献
-        VAR_CLAN_ENTER = 8, //进入帮派的时间
+        VAR_INVALID = 0,            //无效变量
+        VAR_TEAL    = 1,            //铜钱
+        VAR_COUPON  = 2,            //银两
+        VAR_GOLD    = 3,            //金子
+        VAR_EXP    = 4,             //经验
+        VAR_TOTAL_GOLD = 5,         //总充值量
+        VAR_ENCHANT_CD = 6,         //强化cd
+        VAR_CLAN_CONT = 7,          //帮派贡献
+        VAR_CLAN_ENTER = 8,         //进入帮派的时间
         VAR_PACKAGE_SIZE = 9,
-        VAR_OFF_LINE = 10 ,//最近一次在线时间
+        VAR_OFF_LINE = 10 ,         //最近一次在线时间
         VAR_GOVERN_SPEEDUP_CNT = 11, //治理加速次数
         VAR_BATTLE_POINT = 12, //战斗力
         VAR_GOVERN_FIGHTERID = 13, //治理的将领id
