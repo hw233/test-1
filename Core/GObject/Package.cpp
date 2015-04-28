@@ -114,6 +114,15 @@ namespace GObject
             m_Items[ItemKey(typeId, bind)] = item;
         }
         item->IncItem(num);
+        auto it = m_Items.find(ItemKey(typeId, bind));
+        if( it != m_Items.end() )
+        {
+          DB7().PushUpdateData("update item set `count` = %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",(it->second)->Count()+num,typeId,m_Owner->getId());
+        }
+        else
+        {
+            DB7().PushUpdateData("insert into item(itemId,playerId,count) value(%u, %" I64_FMT "u, %u )", typeId, m_Owner->getId(),num);
+        }
         return item;
     } 
 

@@ -29,6 +29,7 @@ GMHandler::GMHandler()
     Reg(3, "addvar", &GMHandler::OnAddVar);
     Reg(3, "mail", &GMHandler::OnSendMail);
     Reg(3, "addfighter", &GMHandler::OnAddFighter);
+    Reg(3, "addmoney",&GMHandler::OnAddMoney);
     _printMsgPlayer = NULL;
 }
 
@@ -143,4 +144,18 @@ void GMHandler::OnAddFighter( GObject::Player * player, std::vector<std::string>
         return ;
     UInt16 id = atoi(args[1].c_str());
     player->addFighter(id);
-} 
+}
+
+
+
+void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& args)
+{
+    if( args.size() != 3 )
+        return;
+    UInt8 id = atoi(args[1].c_str());
+    if( id <= 0 || id > 3)
+       return;
+    UInt32 num = atoi(args[2].c_str());
+    player->AddMoney(id , num);
+
+}

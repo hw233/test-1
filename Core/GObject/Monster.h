@@ -53,6 +53,11 @@ namespace GObject
                 return NULL;
             }
 
+            std::set<Monster*> &GetMonsterSet(UInt8 groupId)
+            {
+                return _monsterTable[groupId-1];
+            }
+
         private:
             std::set<Monster*> _monsterTable[MONSTER_GROUPMAX];
     };

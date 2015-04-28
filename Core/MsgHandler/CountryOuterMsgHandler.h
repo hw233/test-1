@@ -378,7 +378,7 @@ struct GovernInfoReq
 void OnGovernInfo(GameMsgHdr& hdr, GovernInfoReq& gir)
 {
     MSG_QUERY_PLAYER(player);
-    player->GetGovernManager()->SendGovernInfo();
+    player->GetGovernManager()->SendBaseInfo();
 } 
 void OnClanFlash(GameMsgHdr& hdr, const void * data)
 { 

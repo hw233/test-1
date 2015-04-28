@@ -243,6 +243,11 @@ namespace GObject
             void SearchFighter(UInt8 count);
             void VisitFighter(UInt16 fighterId, UInt8 count);
 
+            //addmoney
+            void AddGold(UInt32 num);
+            void UseGold(UInt32 num);
+            void AddMoney(UInt8 type, UInt32 num);
+
     private:
             //IDTYPE _id;
             std::string _accounts;

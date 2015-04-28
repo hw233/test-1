@@ -32,25 +32,29 @@ namespace GObject
 
         if(sday < now) sday += 86400;
         AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
-
         AddTimer(86400 * 1000, World_Test, this, 10* 1000);
         
         
         time_t n = now;
         tm* tt=localtime(&n);
         UInt8 min = tt->tm_min;
-
-        AddTimer(60*60*1000, World_Govern_SendInfo,this, (60-min)*60*1000);
-
         UInt8 sec = tt->tm_sec;
-        AddTimer(2*60*1000, World_Govern_SendAward, this,((TIME_TAB-min%TIME_TAB)*60-sec)* 1000);
+
+        UInt8 second = (min%TIME_ONCE)*60 + sec;
+
+        AddTimer(10*60*1000, World_Govern_SendInfo,this,((TIME_ONCE-min%TIME_ONCE)*60-sec)*1000);
+        AddTimer(15*1000, World_Govern_SendAward, this,TIME_TAB-(second%15));//((TIME_TAB-min%TIME_TAB)*60-sec)* 1000);
 
         return true; 
     }
+
+
     void World::UnInit() 
     {
 
     }
+
+
     std::string World::GetLogName()
     {
         return "log/World/"; 
@@ -58,12 +62,13 @@ namespace GObject
 
     void World::World_Midnight_Check( World * world )
     {
-            UInt32 curtime = TimeUtil::Now();
+        UInt32 curtime = TimeUtil::Now();
 
-            //记录此刻活动状态
-            world->_worldScript->onActivityCheck(curtime+300);  //延迟300秒计算是否活动时间已过
+        //记录此刻活动状态
+        world->_worldScript->onActivityCheck(curtime+300);  //延迟300秒计算是否活动时间已过
             
     }
+
     void World::World_Test( World * world )
     { 
         struct NewUserStruct  
@@ -136,7 +141,10 @@ namespace GObject
                 time_t now = TimeUtil::Now();
                 tm* tt=localtime(&now);
                 UInt8 min = tt->tm_min;
-                UInt8 time = (( min%TIME_TAB == 0 )? (min/TIME_TAB):(min/TIME_TAB+1));
+                UInt8 sec = tt->tm_sec;
+                UInt16 restSec = min%TIME_ONCE*60+sec;
+                //15秒发一次
+                UInt16 time = ( restSec%TIME_TAB == 0 ? restSec/TIME_TAB : restSec/TIME_TAB+1 );
                 (*it)->GetGovernManager()->SendOnlineGovernAward(time);
             }
             else

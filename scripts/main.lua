@@ -1,10 +1,10 @@
 --??????????
-require("global")
-if isVTVersion() then
-require("actmsg_vt")
-else
-require("actmsg")
-end
+--require("global")
+--if isVTVersion() then
+--require("actmsg_vt")
+--else
+--require("actmsg")
+--end
 require("World/Attain")
 require("World/HeroIsland")
 require("Task/Task_All")

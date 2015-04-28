@@ -18,6 +18,8 @@ namespace GObject
              m_fighter = NULL;
          }
     }
+
+
     void GovernManager::ReplaceFighter(Fighter * ft)
     {
         if( ft == NULL || ft == m_fighter)
@@ -29,30 +31,30 @@ namespace GObject
         st<<Stream::eos;
         m_owner->send(st);
 
-
         //换将的话 怪物信息得重发
         SendGovernResult(1);
-        
     }
 
 
     void GovernManager::SpeedUp()
     {
+        _speedUpId2Num.clear();
         UInt8 ret = 1;
         if(m_fighter == NULL )
-            ret = 0;
+            ret = 2 ;
         if(m_owner->GetVar(VAR_GOVERN_SPEEDUP_CNT) >= SPEEDUP_FREE_CNT )
         {
-            return;
-            //扣元宝
+            ret = 4;
+        }
+        if( m_owner->GetVar(VAR_GOLD) < 10 )
+        {
+            ret = 0;
         }
         UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
-        GetSpeedUpGains(times);
-        //判断背包是否已满
-        if( false)
+        if( ret == 1)
         {
-            ret = 1;
-
+            GetSpeedUpGains(times);
+            m_owner->UseGold(10);
         }
         Stream st(REP::GOVERN_SPEEDUP);
         st<<static_cast<UInt8>(ret);
@@ -64,14 +66,34 @@ namespace GObject
         }
         st<<Stream::eos;
         m_owner->send(st);
-        _speedUpId2Num.clear();
+
+        if( ret != 1)
+        {
+            return;
+        }
+
         m_owner->AddVar(VAR_GOVERN_SPEEDUP_CNT,1);
         //发背包 更新背包数据库
+        //
+        for( auto it = _speedUpId2Num.begin() ; it != _speedUpId2Num.end(); ++it)
+        {
+            if( it->first == 100 )
+            {
+                m_owner->AddGold(it->second);
+                Stream st(REP::USER_INFO_CHANGE);
+                st<<static_cast<UInt8>(2);
+                st<<static_cast<UInt32>(it->second);
+                st<<Stream::eos;
+                m_owner->send(st);
+            }
+            m_owner->GetPackage()->AddItem((it)->first,(it)->second,true,true,0);
+        }
     }
 
-    void GovernManager::SendGovernInfo()
+    void GovernManager::SendBaseInfo()
     {
         Stream st(REP::GOVERN_INFO);
+        m_fighter = m_owner->findFighter(m_owner->GetVar(VAR_GOVERN_FIGHTERID));
         UInt16 fighterId = 0;
         if( m_fighter != NULL )
             fighterId = m_fighter->getId();
@@ -96,22 +118,50 @@ namespace GObject
 
     Monster* GovernManager::RandomOneMonster(UInt8 groupId)
     {
-        //UInt32 monsterId = RandomOneMonster(groupId);
-        UInt32 rand = uRand();
-        std::cout<<rand<<std::endl;
-        Monster* mon = monsterTable.GetMonster(groupId,1);
+        std::set<Monster*> monSet = monsterTable.GetMonsterSet(groupId);
+        std::vector<Monster*> monVec;
+        UInt8 n = monSet.size();
+        for( auto it = monSet.begin() ; it != monSet.end() ; ++it)
+        {
+            monVec.push_back(*it);
+        }
+        UInt32 rand = uRand()%n;
+        Monster* mon = monVec[rand];
         return mon;
     }
 
     UInt8 GovernManager::FightWithMonster(Monster* mon)
     {
-        UInt32 power = 1000;
+        UInt32 power = m_fighter->GetTotalPower();
         //小胜  大胜  平局  失败
-        UInt8 res = 1;
-        if( mon->GetPower() < power ) //人胜
+        UInt8 res = 0;
+        cout<<"  "<<m_fighter->GetName()<<"战力   "<<power<<"   ";
+        if( power >= mon->GetPower()*1.4 ) 
         {
-            //
+            cout<<"  大胜 ";
+            res = 1;   //大胜
         }
+        else if( power >= mon->GetPower()*1.2)
+        {
+            cout<<"  小胜 ";
+            res = 2;  //小胜
+        }
+        else if( power >= mon->GetPower())
+        {
+            cout<<"  平手 ";
+            res = 3;
+        }
+        else if( power >= mon->GetPower()*0.8)
+        {
+            cout<<"  小败 ";
+            res = 4;
+        }
+        else
+        {
+            cout<<" 大败 ";
+            res = 5;
+        }
+        cout<<"    野怪名字   "<<mon->GetMonsterName()<<"   野怪战力   " <<mon->GetPower()<<endl;
         return res;
 
     }
@@ -124,9 +174,18 @@ namespace GObject
         UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
         for(UInt8 i = 0; i < times ; ++i )
         {
-             Monster* mon = RandomOneMonster(1);
+             UInt8 rand = uRand()%3+1;
+             Monster* mon = RandomOneMonster(rand);
              UInt8 res = FightWithMonster(mon);
-             GovernInfo info(mon->GetGroupId(),mon->GetMonsterId(),res);
+             UInt16 base = GameAction()->GetGovernDropItem(res);
+             UInt16 random = uRand()%10000 ;
+
+             bool isGet = false;
+             //if( random < base )
+             //{
+                 isGet = true;
+             //}
+             GovernInfo info(mon->GetGroupId(),mon->GetMonsterId(),res,isGet);
              _vecGovernInfo.push_back(info);
         }
         Stream st(REP::GOVERN_ONLINE_GAIN);
@@ -141,16 +200,10 @@ namespace GObject
             time_t now = time(NULL);
             tm* tt=localtime(&now);
             UInt8 min = tt->tm_min;
-            if( min == 60-TIME_TAB || min == 60-TIME_TAB+1 )
-            {
-                cnt = 0;
-                begin = 30;
-            }
-            else
-            {
-                begin = (( min%TIME_TAB == 0) ? (min/TIME_TAB):(min/TIME_TAB+1));
-                cnt = times - begin; 
-            }
+            UInt8 sec = tt->tm_sec;
+            UInt16 second = min%TIME_ONCE+sec;
+            begin = (( second%TIME_TAB == 0) ? (second/TIME_TAB):(second/TIME_TAB+1));
+            cnt = times - begin; 
         }
         st<<static_cast<UInt8>(cnt);
         GetGovernInfo(st,begin);
@@ -161,10 +214,18 @@ namespace GObject
 
     void GovernManager::GetOneSpeedUpGain() //一次加速获得收益
     {
-        Monster* mon = RandomOneMonster(1);
+        UInt8 rand = uRand()%3+1;
+        Monster* mon = RandomOneMonster(rand);
         UInt8 res = FightWithMonster(mon);
         std::vector<ItemInfo> vecItem;
-        GetItemsByResult(res,mon->GetGroupId(),mon->GetMonsterId(),vecItem);
+        UInt16 base = GameAction()->GetGovernDropItem(res);
+        UInt16 random = uRand()%10000 ;
+        bool isGet = false;
+        //if( random < base )
+        //{
+            isGet = true;
+        //}
+        GetItemsByResult(res,mon->GetGroupId(),mon->GetMonsterId(),isGet,vecItem);
         for(auto it = vecItem.begin(); it != vecItem.end(); ++it)
         {
 
@@ -201,8 +262,10 @@ namespace GObject
         for(UInt8 i=begin ;i < _vecGovernInfo.size(); ++i )
         {
             st<<static_cast<UInt32>(_vecGovernInfo[i].monsterId);
-            st<<static_cast<UInt8>(_vecGovernInfo[i].res);
-
+            bool isGet = _vecGovernInfo[i].isGet;
+            UInt8 res = _vecGovernInfo[i].res;
+            res = res | (isGet << 4);
+            st<<static_cast<UInt8>(res);
         }
     }
 
@@ -212,15 +275,32 @@ namespace GObject
             return;
         if( _vecGovernInfo.size() == 0 )
             return ;
-        if( number < 0  || number >= 30 )
+        if( number <= 0  || number > 40 )
             return ;
-        //GovernInfo& info = _vecGovernInfo[number];
-             //curMonster = monsterTable.GetMonster(info.monsterId);
-        //UInt8 res = info.res;
+        GovernInfo& info = _vecGovernInfo[number-1];
+        curMonster = monsterTable.GetMonster(info.groupId , info.monsterId);
+        std::vector<ItemInfo> vecItem;
+        GetItemsByResult(info.res,curMonster->GetGroupId(),curMonster->GetMonsterId(),info.isGet, vecItem);
+        for( auto it = vecItem.begin(); it != vecItem.end() ; ++it )
+        {
+            if( (*it).id  == 100 )
+            {
+                m_owner->AddGold((*it).num);
+                Stream st(REP::USER_INFO_CHANGE);
+                st<<static_cast<UInt8>(2);
+                st<<static_cast<UInt32>((*it).num);
+                st<<Stream::eos;
+                m_owner->send(st);
+            }
+            else
+            {
+                m_owner->GetPackage()->AddItem((*it).id,(*it).num,true,true,0);
+            }
+        }
     }
 
 
-    void GovernManager::GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,std::vector<ItemInfo>& vecItem)
+    void GovernManager::GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,bool isGet, std::vector<ItemInfo>& vecItem)
     {
         if(res <= 0  || res > 5 )
         {
@@ -228,10 +308,8 @@ namespace GObject
         }
         Monster* mon = monsterTable.GetMonster(groupId,monsterId);
         UInt16 moneyNum = mon->GetMoney();
-        float percent =  GameAction()->getGovernDropMoney(res)/10000;
-        UInt16 base =    GameAction()->getGovernDropItem(res);
-        UInt16 rand = 1000 ;//URandom(0,10000);
-        if( rand <= base )
+        UInt16 base =  GameAction()->GetGovernDropMoney(res);
+        if( isGet )
         {
             UInt32  itemId = mon->GetItemId();
             UInt8 itemNum = mon->GetItemNum();
@@ -240,11 +318,11 @@ namespace GObject
                vecItem.push_back(ItemInfo(itemId,itemNum));
             }
         }
-    
-        if( percent != 0 )
-        {
-            vecItem.push_back(ItemInfo(100,moneyNum*percent));
-        }
+        base = 2000;
+        //if( base != 0 )
+        //{
+            vecItem.push_back(ItemInfo(100,moneyNum*(base/10000.0f)));
+        //}
     }
 
 
@@ -252,27 +330,36 @@ namespace GObject
 
     void GovernManager::SendOfflineGovernAward()
     {
+        m_fighter = m_owner->findFighter(m_owner->GetVar(VAR_GOVERN_FIGHTERID));
         if( !m_fighter )
             return;
         Monster* mon = RandomOneMonster(1);
+        curMonster = mon; 
         UInt8 res = FightWithMonster(mon);
         std::vector<ItemInfo> vecItemInfo;
-        GetItemsByResult(res,mon->GetGroupId(),mon->GetMonsterId(),vecItemInfo);
-        for(auto it = vecItemInfo.begin(); it != vecItemInfo.end(); ++it)
+        UInt16 base = GameAction()->GetGovernDropItem(res);
+        UInt16 random = uRand()%10000 ;
+        bool isGet = false;
+        //if( random < base )
+        //{
+            isGet = true;
+        //}
+        std::vector<ItemInfo> items;
+        GetItemsByResult(res,mon->GetGroupId(),mon->GetMonsterId(),isGet,items);
+        for(auto it = items.begin(); it != items.end(); ++it)
         {
             UInt32 itemId = (*it).id;
             UInt16 itemNum = (*it).num;
-
             if( _offlineId2Num.find(itemId) != _offlineId2Num.end() )
             {
                 _offlineId2Num[itemId] += itemNum;
-                DB7().PushUpdateData("update govern_offlinegain set `itemNum` = %u where `itemId` = %u AND `playerId` = %"I64_FMT"u ",itemId,m_owner->getId());
-            }
-            else
-            {
-                _offlineId2Num[itemId] = itemNum;
-                DB7().PushUpdateData("insert into  govern_offlinegain(playerId,itemId,itemNum) value(%"I64_FMT"u,%u,%u)",m_owner->getId(),itemId,itemNum);
-            }
+                DB7().PushUpdateData("update govern_offlinegain set `itemNum` = %u where `itemId` = %u AND `playerId` = %"I64_FMT"u ",itemNum,itemId,m_owner->getId());
+             }
+             else
+             {
+                 _offlineId2Num[itemId] = itemNum;
+                 DB7().PushUpdateData("insert into  govern_offlinegain(playerId,itemId,itemNum) value(%"I64_FMT"u,%u,%u)",m_owner->getId(),itemId,itemNum);
+             }
         }
     }
 
@@ -289,6 +376,7 @@ namespace GObject
 
     void GovernManager::GiveGovernOfflineGain()
     {
+        m_fighter = m_owner->findFighter(m_owner->GetVar(VAR_GOVERN_FIGHTERID));
         if( !m_fighter )
             return;
         //往背包中放置物品
@@ -296,8 +384,21 @@ namespace GObject
             return;
         for( auto it = _offlineId2Num.begin() ; it != _offlineId2Num.end(); ++it)
         {
-            m_owner->GetPackage()->AddItem((it)->first,(it)->second,true,true,0);
+            
+            if( it->first == 100 )
+            {
+                m_owner->AddGold(it->second);
+                Stream st(REP::USER_INFO_CHANGE);
+                st<<static_cast<UInt8>(2);
+                st<<static_cast<UInt32>(it->second);
+                st<<Stream::eos;
+                m_owner->send(st);
 
+            }
+            else
+            {
+                m_owner->GetPackage()->AddItem((it)->first,(it)->second,true,true,0);
+            }
         }
         //发完后清理离线治理物品数据库
 	    DB7().PushUpdateData("delete from govern_offlinegain where `playerId` = %"I64_FMT"u",m_owner->getId());

@@ -199,7 +199,7 @@ CREATE TABLE `monster`(
     `id` int(10) NOT NULL DEFAULT '0',
     `groupId` tinyint(3) NOT NULL DEFAULT '0',
     `name` varchar(255) NOT NULL,
-    `power` tinyint(3) NOT NULL DEFAULT '0',
+    `power` int(10) NOT NULL DEFAULT '0',
     `money` int(10) NOT NULL DEFAULT '0',
     `itemId` int(10) NOT NULL DEFAULT '0',
     `itemNum` tinyint(3) NOT NULL DEFAULT '0',    
