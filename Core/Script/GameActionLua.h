@@ -28,12 +28,12 @@ namespace Script
             void init();
             void postInit();
             void RegisterActionInterface();
+            UInt16 GetGovernDropMoney(UInt8 res);
+            UInt16 GetGovernDropItem(UInt8 res);
 
         public:
             const char* GetItemName(UInt32 itemId);
             const char* GetGreatFighterName(UInt32 fgtId);
-            UInt16 GetGovernDropMoney(UInt8 res);
-            UInt16 GetGovernDropItem(UInt8 res);
             UInt16 GetRandFighter();
 
         public:

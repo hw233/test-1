@@ -256,13 +256,13 @@ namespace Script
 
     UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
     {
-        return Run<UInt16>(NULL, "GetGovernDropMoney", res);
+        return Run<UInt16>(NULL,"GetGovernDropMoney", res);
     }
 
 
     UInt16 GameActionLua::GetGovernDropItem(UInt8 res)
     {
-        return Run<UInt16>(NULL, "GetGovernDropItem", res);
+        return Run<UInt16>(NULL,"GetGovernDropItem", res);
     }
     
     UInt16 GameActionLua::GetRandFighter()

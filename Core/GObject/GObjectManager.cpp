@@ -347,7 +347,7 @@ namespace GObject
         LoadingCounter lc("Loading Item");
         lc.reset(1000);
         DBItem item;
-        if(execu->Prepare("SELECT `itemId`,`playerId`,`count` FROM `item`", item) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`,`itemId`,`count` FROM `item`", item) != DB::DB_OK)
             return false;
         Player* pl = NULL;
         while(execu->Next() == DB::DB_OK)

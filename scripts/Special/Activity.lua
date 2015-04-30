@@ -1492,7 +1492,7 @@ function onInvitedBy(player)
 end
 
 function onCLLoginReward(player, cts)
-    if isFBVersion() then
+    if true --[[isFBVersion()--]] then
         if cts == 0 then
             player:getCoupon(20)
             return
@@ -1513,7 +1513,7 @@ function onCLLoginReward(player, cts)
 end
 
 function onCLLoginRewardRF(player, cts, _type)
-    if isFBVersion() then
+    if false --[[isFBVersion()--]] then
         if cts == 0 then
             player:getCoupon(10)
             return 0
@@ -1734,7 +1734,7 @@ function onTurnOnRF7Day(player, total, offset)
 end
 
 function onEnchantAct(player, level, quality, _type)
-    if isFBVersion() then
+    if false --[[isFBVersion()--]] then
         local pic = {1416, 1417, 1418, 1419, 1420};
         local rand = math.random(1, #pic);
         local rand2 = math.random(1, #pic);
@@ -12232,6 +12232,5 @@ function exchangeTreasure(player,index,num,now)
 
     return true
 end
-
 
 

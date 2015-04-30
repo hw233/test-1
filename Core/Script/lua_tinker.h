@@ -763,6 +763,7 @@ namespace lua_tinker
 
 		lua_pushstring(L, name);
 		lua_gettable(L, LUA_GLOBALSINDEX);
+        print_error(L,"what is why is it `%d' " ,lua_type(L, -1));
 		if(lua_isfunction(L,-1))
 		{
 			push(L, arg);

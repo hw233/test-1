@@ -51,7 +51,7 @@ namespace GObject  //治理
             Monster* RandomOneMonster(UInt8 groupId);
             void SendGovernAward(UInt8 number);
             void GetGovernInfo(Stream &st, UInt8 begin);
-            void OfflineGainsInfo(Stream &st);
+            void SendOfflineGainsInfo();
             void SendGovernResult(UInt8 type);
             inline void Clear() { _vecGovernInfo.clear();}
             void loadGovernOfflineGain(UInt32 itemId, UInt32 itemNum);

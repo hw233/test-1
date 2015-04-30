@@ -150,7 +150,7 @@ void GMHandler::OnAddFighter( GObject::Player * player, std::vector<std::string>
 
 void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& args)
 {
-    if( args.size() != 3 )
+    if( args.size() != 2 )
         return;
     UInt8 id = atoi(args[1].c_str());
     if( id <= 0 || id > 3)

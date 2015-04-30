@@ -97,8 +97,8 @@ namespace GObject
 
     struct DBItem
     {
-        UInt32 itemId;
         UInt64 playerId;
+        UInt32 itemId;
         UInt32 count;
     };
 
@@ -254,8 +254,8 @@ namespace DB
     SPECIALBEGIN(GObject::DBItem)
     SPECIALDEF(3)
     (
-     UInt32 , itemId,
      UInt64 , playerId,
+     UInt32 , itemId,
      UInt32 , count
     )
     SPECIALEND()

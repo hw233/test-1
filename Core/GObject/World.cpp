@@ -40,10 +40,21 @@ namespace GObject
         UInt8 min = tt->tm_min;
         UInt8 sec = tt->tm_sec;
 
-        UInt8 second = (min%TIME_ONCE)*60 + sec;
+        UInt16 second = 0;
+        UInt16 s = 0;
+        if( min%TIME_ONCE == 0 && sec == 0 )
+        {
+            second = 0;
+            s = 0 ;
+        }
+        else
+        {
+            second = ((min%TIME_ONCE)*60+sec)%TIME_TAB;
+            s = TIME_ONCE*60-((min%TIME_ONCE)*60+sec);
+        }
 
-        AddTimer(10*60*1000, World_Govern_SendInfo,this,((TIME_ONCE-min%TIME_ONCE)*60-sec)*1000);
-        AddTimer(15*1000, World_Govern_SendAward, this,TIME_TAB-(second%15));//((TIME_TAB-min%TIME_TAB)*60-sec)* 1000);
+        AddTimer(10*60*1000, World_Govern_SendInfo,this,s*1000);
+        AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second)*1000);
 
         return true; 
     }
@@ -142,15 +153,24 @@ namespace GObject
                 tm* tt=localtime(&now);
                 UInt8 min = tt->tm_min;
                 UInt8 sec = tt->tm_sec;
-                UInt16 restSec = min%TIME_ONCE*60+sec;
+                UInt16 restSec = (min%TIME_ONCE==0 && sec == 0) ? 0: (min%TIME_ONCE*60+sec);
                 //15秒发一次
-                UInt16 time = ( restSec%TIME_TAB == 0 ? restSec/TIME_TAB : restSec/TIME_TAB+1 );
-                (*it)->GetGovernManager()->SendOnlineGovernAward(time);
+                UInt16 time = 0;
+                if( restSec == 0 )
+                {
+                    time = 0;
+                }
+                else
+                {
+                     time = ( restSec%TIME_TAB == 0 ? restSec/TIME_TAB : restSec/TIME_TAB+1);
+                }
+                GameMsgHdr hdr(0x155,WORKER_THREAD_COUNTRY_1,(*it),sizeof(time));
+                GLOBAL().PushMsg(hdr,&time);
             }
             else
             {
-                (*it)->GetGovernManager()->SendOfflineGovernAward();
-
+                GameMsgHdr hdr(0x156,WORKER_THREAD_COUNTRY_1,(*it),NULL);
+                GLOBAL().PushMsg(hdr,NULL);
             }
         }
     }
