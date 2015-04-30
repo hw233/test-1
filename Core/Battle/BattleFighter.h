@@ -119,7 +119,8 @@ namespace Battle
 
             BattleField * GetField();
 
-            UInt8 GetRide(){ return 1 ;} //TODO
+            UInt8 GetRide(UInt8 landform);
+            UInt8 GetMaxRide() { return 3;}  //获得最大的行动力
             UInt8 GetClass(){ return _fighter->GetClass();}
             UInt8 GetDistance(){ return 1;}   //攻击距离BattleGround
             UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}

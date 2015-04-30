@@ -5,6 +5,8 @@
 #include "Script/BattleFormula.h"
 #include "BattleAction.h"
 #include "GObject/Player.h"
+#include "GameActionLua.h"
+#include "Country.h"
 
 namespace Battle
 {
@@ -54,7 +56,12 @@ namespace Battle
                 delete m_fighters[i];
         }
 
-    }   
+    }  
+
+    UInt8 BattleFighter::GetRide(UIn8 landform = 2)
+    {
+        GameAction()->GetRide(landform);
+    }
 
     void BattleFighter::setFighter(GObject::Fighter * f)
     { 

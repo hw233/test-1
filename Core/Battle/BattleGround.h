@@ -53,33 +53,20 @@ namespace Battle
     struct TargetInfo
     {
         BattleFighter * bo;
-        UInt8 ax;  //进攻点 一个行动力
-        UInt8 ay;  
-        UInt8 gx;  //目标点
-        UInt8 gy;  
-        UInt8 size;  //攻击路径的长度
-        TargetInfo():bo(NULL),ax(0),ay(0),gx(0),gy(0) {}
-        TargetInfo(BattleFighter * bf,UInt8 x1,UInt8 y1,UInt8 x2,UInt8 y2):bo(bf),ax(x1),ay(y1),gx(x2),gy(y2) {}
-        void clear(){bo = NULL; ax=0; ay =0;gx=0;gy=0;}
+        GObject::Ascoord stand;
+        GObject::Ascoord goal;
+        UInt8 size;   //从起点到攻击点的路径长度
+        UInt8 prio;   //攻击优先级
+        TargetInfo(BattleFighter * bf,GObject::Ascoord s,GObject::Ascoord g,UInt8 s,UInt8 p):bo(bf),stand(s),goal(g),size(s),prio(p) {}
     };
 
-
-    struct attackInfo
-    {
-       UInt8 size; //路径的长度
-       UInt8 pri;  //优先级
-       GObject::Ascoord target;
-    };
 
     class BattleGround
     {
-        friend class AStar;
         public:
             BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID())
             {
                 map_player.clear();
-                _x = 20;
-                _y = 10;
                 InitMapFight(mapId);
             }
             BattleGround():_astar(GObject::AStar::AStar()){}
@@ -87,7 +74,7 @@ namespace Battle
             {
                 delete [] _mapGround;
                 delete [] _mapFighters;
-                delete [] _mapFlag;
+                //delete [] _mapFlag;
             }
 
             void InitMapFight(UInt8 mapId);
@@ -112,8 +99,14 @@ namespace Battle
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
-            UInt8 GetFactAttackDis();
-            TargetInfo makeTarget(GObject::Ascoord traget,UInt8 ride);
+
+            void GetEnemys(UInt8 x , UInt8 y,std::vector<GObject::Ascoord>& vecEnemy);  //获得敌人的坐标的
+            //UInt8 GetFactAttackDis();
+            //TargetInfo makeTarget(GObject::Ascoord traget,UInt8 ride);
+            void BowGetTarget(UInt8 direction, UInt8 destx , UInt8 desty);
+            void SetBattleInfo();
+            bool CanAttack(GObject::Ascoord& stand, GObject::Ascoord& target);
+            void ParsePath(std::vector<GObject::Ascoord> &path);
         private:
             UInt32 _id;
             UInt8 _x;
@@ -121,7 +114,8 @@ namespace Battle
             std::map<UInt8 ,std::vector<GObject::Player *> >  map_player;
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
-            UInt8 * _mapFlag;
+            //UInt8 * _mapFlag;    
+            UInt8 * _mapCamp;    //地图阵营信息
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
 
             //来一个记录战将分布的结构 满足
@@ -129,7 +123,7 @@ namespace Battle
             std::vector<BattleInfo> battleIds;
 
             //std::vector<TargetInfo>  _vecTarget;
-            TargetInfo _target;
+            std::vector<TargetInfo> _vecTarget;
             BattleFighter * currentBf;
             //static UInt8 scopeForOne[12];
             Stream _pack;

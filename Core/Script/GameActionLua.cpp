@@ -272,6 +272,26 @@ namespace Script
         return Run<UInt16>(NULL, "GetRandFighter");
     }
 
+    Table GameActionLua::GetMapInfo(UInt8 mapId)
+    {
+        return Run<Table>(NULL, "GetMapInfo",mapId);
+    }
+
+    Table GameActionLua::GetCampInfo(UInt8 mapId)
+    {
+        return Run<Table>(NULL,"GetCampInfo",mapId);
+    }
+
+    UInt8 GetRide(UInt8 landform)
+    {
+        return Run<UInt8>(NULL,"GetRide",landform);
+    }
+
+    UInt8 GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息
+    {
+        return Run<UInt8>(NULL,"GetInfo",mapId,x,y);
+    }
+
 
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
     //{

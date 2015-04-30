@@ -34,6 +34,10 @@ namespace Script
             const char* GetGreatFighterName(UInt32 fgtId);
             UInt16 getGovernDropMoney(UInt8 res);
             UInt16 getGovernDropItem(UInt8 res);
+            UInt8  GetRide(UInt8 landform);
+            Table  GetMapInfo(UInt8 mapId);
+            Table  GetCampInfo(UInt8 mapId);
+            UInt8  GetInfo(UInt8 mapId,UInt8 x , UInt y );
             UInt16 GetRandFighter();
 
         public:

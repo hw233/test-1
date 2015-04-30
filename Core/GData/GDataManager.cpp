@@ -74,11 +74,11 @@ namespace GData
             std::abort();
         }
 
-        if (!LoadMapInfo())  
+        /*if (!LoadMapInfo())  
         {
             fprintf(stderr, "Load LoadMapInfo Error !\n");
             std::abort();
-        }
+        }*/
         if (!LoadMonster())  
         {
             fprintf(stderr, "Load LoadMonster Error !\n");
@@ -295,7 +295,8 @@ namespace GData
         }
         return true;
     } 
-
+    
+    /*
     bool GDataManager::LoadMapInfo()
     { 
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -309,6 +310,7 @@ namespace GData
         }
         return true;
     } 
+    */
 
 
     bool GDataManager::LoadMonster()

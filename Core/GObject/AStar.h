@@ -79,16 +79,17 @@ namespace GObject
 
 	    bool IsObstacle(const Ascoord& coord);
 	
-	    void  SetStart(const Ascoord& coord)  {m_start  = coord;}
-	    void  SetTarget(const Ascoord& coord) {m_target = coord;}
-	    const Ascoord& GetStart()            {return m_start;}
-	    const Ascoord& GetTarget()           {return m_target;}
+	    void  SetStart(const Ascoord& coord)  {  m_start  = coord;  }
+	    void  SetTarget(const Ascoord& coord) {  m_target = coord;  }
+	    const Ascoord& GetStart()            {   return m_start;  }
+	    const Ascoord& GetTarget()           {   return m_target; }
         void  SetMap(UInt8* map);
-        void  SetFighters(Battle::BattleObject** mapfighters) { m_mapFighters = mapfighters;}
-        void  SetCurrentBf(Battle::BattleFighter* bf) { m_currentBf = bf; }
-
+        void  SetBattleInfo(UInt8* map);
+        void  SetSide(UInt8 side) { m_side = side; }
     private:
+        UInt8   m_side;   //属于哪一种势力
         UInt8*  m_map;
+        UInt8*  m_battleInfo;   //战场分布情况
 
 	    Ascoord m_target;
 	    Ascoord m_start;
@@ -102,8 +103,6 @@ namespace GObject
 	
 	    std::list<StepData> m_openList;
 	    std::list<StepData> m_closeList;
-        Battle::BattleObject ** m_mapFighters;
-        Battle::BattleFighter * m_currentBf;
 	
 	    bool popBestStep(StepData* pSD); 
 	    bool isInList(std::list<StepData>& list, const Ascoord& coord);
