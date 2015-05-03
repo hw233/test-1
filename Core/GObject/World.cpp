@@ -145,33 +145,25 @@ namespace GObject
 
     void World::World_Govern_SendAward(World* world)
     {
-        for(auto it = GObject::globalPlayerVec.begin() ; it != GObject::globalPlayerVec.end() ; ++it)
+        for(auto it = GObject::globalOnlinePlayerSet.begin() ; it != GObject::globalOnlinePlayerSet.end() ; ++it)
         {
-            if((*it)->isOnline())
+            //在线
+            time_t now = TimeUtil::Now();
+            tm* tt=localtime(&now);
+            UInt8 min = tt->tm_min;
+            UInt8 sec = tt->tm_sec;
+            UInt16 restSec = (min%TIME_ONCE==0 && sec == 0) ? 0: (min%TIME_ONCE*60+sec);
+            UInt16 time = 0;
+            if( restSec == 0 )
             {
-                time_t now = TimeUtil::Now();
-                tm* tt=localtime(&now);
-                UInt8 min = tt->tm_min;
-                UInt8 sec = tt->tm_sec;
-                UInt16 restSec = (min%TIME_ONCE==0 && sec == 0) ? 0: (min%TIME_ONCE*60+sec);
-                //15秒发一次
-                UInt16 time = 0;
-                if( restSec == 0 )
-                {
-                    time = 0;
-                }
-                else
-                {
-                     time = ( restSec%TIME_TAB == 0 ? restSec/TIME_TAB : restSec/TIME_TAB+1);
-                }
-                GameMsgHdr hdr(0x155,WORKER_THREAD_COUNTRY_1,(*it),sizeof(time));
-                GLOBAL().PushMsg(hdr,&time);
+                time = 0;
             }
             else
             {
-                GameMsgHdr hdr(0x156,WORKER_THREAD_COUNTRY_1,(*it),NULL);
-                GLOBAL().PushMsg(hdr,NULL);
+                time = ( restSec%TIME_TAB == 0 ? restSec/TIME_TAB : restSec/TIME_TAB+1);
             }
+            GameMsgHdr hdr(0x155,WORKER_THREAD_COUNTRY_1,(*it),sizeof(time));
+            GLOBAL().PushMsg(hdr,&time);
         }
     }
 

@@ -270,6 +270,11 @@ namespace Script
         return Run<UInt16>(NULL, "GetRandFighter");
     }
 
+    UInt16 GameActionLua::RandMonster(UInt8 group)
+    {
+        return Run<UInt16>(NULL,"RandMonster");
+    }
+
 
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
     //{

@@ -147,6 +147,7 @@ namespace GData
         std::string name;
         UInt32 power;
         UInt16 money;
+        UInt16 prob;
         UInt32 itemId;
         UInt8  itemNum;
     };
@@ -316,13 +317,14 @@ namespace DB
         SPECIALEND()
 
        SPECIALBEGIN(GData::DBMonster)
-       SPECIALDEF(7)
+       SPECIALDEF(8)
        (
           UInt32, id,
           UInt8,  groupId,
           std::string, name,
           UInt32, power,
           UInt16, money,
+          UInt16, prob,
           UInt32, itemId,
           UInt8,  itemNum
        )

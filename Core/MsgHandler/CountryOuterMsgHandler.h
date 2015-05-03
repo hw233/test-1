@@ -540,13 +540,5 @@ void OnGiveOnlineAward(GameMsgHdr& hdr,const void * data)
 
 }
 
-void OnGetOfflineGain(GameMsgHdr& hdr,const void * data)
-{
-    MSG_QUERY_PLAYER(player);
-    BinaryReader br(data,hdr.msgHdr.bodyLen);
-    player->GetGovernManager()->SendOfflineGovernAward();
-}
-
-
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

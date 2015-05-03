@@ -246,6 +246,7 @@ namespace GObject
             void AddGold(UInt32 num);
             void UseGold(UInt32 num);
             void AddMoney(UInt8 type, UInt32 num);
+            UInt8 GetGovernLevel() { return uRand(2)+1;}
 
     private:
             //IDTYPE _id;

@@ -54,9 +54,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
     if(1)
     {
         player->GetGovernManager()->GiveGovernOfflineGain(); //发送离线治理获得的物品
-        player->GetGovernManager()->SendOfflineGainsInfo();
     }
-    //治理信息(一次性发一个小时的)
     if(1)
     {
         player->GetGovernManager()->SendGovernResult(1);

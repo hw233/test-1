@@ -38,6 +38,8 @@ namespace GObject  //治理
         bool   isGet;  //是不是可以领取物品
     };
 
+    typedef std::map<UInt32,UInt32> mapId2Num;
+
     class GovernManager
     {
         public:
@@ -45,26 +47,22 @@ namespace GObject  //治理
             void ReplaceFighter(Fighter * ft);
             void SpeedUp();
             void SendBaseInfo();
-            void GetSpeedUpGains(UInt32 times);    //多次的收益
-            void GetOneSpeedUpGain();  //一次的收益
             UInt8 FightWithMonster(Monster* mon);
             Monster* RandomOneMonster(UInt8 groupId);
             void SendGovernAward(UInt8 number);
             void GetGovernInfo(Stream &st, UInt8 begin);
-            void SendOfflineGainsInfo();
             void SendGovernResult(UInt8 type);
-            inline void Clear() { _vecGovernInfo.clear();}
             void loadGovernOfflineGain(UInt32 itemId, UInt32 itemNum);
             void GiveGovernOfflineGain();
-            void SendOfflineGovernAward();
+            void SendOfflineGainsInfo(mapId2Num& offId2Num);
             void SendOnlineGovernAward(UInt8 number);
             void GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,bool isGet,std::vector<ItemInfo>&itemInfo);
+            void GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt8 times,std::vector<ItemInfo>&vecItem);
+            void GetTotalAward(UInt32 times,mapId2Num& mapId2Num);
         private:
             Player* m_owner;
             Fighter * m_fighter;
             Monster *curMonster;
-            std::map<UInt32,UInt32> _speedUpId2Num; //加速获得物品
-            std::map<UInt32,UInt32> _offlineId2Num; //离线获得物品
             std::vector<GovernInfo> _vecGovernInfo;
     };
 }

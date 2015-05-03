@@ -318,11 +318,11 @@ namespace GData
         LoadingCounter lc("Loading Monster");
         lc.reset(1000);
         DBMonster monsterInfo;
-        if(execu->Prepare("SELECT `id`,`groupId`,`name`,`power`,`money`,`itemId`,`itemNum` FROM `monster`", monsterInfo) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`groupId`,`name`,`power`,`money`,`prob`,`itemId`,`itemNum` FROM `monster`", monsterInfo) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.itemId,monsterInfo.itemNum);
+            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.prob,monsterInfo.itemId,monsterInfo.itemNum);
             GObject::monsterTable.InsertMonster(mon);
             lc.advance();
         }

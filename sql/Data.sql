@@ -201,6 +201,7 @@ CREATE TABLE `monster`(
     `name` varchar(255) NOT NULL,
     `power` int(10) NOT NULL DEFAULT '0',
     `money` int(10) NOT NULL DEFAULT '0',
+    `prob`  int(10) NOT NULL DEFAULT '0',
     `itemId` int(10) NOT NULL DEFAULT '0',
     `itemNum` tinyint(3) NOT NULL DEFAULT '0',    
     PRIMARY KEY(`id`,`groupId`)
