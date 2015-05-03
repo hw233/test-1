@@ -15,19 +15,19 @@ namespace GData
         eMax
     };
 
-
+    typedef std::vector< std::vector<UInt8> > vecInfo;
     class Map
     {
         public:
             void loadMapInfo(UInt8 mapId);
-            void loadMapCampInfo(UInt8 mapId);         
+            void loadCampInfo(UInt8 mapId);         
             UInt8 getlandForm(UInt8 mapId,UInt8 x,UInt8 y);  //由坐标获得地图上的地形
-            std::vector<std::vector<UInt8>> getMapInfo() const { return __mapInfo;}
-            std::vector<std::vector<UInt8>> getMapCampInfo() const { return _mapCamp;}
+            vecInfo GetMapInfo() { return _mapInfo;}
+            vecInfo GetCampInfo() { return _mapCamp;}
 
         private:
-            std::vector<std::vector<UInt8>> _mapInfo;    //地图信息
-            std::vector<std::vector<UInt8>> _mapCamp;//地图阵营信息
+            vecInfo _mapInfo;    //地图信息
+            vecInfo _mapCamp;//地图阵营信息
     };
     extern Map map;
 }

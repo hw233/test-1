@@ -37,7 +37,7 @@ namespace Script
             UInt8  GetRide(UInt8 landform);
             Table  GetMapInfo(UInt8 mapId);
             Table  GetCampInfo(UInt8 mapId);
-            UInt8  GetInfo(UInt8 mapId,UInt8 x , UInt y );
+            UInt8  GetInfo(UInt8 mapId,UInt8 x , UInt8 y );
             UInt16 GetRandFighter();
 
         public:

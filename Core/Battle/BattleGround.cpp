@@ -1,11 +1,12 @@
 #include "BattleGround.h"
-
 #include "BattleFighter.h" 
 #include "GObject/Player.h"
 #include "Battle/BattleSimulator.h"
 #include "Battle/BattleReport.h"
 #include "Common/StringTokenizer.h"
 #include "GData/Map.h"
+#include "GObject/Country.h"
+#include "Script/GameActionLua.h"
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
@@ -13,10 +14,10 @@
 namespace Battle
 {
     //UInt8 scopeForOne[12] = {-2,0, -1,2, 1,-2, 2,0, 1,-2, -1,-2};
-    static UInt8 getDistanceForTwo(UInt8 x ,UInt8 y, UInt8 x1 , UInt8 y1)
-    {
-        return MAX((ABS(x,x1)),(ABS(y,y1)));
-    }
+    //static UInt8 getDistanceForTwo(UInt8 x ,UInt8 y, UInt8 x1 , UInt8 y1)
+    //{
+    //    return MAX((ABS(x,x1)),(ABS(y,y1)));
+    //}
      
     /*
     void BattleGround::InitMapFight(UInt8 mapId)   
@@ -89,7 +90,8 @@ namespace Battle
     { 
 
        //设置地图信息
-        std::vector<std::vector<UInt8>> MapInfo = GData::map.GetMapInfo(mapId);
+        GData::map.loadMapInfo(mapId);
+        vecInfo MapInfo = GData::map.GetMapInfo();
         _y = MapInfo.size();
         if( _y <= 0 )
             return;
@@ -111,7 +113,8 @@ namespace Battle
         _astar.SetMap(_mapGround);
 
         //设置地图上的阵营信息(跟上面的地图是对应的)
-        std::vector<std::vector<UInt8>> CampInfo = GData::map.GetCampInfo(mapId);
+        GData::map.loadCampInfo(mapId);
+        vecInfo CampInfo = GData::map.GetCampInfo();
         _mapCamp = new UInt8[_x*_y];
         memset(_mapCamp , 0 ,_x*_y*sizeof(UInt8));
 
@@ -267,7 +270,7 @@ namespace Battle
 
     void BattleGround::MoveToCenter(UInt8 direction)
     {
-        if( directin <= 0 || direction >= 5 )
+        if( direction <= 0 || direction >= 5 )
         {
             return ;
         }
@@ -281,11 +284,11 @@ namespace Battle
         //
         //       3                4
         //
-        UInt8 ride = currentBf->GetRideMax();
+        UInt8 ride = currentBf->GetMaxRide();
         switch(direction)
         {
             case 1:         //向4这个方向运行
-                for(UInt8 i = x ; i < (x + ride > _x  ? _x : x + ride);++j)
+                for(UInt8 i = x ; i < (x + ride > _x  ? _x : x + ride);++i)
                 {
                     for(UInt8 j = y ; j < ( y + ride > _y ? _y : y + ride); ++j)
                     {
@@ -295,34 +298,16 @@ namespace Battle
                         }
                         if( _mapGround[i+j*_x] == 0 )
                             continue;
-                        if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() )  //如果是自己人可以穿越
+                        if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() < 0 )  //如果是自己人可以穿越
                             continue;
                     }
                 }
                 break;
             case 2:         //向3这个方向运行
-                for()
-                {
-                    for()
-                    {
-                    }
-                }
                 break;
             case 3:         //向2这个方向运行
-                for()
-                {
-                    for()
-                    {
-                    }
-                }
                 break;
             case 4:         //向1这个方向运行
-                for()
-                {
-                    for()
-                    {
-                    }
-                }
                 break;
         }
 
@@ -336,8 +321,9 @@ namespace Battle
         if(!currentBf)
             return ;
         //写入当前战将信息
-        GetTarget(currentBf->GetRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
-        if( _vecTaget.empty() )
+        //GetTarget(currentBf->GetMaxRide(),currentBf->GetGroundX(),currentBf->GetGroundY());
+        GetBestTarget(currentBf->GetGroundX(),currentBf->GetGroundY());
+        if( _vecTarget.empty() )
         {
 
             UInt8 x = currentBf->GetGroundX();
@@ -380,27 +366,27 @@ namespace Battle
 
             for(UInt8 i = ( x > ride ? (x -ride) : 0 ) ; i < ( x + ride > _x ? _x : x + ride ) ; ++i )
             {
-                for(UInt8 j = ( y > ride ? y - ride : 0 ) ; j < ( y + ride > _y ; _y : y + ride ) ; ++j)
+                for(UInt8 j = ( y > ride ? y - ride : 0 ) ; j < ( y + ride > _y ? _y : y + ride ) ; ++j)
                 {
-                    if( !mapGround[i+j*_x] )
+                    if( !_mapGround[i+j*_x] )
                         continue;
                 }
             }
-            if(currentBf->GetGroundX() == resx && currentBf->GetGroundY() == resy)
-            {
-                std::cout << "战将编号"  << static_cast<UInt32>(currentBf->GetBattleIndex()) << " 失去目标" << static_cast<UInt32>(resx) << " , " << static_cast<UInt32>(resy) << std::endl;
-                return ;
-            }
+            //if( currentBf->GetGroundX() == resx && currentBf->GetGroundY() == resy )
+            //{
+              //  std::cout << "战将编号"  << static_cast<UInt32>(currentBf->GetBattleIndex()) << " 失去目标" << static_cast<UInt32>(resx) << " , " << static_cast<UInt32>(resy) << std::endl;
+                //return ;
+            //}
 
-            currentBf->SetGroundX(resx);
-            currentBf->SetGroundY(resy);
+            //currentBf->SetGroundX(resx);
+            //currentBf->SetGroundY(resy);
 
-            std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
-            std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
-            std::cout <<" 无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
-            currentBf->InsertFighterInfo(_pack);  //Stream
+            //std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
+            //std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
+            //std::cout <<" 无方案" << ":移动到 "<<static_cast<UInt32>(resx)<< "," << static_cast<UInt32>(resy) <<std::endl;
+            //currentBf->InsertFighterInfo(_pack);  //Stream
 
-            _pack << static_cast<UInt8>(resx) << static_cast<UInt8>(resy) << static_cast<UInt8>(0); //无战斗发生
+            //_pack << static_cast<UInt8>(resx) << static_cast<UInt8>(resy) << static_cast<UInt8>(0); //无战斗发生
         }
         else
         {
@@ -422,7 +408,7 @@ namespace Battle
             _pack << static_cast<UInt8>(1);
 
             //currentBf->InsertFighterInfo(_pack);
-            _target.bo->InsertFighterInfo(_pack);
+            target.bo->InsertFighterInfo(_pack);
 
             UInt8 win = 0;
             UInt32 reportId = 0;
@@ -430,10 +416,10 @@ namespace Battle
             _pack << win << reportId;
 
             //cout
-            TestCoutBattleS(_target.bo);
+            TestCoutBattleS(target.bo);
             std::cout << std::endl;
         }
-        memset(_mapFlag,0,_x*_y*sizeof(UInt8));
+        //memset(_mapFlag,0,_x*_y*sizeof(UInt8));
         currentBf = NULL;
     }
 
@@ -458,15 +444,15 @@ namespace Battle
                     continue;
                 if( _mapFighters[i+j*_x] == NULL )
                     continue;
-                if( _mapFighters[i+j*_x] > 100)
+                if( _mapFighters[i+j*_x]->getClass() > 100)
                     continue;
                 if( _mapCamp[i+j*_x] == campType ) //属于同一个阵营  
                     continue;
-                if( _mapFighters[i+j*_x]->GetHp() < 0 ) //已经死了
+                if( _mapFighters[i+j*_x]->getHP() < 0 ) //已经死了
                     continue;
                 if( _mapFighters[i+j*_x] == currentBf )  //不是自己
                     continue;
-                vecEnemy.push_back(Point(i,j));
+                vecEnemy.push_back(GObject::Ascoord(i,j));
             }
         }
     }
@@ -486,11 +472,11 @@ namespace Battle
                 {
                     battleInfo[i+j*_x] = 3;
                 }
-                if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() < 0 )  //死了  
+                if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() < 0 )  //死了  
                 {
                     battleInfo[i+j*_x] = 3;
                 }
-                if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() > 0 )
+                if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() > 0 )
                 {
                     battleInfo[i+j*_x] = _mapFighters[i+j*_x]->GetSide();
                 }
@@ -504,6 +490,15 @@ namespace Battle
 
     void BattleGround::BowGetTarget(UInt8 direction, UInt8 destx , UInt8 desty)
     {
+        /*
+        static UInt8 priority [4][4] = {
+            {1,2,3,4},
+            {1,2,3,4},
+            {1,2,3,4},
+            {1,2,3,4}
+        };
+        */
+        if(!currentBf)
         if( direction <= 0 || direction >= 4 )
         {
             return;
@@ -515,11 +510,11 @@ namespace Battle
         UInt8 standx = 0;
         UInt8 standy = 0;
 
-        if( x =  _x )
+        if( x ==  _x )
         {
             standx = _x;
         }
-        if( y = _y )
+        if( y == _y )
         {
             standy = _y;
         }
@@ -535,12 +530,12 @@ namespace Battle
                 {
                     for(UInt8 j = y ; j > 0 ; --j )
                     {
-                        if( (_mapInfo[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() <= 0 )) 
+                        if( (_mapGround[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() <= 0 )) 
                         {
                             if( ride < 0 &&  !can  )
                                 break;
                             can = CanAttack(GObject::Ascoord(i,j),GObject::Ascoord(destx,desty));
-                            UInt8 landform = _mapInfo[ i + j*_x] ;
+                            UInt8 landform = _mapGround[ i + j*_x] ;
                             UInt8 rideSub = GameAction()->GetRide(landform);
                             ride = ride - rideSub;
                             stand = GObject::Ascoord(i,j);
@@ -554,12 +549,12 @@ namespace Battle
                 {
                     for( UInt8 j = y; j > ( y -ride < 0 ? 0 : y - ride ) ; --j )
                     {
-                        if( (_mapInfo[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() <= 0 )) 
+                        if( (_mapGround[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() <= 0 )) 
                         {
                             if( ride < 0 && !can )
                                 break;
                             can = CanAttack(GObject::Ascoord(i,j),GObject::Ascoord(destx,desty));
-                            UInt8 landform = _mapInfo[i + j*_x] ;
+                            UInt8 landform = _mapGround[i + j*_x] ;
                             UInt8 rideSub = GameAction()->GetRide(landform);
                             ride = ride - rideSub;
                             stand = GObject::Ascoord(i,j);
@@ -569,16 +564,16 @@ namespace Battle
                 }
                 break;
             case 3:
-                for( UInt8 i = x ; i > ( x - ride < 0 ? 0 : x - ride ) --i)
+                for( UInt8 i = x ; i > ( x - ride < 0  ? 0 : x - ride );  --i)
                 {
                     for( UInt8 j = y ; j < ( y + ride > _y ? _y : y + ride ) ; ++j)
                     {
-                        if( (_mapInfo[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() <= 0 )) 
+                        if( (_mapGround[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() <= 0 )) 
                         {
                             if( ride < 0 && !can )
                                 break;
                             can = CanAttack(GObject::Ascoord(i,j),GObject::Ascoord(destx,desty));
-                            UInt8 landform = _mapInfo[i + j*_x] ;
+                            UInt8 landform = _mapGround[i + j*_x] ;
                             UInt8 rideSub = GameAction()->GetRide(landform);
                             ride = ride - rideSub;
                             stand = GObject::Ascoord(i,j);
@@ -592,12 +587,12 @@ namespace Battle
                 {
                     for( UInt8 j = y; j < ( y + ride > _y ? _y : y + ride ) ; ++ j )
                     {
-                        if( (_mapInfo[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->GetHp() <= 0 )) 
+                        if( (_mapGround[i+j*_x] != 0 && _mapFighters[i+j*_x] == NULL) || ( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() <= 0 )) 
                         {
                             if( ride < 0 && !can )
                                 break;
                             can = CanAttack(GObject::Ascoord(i,j),GObject::Ascoord(destx,desty));
-                            UInt8 landform = _mapInfo[i + j*_x] ;
+                            UInt8 landform = _mapGround[i + j*_x] ;
                             UInt8 rideSub = GameAction()->GetRide(landform);
                             ride = ride - rideSub;
                             stand = GObject::Ascoord(i,j);
@@ -609,10 +604,10 @@ namespace Battle
             default:
                 break;
         }
-        UInt8 pri = priority[currentBf()->GetClass()-1][_mapFighters[destx+desty*_x]->GetClass()-1];
+        //UInt8 pri = priority[currentBf()->GetClass()-1][_mapFighters[destx+desty*_x]->getClass()-1];
         if( stand._x == -1 && stand._y == -1 )
         {
-            _vecTarget.push_back(TargetInfo(stand,GObject::Ascoord(destx,desty,size,pri)));
+            // _vecTarget.push_back(TargetInfo(stand,GObject::Ascoord(destx,desty),size,pri));
         }
     }
 
@@ -684,7 +679,7 @@ namespace Battle
                 {
                     std::vector<GObject::Ascoord> path;
                     _astar.SetTarget((*it));
-                    _astar.Compute();
+                    _astar.ComputeRoute();
                     _astar.GetRoute(&path);
                     ParsePath(path);
                 }
@@ -693,7 +688,7 @@ namespace Battle
 
     }
 
-    bool BattleGround::CanAttack(GObject::Ascoord& stand, GObject::Ascoord& target)   //站在某一点是不是可以攻击到目标呢
+    bool BattleGround::CanAttack(GObject::Ascoord stand, GObject::Ascoord target)   //站在某一点是不是可以攻击到目标呢
     {
         UInt8 attackDis = currentBf->GetDistance();
         UInt8 dis = (stand._x-target._x)*(stand._x-target._x) + (stand._y-target._y)*(stand._y-target._y);
@@ -715,7 +710,7 @@ namespace Battle
             {1,2,3,4}
         };
 
-        UInt8 ride = currentBf->GetRideMax();
+        UInt8 ride = currentBf->GetMaxRide();
         if( path.size() < 2 )
         {
             return;
@@ -725,8 +720,6 @@ namespace Battle
             auto begin = path.begin();  //起点
             auto end   = path.end();
             UInt8 size = 0xFF;
-            BattleFighter* ft = static_cast<BattleFighter*>(_mapFighters[target._x + target._y*_x]);
-            UInt8 pri = priority[currentBf->GetClass()-1][ft->GetClass()-1]; 
             while( begin != end )
             {
                 if( CanAttack(*begin,*end))   //
@@ -735,16 +728,19 @@ namespace Battle
                     break;
                 GObject::Ascoord p = (*begin);   //可以走到的位置
                 //先获得地形 
-                UInt8 landform = _mapInfo[p._x + p._y*_x] ;
+                UInt8 landform = _mapGround[p._x + p._y*_x] ;
                 UInt8 rideSub = GameAction()->GetRide(landform);
                 ride = ride - rideSub;
                 ++begin;
                 ++size;
             }
+            BattleFighter* ft = static_cast<BattleFighter*>(_mapFighters[(*end)._x + (*end)._y*_x]);
+            UInt8 pri = priority[currentBf->GetClass()-1][ft->GetClass()-1]; 
             _vecTarget.push_back(TargetInfo(ft,*begin,*end,size,pri));
         }
     }
-
+    
+    /*
     void BattleGround::GetTarget(UInt8 ride, const UInt8& x,const UInt8& y,UInt8 flag)
     {
         _astar.SetFighters(_mapFighters);
@@ -941,6 +937,7 @@ namespace Battle
             return TargetInfo(ft,attack._x,attack._y,target._x,target._y);
         }
     }
+    */
     /* 
     void BattleGround::GetNearPos(UInt8 ride ,const UInt8& x ,const UInt8& y , UInt8 flag)
     { 
@@ -1123,12 +1120,7 @@ namespace Battle
             return 0;
         map_player[index].push_back( pl);
         pl->SetBattleId(_id);
-        UInt8 side = 0;
-        if( index%5 >= 3 )
-        {
-            side = 1;
-        }
-        pl->SetBattleSide(side);
+        pl->SetBattleSide(index);
         return 1;
     } 
 
@@ -1196,9 +1188,9 @@ namespace Battle
         } 
     } 
 
-    /*
     UInt8 BattleGround::GetFactAttackDis()
     {
+        /*
         if( _target.bo == NULL )
             return 1;
         //TODO  如果是弓兵 判断攻击点和目标点连线上是否有障碍物
@@ -1216,7 +1208,8 @@ namespace Battle
         {
             return dis;
         }
+        */
+        return 1;
     }
-    */
 
 }

@@ -1,14 +1,15 @@
 #include "AStar.h"
-#include "GameActionLua.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 #include "Country.h"
 
 namespace GObject
 {
     AStar::AStar():
-	    m_numSurround(6),
+	    m_numSurround(6)
     {
-        memset(m_map,0 ,m_col*m_row*sizeof(UInt8));
-        memset(m_battleInfo, 0 , m_col*m_row*sizeof(UInt8));
+        //memset(m_map,0 ,m_col*m_row*sizeof(UInt8));
+        //memset(m_battleInfo, 0 , m_col*m_row*sizeof(UInt8));
 	    for(UInt8 i = 0 ; i<6 ; ++i)
         {
 		    //m_gAdd[i] = 10;
@@ -42,13 +43,13 @@ namespace GObject
     UInt8 AStar::GetGValue(Ascoord& coord)
     {
         //把行动力消耗也放进去了
-        if( coord._x >= _x || coord._y >= _y)
+        if( coord._x >= m_row || coord._y >= m_col)
         {
             return 0xFF;
         }
         //先从地图中把相应的坐标的地形读取出来
         UInt8 landform = m_map[coord._x+coord._y*m_row];
-        UInt8 g = GameAction()->GetRide()
+        UInt8 g = GameAction()->GetRide(landform);
         return g*10;
 
     }

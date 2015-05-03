@@ -36,7 +36,7 @@ namespace Battle
 
     class BattleObject;
     class BattleFighter;
-    
+    typedef std::vector< std::vector<UInt8> > vecInfo;    
     /*
     struct TargetInfo
     {
@@ -56,8 +56,8 @@ namespace Battle
         GObject::Ascoord stand;
         GObject::Ascoord goal;
         UInt8 size;   //从起点到攻击点的路径长度
-        UInt8 prio;   //攻击优先级
-        TargetInfo(BattleFighter * bf,GObject::Ascoord s,GObject::Ascoord g,UInt8 s,UInt8 p):bo(bf),stand(s),goal(g),size(s),prio(p) {}
+        UInt8 pri;   //攻击优先级
+        TargetInfo(BattleFighter * bf,GObject::Ascoord st,GObject::Ascoord g,UInt8 s,UInt8 p):bo(bf),stand(st),goal(g),size(s),pri(p) {}
     };
 
 
@@ -101,12 +101,14 @@ namespace Battle
             void InsertFighterInfo(UInt8 flag = 0);
 
             void GetEnemys(UInt8 x , UInt8 y,std::vector<GObject::Ascoord>& vecEnemy);  //获得敌人的坐标的
-            //UInt8 GetFactAttackDis();
+            UInt8 GetFactAttackDis();
             //TargetInfo makeTarget(GObject::Ascoord traget,UInt8 ride);
             void BowGetTarget(UInt8 direction, UInt8 destx , UInt8 desty);
             void SetBattleInfo();
-            bool CanAttack(GObject::Ascoord& stand, GObject::Ascoord& target);
+            bool CanAttack(GObject::Ascoord stand, GObject::Ascoord target);
             void ParsePath(std::vector<GObject::Ascoord> &path);
+            void MoveToCenter(UInt8 direction);
+            void GetBestTarget(UInt8 x, UInt8 y );
         private:
             UInt32 _id;
             UInt8 _x;

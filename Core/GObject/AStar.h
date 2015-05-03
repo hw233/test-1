@@ -75,6 +75,8 @@ namespace GObject
 
 	    void CancleObstacle(const Ascoord& coord);
 
+        UInt8 GetGValue(Ascoord& coord);
+
 	    void ClearObstacles();
 
 	    bool IsObstacle(const Ascoord& coord);
