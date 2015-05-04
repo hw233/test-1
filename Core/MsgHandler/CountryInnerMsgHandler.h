@@ -49,17 +49,17 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
     }
     if(1)
     {
-        player->GetGovernManager()->GiveGovernOfflineGain(); //发送离线治理获得的物品
-        Stream st(REP::GOVERN_OFFLINE_GAIN);
-        player->GetGovernManager()->OfflineGainsInfo(st);
-        st<< Stream::eos;
-        player->send(st);
+         player->GetPackage()->SendPackageInfo();
     }
-    //治理信息(一次性发一个小时的)
+    if(1)
+    {
+        player->GetGovernManager()->GiveGovernOfflineGain(); //发送离线治理获得的物品
+    }
     if(1)
     {
         player->GetGovernManager()->SendGovernResult(1);
     }
+
 	player->Login();
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());

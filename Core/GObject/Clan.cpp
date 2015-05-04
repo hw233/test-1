@@ -146,7 +146,7 @@ namespace GObject
     { 
         st << static_cast<UInt32>(_id);
         st << GetName();
-        st << static_cast<UInt8>(GetLevel());
+        st << static_cast<UInt32>(GetLevel());
         st << _announcement;
         st << static_cast<UInt8>(_players.size());
         for(UInt8 i = 0; i < _players.size(); ++i)

@@ -36,7 +36,8 @@ namespace GObject
         VAR_PACKAGE_SIZE = 9,
         VAR_OFF_LINE = 10 ,         //最近一次在线时间
         VAR_GOVERN_SPEEDUP_CNT = 11, //治理加速次数
-        VAR_BATTLE_POINT = 12,      //战斗力
+        VAR_BATTLE_POINT = 12, //战斗力
+        VAR_GOVERN_FIGHTERID = 13, //治理的将领id
         VAR_MAX
     };
 
@@ -79,6 +80,7 @@ namespace GObject
                 REGISTER_VAR(VAR_GOLD , CYCLE_NONE);
                 REGISTER_VAR(VAR_OFF_LINE,CYCLE_NONE);
                 REGISTER_VAR(VAR_GOVERN_SPEEDUP_CNT,CYCLE_DAY);
+                REGISTER_VAR(VAR_GOVERN_FIGHTERID,CYCLE_NONE);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

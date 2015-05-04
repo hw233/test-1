@@ -1,6 +1,8 @@
 -- 给以下ID增加相应等级的GM权限
-gm = {{5,3},}
+--
+--gm = {{5,3},}
 -- 删除以下ID的GM权限
+--[[
 delgm = {}
 
 function _addGM()
@@ -19,4 +21,4 @@ end
 
 _addGM(gm);
 _delGM(delgm);
-
+--]]

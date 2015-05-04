@@ -6,18 +6,18 @@
 namespace REQ
 {
     //聊天
-    const UInt8 CHAT            = 0x06;
+    const UInt8 CHAT                 = 0x06;
     //强化
-    const UInt8 ENCHART             = 0x20;// 0xF0
+    const UInt8 ENCHART              = 0x20;// 0xF0
 
     /*背包信息*/
-    const UInt8 PACKAGE_INFO = 0x30;// 0xE0
+    const UInt8 PACKAGE_INFO         = 0x30;// 0xE0
 
     /*刷将*/
-    const UInt8 FIND_FIGHTER= 0x31;// 0xE1
+    const UInt8 FIND_FIGHTER         = 0x31;// 0xE1
     
-       /**战报请求 */
-    const UInt8 BATTLE_REPORT_REQ   = 0x80;// 0xC0
+    /**战报请求 */
+    const UInt8 BATTLE_REPORT_REQ    = 0x80;// 0xC0
     const UInt8 BATTLE_REPORT_REQ1   = 0x81;// 0xC0
     /**登陆 */
     const UInt8 LOGIN               = 0xE0;// 0x10
@@ -47,6 +47,9 @@ namespace REQ
     const UInt8 FRIEND_DELETE       = 0x44;
     /*好友推荐*/
     const UInt8 FRIEND_RECOMMAND    = 0x45;
+    /*好友基础信息*/
+    const UInt8 FRIEND_BASEINFO     = 0x46;
+
 
     //Mail
     const UInt8 MAIL             = 0x50;// 
@@ -537,13 +540,14 @@ namespace REQ
 
 namespace REP
 {
-    const UInt8 CHAT            = 0x06;
+    const UInt8 CHAT                = 0x06;
     //强化
     const UInt8 ENCHART             = 0x20;// 0xF0
 
     /*背包信息*/
-    const UInt8 PACKAGE_INFO = 0x30;// 0xE0
-    const UInt8 FIND_FIGHTER = 0x31;// 0xE0
+    const UInt8 PACKAGE_INFO        = 0x30;// 0xE0
+    /*抽将*/
+    const UInt8 FIND_FIGHTER        = 0x31;// 0xE0
 
     /*好友列表*/
     const UInt8 FRIEND_LIST         = 0x40;
@@ -557,13 +561,20 @@ namespace REP
     const UInt8 FRIEND_DELETE       = 0x44;
     /*好友推荐*/
     const UInt8 FRIEND_RECOMMAND    = 0x45;
+    /*好友基础信息*/
+    const UInt8 FRIEND_BASEINFO     = 0x46;
 
  
     const UInt8 MAIL                = 0x50;// 
+
     const UInt8 MAIL_GET            = 0x51;// 
+
     const UInt8 MAIL_DELETE         = 0x52;// 
-    const UInt8 MAIL_NOTICE         = 0x52;// 
-    const UInt8 MAIL_GET_ALL        = 0x53;// 
+
+    const UInt8 MAIL_NOTICE         = 0x52;//
+
+    const UInt8 MAIL_GET_ALL        = 0x53;//
+
     const UInt8 MAIL_DELETE_ALL     = 0x54;// 
 
     /*治理换将*/
@@ -577,11 +588,15 @@ namespace REP
     /*在线治理获得*/
     const UInt8 GOVERN_ONLINE_GAIN  = 0x64;
 
-    const UInt8 CLAN_LIST        = 0x70;
-    const UInt8 CLAN_CREATE        = 0x71;
+    const UInt8 CLAN_LIST           = 0x70;
+    
+    const UInt8 CLAN_CREATE         = 0x71;
+
     //const UInt8 CLAN_FLASH        = 0x72;
-    const UInt8 CLAN_OPTION        = 0x73;
-    const UInt8 CLAN_INFO        = 0x72;
+    //
+    const UInt8 CLAN_OPTION         = 0x73;
+
+    const UInt8 CLAN_INFO           = 0x72;
 
 
 
@@ -603,14 +618,14 @@ namespace REP
 
     const UInt8 LOGIN               = 0xE0;// 0x10  //DOEN
     const UInt8 NEW_CHARACTER       = 0xE1;// 0x11  //DOEN
-    const UInt8 USER_INFO_CHANGE    = 0xE2;
-    const UInt8 CREATE_ACCOUNT       = 0xE5;// 0x15 //DOEN
-    const UInt8 IDENTIFY_ACCOUNT       = 0xE6;// 0x15 //DOEN
+    const UInt8 USER_INFO_CHANGE    = 0xE3;
+    const UInt8 CREATE_ACCOUNT      = 0xE5;// 0x15 //DOEN
+    const UInt8 IDENTIFY_ACCOUNT    = 0xE6;// 0x15 //DOEN
     const UInt8 GMHAND              = 0xEF;
     
 
     const UInt8 WALLOW_VERIFY       = 0xE2;// 0x12
-    const UInt8 GUIDE_RESPONSE_STEP = 0xE3;// 0x13
+    //const UInt8 GUIDE_RESPONSE_STEP = 0xE3;// 0x13
     const UInt8 USER_INFO           = 0xE4;// 0x14
 
     const UInt8 STATE_CHANGE        = 0x16;

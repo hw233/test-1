@@ -28,6 +28,9 @@ namespace Script
             void init();
             void postInit();
             void RegisterActionInterface();
+            UInt16 GetGovernDropMoney(UInt8 res);
+            UInt16 GetGovernDropItem(UInt8 res);
+            UInt16 RandMonster(UInt8 group);
 
         public:
             const char* GetItemName(UInt32 itemId);
@@ -80,5 +83,6 @@ namespace Script
 #include "GameActionLuaImpl.inl"
 
 }
+
 
 #endif

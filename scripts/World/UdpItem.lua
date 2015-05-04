@@ -84,7 +84,7 @@ local items =
     9087,
     9088,
 }
-
+--[[
 function loadUdpItem()
     clearUdpItem()
     for n=1,#items do
@@ -93,4 +93,4 @@ function loadUdpItem()
 end
 
 loadUdpItem()
-
+--]]

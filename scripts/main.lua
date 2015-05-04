@@ -1,11 +1,5 @@
---??????????
 require("global")
-if isVTVersion() then
-require("actmsg_vt")
-else
-require("actmsg")
-end
-require("World/Attain")
+--[[require("World/Attain")
 require("World/HeroIsland")
 require("Task/Task_All")
 require("Explore/Explore_All")
@@ -36,9 +30,11 @@ require("World/ShuoShuo")
 require("World/CFriend")
 require("World/StrengthenMgr")
 require("items/LuckyDraw")
+--]]
 require("items/Awards")
-require("items/ZhenYuan")
-require("salePriceLimit")
+--require("items/ZhenYuan")
+--require("salePriceLimit")
+require("items/GovernAward")
 --require("AirBook")
 --require("forceCommitArena")
 

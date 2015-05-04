@@ -32,25 +32,40 @@ namespace GObject
 
         if(sday < now) sday += 86400;
         AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
-
         AddTimer(86400 * 1000, World_Test, this, 10* 1000);
         
         
         time_t n = now;
         tm* tt=localtime(&n);
         UInt8 min = tt->tm_min;
-
-        AddTimer(60*60*1000, World_Govern_SendInfo,this, (60-min)*60*1000);
-
         UInt8 sec = tt->tm_sec;
-        AddTimer(2*60*1000, World_Govern_SendAward, this, ((TIME_TAB-min%TIME_TAB)*60+sec)* 1000);
+
+        UInt16 second = 0;
+        UInt16 s = 0;
+        if( min%TIME_ONCE == 0 && sec == 0 )
+        {
+            second = 0;
+            s = 0 ;
+        }
+        else
+        {
+            second = ((min%TIME_ONCE)*60+sec)%TIME_TAB;
+            s = TIME_ONCE*60-((min%TIME_ONCE)*60+sec);
+        }
+
+        AddTimer(10*60*1000, World_Govern_SendInfo,this,s*1000);
+        AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second)*1000);
 
         return true; 
     }
+
+
     void World::UnInit() 
     {
 
     }
+
+
     std::string World::GetLogName()
     {
         return "log/World/"; 
@@ -58,12 +73,13 @@ namespace GObject
 
     void World::World_Midnight_Check( World * world )
     {
-            UInt32 curtime = TimeUtil::Now();
+        UInt32 curtime = TimeUtil::Now();
 
-            //记录此刻活动状态
-            world->_worldScript->onActivityCheck(curtime+300);  //延迟300秒计算是否活动时间已过
+        //记录此刻活动状态
+        world->_worldScript->onActivityCheck(curtime+300);  //延迟300秒计算是否活动时间已过
             
     }
+
     void World::World_Test( World * world )
     { 
         struct NewUserStruct  
@@ -95,6 +111,7 @@ namespace GObject
         LoginMsgHdr hdr1(0xE1, WORKER_THREAD_LOGIN, 8500, 1212121 , sizeof(ns)); 
         GLOBAL().PushMsg(hdr1, &ns);
         UInt32 BattleId = Battle::battleManager.CreateBattleGround();
+        /*
         for(UInt8 i = 1; i < 10 ;++i)
         {
             UInt64 pid = (static_cast<UInt64>(1)<<48)|i;
@@ -102,6 +119,18 @@ namespace GObject
             if(!pl)
                 continue;
             Battle::battleManager.EnterBattleGround(BattleId,pl,i);
+        }
+        */
+        UInt8 i = 1;
+        for(auto it = globalPlayerVec.begin(); it != globalPlayerVec.end(); ++it)
+        {
+            if( i >= 10 )
+                break;
+            Player * pl = (*it);
+            if(!pl)
+                continue;
+            Battle::battleManager.EnterBattleGround(BattleId,pl,i);
+            ++i;
         }
         Battle::battleManager.StartGround(BattleId);
     }
@@ -116,21 +145,25 @@ namespace GObject
 
     void World::World_Govern_SendAward(World* world)
     {
-        for(auto it = GObject::globalPlayerVec.begin() ; it != GObject::globalPlayerVec.end() ; ++it)
+        for(auto it = GObject::globalOnlinePlayerSet.begin() ; it != GObject::globalOnlinePlayerSet.end() ; ++it)
         {
-            if((*it)->isOnline())
+            //在线
+            time_t now = TimeUtil::Now();
+            tm* tt=localtime(&now);
+            UInt8 min = tt->tm_min;
+            UInt8 sec = tt->tm_sec;
+            UInt16 restSec = (min%TIME_ONCE==0 && sec == 0) ? 0: (min%TIME_ONCE*60+sec);
+            UInt16 time = 0;
+            if( restSec == 0 )
             {
-                time_t now = TimeUtil::Now();
-                tm* tt=localtime(&now);
-                UInt8 min = tt->tm_min;
-                UInt8 time = (( min%TIME_TAB == 0 )? (min/TIME_TAB):(min/TIME_TAB+1));
-                (*it)->GetGovernManager()->SendOnlineGovernAward(time);
+                time = 0;
             }
             else
             {
-                (*it)->GetGovernManager()->SendOfflineGovernAward();
-
+                time = ( restSec%TIME_TAB == 0 ? restSec/TIME_TAB : restSec/TIME_TAB+1);
             }
+            GameMsgHdr hdr(0x155,WORKER_THREAD_COUNTRY_1,(*it),sizeof(time));
+            GLOBAL().PushMsg(hdr,&time);
         }
     }
 

@@ -198,6 +198,7 @@ namespace GObject
         if(1 && GetClan())
         {
             Stream st(REP::CLAN_INFO);
+            st << GetClan()->IsTheFounder(this);
             GetClan()->GetClanInfo2(st);
             st << Stream::eos;
             send(st);
@@ -544,4 +545,26 @@ namespace GObject
         st << Stream::eos;
         send(st);
     } 
+
+
+    void Player::AddGold(UInt32 num)
+    {
+        AddVar(VAR_GOLD,num);
+    }
+
+
+    void Player::UseGold(UInt32 num)
+    {
+        if( GetVar(VAR_GOLD) < num )
+            return;
+        SetVar(VAR_GOLD,GetVar(VAR_GOLD)-num);
+    }
+
+    void Player::AddMoney(UInt8 type,UInt32 num)
+    {
+        if( type <= 0 || type > 3)
+            return;
+        AddVar(type,num);
+    }
+
 }

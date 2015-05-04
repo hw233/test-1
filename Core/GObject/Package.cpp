@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "FVar.h"
 #include "Common/URandom.h"
+#include "MsgID.h"
 namespace GObject
 {
     ItemBase* Package::AddItemFromDB(UInt32 id, UInt32 num, bool bind)
@@ -114,6 +115,15 @@ namespace GObject
             m_Items[ItemKey(typeId, bind)] = item;
         }
         item->IncItem(num);
+        auto it = m_Items.find(ItemKey(typeId, bind));
+        if( it != m_Items.end() )
+        {
+          DB7().PushUpdateData("update item set `count` = %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",(it->second)->Count()+num,typeId,m_Owner->getId());
+        }
+        else
+        {
+            DB7().PushUpdateData("insert into item(itemId,playerId,count) value(%u, %" I64_FMT "u, %u )", typeId, m_Owner->getId(),num);
+        }
         return item;
     } 
 
@@ -146,7 +156,8 @@ namespace GObject
             }
         }
         return 0;
-    } 
+    }
+
     UInt32 Package::GetPackageSize()
     { 
         UInt32 size = 0;
@@ -157,23 +168,18 @@ namespace GObject
         return size;
     } 
 
-    void Package::GetStream(Stream& st) 
-    { 
-        item_elem_iter it =  m_Items.begin();
-        /*
-           st << static_cast<UInt8>(m_Items.size());
-           for(;it != m_Items.end(); ++it)
-           { 
+    void Package::SendPackageInfo() 
+    {
+        if( m_Items.size() == 0 )
+            return;
+        Stream st(REP::PACKAGE_INFO);
+        st << static_cast<UInt8>(m_Items.size());
+        for(auto it = m_Items.begin();it != m_Items.end(); ++it)
+        {
            st << static_cast<UInt32>(it->second->getId());
            st << static_cast<UInt16>(it->second->Count());
-           } 
-           */
-        UInt32 num = 2;
-        st << static_cast<UInt8>(num);
-        for(UInt8 i = 0; i < num ;++i)
-        {
-            st << static_cast<UInt32>(i+1);
-            st << static_cast<UInt16>(i+1);
         }
+        st << Stream::eos;
+        m_Owner->send(st);
     } 
 }

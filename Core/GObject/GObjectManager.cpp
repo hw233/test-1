@@ -101,11 +101,6 @@ namespace GObject
             fprintf(stderr, "loadMail error!\n");
             std::abort();
         }
-        if(!loadGovernOfflineGain())
-        {
-            fprintf(stderr, "loadGovern OfflienGain error!\n");
-            std::abort();
-        }
     } 
 
     bool GObjectManager::loadAllPlayers()
@@ -347,7 +342,7 @@ namespace GObject
         LoadingCounter lc("Loading Item");
         lc.reset(1000);
         DBItem item;
-        if(execu->Prepare("SELECT `itemId`,`playerId`,`count` FROM `item`", item) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`,`itemId`,`count` FROM `item`", item) != DB::DB_OK)
             return false;
         Player* pl = NULL;
         while(execu->Next() == DB::DB_OK)
@@ -446,27 +441,6 @@ namespace GObject
             mail->LoadMailInfo(mailInfo.id, pl, mailInfo.contextId, mailInfo.items, mailInfo.option, mailInfo.overTime);
             globalMails.add(mailInfo.id, mail);
             pl->AddMail(mailInfo.id,0);
-            lc.advance();
-        }
-        lc.finalize();
-        return true;
-    }
-
-    bool GObjectManager::loadGovernOfflineGain()
-    {
-        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-        if (execu.get() == NULL || !execu->isConnected()) return false;
-        LoadingCounter lc("Loading Govern offline items");
-        lc.reset(1000);
-        DBGovernOffline governInfo;
-        if(execu->Prepare("SELECT `playerId`,`itemId`,`itemNum` FROM `govern_offlinegain`",governInfo) != DB::DB_OK)
-            return false;
-        while(execu->Next() == DB::DB_OK)
-        {
-            Player* pl = globalPlayers[governInfo.playerId];
-            if(!pl)
-                continue;
-            pl->GetGovernManager()->loadGovernOfflineGain(governInfo.itemId,governInfo.itemNum);
             lc.advance();
         }
         lc.finalize();

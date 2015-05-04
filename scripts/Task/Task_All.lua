@@ -1,8 +1,9 @@
-if isVTVersion() then
+--[[if isVTVersion() then
 	require("scripts/taskmsg_vt")
 else
 	require("scripts/taskmsg")
 end
+--]]
 require("scripts/global")
 require("scripts/Task/Task_Func")
 require("scripts/Task/Task_00000016")

@@ -95,7 +95,7 @@ namespace Script
         //CLASS_DEF(GameActionLua, RunItemTaskAction);
         //CLASS_DEF(GameActionLua, GetSharpDay);
         //CLASS_DEF(GameActionLua, GetPlayerPtr);
-
+        //
         CLASS_ADD(Player);
         CLASS_DEF(Player, GetVar);
         CLASS_DEF(Player, GetVarS);
@@ -253,9 +253,26 @@ namespace Script
         return TimeUtil::SharpDay(0, now);
     }
 
+
+    UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
+    {
+        return Run<UInt16>(NULL,"GetGovernDropMoney", res);
+    }
+
+
+    UInt16 GameActionLua::GetGovernDropItem(UInt8 res)
+    {
+        return Run<UInt16>(NULL,"GetGovernDropItem", res);
+    }
+    
     UInt16 GameActionLua::GetRandFighter()
     {
         return Run<UInt16>(NULL, "GetRandFighter");
+    }
+
+    UInt16 GameActionLua::RandMonster(UInt8 group)
+    {
+        return Run<UInt16>(NULL,"RandMonster");
     }
 
 

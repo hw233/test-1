@@ -226,6 +226,6 @@ namespace GObject
 
     bool AStar::IsObstacle(const Ascoord& coord)
     {
-        return m_map[coord._x + coord._y * m_row ] != 0 ;
+        return m_map[coord._x + coord._y * m_row ] == 0 ;
     }
 }
