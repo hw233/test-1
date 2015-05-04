@@ -188,14 +188,14 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
-        if(0)
+        if(1)
         {
-            Stream st(REP::CLAN_LIST);
+           Stream st(REP::CLAN_LIST);
            SendClanListinfo(st);
            st << Stream::eos;
            send(st);
         }
-        if(0 && GetClan())
+        if(1 && GetClan())
         {
             Stream st(REP::CLAN_INFO);
             GetClan()->GetClanInfo2(st);
@@ -453,6 +453,7 @@ namespace GObject
         st.data<UInt16>(offset) = count;
         return 0;
     } 
+
     bool GetClanListInfo(Clan* cl, Stream* st)
     { 
         if(!cl)
@@ -460,6 +461,7 @@ namespace GObject
         cl->GetClanInfo(*st);
         return true;
     } 
+
     void Player::SendClanListinfo(Stream &st)
     { 
         //Stream st(StreamHand);
@@ -527,6 +529,7 @@ namespace GObject
         st << Stream::eos;
         send(st);
     } 
+
     void Player::VisitFighter(UInt16 fighterId,UInt8 count)
     { 
         UInt32 resultCount = 0;

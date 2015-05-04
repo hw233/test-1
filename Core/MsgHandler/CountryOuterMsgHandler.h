@@ -402,6 +402,7 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
     MSG_QUERY_PLAYER(player) ;
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt8 option = 0;
+    br >> option;
     switch(option)
     { 
         case 0x01:

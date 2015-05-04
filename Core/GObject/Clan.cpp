@@ -25,7 +25,7 @@ namespace GObject
 
         _applicant.push_back(pl);
         if(!update)
-            DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
+            DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u)",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
         return 0;
     } 
 
