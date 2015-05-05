@@ -139,6 +139,12 @@ namespace GObject
                     m_OverTime[id] = TimeUtil::SharpYear(1, now);
                 }
                 break;
+            case CYCLE_DAY_4:
+                {
+                    //天
+                    m_OverTime[id] = TimeUtil::SharpDayT(1, now) + 4 *3600;
+                }
+                break;
             default:
                 break;
         }
