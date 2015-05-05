@@ -60,4 +60,6 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr,0x155,OnGiveOnlineAward);
 
+    MSG_REG_2(GameMsgHdr,0x156,OnSendGovernResult);
+
 MSG_HANDLER_END()

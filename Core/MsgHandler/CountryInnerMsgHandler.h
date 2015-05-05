@@ -57,7 +57,9 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
     }
     if(1)
     {
-        player->GetGovernManager()->SendGovernResult(1);
+        UInt8 type = 1;
+        GameMsgHdr hdr(0x156,WORKER_THREAD_COUNTRY_1,player,sizeof(type));
+        GLOBAL().PushMsg(hdr,&type);
     }
 
 	player->Login();
