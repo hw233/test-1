@@ -25,7 +25,7 @@ namespace GObject
 
         _applicant.push_back(pl);
         if(!update)
-            DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
+            DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u)",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
         return 0;
     } 
 
@@ -146,7 +146,7 @@ namespace GObject
     { 
         st << static_cast<UInt32>(_id);
         st << GetName();
-        st << static_cast<UInt8>(GetLevel());
+        st << static_cast<UInt32>(GetLevel());
         st << _announcement;
         st << static_cast<UInt8>(_players.size());
         for(UInt8 i = 0; i < _players.size(); ++i)

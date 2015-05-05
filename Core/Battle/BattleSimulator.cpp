@@ -183,6 +183,7 @@ namespace Battle
         return count;
     } 
 
+    //普通进攻(有动作时间)
     UInt8 BattleSimulator::doImage(UInt16 time)
     { 
         std::vector<Battle::ImagePackage> vec = GetTimeBattleImage(time);
@@ -286,6 +287,7 @@ namespace Battle
 
         return count;
     } 
+
     UInt8 BattleSimulator::ClearObjectPackage()
     { 
         std::list<ObjectPackage>& lst = GetObjectpackage();
