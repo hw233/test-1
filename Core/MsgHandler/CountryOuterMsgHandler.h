@@ -549,5 +549,16 @@ void OnFindInfo(GameMsgHdr& hdr, const void * data)
     st << Stream::eos;
     player->send(st);
 }
+
+void OnSendGovernResult(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    player->GetGovernManager()->SendGovernResult(type);
+}
+
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

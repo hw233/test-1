@@ -514,6 +514,7 @@ namespace GObject
     { 
         Stream st(REP::FIND_FIGHTER);
         UInt8 num = 0;
+
         st << static_cast<UInt8>(0);
         size_t offect = st.size();
         st << num;

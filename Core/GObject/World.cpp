@@ -53,8 +53,8 @@ namespace GObject
             s = TIME_ONCE*60-((min%TIME_ONCE)*60+sec);
         }
 
-        AddTimer(10*60*1000, World_Govern_SendInfo,this,s*1000);
-        AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second)*1000);
+        AddTimer(10*60*1000, World_Govern_SendInfo,this,(s+1)*1000);
+        AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second+3)*1000);
 
         return true; 
     }
@@ -139,7 +139,9 @@ namespace GObject
     {
         for(auto it = GObject::globalOnlinePlayerSet.begin() ; it != GObject::globalOnlinePlayerSet.end() ; ++it)
         {
-            (*it)->GetGovernManager()->SendGovernResult(0);
+            UInt8 type = 0;
+            GameMsgHdr hdr(0x156,WORKER_THREAD_COUNTRY_1,(*it),sizeof(type));
+            GLOBAL().PushMsg(hdr,&type);
         }
     }
 

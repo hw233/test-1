@@ -50,8 +50,6 @@ namespace GObject
             ret = 0;
         }
         UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
-        UInt8 lv = m_owner->GetGovernLevel();
-        std::set<Monster*> monSet = monsterTable.GetMonsterSet(lv);
         mapId2Num speedupId2Num;        
         if( ret == 1)
         {
@@ -106,17 +104,11 @@ namespace GObject
 
     Monster* GovernManager::RandomOneMonster(UInt8 groupId)
     {
-        std::set<Monster*> monSet = monsterTable.GetMonsterSet(groupId);
-        std::vector<Monster*> monVec;
-        UInt8 n = monSet.size();
-        for( auto it = monSet.begin() ; it != monSet.end() ; ++it)
-        {
-            monVec.push_back(*it);
-        }
-        UInt32 rand = uRand(n-1)%n;
-        if(rand > monVec.size())
-            return NULL;
-        Monster* mon = monVec[rand];
+        UInt32 monsterId = GameAction()->RandMonster(groupId);
+        if( monsterId == 0 )
+            monsterId = 1;
+        std::cout<<"the monster id is"<<monsterId<<std::endl;
+        Monster* mon = monsterTable.GetMonster(groupId,monsterId);
         return mon;
     }
 
@@ -124,9 +116,11 @@ namespace GObject
 
     UInt8 GovernManager::FightWithMonster(Monster* mon)
     {
+        UInt8 res = 0;
+        if( mon == NULL )
+           return res;
         UInt32 power = m_fighter->GetTotalPower();
         //小胜  大胜  平局  失败
-        UInt8 res = 0;
         cout<<"  "<<m_fighter->GetName()<<"战力   "<<power<<"   ";
         if( power >= mon->GetPower()*1.4 ) 
         {
@@ -166,11 +160,11 @@ namespace GObject
         _vecGovernInfo.clear();
         if( !m_fighter )
             return;
+        UInt8 lv = m_owner->GetGovernLevel();
         UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
         for(UInt8 i = 0; i < times ; ++i )
         {
-             UInt8 rand = uRand(2)+1;
-             Monster* mon = RandomOneMonster(rand);
+             Monster* mon = RandomOneMonster(lv);
              UInt8 res = FightWithMonster(mon);
              UInt16 base = GameAction()->GetGovernDropItem(res);
              UInt16 random = uRand(10000);
@@ -241,7 +235,11 @@ namespace GObject
         if( number < 0  || number >= 40 )
             return ;
         GovernInfo& info = _vecGovernInfo[number];
+        if( info.groupId < 1 || info.monsterId <= 0 )
+            return;
         curMonster = monsterTable.GetMonster(info.groupId , info.monsterId);
+        if( curMonster == NULL )
+            return;
         std::vector<ItemInfo> vecItem;
         GetItemsByResult(info.res,curMonster->GetGroupId(),curMonster->GetMonsterId(),info.isGet, vecItem);
         for( auto it = vecItem.begin(); it != vecItem.end() ; ++it )
@@ -305,6 +303,8 @@ namespace GObject
     {
         UInt8 lv = m_owner->GetGovernLevel();
         std::set<Monster*> monSet = monsterTable.GetMonsterSet(lv);
+        if( monSet.empty() )
+            return;
         for( auto it = monSet.begin() ; it != monSet.end() ; ++it)
         {
             UInt8 res = FightWithMonster(*it);
@@ -317,11 +317,11 @@ namespace GObject
                     continue;
                 if( mapId2Num.find((*i).id) != mapId2Num.end() )
                 {
-                    mapId2Num[(*i).id] += floor((*i).num*times*(prob/10000.0f));
+                    mapId2Num[(*i).id] += (*i).num;
                 }
                 else
                 {
-                    mapId2Num[(*i).id] = floor((*i).num*times*(prob/10000.0f));
+                    mapId2Num[(*i).id] = (*i).num;
                 }
             }
         }
@@ -372,7 +372,4 @@ namespace GObject
         st<<Stream::eos;
         m_owner->send(st);
     }
-
-
-
 }
