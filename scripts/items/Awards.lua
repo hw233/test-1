@@ -14,14 +14,17 @@ local ColorFighter = {
 function GetRandFighter()
     print("lua开始筛选将领")
     local r = math.rand(1,10000)
-    local index = 0
+    local index = 1
     for i = 1,#ColorChance do
         if r < ColorChance[i] then
             index = r
             break
         end
     end
+    if index > #ColorChance then
+        return 0
+    end
     
-    return ColorFighter[r%(#ColorFighter[index])+1]
+    return ColorFighter[index][r%(#ColorFighter[index])+1]
 end
 

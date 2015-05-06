@@ -515,6 +515,18 @@ namespace GObject
         Stream st(REP::FIND_FIGHTER);
         UInt8 num = 0;
 
+        UInt32 free = GetVar(VAR_SEARCH_FIGHTER);
+
+        if(free < 1)
+        {
+            AddVar(VAR_SEARCH_FIGHTER, 1);
+        }
+        else
+        {
+            if(UseGold(count * 10)) 
+                return ;
+        }
+
         st << static_cast<UInt8>(0);
         size_t offect = st.size();
         st << num;
@@ -526,6 +538,7 @@ namespace GObject
             Fighter * fgt = findFighter(fighterId);
             if(!fgt)
             { 
+                break;
                 GetPackage()->AddItem(fighterId,10);
             }
             else
@@ -537,7 +550,6 @@ namespace GObject
         st.data<UInt8>(offect) = num;
         st << Stream::eos;
         send(st);
-        AddVar(VAR_SEARCH_FIGHTER, 1);
     } 
 
     void Player::VisitFighter(UInt16 fighterId,UInt8 count)
@@ -562,18 +574,19 @@ namespace GObject
     }
 
 
-    void Player::UseGold(UInt32 num)
+    UInt8 Player::UseGold(UInt32 num)
     {
         if( GetVar(VAR_GOLD) < num )
-            return;
+            return 1;
         SetVar(VAR_GOLD,GetVar(VAR_GOLD)-num);
+        return 0;
     }
 
     void Player::AddMoney(UInt8 type,UInt32 num)
     {
         if( type <= 0 || type > 3)
             return;
-        AddVar(type,num);
+        AddVar(type ,num);
     }
     
     UInt8 Player::GetFreeSearch()

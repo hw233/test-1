@@ -161,7 +161,7 @@ namespace GObject
         if( !m_fighter )
             return;
         UInt8 lv = m_owner->GetGovernLevel();
-        UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
+        UInt32 times = (TIME_ONCE*60)/TIME_TAB;
         for(UInt8 i = 0; i < times ; ++i )
         {
              Monster* mon = RandomOneMonster(lv);

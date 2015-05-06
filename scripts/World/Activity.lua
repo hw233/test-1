@@ -6,7 +6,6 @@ function onActivityCheck(tm)
 --      --setCollectCardAct(false)
 --  end
 
-
   --setAutoHeal(true)
   --setHeroIslandAct(true)
   --setCopyFrontWinSwitch(true)
