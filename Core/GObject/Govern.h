@@ -8,10 +8,10 @@
 #include "LoadWorker.h"
 #include "Script/lua_tinker.h"
 
-#define SPEEDUP_MAXTIME 10*60 //一次加速的加速时间
+#define SPEEDUP_MAXTIME 3600 //一次加速的加速时间
 #define TIME_TAB 15           //刷一次怪的间隔时间
 #define TIME_ONCE 10          //隔多少分钟发送给客户端
-#define SPEEDUP_FREE_CNT 10   //每日免费加速的次数(vip的话 在此数值上加)
+#define SPEEDUP_FREE_CNT 4   //每日免费加速的次数(vip的话 在此数值上加)
 
 namespace GObject  //治理
 {

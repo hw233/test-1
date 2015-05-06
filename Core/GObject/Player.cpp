@@ -564,7 +564,7 @@ namespace GObject
     {
         if( type <= 0 || type > 3)
             return;
-        AddVar(type,num);
+        SetVar(type,GetVar(type)+num);
     }
 
 }
