@@ -284,17 +284,17 @@ namespace GObject
     }
 
 
-    void GovernManager::GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt8 times,std::vector<ItemInfo>&vecItem)
+    void GovernManager::GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt32 times,std::vector<ItemInfo>&vecItem)
     {
         if( res <= 0  || res >= 5 || mon == NULL )   //大败的话什么东西都没有的
             return;
         UInt16 moneyNum = mon->GetMoney();
         UInt16 mbase =  GameAction()->GetGovernDropMoney(res);
         UInt16 ibase =  GameAction()->GetGovernDropItem(res);
-        vecItem.push_back(ItemInfo(20001,floor(moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times)));
+        vecItem.push_back(ItemInfo(20001,moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times));
         UInt32 itemId = mon->GetItemId();
         UInt32 itemNum = mon->GetItemNum();
-        vecItem.push_back(ItemInfo(itemId,floor(itemNum*(ibase/10000.0f)*(prob/10000.0f)*times)));
+        vecItem.push_back(ItemInfo(itemId,itemNum*(ibase/10000.0f)*(prob/10000.0f)*times));
     }
 
 
