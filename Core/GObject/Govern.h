@@ -57,7 +57,7 @@ namespace GObject  //治理
             void SendOfflineGainsInfo(mapId2Num& offId2Num);
             void SendOnlineGovernAward(UInt8 number);
             void GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,bool isGet,std::vector<ItemInfo>&itemInfo);
-            void GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt8 times,std::vector<ItemInfo>&vecItem);
+            void GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt32 times,std::vector<ItemInfo>&vecItem);
             void GetTotalAward(UInt32 times,mapId2Num& mapId2Num);
         private:
             Player* m_owner;
