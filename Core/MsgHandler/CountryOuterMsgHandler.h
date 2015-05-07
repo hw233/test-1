@@ -104,10 +104,7 @@ void OnEnchantReq(GameMsgHdr& hdr, const void * data)
 void OnPackageInfo(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;
-    Stream st(REP::PACKAGE_INFO);
-    player->GetPackage()->GetStream(st);
-    st << Stream::eos;
-    player->send(st);
+    player->GetPackage()->SendPackageInfo();
 } 
 
 struct BattleReportReq0
@@ -378,7 +375,7 @@ struct GovernInfoReq
 void OnGovernInfo(GameMsgHdr& hdr, GovernInfoReq& gir)
 {
     MSG_QUERY_PLAYER(player);
-    player->GetGovernManager()->SendGovernInfo();
+    player->GetGovernManager()->SendBaseInfo();
 } 
 void OnClanFlash(GameMsgHdr& hdr, const void * data)
 { 
@@ -531,6 +528,17 @@ void OnFindFighter(GameMsgHdr& hdr, const void * data)
         br >> fighterId >> count;
         player->VisitFighter(fighterId,count);
     } 
-} 
+}
+
+void OnGiveOnlineAward(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 time = 0;
+    br >> time;
+    player->GetGovernManager()->SendOnlineGovernAward(time);
+
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

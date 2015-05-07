@@ -34,6 +34,7 @@ private:
 	void OnSetGVar(GObject::Player *, std::vector<std::string>&);
 	void OnSendMail(GObject::Player *, std::vector<std::string>&);
     void OnAddFighter( GObject::Player * player, std::vector<std::string>& args );
+    void OnAddMoney(GObject::Player *player,std::vector<std::string>&);
 
 };
 

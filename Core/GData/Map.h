@@ -3,6 +3,8 @@
 #define MAP_H_
 
 #include "Config.h"
+#define MAP_MAX 100
+
 namespace GData
 {
     enum eLandForm
@@ -15,19 +17,17 @@ namespace GData
         eMax
     };
 
-    typedef std::vector< std::vector<UInt8> > vecInfo;
+    typedef std::vector<UInt8> vecInfo;
     class Map
     {
         public:
-            void loadMapInfo(UInt8 mapId);
-            void loadCampInfo(UInt8 mapId);         
-            UInt8 getlandForm(UInt8 mapId,UInt8 x,UInt8 y);  //由坐标获得地图上的地形
-            vecInfo GetMapInfo() { return _mapInfo;}
-            vecInfo GetCampInfo() { return _mapCamp;}
-
+            void loadMapInfo(UInt8 index,vecInfo info);
+            void loadCampInfo(UInt8 index,vecInfo info);        
+            vecInfo GetMap(UInt8 mapId) { return _mapInfo[mapId-1];}
+            vecInfo GetCamp(UInt8 mapId) { return _mapCamp[mapId-1];}
         private:
-            vecInfo _mapInfo;    //地图信息
-            vecInfo _mapCamp;//地图阵营信息
+            std::vector<UInt8> _mapInfo[MAP_MAX];    //地图信息
+            std::vector<UInt8> _mapCamp[MAP_MAX];//地图阵营信息
     };
     extern Map map;
 }

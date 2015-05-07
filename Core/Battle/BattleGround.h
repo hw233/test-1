@@ -36,30 +36,56 @@ namespace Battle
 
     class BattleObject;
     class BattleFighter;
-    typedef std::vector< std::vector<UInt8> > vecInfo;    
-    /*
-    struct TargetInfo
+    typedef std::vector<UInt8> vecInfo;   
+
+    
+    struct Ascoord
     {
-        BattleFighter * bo;
-        UInt8 x ;
-        UInt8 y ;
-        UInt8 step;
-        TargetInfo():bo(NULL),x(0),y(0),step(0){}
-        TargetInfo(BattleFighter * bf,UInt8 x1, UInt8 y1, UInt8 step1):bo(bf),x(x1),y(y1),step(step1){}
-        void clear(){bo = NULL ; x =0; y =0;step=0;}
+        UInt8 x;
+        UInt8 y;
+        Ascoord() {}
+        Ascoord(UInt8 vx,UInt8 vy):x(vx),y(vy) {}
+        inline bool operator == ( const Ascoord p)
+        {
+            return (this->x == p.x && this->y == p.y );
+        }
+        inline bool operator != ( const Ascoord p)
+        {
+            return (this->x != p.x || this->y != p.y );
+        }
+        inline void operator += ( const Ascoord p)
+        {
+            this->x += p.x;
+            this->y += p.y;
+        }
     };
-    */
+
+    struct Node
+    {
+        Ascoord node; 
+        Ascoord parent;
+        UInt8 g;
+        UInt8 h;
+        Node(Ascoord p) : node(p) {}
+        Node(Ascoord n,Ascoord p,UInt8 lh,UInt8 rh):node(n),parent(p),g(lh),h(rh) {} 
+    };
+
+    struct AttackInfo
+    {
+        Ascoord attack;
+        Ascoord target;
+        AttackInfo(Ascoord a,Ascoord t) : attack(a) , target(t) {}
+    };
 
     struct TargetInfo
     {
         BattleFighter * bo;
-        GObject::Ascoord stand;
-        GObject::Ascoord goal;
-        UInt8 size;   //从起点到攻击点的路径长度
-        UInt8 pri;   //攻击优先级
-        TargetInfo(BattleFighter * bf,GObject::Ascoord st,GObject::Ascoord g,UInt8 s,UInt8 p):bo(bf),stand(st),goal(g),size(s),pri(p) {}
+        Ascoord attack;  //攻击点
+        Ascoord goal;    //目标点
+        UInt8 cost;    //行动力消耗
+        UInt8 pri;     //攻击优先级
+        TargetInfo(BattleFighter* b, Ascoord a,Ascoord g,UInt8 c,UInt8 p): bo(b),attack(a),goal(g),cost(c),pri(p) {}
     };
-
 
     class BattleGround
     {
@@ -69,16 +95,15 @@ namespace Battle
                 map_player.clear();
                 InitMapFight(mapId);
             }
-            BattleGround():_astar(GObject::AStar::AStar()){}
             ~BattleGround()
             {
                 delete [] _mapGround;
                 delete [] _mapFighters;
-                //delete [] _mapFlag;
+                delete [] _mapFlag;
             }
 
             void InitMapFight(UInt8 mapId);
-            UInt8 PushPlayer(GObject::Player *,UInt8 );
+            void PushPlayer(GObject::Player*,UInt8,UInt8 flag );
             void PushBattleInfo(const BattleInfo& bi);
 
             //对象移动
@@ -86,29 +111,50 @@ namespace Battle
             //产生战报信息
             void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport);
             void FighterMove(BattleFighter *, UInt8 x ,UInt8 y);
-            //void GetNearPos(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
-            void GetTarget(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
-            void GetTargetBo(UInt8 x ,UInt8 y ,UInt8 step = 0);
+            //void GetTarget(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
+            //void GetTargetBo(UInt8 x ,UInt8 y ,UInt8 step = 0);
             UInt8 GetRideSub(const UInt8& posx ,const UInt8& posy);
 
             BattleFighter * newFighter( UInt8 x , UInt8 y, GObject::Fighter *);
             void setObject(UInt8 x , UInt8 y ,BattleFighter * bf,UInt8 flag = 0);
-
             void preStart();
             void start();
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
 
-            void GetEnemys(UInt8 x , UInt8 y,std::vector<GObject::Ascoord>& vecEnemy);  //获得敌人的坐标的
             UInt8 GetFactAttackDis();
-            //TargetInfo makeTarget(GObject::Ascoord traget,UInt8 ride);
-            void BowGetTarget(UInt8 direction, UInt8 destx , UInt8 desty);
-            void SetBattleInfo();
-            bool CanAttack(GObject::Ascoord stand, GObject::Ascoord target);
-            void ParsePath(std::vector<GObject::Ascoord> &path);
-            void MoveToCenter(UInt8 direction);
-            void GetBestTarget(UInt8 x, UInt8 y );
+            UInt8 GetCampInfo(UInt8 index) { return _mapCamp[index];}
+            std::vector<UInt8> GetSameCamp(UInt8 side);
+            void GetNearEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecEnemy); 
+            void Analyse(std::list<Ascoord>path,Ascoord& target);
+            bool IsInAttackZone(Ascoord stand, Ascoord target);
+            void GetTarget(UInt8 x,UInt8 y ,UInt8 ride);
+            void GetNearbyEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecAscoord);//相邻的敌人
+            void BowAnalyse(std::list<Ascoord> path,Ascoord target);
+            void GetBackPosition(std::vector<Ascoord>& vecNearEnemy, std::vector<AttackInfo> vecFinal);
+            void GetRideZone(std::vector<Ascoord>& vecAscoord);
+            bool EnemyCanAttack(Ascoord stand, Ascoord target);
+            UInt8 GetDirection(UInt8 x,UInt8 y , UInt8 cx, UInt8 cy);
+            void MoveAnalyse(std::list<Ascoord> path, Ascoord& target, Ascoord& last);
+            void GetMoveTargetByDir(UInt8 d, Ascoord& move);
+            ////////一下这些家伙全是A*相关东西
+
+            UInt8 GetGValue();  //获得G值
+            UInt8 GetHValue(const Ascoord &p);  //获得H值
+            void  SetStart(const Ascoord &p);   //设置终止点
+            void  SetEnd(const Ascoord &p);  //设置起始点
+            
+            bool  IsObstract(const Ascoord &p);
+            bool  IsInList(std::list<Node>&list, const Ascoord &p );
+            bool  JudgeSurround(const Ascoord& cur,const Ascoord& parent, UInt8 g);
+            Node* FindFromList(std::list<Node>& list,const Ascoord& p);
+            void  CheckUp(std::vector<Ascoord>&vecAScoord);
+            bool  ComputeRoute();
+            bool  PopBestStep(Node* node);
+            bool  GetRoute(std::list<Ascoord>& list);
+            void  GetAround(const Ascoord& p,std::vector<Ascoord>&vecAscoord);
+
         private:
             UInt32 _id;
             UInt8 _x;
@@ -116,7 +162,7 @@ namespace Battle
             std::map<UInt8 ,std::vector<GObject::Player *> >  map_player;
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
-            //UInt8 * _mapFlag;    
+            UInt8 * _mapFlag;    
             UInt8 * _mapCamp;    //地图阵营信息
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
 
@@ -124,15 +170,21 @@ namespace Battle
             std::vector<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;
 
-            //std::vector<TargetInfo>  _vecTarget;
             std::vector<TargetInfo> _vecTarget;
             BattleFighter * currentBf;
-            //static UInt8 scopeForOne[12];
             Stream _pack;
 
             UInt16 _maxID;
             UInt32 _battleNum;
-            GObject::AStar  _astar;   //A* 算法
+
+            //一下全是跟A*算法  有关的东西
+            Ascoord _start;
+            Ascoord _end;
+            std::list<Node>  _closeList;
+            std::list<Node>  _openList;
+            std::vector<Ascoord> _aroundAscoord;
+
+
     };
 }
 #endif // BATTLEGROUND_H_

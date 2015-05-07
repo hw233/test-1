@@ -91,8 +91,8 @@ CREATE TABLE `friends` (
 
 DROP TABLE IF EXISTS `item`; 
 CREATE TABLE `item` (
-    `itemId` int(10) unsigned NOT NULL DEFAULT '0',
     `playerId` bigint(20) unsigned NOT NULL,
+    `itemId` int(10) unsigned NOT NULL DEFAULT '0',
     `count` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`itemId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

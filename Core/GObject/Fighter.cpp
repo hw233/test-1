@@ -56,7 +56,14 @@ namespace GObject
         return fgt;
     }
 
-    UInt8 Fighter::GetSide(){ if(_owner) return _owner->GetBattleSide(); return 0;}
+    UInt8 Fighter::GetSide()
+    { 
+        if(_owner)
+        {
+            return _owner->GetBattleSide();
+        }
+        return 0;
+    }
 
     FVarSystem* Fighter::GetFVar() 
     {
@@ -145,4 +152,9 @@ namespace GObject
         }
         return value; 
     } 
+
+    UInt32 Fighter::GetTotalPower() const
+    {
+        return _hp+_attack+_defend+_magatk+_magdef+_critical+_criticalDef+_hit+_evade;
+    }
 }

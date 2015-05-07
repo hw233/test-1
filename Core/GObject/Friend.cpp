@@ -18,31 +18,32 @@ namespace GObject
     void FriendManager::SendFriendList(UInt8 type,UInt8 index)
     { 
         eFriendType ftype = (eFriendType)type;
-        Stream st(REP::FRIEND_LIST);
         if(ftype >= friend_max || index < 0 || index > _friends[ftype].size())
         {
-            st<<static_cast<UInt8>(0);
+            return;
         }
-        else
+        if( _friends[ftype].size() == 0 )
         {
-            UInt8 totalNum = _friends[ftype].size();
-            UInt8 actSendNum = FRIEND_SENDONCE_MAX;  //实际每次发送好友信息的个数
-            if( totalNum -index  < FRIEND_SENDONCE_MAX )
-            {
-                actSendNum = totalNum-index ;
-            }
-            st<<static_cast<UInt8>(actSendNum);
+            return;
+        }
+        Stream st(REP::FRIEND_LIST);
+        UInt8 totalNum = _friends[ftype].size();
+        UInt8 actSendNum = FRIEND_SENDONCE_MAX;  //实际每次发送好友信息的个数
+        if( totalNum -index  < FRIEND_SENDONCE_MAX )
+        {
+            actSendNum = totalNum-index ;
+        }
+        st<<static_cast<UInt8>(actSendNum);
 
-            //擦 就为了用下标操作
-            std::vector<Player*> vecPlayer;
-            for(auto it = _friends[ftype].begin() ; it != _friends[ftype].end();++it)
-            {
-                vecPlayer.push_back(*it);
-            }
-            for(UInt8 i = index; i < index+actSendNum ; ++i)
-            {
-                (vecPlayer[i])->GetSelfInfoStream(st);
-            }
+        //擦 就为了用下标操作
+        std::vector<Player*> vecPlayer;
+        for(auto it = _friends[ftype].begin() ; it != _friends[ftype].end();++it)
+        {
+            vecPlayer.push_back(*it);
+        }
+        for(UInt8 i = index; i < index+actSendNum ; ++i)
+        {
+            (vecPlayer[i])->GetSelfInfoStream(st);
         }
         st<<Stream::eos;
         m_owner->send(st);
@@ -204,6 +205,8 @@ namespace GObject
             if( (*it) == m_owner )
                 continue;
             if(IsInList(friend_normal,*it))
+                continue;
+            if((*it)->GetFriendManager()->IsInList(friend_normal,m_owner) || (*it)->GetFriendManager()->IsInList(friend_apply,m_owner))
                 continue;
             PushInSet(friend_recommand,*it);
         }

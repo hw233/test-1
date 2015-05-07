@@ -12,13 +12,13 @@ namespace Battle
         } 
         return BATTLEGROUND_MAN;
     }
-    void BattleManager::EnterBattleGround(UInt32 battleId, GObject::Player * pl , UInt8 index)
+    void BattleManager::EnterBattleGround(UInt32 battleId, GObject::Player * pl , UInt8 index,UInt8 flag)
     { 
         if(_map.find(battleId) == _map.end())
             return ;
         if(!pl)
             return ;
-        _map[battleId]->PushPlayer(pl,index);
+        _map[battleId]->PushPlayer(pl,index,flag);
     } 
 
     UInt32 BattleManager::CreateBattleGround(UInt8 backGround , UInt8 limit)

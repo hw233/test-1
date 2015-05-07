@@ -4,9 +4,9 @@
 mapInfo =
 {
      [1]={
-	     [1] = {0 , 1,  1 , 1, 1 },
-		 [2] = {1 , 1,  1 , 1, 1 },
-		 [3] = {1 , 1,  1 , 1, 1 }
+	     [1] = {0 , 1,  2 , 1, 1 },
+		 [2] = {1 , 1,  3 , 1, 1 },
+		 [3] = {1 , 1,  1 , 4, 1 }
 	 },
 }
 
@@ -29,6 +29,13 @@ mapCampInfo =
 ---分别代表 在不可通过的障碍物  草地  城镇   森林   山地  上的行动力   与上述的地形相对应
 rideWithLandform  = {0,2,1,1,1}
 
+function GetMap()
+    return mapInfo
+end
+
+function GetCamp()
+    return mapCampInfo
+end
 
 function GetMapInfo(id)
 	return mapInfo[id]

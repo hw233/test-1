@@ -295,7 +295,6 @@ void GameClient::onDisconnected()
     pl->setOnline(false);
     UInt32 now = TimeUtil::Now();
     pl->SetVar(GObject::VAR_OFF_LINE,now);
-    pl->GetGovernManager()->Clear();
     GObject::globalOnlinePlayerSet.erase(pl);
 
 	GameMsgHdr hdr(0xFF, WORKER_THREAD_LOGIN, pl, 0);

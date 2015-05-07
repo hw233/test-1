@@ -79,6 +79,7 @@ struct ServerLeftMsgHdr
 	MsgHdr	msgHdr;
 	int	sessionID;
 };
+
 /*struct SocialMsgHdr
 {
 	SocialMsgHdr():

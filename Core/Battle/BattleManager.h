@@ -18,7 +18,7 @@ namespace Battle
             //获得战场空闲编号
             UInt32 GetBattleGroundIndex(); 
             //进入战场
-            void EnterBattleGround(UInt32,GObject::Player*,UInt8 ); 
+            void EnterBattleGround(UInt32,GObject::Player*,UInt8,UInt8 ); 
 
             //创建战场
             UInt32 CreateBattleGround(UInt8 backGround = 1,UInt8 limit = 4);

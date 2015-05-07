@@ -5,39 +5,15 @@
 namespace GData
 {
     Map map;
-    void Map::loadMapInfo(UInt8 mapId)
+    void Map::loadMapInfo(UInt8 index, vecInfo info)
     { 
-        Table t = GameAction()->GetMapInfo(mapId);
-        for(UInt8 i = 0 ; i < t.size() ; ++i)
-        {
-            Table table = t.get<Table>(i+1);
-            for(UInt8 j =0 ; j <  table.size() ; ++j )
-            {
-                UInt8 info = table.get<UInt8>(j+1);
-                 _mapInfo[i].push_back(info);
-            }
-        }
+        _mapInfo[index] = info;
     } 
 
 
-    void Map::loadCampInfo(UInt8 mapId)
-    { 
-        Table t = GameAction()->GetCampInfo(mapId);
-        for(UInt8 i = 0 ; i < t.size() ; ++i)
-        {
-            Table table = t.get<Table>(i+1);
-            for(UInt8 j =0 ; j <  table.size() ;++j)
-            {
-                //UInt8 info = static_cast<UInt8>(table.get<Table>(j+1));
-                //_mapCamp[i].push_back(info);
-            }
-        }
-    }
-
-
-    UInt8 getLandForm(UInt8 mapId, UInt8 x, UInt8 y)
+    void Map::loadCampInfo(UInt8 index , vecInfo info)
     {
-        UInt8 form = GameAction()->GetInfo(mapId,x+1,y+1);
-        return form;
+        _mapCamp[index] = info;
+
     }
 }

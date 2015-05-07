@@ -233,19 +233,6 @@ namespace GObject
 
     }
 
-
-
-    void AStar::SetBattleInfo(UInt8* battleInfo)
-    {
-        if( battleInfo )
-        { 
-            delete m_battleInfo;
-        }
-        m_battleInfo = battleInfo;
-    }
-
-
-
     bool AStar::SetMapSize(UInt8 row, UInt8 col)
     {
 	    if(row<= 0 || col<=0)
@@ -261,12 +248,6 @@ namespace GObject
 
     bool AStar::IsObstacle(const Ascoord& coord)
     {
-        bool ret = true;
-        if( m_battleInfo[coord._x + coord._y*m_row] == m_side ||   m_battleInfo[coord._x + coord._y*m_row] == 3 )
-        {
-            ret = false;
-
-        }
-        return ret;
+        return false;
     }
 }

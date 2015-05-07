@@ -26,8 +26,8 @@ void WorldScript::init()
 void WorldScript::postInit()
 {
 	call<void>("initSeed", IDGenerator::gSeedOidGenerator.ID());
-	call<void>("setServer", cfg.channelName.c_str(), cfg.serverNum);
-	call<void>("initActTime", cfg.openYear, cfg.openMonth, cfg.openDay);
+	//call<void>("setServer", cfg.channelName.c_str(), cfg.serverNum);
+	//call<void>("initActTime", cfg.openYear, cfg.openMonth, cfg.openDay);
 }
 
 UInt32 WorldScript::onAthleticsNewBox( UInt8 type, UInt32 count )

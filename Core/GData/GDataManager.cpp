@@ -15,6 +15,10 @@
 #include "GData/Map.h"
 #include "GObject/Monster.h"
 #include "Common/LoadingCounter.h"
+#include "Script/lua_tinker.h"
+#include "Config.h"
+#include "Server/Cfg.h"
+#include "Server/WorldServer.h"
 
 namespace GData
 {
@@ -82,6 +86,11 @@ namespace GData
         if (!LoadMonster())  
         {
             fprintf(stderr, "Load LoadMonster Error !\n");
+            std::abort();
+        }
+        if( ! LoadMapConfig() )
+        {
+            fprintf(stderr, "Load LoadMapInfo Error !\n");
             std::abort();
         }
 
@@ -229,7 +238,6 @@ namespace GData
             fgt->SetBaseAttr(dbfb.hp,dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical, dbfb.criticalDef, dbfb.hit, dbfb.evade);
 
             fgt->SetSkill(dbfb.skills);
-
             GObject::globalFighters.add(fgt);
         }    
 
@@ -320,15 +328,89 @@ namespace GData
         LoadingCounter lc("Loading Monster");
         lc.reset(1000);
         DBMonster monsterInfo;
-        if(execu->Prepare("SELECT `id`,`groupId`,`name`,`power`,`money`,`itemId`,`itemNum` FROM `monster`", monsterInfo) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`groupId`,`name`,`power`,`money`,`prob`,`itemId`,`itemNum` FROM `monster`", monsterInfo) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.itemId,monsterInfo.itemNum);
+            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.prob,monsterInfo.itemId,monsterInfo.itemNum);
             GObject::monsterTable.InsertMonster(mon);
             lc.advance();
         }
         lc.finalize();
+        return true;
+    }
+
+    bool GDataManager::LoadMapConfig()
+    {
+        lua_State * L = lua_open();
+        //luaOpen_base(L);
+        //luaOpen_string(L);
+        //luaOpen_table(L);
+        luaL_openlibs(L);
+        {
+            std::string path = cfg.scriptPath+"items/map.lua";
+            lua_tinker::dofile(L,path.c_str());
+            lua_tinker::table table = lua_tinker::call<lua_tinker::table>(L,"GetMap"); 
+            //处理这个table
+            UInt8 size = table.size();
+            vecInfo map;
+            for(UInt8 i = 0; i < size; ++i)
+            {
+                //TODO
+                lua_tinker::table t = table.get<lua_tinker::table>(i+1);
+                UInt8 s = t.size();
+                map.push_back(s);
+
+                lua_tinker::table tt =  t.get<lua_tinker::table>(1);
+                UInt8 ss = tt.size();
+                map.push_back(ss);
+
+                for(UInt8 j = 0 ; j < s ; ++ j )
+                {
+                    lua_tinker::table tt =  t.get<lua_tinker::table>(j+1);
+                    for(UInt8 k = 0 ; k < ss ; ++k)
+                    {
+                        UInt8 form = tt.get<UInt8>(k+1);
+                        map.push_back(form);
+                    }
+                }
+                GData::map.loadMapInfo(i,map);
+                map.clear();
+            }
+            //
+            
+        }
+        {
+            std::string path = cfg.scriptPath+"items/map.lua";
+            lua_tinker::dofile(L,path.c_str());
+            lua_tinker::table table = lua_tinker::call<lua_tinker::table>(L,"GetCamp"); 
+            //处理这个table
+            UInt8 size = table.size();
+            vecInfo camp;
+            for(UInt8 i = 0; i < size; ++i)
+            {
+                //TODO
+                lua_tinker::table t = table.get<lua_tinker::table>(i+1);
+                UInt8 s = t.size();
+                camp.push_back(s);
+
+                lua_tinker::table tt =  t.get<lua_tinker::table>(1);
+                UInt8 ss = tt.size();
+                camp.push_back(ss);
+
+                for(UInt8 j = 0 ; j < s ; ++ j )
+                {
+                    lua_tinker::table tt =  t.get<lua_tinker::table>(j+1);
+                    for(UInt8 k = 0 ; k < ss ; ++k)
+                    {
+                        UInt8 form = tt.get<UInt8>(k+1);
+                        camp.push_back(form);
+                    }
+                }
+                GData::map.loadCampInfo(i,camp);
+                camp.clear();
+            }
+        }
         return true;
     }
 }

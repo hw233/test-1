@@ -115,6 +115,8 @@ namespace GObject
             //强化更新
             void updateEuipmentLoad(UInt8 index);
             UInt32 GetEquipmentUpgradeLoad(UInt8 index);
+            UInt32 GetTotalPower() const;  //获得总战力
+            std::string GetName() const { return _name;}
 
             std::vector<UInt16> m_baseSkills;
     private:

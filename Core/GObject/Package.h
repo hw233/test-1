@@ -58,7 +58,7 @@ namespace GObject
             UInt32 DelAllItem(UInt32 id, UInt32 num);
             UInt32 GetPackageSize();
 
-            void  GetStream(Stream& st);
+            void  SendPackageInfo();
 
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;

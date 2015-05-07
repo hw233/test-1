@@ -95,9 +95,6 @@ namespace Script
         //CLASS_DEF(GameActionLua, RunItemTaskAction);
         //CLASS_DEF(GameActionLua, GetSharpDay);
         //CLASS_DEF(GameActionLua, GetPlayerPtr);
-        //
-        
-
         CLASS_ADD(Player);
         CLASS_DEF(Player, GetVar);
         CLASS_DEF(Player, GetVarS);
@@ -267,6 +264,17 @@ namespace Script
         return Run<UInt16>(NULL, "getGovenDropItem", res);
     }
 
+    UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
+    {
+        return Run<UInt16>(NULL,"GetGovernDropMoney", res);
+    }
+
+
+    UInt16 GameActionLua::GetGovernDropItem(UInt8 res)
+    {
+        return Run<UInt16>(NULL,"GetGovernDropItem", res);
+    }
+    
     UInt16 GameActionLua::GetRandFighter()
     {
         return Run<UInt16>(NULL, "GetRandFighter");
@@ -290,6 +298,11 @@ namespace Script
     UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息
     {
         return Run<UInt8>(NULL,"GetInfo",mapId,x,y);
+    }
+
+    UInt16 GameActionLua::RandMonster(UInt8 group)
+    {
+        return Run<UInt16>(NULL,"RandMonster");
     }
 
 
