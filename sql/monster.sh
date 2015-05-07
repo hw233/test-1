@@ -23,7 +23,7 @@ function monster()
         BEGIN {
             print "INSERT INTO `monster` VALUES";
         } {
-            printf("(%u,\x27%s\x27,%u)",$1,$2,$3);
+            printf("(%u,%u,\x27%s\x27,%u,%u,%u,%u,%u)",$1,$2,$3,$4,$5,$6,$7,$8);
             if (NR <= ENVIRON["lines"])
                 printf(",");
             else if (NR > ENVIRON["lines"])

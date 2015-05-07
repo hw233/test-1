@@ -300,9 +300,9 @@ namespace Script
         return Run<UInt8>(NULL,"GetInfo",mapId,x,y);
     }
 
-    UInt16 GameActionLua::RandMonster(UInt8 group)
+    UInt32 GameActionLua::RandMonster(UInt8 group)
     {
-        return Run<UInt16>(NULL,"RandMonster");
+        return Run<UInt32>(NULL,"RandMonster",group);
     }
 
 

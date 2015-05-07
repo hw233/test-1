@@ -39,13 +39,16 @@ namespace GObject
             {
                 if(monster == NULL )
                     return;
-                _monsterTable[monster->GetGroupId()-1].insert(monster);
+                _monsterTable[monster->GetGroupId()].insert(monster);
             }
 
             Monster* GetMonster(UInt8 groupId,UInt32 id)
             {
-               
-                for(auto it= _monsterTable[groupId-1].begin(); it != _monsterTable[groupId-1].end(); ++it)
+
+                std::set<Monster*> monSet = _monsterTable[groupId];
+                if( monSet.empty() )
+                    return NULL;
+                for(auto it= monSet.begin(); it != monSet.end(); ++it)
                 {
                     if( (*it)->GetMonsterId() == id )
                     {
@@ -73,7 +76,7 @@ namespace GObject
 
             std::set<Monster*> &GetMonsterSet(UInt8 groupId)
             {
-                return _monsterTable[groupId-1];
+                return _monsterTable[groupId];
             }
 
         private:

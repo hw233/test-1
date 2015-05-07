@@ -403,6 +403,7 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
     MSG_QUERY_PLAYER(player) ;
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt8 option = 0;
+    br >> option;
     switch(option)
     { 
         case 0x01:
@@ -539,6 +540,16 @@ void OnGiveOnlineAward(GameMsgHdr& hdr,const void * data)
     player->GetGovernManager()->SendOnlineGovernAward(time);
 
 }
+
+void OnSendGovernResult(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    player->GetGovernManager()->SendGovernResult(type);
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

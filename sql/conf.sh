@@ -1,15 +1,15 @@
 #!/bin/bash
 
 H=127.0.0.1
-U=qsj
+U=jacob
 P=kingxin
 PT=3306
 
 #请勿改动该文件，请将个人配置存放到 conf.user.sh 文件中
 #如果文件不存在，则使用8888的默认配置
 # conf.user.sh 文件请勿提交入 git 仓库
-DBD=data_qsj
-DBO=asss_qsj
+DBD=data_hand
+DBO=asss_hand
 
 if [ -f conf.user.sh ] ; then
     source conf.user.sh

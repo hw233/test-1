@@ -53,8 +53,6 @@ namespace GObject
             ret = 0;
         }
         UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
-        UInt8 lv = m_owner->GetGovernLevel();
-        std::set<Monster*> monSet = monsterTable.GetMonsterSet(lv);
         mapId2Num speedupId2Num;        
         if( ret == 1)
         {
@@ -82,7 +80,7 @@ namespace GObject
         //
         for( auto it = speedupId2Num.begin() ; it != speedupId2Num.end(); ++it)
         {
-            if( it->first == 30001 )
+            if( it->first == 20001 )
             {
                 m_owner->AddMoney(1,it->second);
             }
@@ -109,23 +107,21 @@ namespace GObject
 
     Monster* GovernManager::RandomOneMonster(UInt8 groupId)
     {
-        std::set<Monster*> monSet = monsterTable.GetMonsterSet(groupId);
-        std::vector<Monster*> monVec;
-        UInt8 n = monSet.size();
-        for( auto it = monSet.begin() ; it != monSet.end() ; ++it)
-        {
-            monVec.push_back(*it);
-        }
-        UInt32 rand = uRand(n-1);
-        Monster* mon = monVec[rand];
+        UInt32 monsterId = GameAction()->RandMonster(groupId);
+        if( monsterId == 0 )
+            monsterId = 1;
+        std::cout<<"the monster id is"<<monsterId<<std::endl;
+        Monster* mon = monsterTable.GetMonster(groupId,monsterId);
         return mon;
     }
 
     UInt8 GovernManager::FightWithMonster(Monster* mon)
     {
+        UInt8 res = 0;
+        if( mon == NULL )
+           return res;
         UInt32 power = m_fighter->GetTotalPower();
         //小胜  大胜  平局  失败
-        UInt8 res = 0;
         cout<<"  "<<m_fighter->GetName()<<"战力   "<<power<<"   ";
         if( power >= mon->GetPower()*1.4 ) 
         {
@@ -165,11 +161,11 @@ namespace GObject
         _vecGovernInfo.clear();
         if( !m_fighter )
             return;
-        UInt32 times = SPEEDUP_MAXTIME/TIME_TAB;
+        UInt8 lv = m_owner->GetGovernLevel();
+        UInt32 times = (TIME_ONCE*60)/TIME_TAB;
         for(UInt8 i = 0; i < times ; ++i )
         {
-             UInt8 rand = uRand(2)+1;
-             Monster* mon = RandomOneMonster(rand);
+             Monster* mon = RandomOneMonster(lv);
              UInt8 res = FightWithMonster(mon);
              UInt16 base = GameAction()->GetGovernDropItem(res);
              UInt16 random = uRand(10000);
@@ -241,13 +237,17 @@ namespace GObject
         if( number < 0  || number >= 40 )
             return ;
         GovernInfo& info = _vecGovernInfo[number];
+        if( info.groupId < 1 || info.monsterId <= 0 )
+            return;
         curMonster = monsterTable.GetMonster(info.groupId , info.monsterId);
+        if( curMonster == NULL )
+            return;
         std::vector<ItemInfo> vecItem;
         GetItemsByResult(info.res,curMonster->GetGroupId(),curMonster->GetMonsterId(),info.isGet, vecItem);
         for( auto it = vecItem.begin(); it != vecItem.end() ; ++it )
         {
             std::cout<<m_owner->GetName()<<"的战将 >>>>>>>"<<m_fighter->GetName()<<"     在线获得物品    "<<(*it).id<<"  " <<(*it).num<<endl;
-            if( (*it).id  == 30001 )
+            if( (*it).id  == 20001 )
             {
                 m_owner->AddMoney(1,(*it).num);
             }
@@ -280,22 +280,22 @@ namespace GObject
         }
         if( base != 0 )
         {
-            vecItem.push_back(ItemInfo(30001,moneyNum*(base/10000.0f)));
+            vecItem.push_back(ItemInfo(20001,moneyNum*(base/10000.0f)));
         }
     }
 
 
-    void GovernManager::GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt8 times,std::vector<ItemInfo>&vecItem)
+    void GovernManager::GetAccumulativeAward(UInt8 res ,Monster* mon,UInt16 prob,UInt32 times,std::vector<ItemInfo>&vecItem)
     {
         if( res <= 0  || res >= 5 || mon == NULL )   //大败的话什么东西都没有的
             return;
         UInt16 moneyNum = mon->GetMoney();
         UInt16 mbase =  GameAction()->GetGovernDropMoney(res);
         UInt16 ibase =  GameAction()->GetGovernDropItem(res);
-        vecItem.push_back(ItemInfo(30001,floor(moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times)));
+        vecItem.push_back(ItemInfo(20001,moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times));
         UInt32 itemId = mon->GetItemId();
         UInt32 itemNum = mon->GetItemNum();
-        vecItem.push_back(ItemInfo(itemId,floor(itemNum*(ibase/10000.0f)*(prob/10000.0f)*times)));
+        vecItem.push_back(ItemInfo(itemId,itemNum*(ibase/10000.0f)*(prob/10000.0f)*times));
     }
 
 
@@ -304,6 +304,8 @@ namespace GObject
     {
         UInt8 lv = m_owner->GetGovernLevel();
         std::set<Monster*> monSet = monsterTable.GetMonsterSet(lv);
+        if( monSet.empty() )
+            return;
         for( auto it = monSet.begin() ; it != monSet.end() ; ++it)
         {
             UInt8 res = FightWithMonster(*it);
@@ -316,11 +318,11 @@ namespace GObject
                     continue;
                 if( mapId2Num.find((*i).id) != mapId2Num.end() )
                 {
-                    mapId2Num[(*i).id] += floor((*i).num*times*(prob/10000.0f));
+                    mapId2Num[(*i).id] += (*i).num;
                 }
                 else
                 {
-                    mapId2Num[(*i).id] = floor((*i).num*times*(prob/10000.0f));
+                    mapId2Num[(*i).id] = (*i).num;
                 }
             }
         }
@@ -345,7 +347,7 @@ namespace GObject
         for( auto it = offId2Num.begin() ; it != offId2Num.end(); ++it)
         {
             
-            if( it->first == 30001 )
+            if( it->first == 20001 )
             {
                 m_owner->AddMoney(1,it->second);
             }
