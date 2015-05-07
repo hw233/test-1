@@ -77,7 +77,7 @@ namespace GObject
         //
         for( auto it = speedupId2Num.begin() ; it != speedupId2Num.end(); ++it)
         {
-            if( it->first == 30001 )
+            if( it->first == 20001 )
             {
                 m_owner->AddMoney(1,it->second);
             }
@@ -245,7 +245,7 @@ namespace GObject
         for( auto it = vecItem.begin(); it != vecItem.end() ; ++it )
         {
             std::cout<<m_owner->GetName()<<"的战将 >>>>>>>"<<m_fighter->GetName()<<"     在线获得物品    "<<(*it).id<<"  " <<(*it).num<<endl;
-            if( (*it).id  == 30001 )
+            if( (*it).id  == 20001 )
             {
                 m_owner->AddMoney(1,(*it).num);
             }
@@ -279,7 +279,7 @@ namespace GObject
         }
         if( base != 0 )
         {
-            vecItem.push_back(ItemInfo(30001,moneyNum*(base/10000.0f)));
+            vecItem.push_back(ItemInfo(20001,moneyNum*(base/10000.0f)));
         }
     }
 
@@ -291,7 +291,7 @@ namespace GObject
         UInt16 moneyNum = mon->GetMoney();
         UInt16 mbase =  GameAction()->GetGovernDropMoney(res);
         UInt16 ibase =  GameAction()->GetGovernDropItem(res);
-        vecItem.push_back(ItemInfo(30001,floor(moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times)));
+        vecItem.push_back(ItemInfo(20001,floor(moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times)));
         UInt32 itemId = mon->GetItemId();
         UInt32 itemNum = mon->GetItemNum();
         vecItem.push_back(ItemInfo(itemId,floor(itemNum*(ibase/10000.0f)*(prob/10000.0f)*times)));
@@ -346,7 +346,7 @@ namespace GObject
         for( auto it = offId2Num.begin() ; it != offId2Num.end(); ++it)
         {
             
-            if( it->first == 30001 )
+            if( it->first == 20001 )
             {
                 m_owner->AddMoney(1,it->second);
             }
