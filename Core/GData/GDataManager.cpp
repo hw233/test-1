@@ -113,7 +113,8 @@ namespace GData
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBItemType2 idt;
         //if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `vLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `trumpExp`, `data`, `enchant`, `attrId`, `salePriceUp` FROM `item_template`", idt) != DB::DB_OK)
-        if(execu->Prepare("SELECT `id`, `name`, `subClass`,`maxQuantity`, `coin` FROM `item_template`", idt) != DB::DB_OK)
+        //if(execu->Prepare("SELECT `id`, `name`, `subClass`,`maxQuantity`, `coin` FROM `item_template`", idt) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`, `name`, `subClass`,`maxQuantity`, `coin` FROM `item_template2`", idt) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
@@ -252,13 +253,13 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkill dbskill;
-        if(execu->Prepare("SELECT `id`,`name`,`skillCondId`,`skillScopeId`,`skillEffectId`,`cd`,`actionCostCd`,`actionBackCd` FROM `skill`", dbskill) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`skillCondId`,`skillScopeId`,`skillEffectId`,`cd`,`actionCostCd`,`actionBackCd`,`mpCost` FROM `skill`", dbskill) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
             //skill[dbskill].LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId);
             Skill* se = new Skill(dbskill.id, dbskill.name);
-            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd, dbskill.actionCd,dbskill.actionBackCd);
+            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd, dbskill.actionCd,dbskill.actionBackCd, dbskill.mpCost);
 
             skillManager.add(se);
         }

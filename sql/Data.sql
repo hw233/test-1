@@ -168,6 +168,7 @@ CREATE TABLE `skill` (
       `cd` int(10) NOT NULL DEFAULT '0',
       `actionCostCd` int(10) NOT NULL DEFAULT '0',
       `actionBackCd` int(10) NOT NULL DEFAULT '0',
+      `mpCost` int(10) NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -206,3 +207,18 @@ CREATE TABLE `monster`(
     `itemNum` tinyint(3) NOT NULL DEFAULT '0',    
     PRIMARY KEY(`id`,`groupId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+DROP TABLE IF EXISTS `item_template2`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `item_template2` (
+      `id` int(11) NOT NULL,
+      `name` varchar(255) NOT NULL,
+      `subClass` tinyint(3) unsigned NOT NULL COMMENT '物品类型',
+      `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
+      `coin` int(10) NOT NULL COMMENT '交易价格上限',
+      PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+

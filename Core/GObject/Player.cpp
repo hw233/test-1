@@ -163,7 +163,7 @@ namespace GObject
         else  
             _fighters[fgt->getId()] = fgt;
         if(writedb)
-            DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %u,%u,0,%u)",getId(),id,now);
+            DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %" I64_FMT "u,%u,0,%u)",getId(),id,now);
     } 
 
     void Player::addFighter(UInt16 fgtId, bool writedb, bool load )
@@ -533,18 +533,17 @@ namespace GObject
         for(UInt8 i = 0; i < count ; ++i)
         { 
             UInt16 fighterId = GameAction()->GetRandFighter();
-            st << fighterId;
             
             Fighter * fgt = findFighter(fighterId);
-            if(!fgt)
+            if(fgt)
             { 
-                break;
-                GetPackage()->AddItem(fighterId,10);
+                GetPackage()->AddItem(fighterId + 40000,10);
             }
             else
             {
                 addFighter(fighterId, true, true);
             }
+            st << fighterId;
             ++num;
         } 
         st.data<UInt8>(offect) = num;

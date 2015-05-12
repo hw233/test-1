@@ -58,15 +58,12 @@ namespace Battle
 
     void BattleFighter::setFighter(GObject::Fighter * f)
     { 
+        if(!f)
+            return ;
         _fighter = f ;
         //运动行为
         //preActionList.push_back(ActionBase(0,0,0));
         //普通攻击
-        if(f!=NULL)
-        {
-            for(UInt8 i = 0; i < f->m_baseSkills.size(); ++i)
-                preActionList.push_back(ActionBase(f->m_baseSkills[i]));
-        }
     } 
 
     void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
@@ -313,6 +310,16 @@ namespace Battle
             } 
             ++it;
         } 
+    } 
+   
+    void BattleFighter::AddSkill() 
+    { 
+        preActionList.push_back(GetBaseActionNum());
+        if(_fighter!=NULL)
+        {
+            for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
+                preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
+        }
     } 
 
 }

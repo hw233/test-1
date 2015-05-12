@@ -56,9 +56,12 @@ namespace Battle
             case e_image_attack:
             case e_image_therapy:
                 { 
-                    ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                    GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId);
-                    GetField()->InsertTimeBattleAction(_nowTime+_actionLast,ip);
+                    if(_ab._skillId)
+                    {
+                        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+                        GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId);
+                        GetField()->InsertTimeBattleAction(_nowTime+(_actionLast?_actionLast:1),ip);
+                    }
                 } 
                 break;
             case e_attack_counter:

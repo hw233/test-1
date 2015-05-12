@@ -4,6 +4,10 @@
 
 #include "Config.h"
 #include "GObject/GObjectManager.h"
+
+#undef SKillT 
+
+
 namespace GData
 {
     enum    // 技能触发方式
@@ -20,16 +24,24 @@ namespace GData
         SCOPE_CORESS,      //十字形
     };
 
-    class SkillCondition : public ObjectBaseT<UInt16>
+#ifdef SKillT
+    class SkillCondition 
+    { 
+        public:
+            SkillCondition(){}
+#else
+    class SkillCondition 
+        : public ObjectBaseT<UInt16>
     { 
         public:
             SkillCondition(UInt16 id, const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) ,cond(0),prob(0),distance(0),priority(0)
+#endif
             { } 
             ~SkillCondition(){}
             bool MeetCondition(UInt16 advance ,UInt8& pri) const 
             {
-                if(distance >= advance && pri < priority)
+                if(distance >= advance && pri <= priority)  //XXX 等号添加
                 { 
                     pri = priority;
                     return true;
@@ -42,11 +54,19 @@ namespace GData
             UInt16 distance;  //攻击距离  
             UInt8 priority;   //优先级
     };
+
+#ifdef SkillT
+    class SkillScope 
+    { 
+        public:
+            SkillScope(){}
+#else
     class SkillScope : public ObjectBaseT<UInt16>
     { 
         public:
             SkillScope(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
+#endif
             bool InTheScope(UInt16 loaclX ,UInt16 localY ,UInt16 targetX , UInt16 targetY);
         public:
             UInt8 area;  //范围类型  0-单体 1-全体  2-目标扩散型 3-地形半径扩散型  4-地形直线扩散型 4-无限范围
@@ -58,8 +78,12 @@ namespace GData
     class SkillEffect : public ObjectBaseT<UInt16>
     { 
         public:
+#ifdef SkillT
+            SkillEffect(){}
+#else
             SkillEffect(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
+#endif
         public:
             UInt8 skillType;
 
@@ -108,13 +132,15 @@ namespace GData
     class Skill : public ObjectBaseT<UInt16>
     {
         public:
+#ifdef SkillT
+            Skill(SkillCondition * sc, SkillScope* ss, SkillEffect* se):_sc(sc),_ss(ss),_se(se){}
+#else
             Skill(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
-            //Skill(SkillCondition * sc, SkillScope* ss, SkillEffect* se):_sc(sc),_ss(ss),_se(se){}
             const SkillCondition * GetSkillCondition() const {return skillConditionManager[_conditionId];} 
             const SkillScope * GetSkillScope() const {return skillScopeManager[_scopeId];}
             const SkillEffect * GetSkillEffect() const {return skillEffectManager[_effectId];}
-            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId,UInt16 cd, UInt16 actionCd, UInt16 actionBackCd)
+            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId,UInt16 cd, UInt16 actionCd, UInt16 actionBackCd, UInt16 mpCost)
             { 
                 _conditionId = conditionId;
                 _scopeId = scopeId;
@@ -122,17 +148,28 @@ namespace GData
                 _cd = cd ;
                 _actionCd = actionCd;
                 _actionBackCd = actionBackCd;
+                _mpCost = mpCost;
             } 
+#endif
             UInt16 GetCd() const {return _cd;}
             UInt16 GetActionCd() const { return _actionCd;}
             UInt16 GetActionBackCd() const { return _actionBackCd;}
+            UInt16 GetMpCost() const { return _mpCost;}
         private:
+#ifdef Skill
+            SkillCondition * _sc;
+            SkillScope * _ss;
+            SkillEffect * _se;
+#else
             UInt16 _conditionId;
             UInt16 _scopeId;
             UInt16 _effectId;
+#endif
+
             UInt16 _cd;
             UInt16 _actionCd;
             UInt16 _actionBackCd;
+            UInt16 _mpCost;
     };
 
     typedef ObjectMapT<Skill, UInt16> SkillManager;   

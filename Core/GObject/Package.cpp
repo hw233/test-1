@@ -107,18 +107,20 @@ namespace GObject
     ItemBase * Package::AddItem(UInt32 typeId, UInt32 num, bool bind , bool silence , UInt16 fromWhere )
     { 
         ItemBase* item = m_Items[ItemKey(typeId, bind)];
+        UInt8 flag = 0;
         if(!item)
         {
             const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
             if(itemType == NULL) return NULL;
             item = new(std::nothrow) ItemBase(typeId, itemType);
             m_Items[ItemKey(typeId, bind)] = item;
+            flag =1;
         }
         item->IncItem(num);
         auto it = m_Items.find(ItemKey(typeId, bind));
-        if( it != m_Items.end() )
+        if(!flag)
         {
-          DB7().PushUpdateData("update item set `count` = %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",(it->second)->Count()+num,typeId,m_Owner->getId());
+          DB7().PushUpdateData( "update item set `count`= %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",(it->second)->Count()+num,typeId,m_Owner->getId());
         }
         else
         {

@@ -24,6 +24,7 @@ namespace Battle
             virtual void SetGone(bool v){ isGone = v;}
             virtual bool GetGone(){return isGone;}
             virtual UInt8 GetRideCount() {return count-1;}
+            virtual UInt16 GetBaseActionNum(){return 5;}
         private:
             BattleFighter * _target ; 
             UInt8 count; //控制来回次数
