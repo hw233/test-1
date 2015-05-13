@@ -42,7 +42,8 @@ namespace GObject
 
     UInt8 AStar::GetGValue(Ascoord& coord)
     {
-        //把行动力消耗也放进去了
+        
+        /*
         if( coord._x >= m_row || coord._y >= m_col)
         {
             return 0xFF;
@@ -50,7 +51,8 @@ namespace GObject
         //先从地图中把相应的坐标的地形读取出来
         UInt8 landform = m_map[coord._x+coord._y*m_row];
         UInt8 g = GameAction()->GetRide(landform);
-        return g*10;
+        */
+        return 10;
 
     }
 

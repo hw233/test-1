@@ -5,8 +5,7 @@
 #include "Script/BattleFormula.h"
 #include "BattleAction.h"
 #include "GObject/Player.h"
-#include "Script/GameActionLua.h"
-#include "GObject/Country.h"
+#include "Script/lua_tinker.h"
 
 namespace Battle
 {
@@ -57,11 +56,6 @@ namespace Battle
         }
 
     }  
-
-    UInt8 BattleFighter::GetRide(UInt8 landform = 2)
-    {
-        return GameAction()->GetRide(landform);
-    }
 
     void BattleFighter::setFighter(GObject::Fighter * f)
     { 
@@ -321,5 +315,34 @@ namespace Battle
             ++it;
         } 
     } 
+
+    UInt8 BattleFighter::GetMovePower()
+    {
+        lua_State * L = lua_open();
+        //luaOpen_base(L);
+        //luaOpen_string(L);
+        //luaOpen_table(L);
+        luaL_openlibs(L);
+        std::string path = cfg.scriptPath+"items/map.lua";
+        lua_tinker::dofile(L,path.c_str());
+        UInt8 stype = GetTypeId();
+        UInt8 power = lua_tinker::call<UInt8>(L,"GetMovePower",stype); 
+        return power;
+    }
+
+
+    UInt8 BattleFighter::GetAttackRange()
+    {
+        lua_State * L = lua_open();
+        //luaOpen_base(L);
+        //luaOpen_string(L);
+        //luaOpen_table(L);
+        luaL_openlibs(L);
+        std::string path = cfg.scriptPath+"items/map.lua";
+        lua_tinker::dofile(L,path.c_str());
+        UInt8 stype = GetTypeId();
+        UInt8 range = lua_tinker::call<UInt8>(L,"GetAttackRange",stype); 
+        return range;
+    }
 
 }

@@ -1,33 +1,38 @@
-
-
---地图信息  0 不可通过的障碍   1 草地   2城镇    3森林     4山地
+--map info :  0  uncross  1 grass 2 town 3 forest 4 hill
 mapInfo =
 {
      [1]={
 	     [1] = {0 , 1,  2 , 1, 1 },
 		 [2] = {1 , 1,  3 , 1, 1 },
-		 [3] = {1 , 1,  1 , 4, 1 }
+		 [3] = {0 , 1,  1 , 4, 1 }
 	 },
 }
 
 
-
---地图上的阵营信息       //0属于障碍 不可通过  可视为中立阵营
+--map camp info : 0 uncross 1 camp one 2 camp two
 mapCampInfo =
 {
 	[1]={
 		[1] = {0,1,1,2,2},
-		[2] = {1,1,0,2,2},                ---地图1的
+		[2] = {1,1,0,2,2},               --corresponding with mapinfo
 		[3] = {0,1,1,0,2}
 	}
 
 }
 
+--ride sub with different soldier and diff landform 
+rideWithLandform  = {
+    [1] = {1,2,2,3},   --hoser  in  grass town forest hill ridesub 
+    [2] = {1,2,1,3},   --walker 
+    [3] = {1,2,1,3}    --shooter
+}
 
+soldierBaseData={
+    [1] = { 1, 3 }, --hoser  attackRange movePower
+    [2] = { 1, 2 }, --waller 
+    [3] = { 2, 2 }  --shooter
+}
 
-
----分别代表 在不可通过的障碍物  草地  城镇   森林   山地  上的行动力   与上述的地形相对应
-rideWithLandform  = {0,2,1,1,1}
 
 function GetMap()
     return mapInfo
@@ -46,10 +51,18 @@ function GetCampInfo(id)
 	return mapCampInfo[id]
 end
 
-function GetRide(landform)
-	return rideWithLandform[landform]
-end
-
 function GetInfo(id,x,y)
    return mapInfo[id][x][y]
+end
+
+function GetMovePower(stype)
+    return soldierBaseData[stype][2]
+end
+
+function GetAttackRange(stype)
+    return soldierBaseData[stype][1]
+end
+
+function GetRideSub(stype,lanform)
+    return rideWithLandform[stype][lanform]
 end

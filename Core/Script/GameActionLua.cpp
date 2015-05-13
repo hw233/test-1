@@ -252,18 +252,6 @@ namespace Script
         return TimeUtil::SharpDay(0, now);
     }
 
-
-    UInt16 GameActionLua::getGovernDropMoney(UInt8 res)
-    {
-        return Run<UInt16>(NULL, "getGovenDropMoney", res);
-    }
-
-
-    UInt16 GameActionLua::getGovernDropItem(UInt8 res)
-    {
-        return Run<UInt16>(NULL, "getGovenDropItem", res);
-    }
-
     UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
     {
         return Run<UInt16>(NULL,"GetGovernDropMoney", res);
@@ -280,21 +268,6 @@ namespace Script
         return Run<UInt16>(NULL, "GetRandFighter");
     }
 
-    Table GameActionLua::GetMapInfo(UInt8 mapId)
-    {
-        return Run<Table>(NULL, "GetMapInfo",mapId);
-    }
-
-    Table GameActionLua::GetCampInfo(UInt8 mapId)
-    {
-        return Run<Table>(NULL,"GetCampInfo",mapId);
-    }
-
-    UInt8 GameActionLua::GetRide(UInt8 landform)
-    {
-        return Run<UInt8>(NULL,"GetRide",landform);
-    }
-
     UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息
     {
         return Run<UInt8>(NULL,"GetInfo",mapId,x,y);
@@ -305,6 +278,21 @@ namespace Script
         return Run<UInt32>(NULL,"RandMonster",group);
     }
 
+
+    UInt8 GameActionLua::GetRideSub(UInt8 stype, UInt8 landform)
+    {
+        return Run<UInt8>(NULL, "GetRideSub",stype,landform);
+    }
+
+    UInt8 GameActionLua::GetAttackRange(UInt8 stype)
+    {
+        return Run<UInt8>(NULL,"GetAttackRange",stype);
+    }
+
+    UInt8 GameActionLua::GetMovePower(UInt8 stype)
+    {
+        return Run<UInt8>(NULL,"GetMovePower",stype);
+    }
 
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
     //{

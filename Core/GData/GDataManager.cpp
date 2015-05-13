@@ -16,7 +16,6 @@
 #include "GObject/Monster.h"
 #include "Common/LoadingCounter.h"
 #include "Script/lua_tinker.h"
-#include "Config.h"
 #include "Server/Cfg.h"
 #include "Server/WorldServer.h"
 

@@ -118,9 +118,11 @@ namespace Battle
 
     UInt8 BattleSimulator::GetWin()
     { 
-        if(!_fgt[0] || !_fgt[0]->getHP())
+        if( _fgt[0] && _fgt[0]->getHP() == 0 && _fgt[1] && _fgt[1]->getHP()==0 )
+            return 3;
+        if( _fgt[0] && _fgt[0]->getHP() > 0 )
             return 0;
-        if(!_fgt[1] || !_fgt[1]->getHP())
+        if( _fgt[1] && _fgt[1]->getHP() > 0 )
             return 1;
         return 2;
     } 

@@ -130,17 +130,29 @@ namespace Battle
             void Analyse(std::list<Ascoord>path,Ascoord& target);
             bool IsInAttackZone(Ascoord stand, Ascoord target);
             void GetTarget(UInt8 x,UInt8 y ,UInt8 ride);
-            void GetNearbyEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecAscoord);//相邻的敌人
+            void GetNeighbourEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecAscoord);//相邻的敌人
             void BowAnalyse(std::list<Ascoord> path,Ascoord target);
             void GetBackPosition(std::vector<Ascoord>& vecNearEnemy, std::vector<AttackInfo> vecFinal);
             void GetRideZone(std::vector<Ascoord>& vecAscoord);
             bool EnemyCanAttack(Ascoord stand, Ascoord target);
             UInt8 GetDirection(UInt8 x,UInt8 y , UInt8 cx, UInt8 cy);
-            void MoveAnalyse(std::list<Ascoord> path, Ascoord& target, Ascoord& last);
+            void MoveAnalyse(std::list<Ascoord> path, Ascoord target, Ascoord& move);
             void GetMoveTargetByDir(UInt8 d, Ascoord& move);
+            bool InMyAttackHasEnemy(const Ascoord& p );
+            Ascoord ConvertConverstion(const Ascoord& p);
+            void GetMovePos(std::list<Ascoord>& path, Ascoord& last);
+            UInt8 GetShootActionType(UInt8 x ,UInt8 y, std::vector<Ascoord>& vecEnemy);
+            void  ShootGetTarget(UInt8 actionType);
+            void  ShootFrontAttack();
+            void  ShootCurrentPosAttack();
+            void  ShootBackAttack();
+            void  GiveBattleAward();
+            void  MoveGetEnemy(std::vector<Ascoord>& vecAscoord);
+            void  GetMovePosition(Ascoord& move);
+            UInt8 GetDistance(Ascoord & lp , Ascoord& rp );
             ////////一下这些家伙全是A*相关东西
 
-            UInt8 GetGValue();  //获得G值
+            UInt8 GetGValue(const Ascoord& p);
             UInt8 GetHValue(const Ascoord &p);  //获得H值
             void  SetStart(const Ascoord &p);   //设置终止点
             void  SetEnd(const Ascoord &p);  //设置起始点
@@ -154,6 +166,7 @@ namespace Battle
             bool  PopBestStep(Node* node);
             bool  GetRoute(std::list<Ascoord>& list);
             void  GetAround(const Ascoord& p,std::vector<Ascoord>&vecAscoord);
+            bool  IsInAround(const Ascoord& p , const Ascoord& t);
 
         private:
             UInt32 _id;
