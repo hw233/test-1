@@ -25,6 +25,8 @@ namespace GData
         float       salePriceUp;    // 交易价格上限 
     };
 
+
+
     struct DBItemType2
     {
         UInt32      typeId;         // 物品编号
@@ -131,6 +133,7 @@ namespace GData
         UInt16 cd;
         UInt16 actionCd;
         UInt16 actionBackCd;
+        UInt16 mpCost;
     };
 
     struct DBMap  
@@ -280,7 +283,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkill)
-        SPECIALDEF(8)
+        SPECIALDEF(9)
         (
          UInt32, id,
          std::string , name,
@@ -289,7 +292,8 @@ namespace DB
          UInt32, skillEffectId,
          UInt16, cd,
          UInt16, actionCd,
-         UInt16, actionBackCd
+         UInt16, actionBackCd,
+         UInt16, mpCost
         )
         SPECIALEND()
 

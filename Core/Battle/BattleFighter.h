@@ -181,6 +181,8 @@ namespace Battle
             virtual bool GetGone(){return true;}
 
             virtual UInt8 GetRideCount() {return 1;}
+
+            virtual UInt16 GetBaseActionNum() = 0 ;
             
             UInt32 GetAttack() { return GetTotalAttr(e_attr_attack);}
 
@@ -239,6 +241,7 @@ namespace Battle
 
             void AddBuff(UInt16 buffId);
             void CheckBuff();
+            void AddSkill() ;
 
         protected:
             UInt8 _crick;  //硬直

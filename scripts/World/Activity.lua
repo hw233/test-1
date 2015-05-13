@@ -1,11 +1,10 @@
 function onActivityCheck(tm)
 
-  --if tm >= actTime250 and tm < actTime250_1 then
-      --setCollectCardAct(true)
-  --else
-      --setCollectCardAct(false)
-  --end
-
+--  if tm >= actTime250 and tm < actTime250_1 then
+--      --setCollectCardAct(true)
+--  else
+--      --setCollectCardAct(false)
+--  end
 
   --setAutoHeal(true)
   --setHeroIslandAct(true)

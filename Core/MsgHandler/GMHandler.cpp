@@ -157,5 +157,4 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
        return;
     UInt32 num = atoi(args[1].c_str());
     player->AddMoney(id , num);
-
 }

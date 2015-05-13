@@ -125,7 +125,7 @@ namespace GObject
         UInt8 i = 1;
         for(auto it = globalPlayerVec.begin(); it != globalPlayerVec.end(); ++it)
         {
-            if( i > 9 )
+            if( i > 11 )
                 break;
             Player* pl = *it;
             Battle::battleManager.EnterBattleGround(BattleId,pl,i, flag);

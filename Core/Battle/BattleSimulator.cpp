@@ -4,6 +4,8 @@
 #include "Server/OidGenerator.h"
 #include "Battle/BattleWalkFighter.h"
 #include "Battle/BattleRideFighter.h"
+#include "Battle/BattleShootFighter.h"
+#include "Battle/BattleAdviceFighter.h"
 #include "Battle/BattleReport.h"
 #include "GData/SkillTable.h"
 
@@ -131,19 +133,25 @@ namespace Battle
     { 
         if(!bf)
             bf = Script::BattleFormula::getCurrent();
+        BattleFighter * fgt = NULL;
         switch(Class)
         { 
             case 1:
-                return new BattleRideFighter(bf,f,pointX,pointY);
+                fgt = new BattleRideFighter(bf,f,pointX,pointY);
             case 2:
-                return new BattleRideFighter(bf,f,pointX,pointY);
+                fgt = new BattleWalkFighter(bf,f,pointX,pointY);
             case 3:
-                return new BattleRideFighter(bf,f,pointX,pointY);
+                fgt =  new BattleShootFighter(bf,f,pointX,pointY);
             case 4:
-                return new BattleRideFighter(bf,f,pointX,pointY);
+                fgt =  new BattleAdviceFighter(bf,f,pointX,pointY);
             default:
-                return new BattleRideFighter(bf,f,pointX,pointY);
+                fgt =  new BattleRideFighter(bf,f,pointX,pointY);
         } 
+        fgt = new BattleShootFighter(bf,f,pointX,pointY);
+        if(!fgt)
+            return NULL;
+        fgt->AddSkill();
+        return fgt;
     } 
     UInt8 BattleSimulator::doAttack(UInt16 time)
     { 

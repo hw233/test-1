@@ -295,6 +295,16 @@ namespace Battle
             UInt8 win = 0;
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
+
+            ////////////////////////////////////////////////////////////
+            //测试代码
+            UInt8 gx = target.goal.x;
+            UInt8 gy = target.goal.y;
+            if( currentBf->GetTypeId() == 3 && win == 0 )   //己方赢
+            {
+                _mapFighters[gx+gy*_x]->setHP(0);
+            }
+            ////////////////////////////////////////////////////////
             _pack << win << reportId;
 
             //cout
@@ -808,7 +818,8 @@ namespace Battle
 
                 bool flag = false;
                 for(UInt8 j = 0; j < fighters[i].size();++j)
-                { 
+                {
+                    //////////////////////////////////////
                     if(fighters[i][j] && fighters[i][j]->getHP())
                     {
                         flag = true ;

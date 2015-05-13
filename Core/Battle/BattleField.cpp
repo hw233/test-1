@@ -314,17 +314,21 @@ namespace Battle
                     } 
                     break;
                 } 
-            case 6:
+            case 6:    //弓箭手的攻击范围
                 {
                     
                     BattleObject * bo = GetTarget(side , bf->getPosX() , bf->getPosY());
                     if(!bo)
                         return ;
+                    vec.push_back(bo) ;
                     for(UInt8 i = 0; i < _fighters[side].size(); ++i)
                     { 
                         BattleObject* fgt1 = _fighters[side][i] ;
+                        if(bo == fgt1)
+                            continue;
                         if(!fgt1 || !fgt1->getHP())
                             continue;
+                        if(getShootDistance(bf,bo,fgt1) < fgt1->GetRad())
                             vec.push_back(fgt1);
                     } 
                     break;

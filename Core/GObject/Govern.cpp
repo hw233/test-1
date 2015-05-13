@@ -373,7 +373,4 @@ namespace GObject
         st<<Stream::eos;
         m_owner->send(st);
     }
-
-
-
 }
