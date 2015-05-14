@@ -163,7 +163,7 @@ namespace GObject
         else  
             _fighters[fgt->getId()] = fgt;
         if(writedb)
-            DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %u,%u,0,%u)",getId(),id,now);
+            DB2().PushUpdateData("INSERT INTO `fighter` (`playerId`,`fighterId`,`experience`,`addTime`) VALUES( %" I64_FMT "u,%u,0,%u)",getId(),id,now);
     } 
 
     void Player::addFighter(UInt16 fgtId, bool writedb, bool load )
@@ -500,6 +500,13 @@ namespace GObject
         SetClanPos(1);
         clan->LoadPlayer(this,1);
         DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax());
+
+        Stream st(REP::CLAN_OPTION);
+        st << static_cast<UInt8>(0x02);
+        clan->GetClanInfo(st);
+        st << Stream::eos;
+        send(st);
+
         return 0;
     } 
 
@@ -507,23 +514,36 @@ namespace GObject
     { 
         Stream st(REP::FIND_FIGHTER);
         UInt8 num = 0;
+
+        UInt32 free = GetVar(VAR_SEARCH_FIGHTER);
+
+        if(free < 1)
+        {
+            AddVar(VAR_SEARCH_FIGHTER, 1);
+        }
+        else
+        {
+            if(UseGold(count * 10)) 
+                return ;
+        }
+
         st << static_cast<UInt8>(0);
         size_t offect = st.size();
         st << num;
         for(UInt8 i = 0; i < count ; ++i)
         { 
             UInt16 fighterId = GameAction()->GetRandFighter();
-            st << fighterId;
             
             Fighter * fgt = findFighter(fighterId);
-            if(!fgt)
+            if(fgt)
             { 
-                GetPackage()->AddItem(fighterId,10);
+                GetPackage()->AddItem(fighterId + 40000,10);
             }
             else
             {
                 addFighter(fighterId, true, true);
             }
+            st << fighterId;
             ++num;
         } 
         st.data<UInt8>(offect) = num;
@@ -553,18 +573,28 @@ namespace GObject
     }
 
 
-    void Player::UseGold(UInt32 num)
+    UInt8 Player::UseGold(UInt32 num)
     {
         if( GetVar(VAR_GOLD) < num )
-            return;
+            return 1;
         SetVar(VAR_GOLD,GetVar(VAR_GOLD)-num);
+        return 0;
     }
 
     void Player::AddMoney(UInt8 type,UInt32 num)
     {
         if( type <= 0 || type > 3)
             return;
-        SetVar(type,GetVar(type)+num);
+        AddVar(type ,num);
     }
+    
+    UInt8 Player::GetFreeSearch()
+    { 
+        const UInt32 freeMax = 1;
+        UInt32 Count = GetVar(VAR_SEARCH_FIGHTER);
+        if(freeMax > Count )
+            return freeMax - Count;
+        return 0;
+    } 
 
 }

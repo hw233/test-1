@@ -541,6 +541,15 @@ void OnGiveOnlineAward(GameMsgHdr& hdr,const void * data)
 
 }
 
+void OnFindInfo(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player);
+    Stream st(REP::FIND_INFO);
+    st << static_cast<UInt8>(player->GetFreeSearch());
+    st << Stream::eos;
+    player->send(st);
+}
+
 void OnSendGovernResult(GameMsgHdr& hdr,const void * data)
 {
     MSG_QUERY_PLAYER(player);

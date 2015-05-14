@@ -18,6 +18,9 @@ namespace GObject
         CYCLE_MONTH =   5,  //月
         CYCLE_YEAR =    6,  //年
 
+        CYCLE_DAY_4 =   7 ,  //日
+        
+
         CYCLE_MAX,
     };
 
@@ -38,6 +41,7 @@ namespace GObject
         VAR_GOVERN_SPEEDUP_CNT = 11, //治理加速次数
         VAR_BATTLE_POINT = 12, //战斗力
         VAR_GOVERN_FIGHTERID = 13, //治理的将领id
+        VAR_SEARCH_FIGHTER = 14 ,  //探索次数
         VAR_MAX
     };
 
@@ -81,6 +85,7 @@ namespace GObject
                 REGISTER_VAR(VAR_OFF_LINE,CYCLE_NONE);
                 REGISTER_VAR(VAR_GOVERN_SPEEDUP_CNT,CYCLE_DAY);
                 REGISTER_VAR(VAR_GOVERN_FIGHTERID,CYCLE_NONE);
+                REGISTER_VAR(VAR_SEARCH_FIGHTER,CYCLE_DAY_4);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

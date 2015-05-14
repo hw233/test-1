@@ -19,9 +19,9 @@ local Govern_monster =
 
 local monster_appear =
 {
-    [1] = {2200,4400,6600,7800,1000},
-    [2] = {2200,4400,6600,7800,1000},
-    [3] = {2200,4400,6600,7800,1000}
+    [1] = {2200,4400,6600,7800,10000},
+    [2] = {2200,4400,6600,7800,10000},
+    [3] = {2200,4400,6600,7800,10000}
 }
 
 function RandMonster(group)
@@ -39,6 +39,7 @@ end
 
 
 function GetGovernDropMoney(res)
+    print("_____" .. res)
 	return Govern_item[res][2]
 end
 
