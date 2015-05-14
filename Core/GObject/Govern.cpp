@@ -295,7 +295,18 @@ namespace GObject
         vecItem.push_back(ItemInfo(20001,moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times));
         UInt32 itemId = mon->GetItemId();
         UInt32 itemNum = mon->GetItemNum();
-        vecItem.push_back(ItemInfo(itemId,itemNum*(ibase/10000.0f)*(prob/10000.0f)*times));
+        if( ibase*times > 10000 )
+        {
+            vecItem.push_back(ItemInfo(itemId,itemNum*(ibase/10000.0f)*(prob/10000.0f)*times));
+        }
+        else
+        {
+            UInt16 rand = uRand(10000);
+            if( rand < ibase*times )
+            {
+                vecItem.push_back(ItemInfo(itemId,itemNum));
+            }
+        }
     }
 
 
