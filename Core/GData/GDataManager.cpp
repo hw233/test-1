@@ -18,6 +18,7 @@
 #include "Script/lua_tinker.h"
 #include "Server/Cfg.h"
 #include "Server/WorldServer.h"
+#include "GData/BattleAward.h"
 
 namespace GData
 {
@@ -84,12 +85,17 @@ namespace GData
         }*/
         if (!LoadMonster())  
         {
-            fprintf(stderr, "Load LoadMonster Error !\n");
+            fprintf(stderr, "Load Monster Error !\n");
             std::abort();
         }
         if( ! LoadMapConfig() )
         {
             fprintf(stderr, "Load LoadMapInfo Error !\n");
+            std::abort();
+        }
+        if (!LoadBattleAwardData())  
+        {
+            fprintf(stderr, "Load BattleAward Error !\n");
             std::abort();
         }
 
@@ -411,6 +417,42 @@ namespace GData
                 camp.clear();
             }
         }
+        return true;
+    }
+    bool GDataManager::LoadBattleAwardData()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading BattleAward");
+        lc.reset(1000);
+        DBBattleAward AwardInfo;
+        if(execu->Prepare("SELECT `mapId`,`exp`,`moneyNum`,`itemIds`,`itemNums` FROM `battleAward`", AwardInfo) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::BattleAward* award = new GData::BattleAward(AwardInfo.mapId,AwardInfo.exp,AwardInfo.moneyNum);
+            std::vector<UInt32> vecId;
+            std::vector<UInt32> vecNum;
+            StringTokenizer st(AwardInfo.itemIds,",");
+            for(UInt8 i = 0; i < st.count(); ++i)
+                vecId.push_back(::atoi(st[i].c_str()));
+
+            StringTokenizer st1(AwardInfo.itemNums,",");
+            for(UInt8 i = 0; i < st1.count(); ++i)
+                vecNum.push_back(::atoi(st[i].c_str()));
+
+            if( vecId.size() != vecNum.size() )
+                return false;
+            std::vector<ItemInfo> vecItem;
+            for(UInt8 i = 0 ; i < vecId.size() ; ++i )
+            {
+              vecItem.push_back(ItemInfo(vecId[i],vecNum[i]));
+            }
+            award->SetItems(vecItem);
+            GData::battleAwardTable.InsertBattleAward(award);
+            lc.advance();
+        }
+        lc.finalize();
         return true;
     }
 }

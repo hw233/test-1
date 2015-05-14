@@ -300,8 +300,9 @@ namespace Battle
             //测试代码
             UInt8 gx = target.goal.x;
             UInt8 gy = target.goal.y;
-            if( currentBf->GetTypeId() == 3 && win == 0 )   //己方赢
+            if( currentBf->GetTypeId() == 3 && win == 2 )   //己方赢
             {
+                win = 0;
                 _mapFighters[gx+gy*_x]->setHP(0);
             }
             ////////////////////////////////////////////////////////
@@ -897,7 +898,7 @@ namespace Battle
         map_player[side].push_back( pl);
         pl->SetBattleId(_id);
         pl->SetBattleSide(side);
-    } 
+    }
 
 
     std::vector<UInt8> BattleGround::GetSameCamp(UInt8 side)
@@ -932,6 +933,10 @@ namespace Battle
             std::vector<UInt8> vecforce =  GetSameCamp(it->first);
             for(UInt8 i = 0; i < vec.size(); ++i)
             {
+                if( it->first== 1 && i > 3 )
+                {
+                    continue;
+                }
                 //for(UInt8 j = 0; j < 6 ; ++j)
                 {
                     //军团成员放入战将

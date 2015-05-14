@@ -221,4 +221,17 @@ CREATE TABLE `item_template2` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `battleAward`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `battleAward` (
+      `mapId` tinyint(3) NOT NULL DEFAULT '1' COMMENT '地图ID',
+      `exp`   int(10) NOT NULL DEFAULT '0' COMMENT '经验',
+      `moneyNum`   int(10) NOT NULL DEFAULT '0' COMMENT '铜钱数量',
+      `itemIds`  varchar(255) NOT NULL,
+      `itemNums`  varchar(255) NOT NULL,
+      PRIMARY KEY (`mapId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 

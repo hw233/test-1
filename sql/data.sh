@@ -18,6 +18,7 @@ function update_data()
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skill; source skill;";
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map; source map;";
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from monster; source monster;";
+   mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from battleAward; source battleAward;";
 }
 
 update_data
