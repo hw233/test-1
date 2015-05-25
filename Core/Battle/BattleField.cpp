@@ -7,6 +7,7 @@
 #include <math.h>
 
 #define SUB(x,y) (x>y)?(x-y):(y-x)
+#define Min(x,y) (x>y)?(y):(x)
 namespace Battle
 {
 
@@ -381,6 +382,40 @@ namespace Battle
         return FieldImage[time];
     } 
 
+    //BATTLE@
+   void BattleField::InsertTimeBattleAction(float time , ActionPackage ba)
+    { 
+        FieldAttack[time].push_back(ba);
+    } 
+
+    std::vector<ActionPackage> BattleField::GetTimeBattleAction(float& time)
+    { 
+        std::vector<ActionPackage> vec;
+        if(FieldAttack.begin() != FieldAttack.end())
+        {
+            time = FieldAttack.begin()->first;
+            vec = FieldAttack.begin()->second;
+        }
+        return vec;
+    } 
+
+
+    //BATTLE@
+    void BattleField::InsertTimeBattleAction(float time , ImagePackage ip)
+    { 
+        FieldImage[time].push_back(ip);
+    } 
+    std::vector<ImagePackage> BattleField::GetTimeBattleImage(float& time)
+    { 
+        std::vector<ImagePackage> vec;
+        if(FieldImage.begin() != FieldImage.end())
+        {
+            time = FieldImage.begin()->first;
+            vec = FieldImage.begin()->second;
+        }
+        return vec;
+    } 
+
 
     void BattleField::InsertObjectPackage(ObjectPackage ba)
     { 
@@ -391,4 +426,48 @@ namespace Battle
         return FieldObject;
     } 
 
+    float BattleField::GetMinTime()
+    { 
+        float min1 = 100;
+        float min2 = 100;
+        float min3 = 100;
+        if(FieldAttack.begin() != FieldAttack.end())
+            min1 = FieldAttack.begin()->first;
+        if(FieldImage.begin() != FieldImage.end())
+            min2 = FieldImage.begin()->first;
+        if(BattlePre.begin() != BattlePre.end())
+            min3 = BattlePre.begin()->first;
+        return Min(Min(min1,min2),min3);
+    } 
+    void BattleField::DelBattleAction()
+    { 
+        if(FieldAttack.begin() == FieldAttack.end())
+            return ;
+        FieldAttack.erase(FieldAttack.begin());
+
+    } 
+    void BattleField::DelBattleImage()
+    { 
+        if(FieldImage.begin() == FieldImage.end())
+            return ;
+        FieldImage.erase(FieldImage.begin());
+    } 
+
+    std::vector<BattleFighter* > BattleField::GetBattlePre(float& time)
+    { 
+        std::vector<BattleFighter*> vec;
+        if(BattlePre.begin() != BattlePre.end())
+        {
+            time = BattlePre.begin()->first;
+            vec = BattlePre.begin()->second;
+        }
+        return vec;
+    } 
+
+    void BattleField::DelBattlePre()
+    { 
+       if(BattlePre.begin() == BattlePre.end()) 
+           return ;
+       BattlePre.erase(BattlePre.begin());
+    } 
 }

@@ -1,68 +1,7 @@
 #include "BattleWalkFighter.h"
+#include "GData/SkillTable.h"
 namespace Battle
 { 
-    void BattleWalkFighter::Action()
-    { 
-
-        _st.clear();
-        UpdateActionList();
-        //硬直
-        if(_crick)
-        {
-            --_crick;
-            return ;
-        }
-        //动作行为
-        if(_actionLast)
-        { 
-            --_actionLast;
-            return ;
-        } 
-
-        if(_actionBackLast)
-        { 
-            --_actionBackLast;
-            return ;
-        } 
-
-        GetActionFromField();
-
-        switch(_actionType)
-        { 
-            case e_none:
-                break;
-            case e_run:
-                GoForward(1);
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-                {
-                    if(_target)
-                    {
-                        ActionPackage ap(this,_nowTime);
-                        ap.PushObject(_target);
-
-                        GetField()->InsertTimeBattleAction( _nowTime + 3 ,ap );
-                        // (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                        // (_target)->AppendFighterStream(_st);
-                    }
-                } 
-                break;
-            case e_image_attack:
-            case e_image_therapy:
-                { 
-                    ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                    GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId);
-                    GetField()->InsertTimeBattleAction(_nowTime+3,ip);
-                } 
-                break;
-            case e_attack_counter:
-                break;
-            default:
-                break;
-        } 
-    } 
     bool BattleWalkFighter::PreGetObject()
     { 
         if(!_target || !_target->getHP())
@@ -136,5 +75,52 @@ namespace Battle
         _sideInBS = 0;
         return ;
     } 
+
+    void BattleWalkFighter::NormolAttack()
+    { 
+        if(_target)
+        {
+            ActionPackage ap(this,_nowTime2);
+            ap.PushObject(_target);
+
+            GetField()->InsertTimeBattleAction( _nowTime2 + 3 ,ap );
+            _actionType = e_none;
+        }
+    } 
+
+    void BattleWalkFighter::NormolImage()
+    { 
+        const GData::Skill * s = GData::skillManager[_ab._skillId];
+        if(!s)
+            return ;
+        //BATTLE2
+        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
+        GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
+        GetField()->InsertTimeBattleAction(GetNowTime2()+s->GetActionCd(),ip);
+    } 
+
+    void BattleWalkFighter::NormolObject()
+    { 
+        const GData::SkillScope* ss =GData::skillManager[_ab._skillId]->GetSkillScope();
+        if(!ss)
+            return ;
+
+        UInt16 myY = getPosY();
+
+        UInt8  minNumber = ss->radx / 2 ;  //radx 表示数量(一般情况为奇数) rady表示间隔 x,y作为上下闭合区间
+        UInt16 width = ss->x + ss->y;
+        UInt16 minY  =  0;
+        if(myY > ((width * ss->rady + width)*minNumber + ss->y))
+            minY = myY - ((width * ss->rady + width)*minNumber);
+
+        for(UInt8 i = 0 ; i < ss->radx ; ++i)
+        {
+            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+            op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
+            GetField()->InsertObjectPackage(op);
+        }
+    } 
+
+
 } 
 

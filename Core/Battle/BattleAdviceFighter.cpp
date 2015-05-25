@@ -1,57 +1,9 @@
 #include "BattleAdviceFighter.h"
+#include "GData/SkillTable.h"
 #include <math.h>
 
 namespace Battle
 { 
-    void BattleAdviceFighter::Action()
-    { 
-        _st.clear();
-        UpdateActionList();
-        //硬直
-        if(_crick)
-        {
-            --_crick;
-            return ;
-        }
-        //动作行为
-        if(_actionLast)
-        { 
-            --_actionLast;
-            return ;
-        } 
-
-        if(_actionBackLast)
-        { 
-            --_actionBackLast;
-            return ;
-        } 
-
-        GetActionFromField();
-
-        switch(_actionType)
-        { 
-            case e_none:
-                break;
-            case e_run:
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-                break;
-            case e_image_attack:
-            case e_image_therapy:
-                { 
-                    ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                    GetField()->GetTargetList( !GetSideInBS(), this , ip.vec_bo, _ab._skillId);
-                    GetField()->InsertTimeBattleAction(_nowTime + _actionLast, ip);
-                } 
-                break;
-            case e_attack_counter:
-                break;
-            default:
-                break;
-        } 
-    } 
     bool BattleAdviceFighter::PreGetObject()
     { 
         return true;
@@ -77,5 +29,24 @@ namespace Battle
         _sideInBS = 0;
         return ;
     } 
+
+    void BattleAdviceFighter::NormolAttack()
+    { 
+        return ;
+    } 
+
+    void BattleAdviceFighter::NormolImage()
+    { 
+        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime2);
+        GetField()->GetTargetList( !GetSideInBS(), this , ip.vec_bo, _ab._skillId);
+        GetField()->InsertTimeBattleAction(_nowTime2 + _actionLast, ip);
+    } 
+
+    void BattleAdviceFighter::NormolObject()
+    { 
+        return ;
+    } 
+
+
 } 
 

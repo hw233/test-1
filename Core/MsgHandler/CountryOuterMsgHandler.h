@@ -559,6 +559,19 @@ void OnSendGovernResult(GameMsgHdr& hdr,const void * data)
     player->GetGovernManager()->SendGovernResult(type);
 }
 
+void OnFindUp(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt16 fighterId = 0;
+    br >> fighterId;
+    UInt8 res = player->UpFighter(fighterId);
+    Stream st(REP::UP_FIGHTER);
+    st << res;
+    st << fighterId;
+    st << Stream::eos;
+    player->send(st);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

@@ -117,7 +117,7 @@ namespace Battle
             UInt32 _id;
             UInt8 _x;
             UInt8 _y;
-            std::map<UInt8 ,std::vector<GObject::Player *> >  map_player;
+            std::map<UInt8 ,std::vector<GObject::Player *> >  map_player;  //战场对阵双方
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
             UInt8 * _mapFlag;

@@ -8,7 +8,7 @@
 
 namespace Battle
 {
-    BattleFighter::BattleFighter( UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(Class/*XXX*/, pointX, pointY/*, field*/),_formula(bf)
+    BattleFighter::BattleFighter( UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(Class/*XXX*/, pointX, pointY/*, field*/),_formula(bf),_target(NULL)
     { 
         setFighter(f);
         memset(m_fighters,0,sizeof( BattleFighter *)*MYFIGHTERMAX);
@@ -107,6 +107,10 @@ namespace Battle
             }
         } 
         setPos(x,y);
+        if(targetX > x)
+            SetBattleDirection(1);
+        else 
+            SetBattleDirection(0);
         // if(1 ||GetBSNumber() == 0 || GetBSNumber() == 7)
         // { 
         //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
@@ -128,6 +132,67 @@ namespace Battle
     } 
     void BattleFighter::Action()
     { 
+        if(!getHP())
+            return ;
+        _st.clear();
+        UpdateActionList();
+        //硬直
+        if(_crick)
+        {
+            --_crick;
+            return ;
+        }
+
+        if(BeForAction())
+            return ;
+
+        /* if(_actionLast)
+        { 
+            --_actionLast;
+            return ;
+        } 
+
+        if(_actionBackLast)
+        { 
+            --_actionBackLast;
+            return ;
+        } 
+        */
+
+        GetActionFromField();
+
+        switch(_actionType)
+        { 
+            case e_none:
+                break;
+            case e_run:
+                GoForward(1);
+                break;
+            case e_attack_near:
+            case e_attack_middle:
+            case e_attack_distant:
+                {
+                    NormolAttack();
+                }
+                break;
+            case e_image_attack:
+            case e_image_therapy:
+                { 
+                    NormolImage();
+                } 
+                break;
+            case e_attack_counter:
+                break;
+            case e_object_image:
+                { 
+                    NormolObject();
+                } 
+                break;
+            default:
+                {
+                }
+                break;
+        } 
         return ;
     } 
 
@@ -148,8 +213,8 @@ namespace Battle
         if(1)  //XXX
         { 
             _actionType = GData::skillManager[_ab._skillId]->GetSkillEffect()->skillType;  //XXX
-            _actionLast =  GData::skillManager[_ab._skillId]->GetActionCd(); //行进时间一秒
-            _actionBackLast =  GData::skillManager[_ab._skillId]->GetActionBackCd(); //行进时间一秒
+            //_actionLast =  GData::skillManager[_ab._skillId]->GetActionCd(); //行进时间一秒
+            //_actionBackLast =  GData::skillManager[_ab._skillId]->GetActionBackCd(); //行进时间一秒
         }
 
     } 
@@ -158,8 +223,9 @@ namespace Battle
     { 
         for(ActionSort::iterator it = preActionCD.begin(); it != preActionCD.end();)
         { 
-            --(it->_cd); 
-            if(it->_cd == 0)
+            //--(it->_cd); 
+            //if(it->_cd == 0)
+            if(it->_cd >= GetNowTime2())   //BATTLE2
             { 
                 preActionList.push_back((*it));
                 it = preActionCD.erase(it);
@@ -186,7 +252,7 @@ namespace Battle
         if(priority != 0 && GData::skillManager[res._skillId])
         { 
             res = *result;
-            res._cd = GData::skillManager[res._skillId]->GetCd();
+            res._cd = GData::skillManager[res._skillId]->GetCd() + GetNowTime2(); //BATTLE2
             preActionList.erase(result);
             preActionCD.push_back(res);
         } 
@@ -254,7 +320,7 @@ namespace Battle
     void BattleFighter::AddBuff(UInt16 buffId)
     { 
         const GData::SkillBuff * sb = GData::skillBuffManager[buffId];
-        UInt8 count = sb->count;
+        float count = sb->count + GetNowTime2();
         UInt8 type = sb->type;
         BattleBuff bb = BattleBuff(buffId, count);
         if(sb->attrIds.size() > sb->valueP.size() || sb->attrIds.size() > sb->value.size())
@@ -280,8 +346,8 @@ namespace Battle
         std::list<BattleBuff>::iterator it = bufflst.begin();
         for(;it != bufflst.end();)
         { 
-            UInt8 count = (*it).count;
-            if(!count)
+            float count = (*it).count;
+            if(count >= GetNowTime2())
             {
                 const GData::SkillBuff * sb = GData::skillBuffManager[it->buffId];
                 if(sb)
@@ -304,10 +370,6 @@ namespace Battle
                 it = bufflst.erase(it);
                 continue;
             }
-            else
-            { 
-                --it->count;
-            } 
             ++it;
         } 
     } 
@@ -322,4 +384,48 @@ namespace Battle
         }
     } 
 
+    void BattleFighter::NormolAttack()
+    { 
+        if(_target)
+        { 
+            ActionPackage ap(this,_nowTime/*,_target*/);
+            ap.PushObject(_target);
+
+            GetField()->InsertTimeBattleAction( _nowTime2 + _actionLast ,ap );
+            _actionType = e_none;
+        } 
+    } 
+
+    void BattleFighter::NormolImage()
+    { 
+        const GData::Skill * s = GData::skillManager[_ab._skillId];
+        if(!s)
+            return ;
+        //BATTLE2
+        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
+        GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
+        GetField()->InsertTimeBattleAction(GetNowTime2()+s->GetActionCd(),ip);
+    } 
+
+    void BattleFighter::NormolObject()
+    { 
+        const GData::SkillScope* ss =GData::skillManager[_ab._skillId]->GetSkillScope();
+        if(!ss)
+            return ;
+
+        UInt16 myY = getPosY();
+
+        UInt8  minNumber = ss->radx / 2 ;  //radx 表示数量(一般情况为奇数) rady表示间隔 x,y作为上下闭合区间
+        UInt16 width = ss->x + ss->y;
+        UInt16 minY  =  0;
+        if(myY > ((width * ss->rady + width)*minNumber + ss->y))
+            minY = myY - ((width * ss->rady + width)*minNumber);
+
+        for(UInt8 i = 0 ; i < ss->radx ; ++i)
+        {
+            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+            op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
+            GetField()->InsertObjectPackage(op);
+        }
+    } 
 }

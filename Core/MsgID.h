@@ -16,6 +16,8 @@ namespace REQ
     /*刷将*/
     const UInt8 FIND_FIGHTER         = 0x31;// 0xE1
     const UInt8 FIND_INFO         = 0x32;// 0xE1
+
+    const UInt8 UP_FIGHTER          =0x33;
     
     /**战报请求 */
     const UInt8 BATTLE_REPORT_REQ    = 0x80;// 0xC0
@@ -550,6 +552,7 @@ namespace REP
     /*抽将*/
     const UInt8 FIND_FIGHTER        = 0x31;// 
     const UInt8 FIND_INFO           = 0x32;// 
+    const UInt8 UP_FIGHTER          =0x33;
 
     /*好友列表*/
     const UInt8 FRIEND_LIST         = 0x40;

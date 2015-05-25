@@ -149,7 +149,7 @@ CREATE TABLE `skillBuff` (
       `attrId` varchar(255) NOT NULL,
       `valueP` varchar(255) NOT NULL,
       `value` varchar(255) NOT NULL,
-      `count` tinyint(3) NOT NULL, 
+      `count` float(10,2) NOT NULL, 
       `side` tinyint(3) NOT NULL,  
       `type` tinyint(3) NOT NULL,  
       PRIMARY KEY (`id`)
@@ -165,9 +165,9 @@ CREATE TABLE `skill` (
       `skillCondId` int(10) NOT NULL DEFAULT '0',
       `skillScopeId` int(10) NOT NULL DEFAULT '0',
       `skillEffectId` int(10) NOT NULL DEFAULT '0',
-      `cd` int(10) NOT NULL DEFAULT '0',
-      `actionCostCd` int(10) NOT NULL DEFAULT '0',
-      `actionBackCd` int(10) NOT NULL DEFAULT '0',
+      `cd` float(10,2) NOT NULL,
+      `actionCostCd` float(10,2) NOT NULL,
+      `actionBackCd` float(10,2) NOT NULL,
       `mpCost` int(10) NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;

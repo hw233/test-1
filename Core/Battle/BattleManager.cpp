@@ -25,7 +25,7 @@ namespace Battle
     { 
         FastMutex::ScopedLock lk(_mutex); 
         UInt32 battleId =  GetBattleGroundIndex();
-        BattleGround * bg = new BattleGround(battleId,1);
+        BattleGround * bg = new BattleGround(battleId,backGround);
         _map[battleId] = bg;
         //_map.insert(std::map<UInt32,BattleGround*>::value_type (battleId,BattleGround(battleId,5,5))); //TODO
         return battleId;

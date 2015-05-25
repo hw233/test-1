@@ -23,6 +23,17 @@ namespace GObject
         if(pl->GetClan())
             return 2;
 
+        if(_id < 10)
+        { 
+            UInt32 now = TimeUtil::Now();
+            _players.push_back(pl);
+            pl->SetClan(this);
+            pl->SetClanPos(1);  //普通成员
+            DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
+            //DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
+            return 0;
+        } 
+
         _applicant.push_back(pl);
         if(!update)
             DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u)",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
@@ -181,5 +192,30 @@ namespace GObject
                 ++ count ;
         } 
         return count;
+    } 
+    Clan* Clan::GetBossClan()
+    { 
+        for(UInt32 i = 0; i < 100; ++i)
+        {
+            Clan * cl = globalClan[i];
+            if(!cl)
+            {
+                char str[3];
+                sprintf(str,"朝廷军团%d",i);
+                cl = new Clan(i,str,NULL);
+                cl->LoadClanInfo(NULL,"","",50);
+                cl->SetPicIndex(0);
+                cl->SetLevel(1);
+                globalClan.add(cl->GetId(),cl);
+                globalNamedClans.add(cl->GetName(), cl);
+                DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",cl->GetId(),cl->GetName().c_str(),0,cl->GetAnnouncement().c_str(), cl->GetAnnouncement2().c_str(), 0,0,1,0,cl->GetPersonMax());
+                return cl;
+            }
+            else if(cl->GetClanNumberCount() < cl->GetPersonMax())
+            {
+                return cl;
+            }
+        }
+        return NULL;
     } 
 }

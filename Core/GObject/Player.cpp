@@ -8,6 +8,7 @@
 #include "Server/OidGenerator.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "FVar.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -468,6 +469,8 @@ namespace GObject
         //Stream st(StreamHand);
         //UInt8 count = 0;
         //size_t offect = st.size();
+        Clan::GetBossClan();
+
         st << static_cast<UInt16>(globalClan.size());
         globalClan.enumerate(GetClanListInfo, &st);
         //GlobalClans::iterator it = globalClan.begin();
@@ -491,12 +494,13 @@ namespace GObject
         if(money < ClanCreateMoney)
             return 2;
         Clan* clan = new Clan(IDGenerator::gPlayerOidGenerator.ID(), name, this);
+        if(!clan)
+            return 3;
         clan->LoadClanInfo(this,"","",50);
         clan->SetPicIndex(picIndex);
         clan->SetLevel(1);
         globalClan.add(clan->GetId(),clan);
-        if(!clan)
-            return 3;
+        globalNamedClans.add(clan->GetName(), clan);
         SetClanPos(1);
         clan->LoadPlayer(this,1);
         DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax());
@@ -596,5 +600,18 @@ namespace GObject
             return freeMax - Count;
         return 0;
     } 
-
+    UInt8 Player::UpFighter(UInt16 fighterId)
+    { 
+        static UInt32 cost[] = {5 ,15 ,30 ,50 ,75 ,105 ,140 ,180 ,225 ,275 ,330 ,390 ,455 ,525 ,600 ,680 ,765 ,855 ,950 ,1050};
+        Fighter *fgt = findFighter(fighterId);
+        if(!fgt)
+            return 1;
+        UInt8 quality = fgt->GetVar(FVAR_QUALITY);
+        if(quality >= 20)
+            return 2;
+        if(cost[quality] != GetPackage()->DelItem(fighterId + 40000 , cost[quality]))
+            return 3;
+        fgt->AddVar(FVAR_QUALITY,1);
+        return 0;
+    } 
 }

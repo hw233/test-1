@@ -94,6 +94,12 @@ namespace Battle
 
             std::vector<ActionPackage> GetTimeBattleAction(UInt16 time);
             std::vector<ImagePackage> GetTimeBattleImage(UInt16 time);
+
+            void InsertTimeBattleAction(float time , ActionPackage);
+            std::vector<ActionPackage> GetTimeBattleAction(float& time);
+
+            void InsertTimeBattleAction(float time , ImagePackage ip);
+            std::vector<ImagePackage> GetTimeBattleImage(float& time);
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -103,6 +109,13 @@ namespace Battle
             BattleFighter *getMyFighters(UInt8 side, UInt8 index);
             std::list<ObjectPackage>& GetObjectpackage();
 
+            float GetMinTime();
+
+            std::vector<BattleFighter*> GetBattlePre(float& time);
+
+            void DelBattleImage();
+            void DelBattleAction();
+            void DelBattlePre();
         protected:
 
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
@@ -112,12 +125,21 @@ namespace Battle
             UInt16 _fieldDistance;
             UInt16 _timeActionLimit ;
 
+            /*
             std::map<UInt16,std::vector<ActionPackage> > FieldAttack;  //攻击
 
             std::map<UInt16,std::vector<ImagePackage> > FieldImage;  //延迟性buff (定时炸弹类型的行为)
 
             std::list< ObjectPackage > FieldObject;  //物体型攻击 (定时炸弹类型的行为)
+            */
 
+            std::map<float,std::vector<ActionPackage> > FieldAttack;  //攻击
+
+            std::map<float,std::vector<ImagePackage> > FieldImage;  //延迟性buff (定时炸弹类型的行为)
+
+            std::list< ObjectPackage > FieldObject;  //物体型攻击 (定时炸弹类型的行为)
+
+            std::map<float,std::vector<BattleFighter*> > BattlePre;
     };
 
 }

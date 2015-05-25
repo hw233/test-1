@@ -160,9 +160,11 @@ namespace Battle
 
             virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
 
-            void SetNowTime(UInt32 time ){ if(_nowTime != time ) SetGone(false); _nowTime = time;}
-            UInt8  GetNowTime() { return _nowTime;}
+            void SetNowTime(UInt16 time ){ if(_nowTime != time ) SetGone(false); _nowTime = time;}
+            float  GetNowTime() { return _nowTime;}
 
+            void SetNowTime(float time ){ if(_nowTime2 != time ) SetGone(false); _nowTime2 = time;}
+            float  GetNowTime2() { return _nowTime2;}
             //Virtual 
             virtual bool PreGetObject(){ return false;}  //设定攻击对象，以及战斗
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
@@ -237,8 +239,19 @@ namespace Battle
             void AddBuff(UInt16 buffId);
             void CheckBuff();
             void AddSkill() ;
+            
+            //BattleAction
+            virtual void NormolAttack();
+            virtual void NormolImage();
+            virtual void NormolObject();
 
+            BattleObject * GetTarget(){ return _target;};
+
+            void SetBattleDirection(UInt8 direct){ if(_direction == direct) return; _direction = direct;}
+            virtual UInt8 GetBattleDirection(){return _direction;}  //1左2右0全部
+            virtual UInt8 BeForAction() { return 0;};
         protected:
+
             UInt8 _crick;  //硬直
             UInt8 _actionLast ;   //动作持续
             UInt8 _actionBackLast ;   //动作收招持续
@@ -287,7 +300,8 @@ namespace Battle
 
             UInt16 _battleIndex;
 
-            UInt32 _nowTime; //行动时间
+            UInt16 _nowTime; //行动时间
+            float _nowTime2; //行动时间
 
             UInt16 _minX;  //入场X坐标  //TODO
             UInt16 _minY;  //入场Y坐标  //TODO
@@ -302,6 +316,9 @@ namespace Battle
             UInt32 attrSub[e_attr_max];
 
             std::list<BattleBuff> bufflst;
+            UInt8 _direction;
+        public:
+            BattleObject * _target;
     };
 
 }

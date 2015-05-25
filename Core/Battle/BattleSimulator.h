@@ -40,11 +40,12 @@ namespace Battle
             static BattleFighter* CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY);
 
             //AfterAction
-            UInt8 doAttack(UInt16 time);
-            UInt8 doImage(UInt16 time);
-            UInt8 doObjectMove(UInt16 time);
+            UInt8 doAction(float time = 0);
+            UInt8 doAttack(float time = 0);
+            UInt8 doImage(float time = 0);
+            UInt8 doObjectMove(float time = 0);
             UInt8 ClearObjectPackage();
-
+            UInt16 FighterAction(BattleFighter* bf,float curTime);
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

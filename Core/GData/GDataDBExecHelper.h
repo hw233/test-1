@@ -118,7 +118,7 @@ namespace GData
         std::string attrIds;
         std::string valueP;
         std::string value;
-        UInt8 count;
+        float count;
         UInt8 side;
         UInt8 type;
     };
@@ -130,9 +130,9 @@ namespace GData
         UInt32 skillCondId; 
         UInt32 skillScopeId;
         UInt32 skillEffectId;
-        UInt16 cd;
-        UInt16 actionCd;
-        UInt16 actionBackCd;
+        float cd;
+        float actionCd;
+        float actionBackCd;
         UInt16 mpCost;
     };
 
@@ -290,9 +290,9 @@ namespace DB
          UInt32, skillCondId,
          UInt32, skillScopeId,
          UInt32, skillEffectId,
-         UInt16, cd,
-         UInt16, actionCd,
-         UInt16, actionBackCd,
+         float, cd,
+         float, actionCd,
+         float, actionBackCd,
          UInt16, mpCost
         )
         SPECIALEND()
@@ -305,7 +305,7 @@ namespace DB
          std::string, attrIds,
          std::string, valueP,
          std::string, value,
-         UInt8, count,
+         float, count,
          UInt8, side,
          UInt8, type
         )

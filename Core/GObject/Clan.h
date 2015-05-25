@@ -52,6 +52,9 @@ namespace GObject
             void SetAnnouncement(std::string announcement){ _announcement = announcement;}
             void SetAnnouncement2(std::string announcement){ _announcement2 = announcement;}
 
+            UInt16 GetClanNumberCount(){ return _players.size();}
+
+            static Clan *GetBossClan();
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;

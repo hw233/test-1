@@ -250,6 +250,7 @@ namespace GObject
 
             UInt8 GetFreeSearch();
 
+            UInt8 UpFighter(UInt16 fighterId);
     private:
             //IDTYPE _id;
             std::string _accounts;

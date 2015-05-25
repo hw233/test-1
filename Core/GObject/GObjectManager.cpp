@@ -38,7 +38,7 @@ namespace GObject
         IDGenerator::gMailOidGenerator.Init(maxId);
 
         execu->Extract("SELECT max(`id`) FROM `clan`", maxId);
-        IDGenerator::gClanOidGenerator.Init(maxId);
+        IDGenerator::gClanOidGenerator.Init(maxId<100?100:maxId);
         return true;
     }
     void GObjectManager::loadAllData()

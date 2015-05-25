@@ -113,11 +113,15 @@ namespace GObject
             const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
             if(itemType == NULL) return NULL;
             item = new(std::nothrow) ItemBase(typeId, itemType);
+            if(!item)
+                return NULL;
             m_Items[ItemKey(typeId, bind)] = item;
-            flag =1;
         }
-        item->IncItem(num);
+
         auto it = m_Items.find(ItemKey(typeId, bind));
+        if(item->Count())
+            flag = 1;
+        item->IncItem(num);
         if(!flag)
         {
           DB7().PushUpdateData( "update item set `count`= %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",(it->second)->Count()+num,typeId,m_Owner->getId());
@@ -138,8 +142,15 @@ namespace GObject
 
         if(count < num)
             return count;
+        item->DecItem(num);
+        if(count == num)
+        {
+            DB7().PushUpdateData( "delete item  where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",id,m_Owner->getId());
+        }
         else
-            item->DecItem(num);
+        {
+            DB7().PushUpdateData( "update item set `count`= %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",count - num,id,m_Owner->getId());
+        }
         return num ;
     } 
 

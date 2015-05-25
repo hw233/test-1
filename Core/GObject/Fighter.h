@@ -61,6 +61,7 @@ namespace GObject
 
             UInt32 GetVar(UInt32 num);
             void SetVar(UInt32 num, UInt32 val);
+            void AddVar(UInt32 num, UInt32 val);
 
             void SetRad(UInt16 rad) { _bodySize = rad;} 
             UInt16 GetRad() { return _bodySize;}

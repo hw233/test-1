@@ -11,6 +11,7 @@ namespace Battle
     void ActionPackage::PushObject(BattleObject* bo){ vec_bo.push_back(bo);}
     UInt16 ActionPackage::GetObjectSize(){return vec_bo.size();}
     UInt16 ActionPackage::GetHappenTime(){return _time;}
+    float ActionPackage::GetHappenTime2(){return _time2;}
 
     BattleObject* ActionPackage::GetObject(UInt16 index){if(index > vec_bo.size())return NULL; return vec_bo[index]; }
 
@@ -31,7 +32,8 @@ namespace Battle
             return 0;
         if(!vec_struct.size())
             return 0;
-        st << static_cast<UInt8>(GetHappenTime()); 
+        //st << static_cast<UInt8>(GetHappenTime()); 
+        st << static_cast<UInt8>(GetHappenTime2()); 
         st << static_cast<UInt8>(GetBattleFighter()->GetBSNumber());
         st << static_cast<UInt8>(3);
         st << static_cast<UInt16>(GetSkillId());

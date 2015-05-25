@@ -7,6 +7,7 @@
 #include "Battle/BattleManager.h"
 #include "Player.h"
 #include "ChatHold.h"
+#include "Clan.h"
 #include <time.h>
 
 #define W_CHAT_MAX 20
@@ -55,6 +56,7 @@ namespace GObject
 
         AddTimer(10*60*1000, World_Govern_SendInfo,this,(s+1)*1000);
         AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second+3)*1000);
+
 
         return true; 
     }
