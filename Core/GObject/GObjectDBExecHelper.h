@@ -114,6 +114,10 @@ namespace GObject
         UInt8 level;
         UInt32 contribute;
         UInt8 personMax;
+        UInt32 battleRoomId;
+        UInt32 clanFame;
+        UInt32 conquests;
+        UInt8  forceId;
     };
     struct DBClanPlayer
     {
@@ -122,6 +126,7 @@ namespace GObject
         UInt8 position;
         UInt32 contribute;
         UInt32 enterTime;
+        UInt8 isClanBattle;
     };
     struct DBMail
     {
@@ -133,18 +138,29 @@ namespace GObject
         UInt32 overTime;
     };
 
-    struct DBGovernOffline
-    {
-        UInt64 playerId;
-        UInt32 itemId;
-        UInt32 itemNum;
-    };
-
     struct DBClanApply
     {
         UInt32 clanId;
         UInt64 playerId; 
         UInt32 time;
+    };
+
+    struct DBClanBattlePos
+    {
+        UInt8 mapId;
+        UInt64 playerId;
+        UInt16 fighterId;
+        UInt8  posx;
+        UInt8 posy;
+    };
+
+    struct DBClanBattleRoom
+    {
+        UInt32 roomId;
+        UInt8  forceId;
+        UInt8  battleId;
+        std::string clans;
+        UInt8 fighterNum;
     };
 }
 namespace DB
@@ -261,7 +277,7 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBClan)
-    SPECIALDEF(10)
+    SPECIALDEF(14)
     (
         UInt32, clanId,
         std::string, name,
@@ -272,18 +288,23 @@ namespace DB
         UInt64, leader,
         UInt8, level,
         UInt32, contribute,
-        UInt8, personMax
+        UInt8, personMax,
+        UInt32, battleRoomId,
+        UInt32, clanFame,
+        UInt32, conquests,
+        UInt8, forceId
     )
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBClanPlayer)
-    SPECIALDEF(5)
+    SPECIALDEF(6)
     (
         UInt32, clanId,
         UInt64, playerId,
         UInt8, position,
         UInt32, contribute,
-        UInt32, enterTime
+        UInt32, enterTime,
+        UInt8, isClanBattle
     )
     SPECIALEND()
 
@@ -299,21 +320,34 @@ namespace DB
     )
     SPECIALEND()
     
-    SPECIALBEGIN(GObject::DBGovernOffline)
-    SPECIALDEF(3)
-    (
-        UInt64, playerId,
-        UInt32, itemId,
-        UInt32, itemNum
-    )
-    SPECIALEND()
-
     SPECIALBEGIN(GObject::DBClanApply)
     SPECIALDEF(3)
     (
         UInt32, clanId,
         UInt64, playerId,
         UInt32, time
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBClanBattlePos)
+    SPECIALDEF(5)
+    (
+        UInt8 , mapId,
+        UInt64, playerId,
+        UInt16, fighterId,
+        UInt8, posx,
+        UInt8, posy
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBClanBattleRoom)
+    SPECIALDEF(5)
+    (
+        UInt32, roomId,
+        UInt8, forceId,
+        UInt8, battleId,
+        std::string, clans,
+        UInt8,fighterNum
     )
     SPECIALEND()
 }

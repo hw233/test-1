@@ -36,6 +36,7 @@ require("items/Awards")
 --require("salePriceLimit")
 require("items/GovernAward")
 require("items/map")
+require("ParseMapInfo")
 --require("AirBook")
 --require("forceCommitArena")
 

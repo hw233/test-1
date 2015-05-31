@@ -22,14 +22,14 @@ mapCampInfo =
 
 --ride sub with different soldier and diff landform 
 rideWithLandform  = {
-    [1] = {1,2,2,3},   --hoser  in  grass town forest hill ridesub 
-    [2] = {1,2,1,3},   --walker 
+    [1] = {1,2,1,3},   --walker 
+    [2] = {1,2,2,3},   --hoser  in  grass town forest hill ridesub 
     [3] = {1,2,1,3}    --shooter
 }
 
 soldierBaseData={
-    [1] = { 1, 3 }, --hoser  attackRange movePower
-    [2] = { 1, 2 }, --waller 
+    [1] = { 1, 2 }, --waller 
+    [2] = { 1, 3 }, --hoser  attackRange movePower
     [3] = { 2, 2 }  --shooter
 }
 

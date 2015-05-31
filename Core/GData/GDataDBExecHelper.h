@@ -163,6 +163,16 @@ namespace GData
         std::string itemIds;
         std::string itemNums;
     };
+
+
+    struct DBClanBattleBase
+    {
+        UInt8 battleId;
+        UInt32 explimit;
+        UInt8 forcenum;
+        UInt8 playermin;
+        UInt8 playermax;
+    };
 }
 namespace DB
 {
@@ -351,6 +361,17 @@ namespace DB
           UInt32, moneyNum,
           std::string, itemIds,
           std::string, itemNums
+       )
+       SPECIALEND()
+
+       SPECIALBEGIN(GData::DBClanBattleBase)
+       SPECIALDEF(5)
+       (
+          UInt8, battleId,
+          UInt32, explimit,
+          UInt8, forcenum,
+          UInt8, playermin,
+          UInt8, playermax
        )
        SPECIALEND()
 }

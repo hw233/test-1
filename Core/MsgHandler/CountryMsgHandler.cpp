@@ -63,4 +63,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr,0x156,OnSendGovernResult);
 
+    //推图战役奖励
+    MSG_REG_2(GameMsgHdr,REQ::BATTLE_AWARD,OnFarWardAward);
+
 MSG_HANDLER_END()

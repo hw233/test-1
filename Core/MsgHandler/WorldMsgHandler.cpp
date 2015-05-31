@@ -14,5 +14,10 @@ MSG_HANDLER_DECLARE(WorldMsgHandler)
 //MSG_REG_2(GameMsgHdr, 0x19C, OnSearchEvents); 
 //MSG_REG_2(GameMsgHdr, REQ::ACTIVE, OnQixiReq);
 //
+MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_JOIN,OnJoinClanBattle);
+MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_INFO,OnClanBattleInfo);
+MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_ADDFIGHTER,OnClanBattleAddFighter);
+MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_MOVEFIGHTER,OnClanBattleMoveFighter);
+MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_CANCELFIGHTER,OnClanBattleDelFighter);
 
 MSG_HANDLER_END()

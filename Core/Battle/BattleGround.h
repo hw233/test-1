@@ -125,7 +125,9 @@ namespace Battle
 
             UInt8 GetFactAttackDis();
             UInt8 GetCampInfo(UInt8 index) { return _mapCamp[index];}
-            std::vector<UInt8> GetSameCamp(UInt8 side);
+            std:: vector<Ascoord> GetSameCamp(UInt8 side);
+            void  GetPutPosition(UInt8 side,UInt8 &x,UInt8 &y);
+
             void GetNearEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecEnemy); 
             void Analyse(std::list<Ascoord>path,Ascoord& target);
             bool IsInAttackZone(Ascoord stand, Ascoord target);
@@ -140,7 +142,7 @@ namespace Battle
             void GetMoveTargetByDir(UInt8 d, Ascoord& move);
             bool InMyAttackHasEnemy(const Ascoord& p );
             Ascoord ConvertConverstion(const Ascoord& p);
-            void GetMovePos(std::list<Ascoord>& path, Ascoord& last);
+            void GetMovePos(std::list<Ascoord>path, Ascoord& last);
             UInt8 GetShootActionType(UInt8 x ,UInt8 y, std::vector<Ascoord>& vecEnemy);
             void  ShootGetTarget(UInt8 actionType);
             void  ShootFrontAttack();
@@ -172,7 +174,7 @@ namespace Battle
             UInt32 _id;
             UInt8 _x;
             UInt8 _y;
-            std::map<UInt8 ,std::vector<GObject::Player *> >  map_player;
+            std::map<UInt8 ,std::list<GObject::Player *> >  map_player;
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
             UInt8 * _mapFlag;    
@@ -180,7 +182,7 @@ namespace Battle
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
 
             //来一个记录战将分布的结构 满足
-            std::vector<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
+            std::list<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;
 
             std::vector<TargetInfo> _vecTarget;

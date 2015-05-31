@@ -4,16 +4,14 @@
 
 namespace GData
 {
-    Map map;
-    void Map::loadMapInfo(UInt8 index, vecInfo info)
+    MapTable mapTable;
+    void MapTable::loadMapInfo(UInt8 mapId, MapInfo* info)
     { 
-        _mapInfo[index] = info;
+        _mapInfo[mapId] = info;
     } 
 
-
-    void Map::loadCampInfo(UInt8 index , vecInfo info)
-    {
-        _mapCamp[index] = info;
-
-    }
+   MapInfo* MapTable::GetMapInfo(UInt8 mapId)
+   {
+       return _mapInfo[mapId];
+   }
 }

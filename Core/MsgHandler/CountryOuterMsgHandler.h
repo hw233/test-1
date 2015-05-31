@@ -560,13 +560,14 @@ void OnSendGovernResult(GameMsgHdr& hdr,const void * data)
 }
 
 
-//推图离线奖励
+//推图战役奖励
 void OnFarWardAward(GameMsgHdr& hdr,const void * data )
 {
     MSG_QUERY_PLAYER(player);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt8 mapId = 0;
     br >> mapId;
+    player->GiveBattleAward(mapId);
 }
 
 

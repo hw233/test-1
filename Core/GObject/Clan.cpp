@@ -169,7 +169,9 @@ namespace GObject
             st << pl->GetName();
             st << static_cast<UInt32>(pl->GetVar(VAR_BATTLE_POINT));
             st << static_cast<UInt8>(pl->GetLevel());
-        } 
+        }
+        st << static_cast<UInt32>(GetConquests()); 
+        st << static_cast<UInt32>(GetClanFame());
     } 
 
     UInt8 Clan::GetPosCount(UInt8 pos)

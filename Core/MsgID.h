@@ -53,18 +53,18 @@ namespace REQ
 
 
     //Mail
-    const UInt8 MAIL             = 0x50;// 
-    const UInt8 MAIL_GET             = 0x51;// 
-    const UInt8 MAIL_DELETE             = 0x52;// 
-    const UInt8 MAIL_NOTICE             = 0x52;// 
-    const UInt8 MAIL_GET_ALL             = 0x53;// 
-    const UInt8 MAIL_DELETE_ALL             = 0x54;// 
+    const UInt8 MAIL                = 0x50;// 
+    const UInt8 MAIL_GET            = 0x51;// 
+    const UInt8 MAIL_DELETE         = 0x52;// 
+    const UInt8 MAIL_NOTICE         = 0x52;// 
+    const UInt8 MAIL_GET_ALL        = 0x53;// 
+    const UInt8 MAIL_DELETE_ALL     = 0x54;// 
 
-    const UInt8 CLAN_LIST        = 0x70;
-    const UInt8 CLAN_CREATE        = 0x71;
+    const UInt8 CLAN_LIST           = 0x70;
+    const UInt8 CLAN_CREATE         = 0x71;
     //const UInt8 CLAN_FLASH        = 0x72;
-    const UInt8 CLAN_OPTION       = 0x73;
-    const UInt8 CLAN_INFO       = 0x72;
+    const UInt8 CLAN_OPTION         = 0x73;
+    const UInt8 CLAN_INFO           = 0x72;
 
 
     /*治理换将*/
@@ -78,6 +78,27 @@ namespace REQ
     /*在线治理获得*/
     const UInt8 GOVERN_ONLINE_GAIN  = 0x64;
 
+    /*推图战役奖励*/
+    const UInt8 BATTLE_AWARD        = 0x82;
+
+
+
+    /*军团战报名*/
+    const UInt8 CLAN_BATTLE_JOIN          = 0xA0;
+    /*军团战加战将*/
+    const UInt8 CLAN_BATTLE_ADDFIGHTER    = 0xA1;
+    /*军团战移动战将*/
+    const UInt8 CLAN_BATTLE_MOVEFIGHTER   = 0xA2;
+    /*取消放置战将*/
+    const UInt8 CLAN_BATTLE_CANCELFIGHTER = 0xA3;
+    /*军团令*/
+    const UInt8 CLAN_BATTLE_COMMAND       = 0xA4;
+    /*留言*/
+    const UInt8 CLAN_BATTLE_COMMENTS      = 0xA5;
+    /*请求战报*/
+    const UInt8 CLAN_BATTLE_REPORT        = 0xA6;
+    /*战场信息*/
+    const UInt8 CLAN_BATTLE_INFO          = 0xA7;
 
 
 
@@ -264,7 +285,7 @@ namespace REQ
     /**帮派动态信息 */
     //const UInt8 CLAN_INFO           = 0x7C;
     /**获取战报信息请求 */
-    const UInt8 CLAN_BATTLE_INFO    = 0x7D;
+    //const UInt8 CLAN_BATTLE_INFO    = 0x7D;
     /**点击NPC对话 */
     const UInt8 DIALOG_START        = 0x50;// 0x80
     /**点击交互动作 */
@@ -599,6 +620,26 @@ namespace REP
     const UInt8 CLAN_OPTION         = 0x73;
 
     const UInt8 CLAN_INFO           = 0x72;
+    /*推图战役奖励*/
+    const UInt8 BATTLE_AWARD        = 0x82;
+
+
+    /*军团战报名*/
+    const UInt8 CLAN_BATTLE_JOIN          = 0xA0;
+    /*军团战加战将*/
+    const UInt8 CLAN_BATTLE_ADDFIGHTER    = 0xA1;
+    /*军团战移动战将*/
+    const UInt8 CLAN_BATTLE_MOVEFIGHTER   = 0xA2;
+    /*取消放置战将*/
+    const UInt8 CLAN_BATTLE_CANCELFIGHTER = 0xA3;
+    /*军团令*/
+    const UInt8 CLAN_BATTLE_COMMAND       = 0xA4;
+    /*留言*/
+    const UInt8 CLAN_BATTLE_COMMENTS      = 0xA5;
+    /*请求战报*/
+    const UInt8 CLAN_BATTLE_REPORT        = 0xA6;
+    /*战场信息*/
+    const UInt8 CLAN_BATTLE_INFO          = 0xA7;
 
 
 

@@ -8,6 +8,8 @@
 #include "Server/OidGenerator.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "GData/BattleAward.h"
+#include "Battle/ClanBattleRoom.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -595,6 +597,143 @@ namespace GObject
         if(freeMax > Count )
             return freeMax - Count;
         return 0;
-    } 
+    }
 
+    void Player::GiveBattleAward(UInt8 mapId)
+    {
+        GData::BattleAward* award = GData::battleAwardTable.GetBattleAward(mapId);
+        if( award == NULL )
+        {
+            return;
+        }
+
+        //判断背包情况
+        UInt8 status = 0;
+        //发奖励
+        UInt32 moneyNum = award->GetMoney();
+        AddMoney(1,moneyNum);
+        std::vector<GData::ItemInfo> vecItem = award->GetItems();
+        for( auto it = vecItem.begin() ; it != vecItem.end() ; ++it )
+        {
+            GetPackage()->AddItem((*it).itemId,(*it).itemNum);
+        }
+        UInt32 exp = award->GetExp();
+        SetVar(VAR_EXP,GetVar(VAR_EXP)+exp);
+
+        //
+        Stream st(REP::BATTLE_AWARD);
+        st<<static_cast<UInt8>(status);
+        st<<Stream::eos;
+        send(st);
+    }
+    /*
+    UInt8 Player::OpenClanBattle()
+    {
+        Clan* clan = GetClan();
+        if( clan == NULL )
+        {
+            std::cout<<"sorry you have no clan"<<std::endl;
+            return 0;
+        }
+        UInt8 pos = GetClanPos();  //只有会长和副会长才能开启军团战
+        if( pos < 2 )
+        {
+            std::cout<<"sorry have no root"<<std::endl;
+            return 1;
+        }
+        UInt8 status = clan->GetClanBattleStatus();
+        if( status != 0 )
+        {
+            std::cout<<"sorry have opened"<<std::endl;
+            return 2;
+        }
+        clan->SetClanBattleStatus(1);
+        DB7().PushUpdateData( "update clan set `clanBattleStatus`= %u where clanId = %u ",static_cast<UInt8>(1),clan->GetId());
+        return 3;
+    }
+    */
+
+    UInt8 Player::SignUpClanBattle()   //报名军团战
+    {
+        Clan* clan = GetClan();
+        if( clan == NULL )
+        {
+            return 1;
+        }
+
+        UInt32 roomId  = clan->GetClanBattleRoomId();
+        UInt8 pos =  GetClanPos();
+        if(roomId == 0 )
+        {
+            //开启军团战
+            if( pos < 2 )
+            {
+                SetJoinClanBattle(1);
+                DB7().PushUpdateData( "update clan_player set `clanBattleStatus`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId()); 
+                Battle::clanBattleRoomManager.EnterRoom(this);
+                return 0;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+        else
+        {
+            UInt8 isJoin = GetJoinClanBattle();
+            if( isJoin != 0 )
+            {
+                return 3;
+            }
+            SetJoinClanBattle(1);
+            DB7().PushUpdateData( "update clan_player set `clanBattleStatus`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId());
+            return 0;
+        }
+    }
+
+    UInt8 Player::GetClanBattleStatue()
+    {
+        return 1;
+    }
+
+    void Player::InsertClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
+    {
+        ClanBattleFighter* battleInfo = new ClanBattleFighter(mapId,fighterId,posx,posy);
+        if( battleInfo == NULL )
+            return;
+        _vecClanBattleFighter.push_back(battleInfo);
+    }
+
+    void Player::DelClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
+    {
+        ClanBattleFighter* battleFighter= new ClanBattleFighter(mapId,fighterId,posx,posy);
+        if( battleFighter == NULL )
+        {
+            return;
+        }
+        for( auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it )
+        {
+            if( (*it) == battleFighter )
+            {
+                it = _vecClanBattleFighter.erase(it);
+            }
+        }
+    }
+
+    ClanBattleFighter* Player::GetClanBattleFighter(UInt16 fighterId)
+    {
+        if( fighterId <= 0 )
+        {
+            return NULL;
+        }
+        for(auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it)
+        {
+             if( (*it)->GetFighterId() == fighterId)
+             {
+                 return (*it);
+             }
+        }
+        return NULL;
+
+    }
 }

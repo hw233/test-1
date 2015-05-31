@@ -15,6 +15,7 @@
 #include "Common/BinaryReader.h"
 #include "GObject/Player.h"
 #include "Battle/BattleReport.h"
+#include "Battle/ClanBattleDistribute.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -121,6 +122,139 @@ void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
     clan->searchMatch(player);
 }
 */
+
+void OnJoinClanBattle(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    UInt8 res = player->SignUpClanBattle();
+
+    Stream st(REP::CLAN_BATTLE_JOIN);
+    st<<static_cast<UInt8>(res);
+    st<<Stream::eos;
+    player->send(st);
+}
+
+void OnClanBattleInfo(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    Stream  st(REP::CLAN_BATTLE_INFO);
+    Battle::battleDistribute.GetBattleInfo(player,st);
+    st<<Stream::eos;
+    player->send(st);
+}
+
+void OnClanBattleAddFighter(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    UInt8 mapId = 0;
+    UInt16 fighterId = 0;
+    UInt8 posx = 0;
+    UInt8 posy = 0;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    brd >> mapId;
+    brd >> fighterId;
+    brd >> posx;
+    brd >> posy;
+    bool res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
+    Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
+    if( res == false )
+    {
+       st<<static_cast<UInt8>(mapId);
+       st<<static_cast<UInt16>(fighterId);
+       st<<static_cast<UInt8>(posx);
+       st<<static_cast<UInt8>(posy);
+    }
+    else
+    {
+        
+    }
+    st<<Stream::eos;
+    player->send(st);
+}
+
+
+void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    UInt16 fighterId = 0;  //要移动的战将Id
+    UInt8 mapId = 0;   //目标城市Id
+    UInt8 posx = 0;    //目标的坐标
+    UInt8 posy = 0;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    brd >> mapId;
+    brd >> fighterId;
+    brd >> posx;
+    brd >> posy;
+    GObject::ClanBattleFighter* fighterInfo = player->GetClanBattleFighter(fighterId);
+    if( fighterInfo == NULL )
+        return;
+    UInt8 curMapId = fighterInfo->GetMapId();
+    if( mapId == 0   || curMapId == 0 )
+    {
+        return;
+    }
+    UInt8 res = false;
+    if( curMapId == mapId )
+    {
+        res = Battle::battleDistribute.MoveFighter(mapId,player,fighterInfo->GetPosX(),fighterInfo->GetPosY(),posx,posy);
+    }
+    else
+    {
+        res = Battle::battleDistribute.MoveFighterWithDiffTown(player,curMapId,fighterInfo->GetPosX(),fighterInfo->GetPosY(),mapId,posx,posy);
+
+    }
+    Stream st(REP::CLAN_BATTLE_MOVEFIGHTER);
+    st<<static_cast<UInt8>(res);
+    if( res == false )
+    {
+        st<< static_cast<UInt8>(curMapId);
+        st<< static_cast<UInt8>(fighterInfo->GetPosX());
+        st<< static_cast<UInt8>(fighterInfo->GetPosY());
+        st<< static_cast<UInt8>(mapId);
+        st<< static_cast<UInt8>(posx);
+        st<< static_cast<UInt8>(posy);
+    }
+    st<<Stream::eos;
+    player->send(st);
+
+}
+
+void OnClanBattleDelFighter(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    UInt8 mapId = 0;
+    UInt16 fighterId = 0;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    brd >> mapId;
+    brd >> fighterId;
+
+    GObject::ClanBattleFighter* fighterInfo = player->GetClanBattleFighter(fighterId);
+
+    if( fighterInfo == NULL )
+        return;
+
+    if( fighterInfo->GetMapId() != mapId)
+        return;
+    bool res =  Battle::battleDistribute.CancelPutFighter(mapId,player,fighterId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
+    Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);
+    st << static_cast<UInt8>(res);
+    if( res == false )
+    {
+    }
+    st<< Stream::eos;
+    player->send(st);
+
+}
 
 
 #endif // _WORLDOUTERMSGHANDLER_H_

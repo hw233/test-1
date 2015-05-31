@@ -26,6 +26,9 @@ namespace GData
             static bool LoadMonster();
             static bool LoadMapConfig();
             static bool LoadBattleAwardData();
+            static bool LoadClanBattleBase();
+            static bool LoadBattleMap();
+
         private:
 
     };

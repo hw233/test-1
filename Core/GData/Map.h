@@ -18,18 +18,30 @@ namespace GData
     };
 
     typedef std::vector<UInt8> vecInfo;
-    class Map
+
+    class MapInfo
     {
         public:
-            void loadMapInfo(UInt8 index,vecInfo info);
-            void loadCampInfo(UInt8 index,vecInfo info);        
-            vecInfo GetMap(UInt8 mapId) { return _mapInfo[mapId-1];}
-            vecInfo GetCamp(UInt8 mapId) { return _mapCamp[mapId-1];}
+            MapInfo(UInt8 w,UInt8 h,vecInfo t,vecInfo c) : width(w),height(h),tileInfo(t),campInfo(c) {}
+            UInt8 GetWidth() const { return width;}
+            UInt8 GetHeight() const { return height;}
+            vecInfo GetTileInfo() const { return tileInfo;}
+            vecInfo GetCampInfo() const { return campInfo;}
         private:
-            std::vector<UInt8> _mapInfo[MAP_MAX];    //地图信息
-            std::vector<UInt8> _mapCamp[MAP_MAX];//地图阵营信息
+            UInt8 width;
+            UInt8 height;
+            vecInfo tileInfo;  //地形信息
+            vecInfo campInfo;  //地图信息
     };
-    extern Map map;
+    class MapTable
+    {
+        public:
+            void loadMapInfo(UInt8 mapId,MapInfo* info);
+            MapInfo* GetMapInfo(UInt8 mapId);
+        private:
+            MapInfo* _mapInfo[MAP_MAX];
+    };
+    extern MapTable mapTable;
 }
 
 #endif // MAP_H_
