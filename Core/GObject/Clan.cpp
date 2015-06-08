@@ -184,4 +184,18 @@ namespace GObject
         } 
         return count;
     } 
+
+
+    std::vector<Player*> Clan::GetJoinClanBattlePlayer()
+    {
+        std::vector<Player*> vecPlayer;
+        for( auto it = _players.begin(); it != _players.end(); ++it )
+        {
+            if( (*it)->GetJoinClanBattle())
+            {
+                vecPlayer.push_back(*it);
+            }
+        }
+        return vecPlayer;
+    }
 }

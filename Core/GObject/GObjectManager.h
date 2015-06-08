@@ -41,6 +41,8 @@ namespace GObject
             static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
             static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
             static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现
+            static bool loadClanBattleComment(); //军团战留言
+            static bool loadClanBattleOrder(); //军团令
         private:
             static std::map<UInt32, ItemEquip *> equips;
     };

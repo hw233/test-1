@@ -92,7 +92,7 @@ namespace REQ
     /*取消放置战将*/
     const UInt8 CLAN_BATTLE_CANCELFIGHTER = 0xA3;
     /*军团令*/
-    const UInt8 CLAN_BATTLE_COMMAND       = 0xA4;
+    const UInt8 CLAN_BATTLE_ORDERS        = 0xA4;
     /*留言*/
     const UInt8 CLAN_BATTLE_COMMENTS      = 0xA5;
     /*请求战报*/
@@ -633,7 +633,7 @@ namespace REP
     /*取消放置战将*/
     const UInt8 CLAN_BATTLE_CANCELFIGHTER = 0xA3;
     /*军团令*/
-    const UInt8 CLAN_BATTLE_COMMAND       = 0xA4;
+    const UInt8 CLAN_BATTLE_ORDERS      = 0xA4;
     /*留言*/
     const UInt8 CLAN_BATTLE_COMMENTS      = 0xA5;
     /*请求战报*/

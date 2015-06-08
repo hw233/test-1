@@ -16,6 +16,8 @@
 #include "GObject/Player.h"
 #include "Battle/BattleReport.h"
 #include "Battle/ClanBattleDistribute.h"
+#include "Battle/ClanBattleComment.h"
+#include "Battle/ClanOrder.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -134,6 +136,14 @@ void OnJoinClanBattle(GameMsgHdr& hdr,const void * data)
     st<<static_cast<UInt8>(res);
     st<<Stream::eos;
     player->send(st);
+
+    if( res == 0 )
+    {
+        Stream  st(REP::CLAN_BATTLE_INFO);
+        Battle::battleDistribute.GetBattleInfo(player,st);
+        st<<Stream::eos;
+        player->send(st);
+    }
 }
 
 void OnClanBattleInfo(GameMsgHdr& hdr, const void * data)
@@ -162,20 +172,24 @@ void OnClanBattleAddFighter(GameMsgHdr& hdr, const void * data)
     brd >> posx;
     brd >> posy;
     bool res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
-    Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
     if( res == false )
     {
+       Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
+       st << static_cast<UInt8>(res);
        st<<static_cast<UInt8>(mapId);
        st<<static_cast<UInt16>(fighterId);
        st<<static_cast<UInt8>(posx);
        st<<static_cast<UInt8>(posy);
+       GObject::Clan* clan = player->GetClan();
+       UInt8 forceId = clan->GetBattleForceId();
+       st<<static_cast<UInt8>(forceId);
+       st<<Stream::eos;
+       player->send(st);
     }
     else
     {
-        
+        Battle::battleDistribute.NoticeAlliesAddFighter(player,fighterId);
     }
-    st<<Stream::eos;
-    player->send(st);
 }
 
 
@@ -211,19 +225,23 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
         res = Battle::battleDistribute.MoveFighterWithDiffTown(player,curMapId,fighterInfo->GetPosX(),fighterInfo->GetPosY(),mapId,posx,posy);
 
     }
-    Stream st(REP::CLAN_BATTLE_MOVEFIGHTER);
-    st<<static_cast<UInt8>(res);
     if( res == false )
     {
+        Stream st(REP::CLAN_BATTLE_MOVEFIGHTER);
+        st<<static_cast<UInt8>(res);
         st<< static_cast<UInt8>(curMapId);
         st<< static_cast<UInt8>(fighterInfo->GetPosX());
         st<< static_cast<UInt8>(fighterInfo->GetPosY());
         st<< static_cast<UInt8>(mapId);
         st<< static_cast<UInt8>(posx);
         st<< static_cast<UInt8>(posy);
+        st<<Stream::eos;
+        player->send(st);
     }
-    st<<Stream::eos;
-    player->send(st);
+    else
+    {
+        Battle::battleDistribute.NoticeAlliesMoveFighter(player,curMapId,fighterInfo->GetPosX(),fighterInfo->GetPosY(),mapId,posx,posy);
+    }
 
 }
 
@@ -246,14 +264,66 @@ void OnClanBattleDelFighter(GameMsgHdr& hdr,const void * data)
     if( fighterInfo->GetMapId() != mapId)
         return;
     bool res =  Battle::battleDistribute.CancelPutFighter(mapId,player,fighterId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
-    Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);
-    st << static_cast<UInt8>(res);
     if( res == false )
     {
+        Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);
+        st << static_cast<UInt8>(res);
+        st<< Stream::eos;
+        player->send(st);
     }
-    st<< Stream::eos;
+    else
+    {
+        Battle::battleDistribute.NoticeAlliesDelFighter(player,mapId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
+    }
+
+}
+
+void OnClanBattleComment(GameMsgHdr& hdr,const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    UInt8 mapId = 0;
+    std::string message;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    brd >> mapId;
+    brd >> message;
+    bool res = Battle::roomCommentManager.InsertComment(player,mapId,message);
+    Stream st(REP::CLAN_BATTLE_COMMENTS);
+    st<<static_cast<UInt8>(res);
+    st<<static_cast<UInt8>(mapId);
+    st<<message;
+    st<<Stream::eos;
     player->send(st);
 
+    if( res )
+    {
+        Battle::roomCommentManager.NoticeOtherAllies(player,mapId,message);
+    }
+}
+
+void OnClanBattleOrder(GameMsgHdr& hdr,const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    UInt8 mapId = 0;
+    UInt8 order = 0;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    brd >> mapId;
+    brd >> order;
+    bool res = Battle::roomOrderManager.InsertClanOrder(player,mapId,order);
+    Stream st(REP::CLAN_BATTLE_ORDERS);
+    st<<static_cast<UInt8>(res);
+    st<<static_cast<UInt8>(mapId);
+    st<<static_cast<UInt8>(order);
+    st<<Stream::eos;
+    player->send(st);
+
+    if( res )
+    {
+        Battle::roomOrderManager.NoticeOtherAllies(player,mapId,order);
+    }
 }
 
 

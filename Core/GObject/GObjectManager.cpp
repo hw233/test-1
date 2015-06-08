@@ -22,6 +22,8 @@
 #include "Mail.h"
 #include "Battle/ClanBattleRoom.h"
 #include "Battle/ClanBattleDistribute.h"
+#include "Battle/ClanBattleComment.h"
+#include "Battle/ClanOrder.h"
 
 namespace GObject
 {
@@ -101,6 +103,26 @@ namespace GObject
         if(!loadMail())
         {
             fprintf(stderr, "loadMail error!\n");
+            std::abort();
+        }
+        if(!loadClanBattleRooms())
+        {
+            fprintf(stderr, "clanBattle Rooms error!\n");
+            std::abort();
+        }
+        if( !loadClanBattlePos())
+        {
+            fprintf(stderr, "clanBattle pos error!\n");
+            std::abort();
+        }
+        if( !loadClanBattleComment())
+        {
+            fprintf(stderr, "clanBattle comment error!\n");
+            std::abort();
+        }
+        if( !loadClanBattleOrder())
+        {
+            fprintf(stderr, "clanBattle comment error!\n");
             std::abort();
         }
     } 
@@ -368,7 +390,7 @@ namespace GObject
         LoadingCounter lc("Loading Clan");
         lc.reset(1000);
         DBClan clan;
-        if(execu->Prepare("SELECT `clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax` `battleRoomId` ,`clanFame`,`conquests` ,`forceId`FROM `clan`", clan) != DB::DB_OK)
+        if(execu->Prepare("SELECT `clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax` ,`battleRoomId` ,`clanFame`,`conquests` ,`forceId` FROM `clan`", clan) != DB::DB_OK)
             return false;
         Player* creater = NULL;
         Player* leader = NULL;
@@ -407,7 +429,7 @@ namespace GObject
         LoadingCounter lc("Loading Clan");
         lc.reset(1000);
         DBClanPlayer clanp;
-        if(execu->Prepare("SELECT `clanId`,`playerId`,`position`,`contribute`,`enterTime` `isClanBattle` FROM `clan_player`", clanp) != DB::DB_OK)
+        if(execu->Prepare("SELECT `clanId`,`playerId`,`position`,`contribute`,`enterTime`,`isClanBattle` FROM `clan_player`", clanp) != DB::DB_OK)
             return false;
         Clan * clan = NULL;
         UInt32 last_clanId = 0;
@@ -522,6 +544,43 @@ namespace GObject
                 vecClan.push_back(::atoi(st[i].c_str()));
             }
             Battle::clanBattleRoomManager.loadBattleRoom(room.roomId,room.battleId,room.forceId,vecClan,room.fighterNum);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+
+    bool GObjectManager::loadClanBattleComment()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading ClanBattle Comments");
+        lc.reset(1000);
+        DBClanBattleComment comment;
+        if(execu->Prepare("SELECT `roomId`,`forceId`,`mapId`,`playerId`,`message` FROM `clan_battle_comment`", comment) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Battle::roomCommentManager.LoadAllComments(comment.roomId,comment.forceId,comment.mapId,comment.playerId,comment.comment);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadClanBattleOrder()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading ClanBattle Order");
+        lc.reset(1000);
+        DBClanBattleOrder order;
+        if(execu->Prepare("SELECT `roomId`,`forceId`,`mapId`,`order` FROM `clan_battle_order`", order) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Battle::roomOrderManager.loadAllClanOrders(order.roomId,order.forceId,order.mapId,order.order);
             lc.advance();
         }
         lc.finalize();

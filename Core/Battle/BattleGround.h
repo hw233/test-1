@@ -87,6 +87,16 @@ namespace Battle
         TargetInfo(BattleFighter* b, Ascoord a,Ascoord g,UInt8 c,UInt8 p): bo(b),attack(a),goal(g),cost(c),pri(p) {}
     };
 
+    struct FighterInfo
+    {
+        FighterInfo(GObject::Player* player,UInt16 id,UInt8 x,UInt8 y) : owner(player),fighterId(id),posx(x),posy(y) {}
+        GObject::Player* owner;
+        UInt16 fighterId;
+        UInt8  posx;
+        UInt8  posy;
+
+    };
+
     class BattleGround
     {
         public:
@@ -105,7 +115,16 @@ namespace Battle
             void InitMapFight(UInt8 mapId);
             void PushPlayer(GObject::Player*,UInt8,UInt8 flag );
             void PushBattleInfo(const BattleInfo& bi);
-
+            void PushFighter(GObject::Player*, UInt16 ,UInt8,UInt8);
+            void SetCampActId();
+            void GetCampAttackOrder(UInt8 campId,UInt8 dir);
+            void SearchFromDownToUp(UInt8 campId);
+            void SearchFromUpToDown(UInt8 campId);
+            void SearchFromRightToLeft(UInt8 campId);
+            void SearchFromLeftToRight(UInt8 campId);
+            void SetBattleIndex();
+            UInt8 GetSpecialDirection();
+            void  FightOneRound();
             //对象移动
             void Move();
             //产生战报信息
@@ -174,7 +193,11 @@ namespace Battle
             UInt32 _id;
             UInt8 _x;
             UInt8 _y;
+            UInt8 _mapId;
             std::map<UInt8 ,std::list<GObject::Player *> >  map_player;
+            
+            std::map<UInt8, std::list<FighterInfo*>> map2fighter;  //战将及所属玩家  对应的阵营
+            std::map<UInt8, std::list<Ascoord>> _camp2pos;  //阵营对应的布阵位置  直接按照行动力顺序进行布局
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
             UInt8 * _mapFlag;    

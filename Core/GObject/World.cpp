@@ -8,6 +8,9 @@
 #include "Player.h"
 #include "ChatHold.h"
 #include <time.h>
+#include "Battle/ClanBattleDistribute.h"
+#include "Battle/CampaignManager.h"
+
 
 #define W_CHAT_MAX 20
 
@@ -56,6 +59,8 @@ namespace GObject
         AddTimer(10*60*1000, World_Govern_SendInfo,this,(s+1)*1000);
         AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second+3)*1000);
 
+
+        //AddTimer(86400 * 1000, world_clan_battle, this, 10* 1000);
         return true; 
     }
 
@@ -110,7 +115,7 @@ namespace GObject
         ns._para = "192.168.88.250";
         LoginMsgHdr hdr1(0xE1, WORKER_THREAD_LOGIN, 8500, 1212121 , sizeof(ns)); 
         GLOBAL().PushMsg(hdr1, &ns);
-        UInt32 BattleId = Battle::battleManager.CreateBattleGround();
+        //UInt32 BattleId = Battle::battleManager.CreateBattleGround();
         /*
         for(UInt8 i = 1; i < 10 ;++i)
         {
@@ -121,6 +126,7 @@ namespace GObject
             Battle::battleManager.EnterBattleGround(BattleId,pl,i);
         }
         */
+        /*
         UInt8 flag = 1;
         UInt8 i = 1;
         for(auto it = globalPlayerVec.begin(); it != globalPlayerVec.end(); ++it)
@@ -133,6 +139,7 @@ namespace GObject
             flag = !flag;
         }
         Battle::battleManager.StartGround(BattleId);
+        */
     }
 
     void World::World_Govern_SendInfo(World* world)
@@ -167,6 +174,35 @@ namespace GObject
             GameMsgHdr hdr(0x155,WORKER_THREAD_COUNTRY_1,(*it),sizeof(time));
             GLOBAL().PushMsg(hdr,&time);
         }
+    }
+    
+    void World::world_clan_battle(World* world)
+    {
+        map<UInt32,std::vector<Battle::MapDistributeInfo*>> room2Distribute = Battle::battleDistribute.GetData();
+        for( auto it = room2Distribute.begin(); it != room2Distribute.end(); ++it )
+        {
+            UInt32 roomId = it->first;
+            for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
+            {
+                UInt8 mapId = (*iter)->GetMapId();
+                Battle::campaignManager.InsertBattleManager(roomId,mapId,0);
+                std::vector<Battle::DistributeInfo*> vecInfo = (*iter)->GetDistributeInfo();
+                for( auto iterator = vecInfo.begin(); iterator != vecInfo.end(); ++iterator )
+                {
+                    //放将进入战场
+                    UInt64 playerId = (*iterator)->GetPlayerId();
+                    UInt16 fighterId = (*iterator)->GetFighterId();
+                    UInt8  posx = (*iterator)->GetPosX();
+                    UInt8  posy = (*iterator)->GetPosY();
+                    GObject::Player* player = GObject::globalPlayers[playerId];
+                    if( player == NULL )
+                        continue;
+                    Battle::campaignManager.EnterBattleGround(roomId,mapId,player,fighterId,posx,posy);
+                }
+
+            }
+        }
+        Battle::campaignManager.BattleStart();
     }
 
 }

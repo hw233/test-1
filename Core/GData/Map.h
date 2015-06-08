@@ -22,16 +22,21 @@ namespace GData
     class MapInfo
     {
         public:
-            MapInfo(UInt8 w,UInt8 h,vecInfo t,vecInfo c) : width(w),height(h),tileInfo(t),campInfo(c) {}
+            MapInfo(UInt8 w,UInt8 h,UInt8 cn,vecInfo t,vecInfo c) : width(w),height(h),campNum(cn),tileInfo(t),campInfo(c) {}
             UInt8 GetWidth() const { return width;}
             UInt8 GetHeight() const { return height;}
             vecInfo GetTileInfo() const { return tileInfo;}
             vecInfo GetCampInfo() const { return campInfo;}
+            UInt8 GetCampNum() const { return campNum;}
+            void InsertCampDir(UInt8 campId,UInt8 dir) { camp2direction[campId] = dir ;}
+            UInt8 GetAttackDirect(UInt8 side) { return camp2direction[side];}
         private:
             UInt8 width;
             UInt8 height;
+            UInt8 campNum;
             vecInfo tileInfo;  //地形信息
             vecInfo campInfo;  //地图信息
+            std::map<UInt8,UInt8> camp2direction;
     };
     class MapTable
     {

@@ -174,3 +174,24 @@ CREATE TABLE `clan_battle_room` (
     `fighterNum` int(3) unsigned NOT NULL DEFAULT '0' COMMENT '某一势力的战将数量',
     PRIMARY KEY (`roomId`,`forceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `clan_battle_comment`; 
+CREATE TABLE `clan_battle_comment` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `forceId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '势力Id',
+    `mapId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图id',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '留言者Id',
+    `message` varchar(1024) NOT NULL DEFAULT '' COMMENT '留言',
+    PRIMARY KEY (`roomId`,`forceId`,`mapId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `clan_battle_order`; 
+CREATE TABLE `clan_battle_order` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `forceId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '势力Id',
+    `mapId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图id',
+    `order` tinyint(3)  NOT NULL DEFAULT '0' COMMENT '军团令',
+    PRIMARY KEY (`roomId`,`forceId`,`mapId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

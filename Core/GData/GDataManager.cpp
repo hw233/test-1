@@ -377,6 +377,9 @@ namespace GData
             lua_tinker::dofile(L,path.c_str());
             lua_tinker::table AllTile = lua_tinker::call<lua_tinker::table>(L,"GetAllMap"); 
             lua_tinker::table AllForce = lua_tinker::call<lua_tinker::table>(L,"GetAllForce"); 
+            lua_tinker::table AllForceNum = lua_tinker::call<lua_tinker::table>(L,"GetAllForceNum");
+            lua_tinker::table AllDirection = lua_tinker::call<lua_tinker::table>(L,"GetAllDirect2Force");
+
             if( AllTile.size() != AllForce.size() )
             {
                 return false;
@@ -388,6 +391,7 @@ namespace GData
                 lua_tinker::table map = AllTile.get<lua_tinker::table>(i+1);
                 UInt8 width = static_cast<UInt8>(map.get<UInt8>(1));
                 UInt8 height = static_cast<UInt8>(map.get<UInt8>(2));
+                UInt8 forceNum = static_cast<UInt8>(AllForceNum.get<UInt8>(i+1));  //势力的数量
                 for( UInt8 j = 2 ; j < map.size() ; ++j )
                 {
                    tileInfo.push_back(static_cast<UInt8>(map.get<UInt8>(j+1)));
@@ -397,7 +401,25 @@ namespace GData
                 {
                     campInfo.push_back(static_cast<UInt8>(force.get<UInt8>(j+1)));
                 }
-                MapInfo* info = new MapInfo(width,height,tileInfo,campInfo);
+                MapInfo* info = new MapInfo(width,height,forceNum,tileInfo,campInfo);
+                lua_tinker::table direct = AllDirection.get<lua_tinker::table>(i+1);
+                std::vector<UInt8> vecForceId;
+                std::vector<UInt8> vecDirection;
+                for( UInt8 j = 0; j < direct.size(); ++j )
+                {
+                    if( j % 2 == 0 )
+                    {
+                        vecForceId.push_back(static_cast<UInt8>(direct.get<UInt8>(j+1)));
+                    }
+                    else
+                    {
+                        vecDirection.push_back(static_cast<UInt8>(direct.get<UInt8>(j+1)));
+                    }
+                }
+                for(UInt8 j = 0 ; j < vecForceId.size(); ++j)
+                {
+                    info->InsertCampDir(vecForceId[j],vecDirection[j]);
+                }
                 GData::mapTable.loadMapInfo(i+1,info);  //第0位不存数据
                 tileInfo.clear();
                 campInfo.clear();
@@ -449,10 +471,10 @@ namespace GData
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
-        LoadingCounter lc("Loading BattleAward");
+        LoadingCounter lc("Loading Clan BattleBase");
         lc.reset(1000);
         DBClanBattleBase battleBase;
-        if(execu->Prepare("SELECT `battleId`,`explimit`,`forcenum`,`playermin`,`playermax` FROM `corps_camapaign_base`", battleBase) != DB::DB_OK)
+        if(execu->Prepare("SELECT `battleId`,`explimit`,`forcenum`,`playermin`,`playermax` FROM `corps_campaign_base`", battleBase) != DB::DB_OK)
             return false;
 
         while(execu->Next() == DB::DB_OK)
@@ -483,6 +505,7 @@ namespace GData
             std::string path = cfg.scriptPath+"paseCampaignMap.lua";
             lua_tinker::dofile(L,path.c_str());
             lua_tinker::table AllBattleMap = lua_tinker::call<lua_tinker::table>(L,"GetAllBattleMap"); 
+
             if( AllBattleMap.size() == 0 )
             {
                 return false;
@@ -506,11 +529,11 @@ namespace GData
                     {
                         links.push_back(static_cast<UInt8>(Links.get<UInt8>(k+1)));
                     }
-                    GData::SingleMapInfo* singalInfo = new SingleMapInfo(mapId,force,links);
+                    GData::SingleMapInfo* singleInfo = new SingleMapInfo(mapId,force,links);
                     links.clear();
-                    mapInfo.push_back(singalInfo);
+                    mapInfo.push_back(singleInfo);
                 }
-                GData::BattleMapInfo* battleMapInfo = new BattleMapInfo(mapInfo);
+                GData::BattleMapInfo* battleMapInfo = new BattleMapInfo(i+1,mapInfo);
                 mapInfo.clear();
                 GData::battleMapTable.loadBattleMap(battleMapInfo);
             }

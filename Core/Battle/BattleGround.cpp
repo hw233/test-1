@@ -15,7 +15,8 @@ namespace Battle
     { 
 
        //设置地图信息
-        GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
+       _mapId = mapId;
+       GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
        if( mapInfo == NULL )
            return;
         _x = mapInfo->GetWidth();
@@ -40,12 +41,14 @@ namespace Battle
         {
             _mapCamp[j] = CampInfo[j];
         }
+        
+        SetCampActId();
         _mapFighters = new BattleObject* [_x*_y];
         _mapFlag = new UInt8[_x*_y];
         memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
         memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
         _pack.init(0x80);
-        return ;
+        
     }
 
      
@@ -795,7 +798,7 @@ namespace Battle
         BattleFighter * bf = BattleSimulator::CreateFighter(fgt->GetTypeId(),NULL,fgt, x, y);
         setObject(x, y, bf ,1);
         bf->SetEnterPos(x,y);
-        bf->SetBattleIndex(++_maxID);
+        //bf->SetBattleIndex(++_maxID);
         //bf->InsertFighterInfo(_pack,1);
         _mapFlag[x+y*_x] = 1;
         //std::cout << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
@@ -819,6 +822,49 @@ namespace Battle
             bf->SetEnterPos(x,y);
         }
     }
+
+
+    void BattleGround::FightOneRound()
+    {
+        preStart();
+        TestCoutBattleS();
+        UInt8 i = 1;
+        UInt8 flag = 0;
+
+        std::list<BattleFighter *> fighters_copy[PLAYERMAX];   //阵营中的战将
+        for(UInt8 i=1; i <= map_player.size();++i)
+        {
+           fighters_copy[i] = fighters[i];
+        }
+        while(true)
+        {
+            if( flag >= map_player.size() )
+                break;
+            if( i > map_player.size() )
+                i = 1;
+            while(!fighters_copy[i].empty() && fighters_copy[i].front()->getHP() <= 0 )
+            {
+                 fighters_copy[i].pop_front();    //已经死亡的让滚蛋
+            }
+
+            if( fighters_copy[i].size() == 0 )
+            {
+                ++flag;
+                ++i;
+                continue;
+            }
+
+            currentBf = fighters_copy[i].front();
+            if( currentBf == NULL )
+            {
+                continue;
+            }
+            Move();
+            fighters_copy[i].pop_front();
+            ++i;
+        }
+    }
+
 
     void BattleGround::start()
     { 
@@ -883,51 +929,7 @@ namespace Battle
         _pack.data<UInt16>(offset) = actCount;
         _pack<<Stream::eos;
         battleReport0.addReport(_battleNum,_pack);
-        //发奖励
-        GiveBattleAward();
     }
-
-    void BattleGround::GiveBattleAward()
-    {
-        //检查剩下的人的阵营
-        UInt8 num = 0;
-        UInt8 count = 0;
-        for( UInt8 j = 0 ; j < _y ; ++j )
-        {
-            for(UInt8 i = 0 ; i < _x ; ++i )
-            {
-                if( _mapFighters[i+j*_x] != NULL && _mapFighters[i+j*_x]->getHP() > 0)
-                {
-                    if( _mapFighters[i+j*_x]->GetSide() == 1)
-                    {
-                        ++count;
-                    }
-                    else
-                    {
-                        ++num;
-                    }
-                }
-
-            }
-        }
-        UInt8 res = 1;
-        if( num == 0 && count == 0 )
-        {
-            std::cout<<"两败俱伤  谁都没赢"<<std::endl;
-        }
-        if( num > count )
-        {
-           res = 2;   //阵营一赢
-        }
-        auto it = map_player.find(res);
-        std::list<GObject::Player *> vec = it->second;
-        for( auto it = vec.begin(); it != vec.end(); ++it)
-        {
-             (*it)->AddMoney(3,1000);
-        }
-
-    }
-
 
     void BattleGround::PushPlayer(GObject::Player * pl,UInt8 index, UInt8 flag)
     { 
@@ -1016,10 +1018,38 @@ namespace Battle
     void BattleGround::preStart()  //需要玩家手动操作
     { 
         //std::map<UInt8 ,std::vector<GObject::Player *> >::iterator it = map_player.begin();
-        _pack << static_cast<UInt8>(1);
-        _pack << static_cast<UInt8>(map_player.size()); 
-        
+        _pack << static_cast<UInt8>(_mapId);
+        //_pack << static_cast<UInt8>(map_player.size()); 
+        _pack << static_cast<UInt8>(map2fighter.size()); 
+        if( map2fighter.size() <= 1 )
+            return;
         UInt8  flags = 0;
+        std::map<UInt8,std::list<FighterInfo*>> map2fighter_copy = map2fighter;
+        do
+        {
+            for( UInt8 i = 1; i < map2fighter_copy.size(); ++i)
+            {
+                if( map2fighter_copy[i].size() == 0 )
+                    continue;
+                std::list<FighterInfo*> listInfo = map2fighter_copy[i];
+                if( listInfo.empty())
+                {
+                    ++flags;
+                    continue;
+                }
+                FighterInfo* info = listInfo.front();
+                listInfo.pop_front();
+                if( !info )
+                    continue;
+                GObject::Player* player = info->owner;
+                UInt16 fighterId = info->fighterId;
+                UInt8  x = info->posx;
+                UInt8  y = info->posy;
+                GObject::Fighter* fgt = player->findFighter(fighterId);
+                fighters[i].push_back(newFighter(x,y,fgt));
+            }
+        }while(flags < map2fighter_copy.size());
+        /*
         std::map<UInt8,std::list<GObject::Player*>> map2player = map_player;
         do 
         {
@@ -1045,10 +1075,10 @@ namespace Battle
                 fighters[i].push_back(newFighter(x,y,fgt));
             }
         }while( flags <  map2player.size() );   //优先把地图填满
-
+        */
+        /*
         for(UInt8 i=1 ; i<= map2player.size() ; ++i)
         {
-            //
             std::cout<<"势力  " << static_cast<UInt32>(i)<<std::endl;
             UInt8 count = fighters[i].size();
             std::cout<<"人数  "<< static_cast<UInt32>(count)<<std::endl;
@@ -1060,7 +1090,7 @@ namespace Battle
 
             }
         }
-
+        */
         //放将的顺序是一个自己一个敌人
         /*
         for(;it != map_player.end(); ++it)
@@ -1353,4 +1383,239 @@ namespace Battle
     }
 
 
+    void BattleGround::PushFighter(GObject::Player* player,UInt16 fighterId ,UInt8 x,UInt8 y)
+    {
+        GObject::Clan* clan = player->GetClan();
+        if( clan == NULL )
+            return;
+        UInt8 forceId = clan->GetBattleForceId();
+        if( forceId == 0 )
+            return;
+        map2fighter[forceId].push_back(new FighterInfo(player,fighterId,x,y));
+
+        player->SetBattleId(_id);
+        player->SetBattleSide(forceId);
+    }
+
+
+    UInt8 BattleGround::GetSpecialDirection()
+    {
+        UInt8 dir = 0;
+        if( map2fighter.size() == 4 )
+        {
+           dir = 1;
+        }
+        if( map2fighter.size() == 3 )
+        {
+            dir = 1;
+        }
+        if( map2fighter.size() == 2 )
+        {
+            dir = 1;
+        }
+        if( map2fighter.size() == 1 )
+        {
+            dir = 1;
+        }
+        return dir;
+
+    }
+    
+    //设置阵营层面的行动Id
+    void BattleGround::SetCampActId()
+    {
+        GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(_mapId);
+        UInt8 forceNum = mapInfo->GetCampNum();  //获得阵营的数量
+        if( forceNum < 2 )
+        {
+            return;
+        }
+        if( forceNum == 5 )  //如果有5个势力的这个比较特殊
+        {
+            forceNum = 4;
+            //势力5特殊处理
+            UInt8 dir = GetSpecialDirection();
+            GetCampAttackOrder(5,dir);
+        }
+        //
+        for(UInt8 i = 1 ; i <= forceNum ; ++i )
+        {
+            UInt8 dir = mapInfo->GetAttackDirect(i);
+            //按照攻击方向获得实际的出手顺序
+            GetCampAttackOrder(i,dir);
+        }
+    }
+    //  我们这么约定 1 left 2 right 3 up 4 down(进攻方向)
+    //
+
+    void BattleGround::GetCampAttackOrder(UInt8 campId,UInt8 dir)
+    {
+        switch(dir)
+        {
+            case 1: //left  向左进攻
+                SearchFromLeftToRight(campId);
+                break;
+            case 2: //right              //以x轴作为标准 y进行变化 4同2 
+                SearchFromRightToLeft(campId);
+                break;
+            case 3: //up
+                SearchFromUpToDown(campId);
+                break;
+            case 4: //down
+                SearchFromDownToUp(campId);
+                break;
+        }
+    }
+
+    void BattleGround::SearchFromLeftToRight(UInt8 campId)
+    {
+        for(UInt8 i = 0 ; i < _x ; ++i)
+        {
+            for(UInt8 j = 0; j < _y ; ++j )
+            {
+                if( _mapCamp[i+j*_x] == campId )
+                {
+                    if( _camp2pos[campId].empty())
+                    {
+                        std::list<Ascoord> listAscoord;
+                        listAscoord.push_back(Ascoord(i,j));
+                        _camp2pos[campId] = listAscoord;
+                    }
+                    else
+                    {
+                        _camp2pos[campId].push_back(Ascoord(i,j));
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    void BattleGround::SearchFromRightToLeft(UInt8 campId)
+    {
+        for( UInt8 i = _x-1; i >= 0 ; --i)
+        {
+            if( i > _x )
+            {
+                break;
+            }
+            for( UInt8 j = 0 ; j < _y ; ++j )
+            {
+                if( j > _y )
+                {
+                    break;
+                }
+                if( _mapCamp[i+j*_x] == campId )
+                {
+                    if( _camp2pos[campId].empty())
+                    {
+                        std::list<Ascoord> listAscoord;
+                        listAscoord.push_back(Ascoord(i,j));
+                        _camp2pos[campId] = listAscoord;
+                    }
+                    else
+                    {
+                        _camp2pos[campId].push_back(Ascoord(i,j));
+
+                    }
+                }
+            }
+        }
+    }
+
+    void BattleGround::SearchFromUpToDown(UInt8 campId)
+    {
+        for( UInt8 j = 0 ; j < _y ; ++j )
+        {
+            for( UInt8 i = 0; i < _x ; ++i )
+            {
+                if( _mapCamp[i+j*_x] == campId )
+                {
+                    if( _camp2pos[campId].empty())
+                    {
+                        std::list<Ascoord> listAscoord;
+                        listAscoord.push_back(Ascoord(i,j));
+                    }
+                    else
+                    {
+                        _camp2pos[campId].push_back(Ascoord(i,j));
+                    }
+
+                }
+            }
+        }
+    }
+
+    void BattleGround::SearchFromDownToUp(UInt8 campId)
+    {
+        for(UInt8 j = _y-1; j >= 0 ; --j )
+        {
+            if( j > _y )
+            {
+                break;
+            }
+            for( UInt8 i = 0 ; i < _x ; ++i )
+            {
+                if( _mapCamp[i+j*_x] == campId )
+                {
+
+                    if( _camp2pos[campId].empty())
+                    {
+                        std::list<Ascoord> listAscoord;
+                        listAscoord.push_back(Ascoord(i,j));
+                        _camp2pos[campId] = listAscoord;
+                    }
+                    else
+                    {
+                        _camp2pos[campId].push_back(Ascoord(i,j));
+                    }
+                }
+            }
+        }
+
+    }
+    
+
+    //设置每个出手顺序
+    void BattleGround::SetBattleIndex()
+    {
+        UInt8 actCampNum = map2fighter.size();  //实际阵营的数量
+        std::list<BattleFighter *> fighters_copy[PLAYERMAX];   //阵营中的战将
+        for(UInt8 i=1; i <= actCampNum;++i)
+        {
+           if( fighters[i].empty())
+               continue;
+           fighters_copy[i] = fighters[i];
+        }
+        
+        std::map<UInt8, std::list<Ascoord>> camp2pos_copy = _camp2pos;
+
+        UInt8 flag = 0 ;
+        UInt8 i = 1;
+        do
+        {
+            if( fighters_copy[i].empty() )
+            {
+                ++flag;
+                continue;
+            }
+            Ascoord point =  camp2pos_copy[i].front();
+            UInt8 x = point.x;
+            UInt8 y = point.y;
+            for( auto it = fighters_copy[i].begin(); it != fighters_copy[i].end(); ++it )
+            {
+                UInt8 posx = (*it)->GetEnterPosX();
+                UInt8 posy = (*it)->GetEnterPosY();
+                if( posx == x && posy == y )
+                {
+                    fighters_copy[i].remove(*it);
+                    (*it)->SetBattleIndex(++_maxID);
+                }
+            }
+            camp2pos_copy[i].pop_front();
+            ++i;
+        }while(flag <= actCampNum );
+      
+    }
 }

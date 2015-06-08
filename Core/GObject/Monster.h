@@ -10,7 +10,6 @@ namespace GObject
     {
         public:
             Monster(UInt32 id,UInt8 groupId,std::string name,UInt16 power,UInt16 money,UInt16 p,UInt32 itemId,UInt16 itemNum):_id(id),_groupId(groupId),_name(name),_power(power),_money(money),_pro(p),_itemId(itemId),_itemNum(itemNum) {}
-            ~Monster();
             UInt32 GetMonsterId() const { return _id;}
             void SetMonsterId(UInt32 id) { _id = id;};
             std::string GetMonsterName() const { return _name;}

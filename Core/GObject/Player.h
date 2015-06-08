@@ -233,8 +233,6 @@ namespace GObject
             void SetClan(Clan* cl) { clan = cl;}
             UInt8 GetClanPos(){ return _clanPos;}
             void SetClanPos(UInt8 clanPos){ _clanPos = clanPos;}
-            void SetJoinClanBattle(UInt8 status) { _isClanBattle = status ; }
-            UInt8 GetJoinClanBattle() const { return _isClanBattle;}
             UInt8 GetFriendMax() const { return _friendMax;}
             void SetFriendMax(UInt8 num) { _friendMax = num;}
 
@@ -272,12 +270,13 @@ namespace GObject
             void GiveBattleAward(UInt8 mapId);
 
             //军团战相关
-            UInt8 OpenClanBattle();     //开启军团战
             UInt8 SignUpClanBattle();   //报名军团战
             UInt8 GetClanBattleStatue();  //0未报名   1已报名
             void  InsertClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy); //加载军团战参战战将信息
             void  DelClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy);  //删除军团战某一参战战将信息
             ClanBattleFighter* GetClanBattleFighter(UInt16 fighterId);
+            void SetJoinClanBattle(UInt8 status) { _isClanBattle = status ; }
+            UInt8 GetJoinClanBattle() const { return _isClanBattle;}
 
     private:
             //IDTYPE _id;

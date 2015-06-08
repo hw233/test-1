@@ -247,7 +247,8 @@ namespace GObject
         for(;it != _fighters.end();++it)
         { 
             (it->second)->MakeFighterInfo(st);
-        } 
+        }
+        st << static_cast<UInt8>(GetJoinClanBattle());
         
         std::cout << "获得玩家信息：" << GetName() << std::endl;
 
@@ -492,16 +493,20 @@ namespace GObject
         UInt32 money = GetVar(VAR_TEAL);
         if(money < ClanCreateMoney)
             return 2;
-        Clan* clan = new Clan(IDGenerator::gPlayerOidGenerator.ID(), name, this);
+        Clan* clan = new Clan(IDGenerator::gClanOidGenerator.ID(), name, this);
         clan->LoadClanInfo(this,"","",50);
         clan->SetPicIndex(picIndex);
         clan->SetLevel(1);
+        clan->SetClanBattleRoomId(0);
+        clan->SetBattleForceId(0);
+        clan->SetClanFame(0);
+        clan->SetConquests(0);
         globalClan.add(clan->GetId(),clan);
         if(!clan)
             return 3;
         SetClanPos(1);
         clan->LoadPlayer(this,1);
-        DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax());
+        DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0,0);
 
         Stream st(REP::CLAN_OPTION);
         st << static_cast<UInt8>(0x02);
@@ -669,7 +674,7 @@ namespace GObject
             if( pos < 2 )
             {
                 SetJoinClanBattle(1);
-                DB7().PushUpdateData( "update clan_player set `clanBattleStatus`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId()); 
+                DB7().PushUpdateData( "update clan_player set `isClanBattle`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId()); 
                 Battle::clanBattleRoomManager.EnterRoom(this);
                 return 0;
             }
@@ -686,14 +691,9 @@ namespace GObject
                 return 3;
             }
             SetJoinClanBattle(1);
-            DB7().PushUpdateData( "update clan_player set `clanBattleStatus`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId());
+            DB7().PushUpdateData( "update clan_player set `isClanBattle`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId());
             return 0;
         }
-    }
-
-    UInt8 Player::GetClanBattleStatue()
-    {
-        return 1;
     }
 
     void Player::InsertClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
@@ -706,16 +706,12 @@ namespace GObject
 
     void Player::DelClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
     {
-        ClanBattleFighter* battleFighter= new ClanBattleFighter(mapId,fighterId,posx,posy);
-        if( battleFighter == NULL )
-        {
-            return;
-        }
         for( auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it )
         {
-            if( (*it) == battleFighter )
+            if( (*it)->GetMapId() == mapId && (*it)->GetFighterId() == fighterId )
             {
                 it = _vecClanBattleFighter.erase(it);
+                break;
             }
         }
     }

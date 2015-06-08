@@ -234,8 +234,8 @@ CREATE TABLE `battleAward` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `corps_camapaign_base`;
-CREATE TABLE `corps_camapaign_base` (
+DROP TABLE IF EXISTS `corps_campaign_base`;
+CREATE TABLE `corps_campaign_base` (
       `battleId` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '战役Id',
       `explimit` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '军团声望限制',
       `forcenum`   int(10) unsigned NOT NULL DEFAULT '0' COMMENT '一张战役地图上的势力的个数',
