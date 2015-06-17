@@ -38,7 +38,8 @@ namespace GObject
         Stream * st = reinterpret_cast<Stream * >(ptr);
         if(pl->GetRecChat(e_chat_world))
             return true;
-        pl->send(*st);
+        if(pl->isOnline())
+            pl->send(*st);
         return true;
     } 
 
@@ -189,7 +190,7 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
-        if(1)
+        if(!GetClan())
         {
            Stream st(REP::CLAN_LIST);
            SendClanListinfo(st);
@@ -204,6 +205,28 @@ namespace GObject
             st << Stream::eos;
             send(st);
         }
+        if(0 && GetRecChat(e_chat_world))
+        { 
+            Stream st(REP::CHAT);
+            WORLD().GetChatHold()->GetStream(st,10);
+            st << Stream::eos;
+            send(st);
+        } 
+
+        if(0 && GetRecChat(e_chat_friend))
+        { 
+            Stream st(REP::CHAT);
+            GetChatHold()->GetStream(st,10);
+            st << Stream::eos;
+            send(st);
+        } 
+        if(GetRecChat(e_chat_clan))
+        { 
+            Stream st(REP::CHAT);
+            GetClan()->GetChatHold()->GetStream(st,10);
+            st << Stream::eos;
+            send(st);
+        } 
     } 
     void Player::PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId)
     { 
@@ -247,6 +270,7 @@ namespace GObject
         { 
             (it->second)->MakeFighterInfo(st);
         } 
+        st << static_cast<UInt8>(0);   //占位符
         
         std::cout << "获得玩家信息：" << GetName() << std::endl;
 
@@ -256,7 +280,7 @@ namespace GObject
     { 
         if(!chatHold)
         { 
-            chatHold = new ChatHold(P_CHAT_MAX);
+            chatHold = new ChatHold(1,P_CHAT_MAX);
         } 
         return chatHold;
     } 
@@ -266,9 +290,12 @@ namespace GObject
         // 聊天协议添加
         //NETWORK()->Broadcast(st);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(0);
-        st << GetName();
-        st << text;
+        //st << static_cast<UInt8>(0);
+        //st << GetName();
+        //st << text;
+        WORLD().GetChatHold()->InsertChat(this,text);
+        WORLD().GetChatHold()->GetStream(st,1);
+        st << Stream::eos;
         globalPlayers.enumerate(enum_send_chat,&st);
         //WORLD()->GetChatHold()->InsertChat(this, text);
     } 
@@ -278,13 +305,14 @@ namespace GObject
         if(!GetClan())
             return ;
 
+        GetClan()->GetChatHold()->InsertChat(this,text);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(e_chat_world);
-        st << GetName();
-        st << text;
+        GetClan()->GetChatHold()->GetStream(st,1);
+        //st << static_cast<UInt8>(e_chat_world);
+        //st << GetName();
+        //st << text;
         st << Stream::eos;
         GetClan()->Boradcast(st,0);
-        GetClan()->GetChatHold()->InsertChat(this,text);
     } 
     void Player::ChatForFriend(IDTYPE playerId, std::string text)
     { 
@@ -298,9 +326,10 @@ namespace GObject
 
         pl->GetChatHold()->InsertChat(this, text);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(e_chat_friend);
-        st << GetName();
-        st << text;
+        //st << static_cast<UInt8>(e_chat_friend);
+        //st << GetName();
+        //st << text;
+        pl->GetChatHold()->GetStream(st,1);
         st << Stream::eos;
         pl->send(st);
     } 
@@ -493,7 +522,7 @@ namespace GObject
         UInt32 money = GetVar(VAR_TEAL);
         if(money < ClanCreateMoney)
             return 2;
-        Clan* clan = new Clan(IDGenerator::gPlayerOidGenerator.ID(), name, this);
+        Clan* clan = new Clan(IDGenerator::gClanOidGenerator.ID(), name, this);
         if(!clan)
             return 3;
         clan->LoadClanInfo(this,"","",50);
@@ -505,11 +534,11 @@ namespace GObject
         clan->LoadPlayer(this,1);
         DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax());
 
-        Stream st(REP::CLAN_OPTION);
-        st << static_cast<UInt8>(0x02);
-        clan->GetClanInfo(st);
-        st << Stream::eos;
-        send(st);
+        //Stream st(REP::CLAN_OPTION);
+        //st << static_cast<UInt8>(0x02);
+        //clan->GetClanInfo(st);
+        //st << Stream::eos;
+        //send(st);
 
         return 0;
     } 
@@ -614,4 +643,7 @@ namespace GObject
         fgt->AddVar(FVAR_QUALITY,1);
         return 0;
     } 
+
+    UInt8 Player::GetLevel() { return getMainFighter()->GetLevel();}
+
 }

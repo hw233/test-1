@@ -395,7 +395,15 @@ void OnClanCreate(GameMsgHdr& hdr, const void * data)
     std::string name;
     UInt8 index;
     br >> name >> index;
-    player->CreateClan(name ,index);
+    UInt8 res = player->CreateClan(name ,index);
+    Stream st(REP::CLAN_CREATE);
+    st << static_cast<UInt8>(res);
+    if(player->GetClan())
+        st << static_cast<UInt32>(player->GetClan()->GetId());
+    else
+        st << static_cast<UInt32>(0);
+    st << Stream::eos;
+    player->send(st);
 }
 
 void OnClanOption(GameMsgHdr& hdr, const void * data)

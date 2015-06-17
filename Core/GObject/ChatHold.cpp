@@ -20,9 +20,14 @@ namespace GObject
             if(index >= count )
                 break;
 
-            // 聊天信息流    
-            //Player* pl = it->pl;
-            //std::string context = it->context;
+            Player * pl = it->pl;
+            st << _type;
+            st << static_cast<UInt16>(pl->getMainFighter()->getId());
+            st << static_cast<UInt8>(pl->GetLevel());
+            st << static_cast<UInt32>(it->time);
+            st << pl->GetName();
+            st << it->context;
+            index ++;
         }
     } 
 }

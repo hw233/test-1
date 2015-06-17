@@ -30,23 +30,18 @@ namespace Battle
         return ;
     } 
 
-    void BattleAdviceFighter::NormolAttack()
+    UInt8 BattleAdviceFighter::NormolImage()
     { 
-        return ;
-    } 
-
-    void BattleAdviceFighter::NormolImage()
-    { 
-        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime2);
+        const GData::Skill * s = GData::skillManager[_ab._skillId];
+        if(!s)
+            return 0;
+        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
         GetField()->GetTargetList( !GetSideInBS(), this , ip.vec_bo, _ab._skillId);
-        GetField()->InsertTimeBattleAction(_nowTime2 + _actionLast, ip);
+
+        float cd = s->GetActionCd(); // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
+        GetField()->InsertTimeBattleAction(GetNowTime2()+cd,ip);
+        //GetField()->InsertTimeBattleAction(_nowTime2 + _actionLast, ip);
+        return 1;
     } 
-
-    void BattleAdviceFighter::NormolObject()
-    { 
-        return ;
-    } 
-
-
 } 
 

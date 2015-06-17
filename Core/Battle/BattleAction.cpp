@@ -33,7 +33,7 @@ namespace Battle
         if(!vec_struct.size())
             return 0;
         //st << static_cast<UInt8>(GetHappenTime()); 
-        st << static_cast<UInt8>(GetHappenTime2()); 
+        st << static_cast<float>(GetHappenTime2()); 
         st << static_cast<UInt8>(GetBattleFighter()->GetBSNumber());
         st << static_cast<UInt8>(3);
         st << static_cast<UInt16>(GetSkillId());
@@ -47,7 +47,7 @@ namespace Battle
         { 
             if(!vec_struct[i].GetBattleObject())
                 continue;
-            std::cout << "被击回合数: " << static_cast<UInt32>(vec_struct[i].GetCurTime());
+            std::cout << "被击回合数: " << static_cast<float>(vec_struct[i].GetCurTime2());
             std::cout << " 被击者：" << static_cast<UInt32>(vec_struct[i].GetBattleObject()->GetBSNumber()) << " 位置: " << static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosX()) <<" , "<< static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosY());
             std::cout << std::endl;
 

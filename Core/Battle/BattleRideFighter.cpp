@@ -174,52 +174,6 @@ namespace Battle
         return 2;
     } 
 
-    void BattleRideFighter::NormolAttack()
-    { 
-        if(_target)
-        { 
-            ActionPackage ap(this,_nowTime/*,_target*/);
-            ap.PushObject(_target);
-
-            GetField()->InsertTimeBattleAction( _nowTime2 + _actionLast ,ap );
-            _actionType = e_none;
-        } 
-    } 
-
-    void BattleRideFighter::NormolImage()
-    { 
-        const GData::Skill * s = GData::skillManager[_ab._skillId];
-        if(!s)
-            return ;
-        //BATTLE2
-        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
-        GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
-        GetField()->InsertTimeBattleAction(GetNowTime2()+s->GetActionCd(),ip);
-
-    } 
-
-    void BattleRideFighter::NormolObject()
-    { 
-        const GData::SkillScope* ss =GData::skillManager[_ab._skillId]->GetSkillScope();
-        if(!ss)
-            return ;
-
-        UInt16 myY = getPosY();
-
-        UInt8  minNumber = ss->radx / 2 ;  //radx 表示数量(一般情况为奇数) rady表示间隔 x,y作为上下闭合区间
-        UInt16 width = ss->x + ss->y;
-        UInt16 minY  =  0;
-        if(myY > ((width * ss->rady + width)*minNumber + ss->y))
-            minY = myY - ((width * ss->rady + width)*minNumber);
-
-        for(UInt8 i = 0 ; i < ss->radx ; ++i)
-        {
-            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-            op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
-            GetField()->InsertObjectPackage(op);
-        }
-    } 
-
      UInt8 BattleRideFighter::BeForAction()
      { 
         if(!isRunSend)

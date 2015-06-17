@@ -140,7 +140,7 @@ namespace GData
             const SkillCondition * GetSkillCondition() const {return skillConditionManager[_conditionId];} 
             const SkillScope * GetSkillScope() const {return skillScopeManager[_scopeId];}
             const SkillEffect * GetSkillEffect() const {return skillEffectManager[_effectId];}
-            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, float cd, float actionCd, float actionBackCd, UInt16 mpCost)
+            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, float cd,float actionBeforeCd, float actionCd, float actionBackCd, UInt16 mpCost)
             { 
                 _conditionId = conditionId;
                 _scopeId = scopeId;
@@ -151,12 +151,14 @@ namespace GData
                 _mpCost = mpCost;
             } 
 #endif
-            UInt16 GetCd() const {return _cd;}
-            UInt16 GetActionCd() const { return _actionCd;}
-            UInt16 GetActionBackCd() const { return _actionBackCd;}
+            float GetCd() const {return _cd;}
+            float GetActionCd() const { return _actionCd + _actionBeforedCd;}
+            float GetActionCd1() const { return _actionBeforedCd;}
+            float GetActionCd2() const { return _actionCd;}
+            float GetActionBackCd() const { return _actionBackCd;}
             UInt16 GetMpCost() const { return _mpCost;}
         private:
-#ifdef Skill
+#ifdef SkillT
             SkillCondition * _sc;
             SkillScope * _ss;
             SkillEffect * _se;
@@ -167,6 +169,7 @@ namespace GData
 #endif
 
             float _cd;
+            float _actionBeforedCd;
             float _actionCd;
             float _actionBackCd;
             UInt16 _mpCost;

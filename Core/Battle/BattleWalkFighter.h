@@ -19,9 +19,10 @@ namespace Battle
             virtual UInt16 GetTargetDistance();
             virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 4;}
-            virtual void NormolAttack();
-            virtual void NormolImage();
-            virtual void NormolObject();
+            virtual UInt16 GetSpeed() {return 37;} 
+            //virtual UInt8 NormolAttack();
+            //virtual UInt8 NormolImage();
+            //virtual UInt8 NormolObject();
         private:
             BattleObject* _target; 
     };

@@ -23,7 +23,7 @@ function skill()
         BEGIN {
             print "INSERT INTO `skill` VALUES";
         } {
-            printf("(%u,\x27%s\x27,%u,%u,%u,%.2f,%.2f,%.2f,%u)",$1,$2,$1,$1,$1,$3,$4+$5,$6,$7);
+            printf("(%u,\x27%s\x27,%u,%u,%u,%.2f,%.2f,%.2f,%.2f,%u)",$1,$2,$1,$1,$1,$3,$4,$5,$6,$7);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

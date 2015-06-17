@@ -131,6 +131,7 @@ namespace GData
         UInt32 skillScopeId;
         UInt32 skillEffectId;
         float cd;
+        float actionBeforeCd;
         float actionCd;
         float actionBackCd;
         UInt16 mpCost;
@@ -283,7 +284,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkill)
-        SPECIALDEF(9)
+        SPECIALDEF(10)
         (
          UInt32, id,
          std::string , name,
@@ -291,6 +292,7 @@ namespace DB
          UInt32, skillScopeId,
          UInt32, skillEffectId,
          float, cd,
+         float, actionBeforeCd,
          float, actionCd,
          float, actionBackCd,
          UInt16, mpCost

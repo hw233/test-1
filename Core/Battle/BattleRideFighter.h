@@ -26,10 +26,7 @@ namespace Battle
             virtual UInt16 GetBaseActionNum(){return 5;}
             virtual UInt8 GetBattleDirection();
 
-            virtual void NormolAttack();
-            virtual void NormolImage();
-            virtual void NormolObject();
-
+            virtual UInt16 GetSpeed() {return 37;} 
             virtual UInt8 BeForAction();
         private:
             BattleFighter * _target ; 

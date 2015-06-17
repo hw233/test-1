@@ -20,9 +20,9 @@ namespace Battle
             virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 7;}
 
-            virtual void NormolAttack();
-            virtual void NormolImage();
-            virtual void NormolObject();
+            //virtual UInt8 NormolAttack();
+            virtual UInt8 NormolImage();
+            //virtual void NormolObject();
     };
 }
 

@@ -210,7 +210,7 @@ namespace GObject
             std::string getSource() { return NULL;}
             UInt8 getVipLevel() const { return 1;}
             UInt8 GetSex() const { return 1;}
-            UInt8 GetLevel() const { return 1;}
+            UInt8 GetLevel() ;// const { return getMainFighter()->GetLevel();}
             
             Clan* GetClan() const { return clan;}
             void SetClan(Clan* cl) { clan = cl;}

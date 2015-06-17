@@ -166,6 +166,7 @@ CREATE TABLE `skill` (
       `skillScopeId` int(10) NOT NULL DEFAULT '0',
       `skillEffectId` int(10) NOT NULL DEFAULT '0',
       `cd` float(10,2) NOT NULL,
+      `actionBeforeCd` float(10,2) NOT NULL,
       `actionCostCd` float(10,2) NOT NULL,
       `actionBackCd` float(10,2) NOT NULL,
       `mpCost` int(10) NOT NULL DEFAULT '0',

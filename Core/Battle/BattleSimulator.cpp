@@ -9,8 +9,8 @@
 #include "Battle/BattleReport.h"
 #include "GData/SkillTable.h"
 
-#define ADVANCE 180
-#define ADVANCE_M 220
+#define ADVANCE 120
+#define ADVANCE_M 140
 namespace Battle
 {
     BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance, bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator1.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
@@ -18,6 +18,7 @@ namespace Battle
         _fgt[0] = bf;
         bf->SetSideInBS(0); 
         bf->SetField(this);
+
         _fgt[1] = bo;
         bo->SetSideInBS(1); 
         bo->SetField(this);
@@ -28,24 +29,28 @@ namespace Battle
             return ;
         if(!_fgt[index])
             return ;
-        UInt8 myFlag = false;
+        //UInt8 myFlag = false;
 
         UInt16 x[] = { ADVANCE + ADVANCE_M ,ADVANCE , 0};
-        if(_fgt[index]->getClass() == shooter || _fgt[index]->getClass() == adviser )
-            x[0] = STEP/2;
-        if((!flag && index) || (flag && !index))
-        { 
-            myFlag = true;
-        } 
+        /*
+           if(_fgt[index]->getClass() == shooter || _fgt[index]->getClass() == adviser )
+           x[0] = STEP/2;
+           if((!flag && index) || (flag && !index))
+           { 
+           myFlag = true;
+           } 
+           */
 
-        for(UInt8 i = 0; i < FIELD_HIGH/(2*STEP); ++i)
+        for(UInt8 i = 0; i <= FIELD_HIGH/(2*STEP); ++i)
         { 
             if( i ==  0)
             {
-                setObjectXY(myFlag?(FIELD_WIDTH -x[0]):x[0] , static_cast<UInt16>(FIELD_HIGH/2),_fgt[index]);
+                //setObjectXY(myFlag?(FIELD_WIDTH -x[0]):x[0] , static_cast<UInt16>(FIELD_HIGH/2),_fgt[index]);
+                setObjectXY((!index)?x[0]:FIELD_WIDTH-x[0], static_cast<UInt16>(FIELD_HIGH/2),_fgt[index]);
                 //_fgt[index]->SetMinX(x[0]);
                 _fighters[index].push_back(_fgt[index]);
                 _fgt[index]->resetBattleStatue();
+                std::cout << "主将编号：" << static_cast<UInt32>(_fgt[index]->GetBSNumber()) << "位置:" << static_cast<UInt32>(_fgt[index]->getPosX()) << " , " << static_cast<UInt32>(_fgt[index]->getPosY()) << std::endl;
                 continue ;
             }
 
@@ -53,26 +58,63 @@ namespace Battle
             BattleFighter* fgt1 =  _fgt[index]->getMyFighters(i*2-1);
             if(!fgt1 || fgt1->getHP() == 0)
                 return ;
-            setObjectXY( myFlag?(FIELD_WIDTH -x[2-i%2]):x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP-STEP/2) , fgt1);
+            //setObjectXY( myFlag?(FIELD_WIDTH -x[2-i%2]):x[2-i%2] , static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP-STEP/2) , fgt1);
+            setObjectXY((!index)?x[2-i%2]:(FIELD_WIDTH -x[2-i%2]), static_cast<UInt16>((FIELD_HIGH/(2 * STEP)+i)*STEP/*-STEP/2*/) , fgt1);
             //fgt1->SetMinX(x[2-i%2]);
             fgt1->resetBattleStatue();
             _fighters[index].push_back(fgt1);
+
+            std::cout << "战将编号：" << static_cast<UInt32>(fgt1->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt1->getPosX()) << " , " << static_cast<UInt32>(fgt1->getPosY()) << std::endl;
 
             //fgt2
             BattleFighter* fgt2 =  _fgt[index]->getMyFighters(i*2);
             if(!fgt2 || fgt2->getHP() == 0)
                 return ;
-            setObjectXY( myFlag?FIELD_WIDTH -x[2-i%2]:x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP-STEP/2) , fgt2);
+            setObjectXY( (!index)?x[2-i%2]:FIELD_WIDTH -x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP/*-STEP/2*/) , fgt2);
+            std::cout << "战将编号：" << static_cast<UInt32>(fgt2->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt2->getPosX()) << " , " << static_cast<UInt32>(fgt2->getPosY()) << std::endl;
             //fgt2->SetMinX(x[2-i%2]);
             fgt2->resetBattleStatue();
             _fighters[index].push_back(fgt2);
         } 
     } 
+
+    void BattleSimulator::InitFightersSide(UInt8 index)
+    { 
+        //XXX
+        static UInt16 XPos[][11] = {
+            {260,120,0,120,0,120,0,120,0,120,0},
+            {940,1080,1200,1080,1200,1080,1200,1080,1200,1080,1200},
+        };
+
+        static UInt16 YPos[][11] = {
+            {120,120,120,108,108,192,192,36,36,264,264},
+            {120,120,120,108,108,192,192,36,36,264,264},
+        };
+
+
+        if(index > 1)
+            return ;
+        if(!_fgt[index])
+            return ;
+
+        for(UInt8 i = 0; i < 10;++i)
+        { 
+            BattleFighter * fgt = _fgt[index]->getMyFighters(i);
+            if(!fgt || fgt->getHP() == 0)
+                return ;
+            setObjectXY(XPos[index][i], YPos[index][i], fgt);
+            fgt->resetBattleStatue();
+            _fighters[index].push_back(fgt);
+
+            std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt->getPosX()) << " , " << static_cast<UInt32>(fgt->getPosY()) << std::endl;
+        } 
+    } 
+
     void BattleSimulator::start(UInt8 prevWin , bool checkEnh)
     { 
         _packet.init(0x81);
-        InitFighters(0);
-        InitFighters(1);
+        InitFightersSide(0);
+        InitFightersSide(1);
         //UInt32 time  = 0;
 
         GetBSEnterInfo(_packet);
@@ -102,20 +144,25 @@ namespace Battle
                 //bf[index]->SetNowTime(i);
                 //bf[index]->Action();
 
-               // actCount +=
-                FighterAction(bf[index],0);//->AppendFighterStream(_packet);
-           //     std::cout << "战报id: " << static_cast<UInt32>(_id) << "包大小：" << static_cast<UInt32>(_packet.size()) << std::endl;
+                // actCount +=
+                //FighterAction(bf[index],0);//->AppendFighterStream(_packet);
+                UInt32 rand = uRand(3);
+                InsertBattlePre(rand * 0.1, bf[index]);
+                //std::cout << "战报id: " << static_cast<UInt32>(_id) << "包大小：" << static_cast<UInt32>(_packet.size()) << std::endl;
             }
-            
+
             UInt8 count = 0;
-            while(count++ < 40)
+            float time = 0;
+            while(count< 40)
             {
-                float time = GetMinTime();
-                if(time > 20)
+                count ++;
+                time = GetMinTime();
+                std::cout << "Now time:"  << time <<std::endl;
+                if(time > 20 || GetWin() < 3)
                 {
                     break; 
                 }
-                doAction(time);
+                actCount += doAction(time);
                 actCount += doObjectMove(time);  //每回合
                 actCount += doImage(time);   
                 actCount += doAttack(time);
@@ -138,7 +185,7 @@ namespace Battle
             return 0;
         if(!_fgt[1] || !_fgt[1]->getHP())
             return 1;
-        return 2;
+        return 3;
     } 
 
     BattleFighter* BattleSimulator::CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY)
@@ -165,6 +212,8 @@ namespace Battle
         fgt->AddSkill();
         return fgt;
     } 
+
+    //物理攻击
     UInt8 BattleSimulator::doAttack(float time)
     { 
         float time1 = 0;
@@ -204,13 +253,19 @@ namespace Battle
                 ++count;
             }
             FighterAction(fgt,time1);
+            float cd = 0.1;
+            const GData::Skill* s = GData::skillManager[fgt->GetBaseActionNum()];
+            if(s)
+                cd = s->GetActionBackCd();
+
+            InsertBattlePre(time1 + cd, fgt);
         } 
 
         DelBattleAction();
         return count;
     } 
 
-    //普通进攻(有动作时间)
+    //技能进攻(有动作时间)
     UInt8 BattleSimulator::doImage(float time)
     { 
         float time1 = 0;
@@ -273,15 +328,22 @@ namespace Battle
                 //std::cout << " 受伤数值:" << static_cast<UInt32>(param) << std::endl;
                 ++count;
             }
+            float backCd = s->GetActionBackCd();
+            if(backCd < 0.1)
+                backCd = 0.1;
+
+            //把行动完成的将领放入准备队列
+            InsertBattlePre(backCd + time, fgt);
         } 
 
-        DelBattleAction();
+        DelBattleImage();
         return count;
     } 
 
+    //物体型技能
     UInt8 BattleSimulator::doObjectMove(float time)
     { 
-        const float oneTime = 0.2;
+        const float oneTime = 0.1;
         UInt8 cnt = time / oneTime;
         std::list<ObjectPackage>& lst = GetObjectpackage();
         if(!lst.size())
@@ -290,6 +352,7 @@ namespace Battle
         UInt8 count = 0;
         for(;it != lst.end();)
         { 
+            bool flag = false;
             for(UInt8 index = 0; index < cnt; ++index)
             {
                 if(it->CanExit())
@@ -297,6 +360,7 @@ namespace Battle
                     it->BuildStream(_packet);
                     it = lst.erase(it);
                     ++count;
+                    flag = true;
                     break;
                 } 
 
@@ -317,8 +381,9 @@ namespace Battle
                     } 
                 } 
                 it->GoNext();
-                ++it;
             }
+            if(!flag)
+                ++it;
         } 
 
         return count;
@@ -339,6 +404,7 @@ namespace Battle
         return count;
     } 
 
+    //武将行动
     UInt16 BattleSimulator::FighterAction(BattleFighter* bf,float curTime)
     { 
         if(!bf)
@@ -373,4 +439,13 @@ namespace Battle
         return 0;
     } 
 
+    void BattleSimulator::RandPosBegin(UInt8 index)
+    { 
+        if(index > 1)
+            return ;
+        if(_fgt[index]->GetClass() != 2 && _fgt[index]->GetClass() != 1)
+            return ;
+
+
+    } 
 }

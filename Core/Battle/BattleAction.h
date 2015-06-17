@@ -5,9 +5,9 @@
 #include "Config.h"
 #include <math.h>
 #include "Common/Stream.h"
-#define FIELD_WIDTH 1440
-#define FIELD_HIGH  9*60
-#define STEP 60
+#define FIELD_WIDTH 1200
+#define STEP 36
+#define FIELD_HIGH  10*STEP
 
 #define MIN(x,y) x>y?y:x
 #define MIN_3(x,y,z) MIN((MIN(x,y)),z)
@@ -26,9 +26,11 @@ namespace Battle
         BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
         BattleActionStream(float curtime, BattleObject*  bo, UInt16 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
         UInt16 GetCurTime(){return _curtime;}
+        UInt16 GetCurTime2(){return _curtime2;}
         BattleObject* GetBattleObject(){ return _bo;}
         UInt16 GetParam(){ return _prarm;}
     };
+
     class BattleAction
     {
         public:

@@ -85,7 +85,7 @@ namespace GObject
     ChatHold * Clan::GetChatHold()
     { 
         if(!chatHold)
-            chatHold = new ChatHold(C_CHAT_MAX);
+            chatHold = new ChatHold(2,C_CHAT_MAX);
         return chatHold;
     } 
 
@@ -137,7 +137,7 @@ namespace GObject
                 case 0:
                     {
                         if(!_players[i]->GetRecChat(e_chat_clan))
-                        return ;
+                            return ;
                     }
                     break;
             } 
@@ -181,6 +181,8 @@ namespace GObject
             st << static_cast<UInt32>(pl->GetVar(VAR_BATTLE_POINT));
             st << static_cast<UInt8>(pl->GetLevel());
         } 
+        st << static_cast<UInt32>(0);
+        st << static_cast<UInt32>(0);
     } 
 
     UInt8 Clan::GetPosCount(UInt8 pos)

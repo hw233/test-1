@@ -653,7 +653,7 @@ void BattleGround::start()
             } 
         } 
         ++Round;
-        std::cout << "回合：" << static_cast<UInt32>(Round) << std::endl;
+        //std::cout << "回合：" << static_cast<UInt32>(Round) << std::endl;
     }while(count < (map_player.size() - 1) && Round < 200);
 
     _pack.data<UInt16>(offset) = actCount;
@@ -703,7 +703,7 @@ void BattleGround::preStart()  //需要玩家手动操作
         _pack << count ;
         std::vector<GObject::Player *> vec = it->second;
 
-        std::cout << std::endl << "势力：" << static_cast<UInt32>(it->first) <<std::endl;
+        //std::cout << std::endl << "势力：" << static_cast<UInt32>(it->first) <<std::endl;
         for(UInt8 i = 0; i < vec.size(); ++i)
         {
             //GObject::Player * pl = vec[i];
@@ -718,7 +718,7 @@ void BattleGround::preStart()  //需要玩家手动操作
             }
         }
         _pack.data<UInt8>(offset) = count;
-        std::cout << "  人数"<< static_cast<UInt32>(count);
+        //std::cout << "  人数"<< static_cast<UInt32>(count);
     }
 } 
 

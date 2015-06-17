@@ -151,8 +151,17 @@ namespace GObject
         return value; 
     } 
 
-    UInt32 Fighter::GetTotalPower() const
+    UInt32 Fighter::GetTotalPower() 
     {
-        return _hp+_attack+_defend+_magatk+_magdef+_critical+_criticalDef+_hit+_evade;
+        //return (_hp+_attack+_defend+_magatk+_magdef+_critical+_criticalDef+_hit+_evade) * (GetVar(FVAR_QUALITY)+1);
+        return GetFighterAttr(e_attr_hp) 
+            + GetFighterAttr(e_attr_attack)
+            + GetFighterAttr(e_attr_magatk)
+            + GetFighterAttr(e_attr_defend)
+            + GetFighterAttr(e_attr_magdef)
+            + GetFighterAttr(e_attr_critical)
+            + GetFighterAttr(e_attr_criticalDef)
+            + GetFighterAttr(e_attr_hit)
+            + GetFighterAttr(e_attr_evade);
     }
 }

@@ -13,9 +13,9 @@ attacker:	0 1 2 3 4
 5 6 7 8 9
 */
 
-#define FIELD_WIDTH 1440
-#define FIELD_HIGH  9*60
-#define STEP 60
+#define FIELD_WIDTH 1200
+#define STEP 36
+#define FIELD_HIGH  10*STEP
 
 namespace GObject
 {
@@ -80,7 +80,7 @@ namespace Battle
             }
             */
 
-            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY);
+            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY, BattleFighter* cur = NULL);
             BattleObject * GetTargetForRide(UInt8 side , UInt16 posX , UInt16 posY,UInt8 direction = 2);
             void GetTargetList(UInt8 side, BattleFighter* bf, std::vector<BattleObject *>& vec, UInt16 , UInt8 flag = 0);
 
@@ -99,7 +99,11 @@ namespace Battle
             std::vector<ActionPackage> GetTimeBattleAction(float& time);
 
             void InsertTimeBattleAction(float time , ImagePackage ip);
+            void InsertBattlePre(float time, BattleFighter* fgt);
+
             std::vector<ImagePackage> GetTimeBattleImage(float& time);
+            std::vector<BattleFighter*> GetBattlePre(float& time);
+
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -111,11 +115,11 @@ namespace Battle
 
             float GetMinTime();
 
-            std::vector<BattleFighter*> GetBattlePre(float& time);
-
             void DelBattleImage();
             void DelBattleAction();
             void DelBattlePre();
+
+            void FieldPrint();
         protected:
 
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标

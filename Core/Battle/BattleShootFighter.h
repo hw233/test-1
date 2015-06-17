@@ -21,9 +21,9 @@ namespace Battle
             virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 6;}
 
-            virtual void NormolAttack();
-            virtual void NormolImage();
-            virtual void NormolObject();
+            virtual UInt8 NormolAttack();
+            //virtual UInt8 NormolImage();
+            //virtual UInt8 NormolObject();
         private:
             //BattleObject * _target;
     };

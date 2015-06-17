@@ -129,7 +129,7 @@ namespace Battle
 
             void setMainFighter(BattleFighter * bf){
                 m_mainFighter = bf;
-                setHP(m_mainFighter->getHP());
+                setHP(1000);//m_mainFighter->getHP());
                 for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
                 { 
                     attrBase[i] = m_mainFighter->GetBattleAttr(i);
@@ -170,7 +170,7 @@ namespace Battle
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance(){ return -1;}
 
-            UInt16 GetSpeed() {return 37;} 
+            virtual UInt16 GetSpeed() {return 0;} 
 
             virtual void resetBattleStatue() = 0;
 
@@ -241,20 +241,22 @@ namespace Battle
             void AddSkill() ;
             
             //BattleAction
-            virtual void NormolAttack();
-            virtual void NormolImage();
-            virtual void NormolObject();
+            virtual UInt8 NormolAttack();
+            virtual UInt8 NormolImage();
+            virtual UInt8 NormolObject();
 
             BattleObject * GetTarget(){ return _target;};
 
             void SetBattleDirection(UInt8 direct){ if(_direction == direct) return; _direction = direct;}
             virtual UInt8 GetBattleDirection(){return _direction;}  //1左2右0全部
-            virtual UInt8 BeForAction() { return 0;};
+            virtual UInt8 BeForAction() { PreGetObject(); return 0;};
+
+            void BattlePrintf();
         protected:
 
             UInt8 _crick;  //硬直
-            UInt8 _actionLast ;   //动作持续
-            UInt8 _actionBackLast ;   //动作收招持续
+            float _actionLast ;   //动作持续
+            float _actionBackLast ;   //动作收招持续
             //std::list<BattleObject*>  targetList; //对象列表 (待解)
             UInt8 _actionType;  // 动作类型
 
