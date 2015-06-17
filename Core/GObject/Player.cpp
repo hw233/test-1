@@ -246,7 +246,7 @@ namespace GObject
         { 
             (it->second)->MakeFighterInfo(st);
         } 
-        
+        st<<static_cast<UInt8>(1);     
         std::cout << "获得玩家信息：" << GetName() << std::endl;
 
     }
