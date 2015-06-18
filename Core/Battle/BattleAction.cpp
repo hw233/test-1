@@ -17,6 +17,9 @@ namespace Battle
 
     bool ObjectPackage::CheckFighterInSCope(BattleObject* bo)  //非指向性
     { 
+        if(_bo != NULL && bo != _bo)
+            return false;
+
         if(CanBeCounted(bo->getPosX(),bo->getPosY()))
             return false;
 
@@ -56,6 +59,43 @@ namespace Battle
             st << static_cast<UInt16>(vec_struct[i].GetParam());
         } 
         return 1;
+    } 
+    void ObjectPackage::GoForTarget()
+    { 
+        UInt16 advance = static_cast<UInt16>(sqrt(_xAdd*_xAdd + _yAdd *_yAdd));
+        UInt16 targetX = _bo->getPosX();
+        UInt16 targetY = _bo->getPosY();
+        UInt16 x = _x;
+        UInt16 y = _y;
+        UInt16 distanceX = x > targetX ? x - targetX:targetX -x;
+        UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
+
+        if(!distanceX && !distanceY)
+            return ;
+        while(advance--)
+        { 
+            if(!distanceX && !distanceY)
+                break;
+
+            if( distanceX > distanceY)
+            {
+                if(x > targetX && x > 0) 
+                    --x;
+                else
+                    ++x;
+                --distanceX;
+            }
+            else
+            {
+                if(y > targetY && x > 0) 
+                    --y;
+                else
+                    ++y;
+                --distanceY;
+            }
+        } 
+        _x = x;
+        _y = y;
     } 
 }
 

@@ -35,6 +35,8 @@ namespace GObject
             //DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
             return 0;
         } 
+        if(!CheckApplicant(pl))
+            return 1;
 
         _applicant.push_back(pl);
 
@@ -245,5 +247,14 @@ namespace GObject
             if(_players[i]->GetClanPos() == pos)
                 _players[i]->send(st);
         } 
+    } 
+    bool Clan::CheckApplicant(Player* pl)
+    { 
+        for(UInt8 i = 0; i < _applicant.size(); ++i)
+        { 
+            if(_applicant[i] == pl)
+                return false;
+        } 
+        return true;
     } 
 }

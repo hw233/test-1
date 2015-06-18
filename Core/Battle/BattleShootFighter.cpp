@@ -45,7 +45,7 @@ namespace Battle
             if(targetZ == 0)
                 targetZ = 1;
             ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-            op.setObjectDirection(getPosX(),getPosY(),targetX>getPosX(),targetY>getPosY(),100*SUB(targetX,getPosX())/targetZ, 100*SUB(targetY,getPosY())/targetZ, 50);
+            op.setObjectDirection(getPosX(),getPosY(),targetX>getPosX(),targetY>getPosY(),100*SUB(targetX,getPosX())/targetZ, 100*SUB(targetY,getPosY())/targetZ, 50 , _target);
             op.setObjectTime(_actionLast);
             GetField()->InsertObjectPackage(op);
 

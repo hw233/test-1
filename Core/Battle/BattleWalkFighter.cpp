@@ -36,8 +36,11 @@ namespace Battle
                 {
                     _st << static_cast<UInt8>(_nowTime);
                     _st << GetBSNumber();
-                    _st << static_cast<UInt8>(wait);
+                    _st << static_cast<UInt8>(4);
                     _st << _target->GetBSNumber();
+                    std::cout << "时间点" << GetNowTime2() << std::endl;
+                    std::cout << "战将编号" << static_cast<UInt32>(GetBSNumber()) << std::endl;
+                    std::cout << "目标编号" << _target->GetBSNumber() << std::endl;
                 }
                 break;
             case e_attack_near:

@@ -199,7 +199,7 @@ namespace Battle
         } 
         if(!flag)
         {
-            GetField()->InsertBattlePre(GetNowTime2() + 0.2, this);
+            GetField()->InsertBattlePre(GetNowTime2() + 0.1, this);
         }
         return ;
     } 

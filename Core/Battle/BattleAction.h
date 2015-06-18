@@ -119,8 +119,8 @@ ActionPackage(){}
     class ObjectPackage : public BattleAction
     { 
         public:
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time2(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
             UInt32 GetAttack(){return _attack;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
@@ -141,12 +141,19 @@ ActionPackage(){}
                     --_count;
                     return;
                 } 
+                if(_bo != NULL)
+                { 
+                    GoForTarget();
+                    return ;
+                } 
 
                 if(_xAdd)
                     _x += _xAdd * _flagX - _xAdd * !_flagX;
                 if(_yAdd)
                     _y += _yAdd * _flagY - _yAdd * !_flagY;
             } 
+
+            void GoForTarget();
 
             bool CanExit()
             { 
@@ -188,7 +195,7 @@ ActionPackage(){}
                 return res < 0;
             }
 
-            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad)  //飞行系
+            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleObject* bo = NULL)  //飞行系
             { 
                 _x = x;
                 _y = y;
@@ -197,6 +204,7 @@ ActionPackage(){}
                 _flagX = flagX;
                 _flagY = flagY;
                 _rad = rad;
+                _bo = bo;
             } 
 
             void setObjectTime(UInt8 count ) { _count = count;}
@@ -219,6 +227,7 @@ ActionPackage(){}
 
             //            UInt16 skillScopeId;
             BattleFighter * _bf; //攻击发起者
+            BattleObject * _bo; //受击者
             UInt16 _time;
             float _time2;
 
@@ -229,7 +238,7 @@ ActionPackage(){}
 
             UInt8  _flagX;
             UInt8  _flagY;
-            UInt16 _rad;
+            UInt16 _rad;   //物体距离
 
             UInt8 _count;
 

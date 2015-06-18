@@ -66,6 +66,7 @@ namespace GObject
 
             static Clan *GetBossClan();
 
+            bool CheckApplicant(Player *pl);
 
         private:
             std::vector<Player* > _players;

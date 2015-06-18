@@ -62,9 +62,9 @@ namespace Battle
             case e_run:
                 if(1)
                 {
-                    //COUNT<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    //COUNT<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
-                    //COUNT<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
+                    std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
+                    std::cout<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
                 }
                 if(!isRunSend)
                 {
@@ -73,10 +73,10 @@ namespace Battle
                     _st << static_cast<UInt8>(0);
                     _st << static_cast<UInt16>(_battleTargetY);
                     isRunSend = true ;
-                    //COUNT << " 回合数：" << static_cast<UInt32>(_nowTime);
-                    //COUNT << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    //COUNT << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
-                    //COUNT << std::endl;
+                    std::cout << " 回合数：" << static_cast<UInt32>(_nowTime);
+                    std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    std::cout << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
+                    std::cout << std::endl;
                 } 
                 break;
             case e_attack_near:

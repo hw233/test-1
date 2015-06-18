@@ -216,8 +216,8 @@ namespace Battle
             { 
                 st << static_cast<UInt8>( _fighters[i][j]->GetBSNumber()); 
                 st << static_cast<UInt16>(_fighters[i][j]->GetId());
-                //st << static_cast<UInt16>(_fighters[i][j]->getPosX());
-                //st << static_cast<UInt16>(_fighters[i][j]->getPosY());
+                st << static_cast<UInt16>(_fighters[i][j]->getPosX());
+                st << static_cast<UInt16>(_fighters[i][j]->getPosY());
                 st << static_cast<UInt16>(_fighters[i][j]->getHP());
                 //std::cout << " 入场战将分部" << std::endl;
                 //std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
