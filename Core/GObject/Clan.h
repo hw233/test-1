@@ -15,6 +15,14 @@ namespace GObject
 {
     class Player;
     class ChatHold;
+
+    enum
+    {
+        e_clan_header = 0,
+        e_clan_header2 = 1,
+        e_clan_member  = 3,
+    };
+
     class Clan
     {
         public:
@@ -54,7 +62,11 @@ namespace GObject
 
             UInt16 GetClanNumberCount(){ return _players.size();}
 
+            void SendStreamOnPos(UInt8 pos, Stream st);
+
             static Clan *GetBossClan();
+
+
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;

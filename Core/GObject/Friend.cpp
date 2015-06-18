@@ -14,7 +14,8 @@ namespace GObject
         eFriendType type = (eFriendType)index;
         _friends[type].insert(friendOne);
     }
-
+    
+    /*
     void FriendManager::SendFriendList(UInt8 type,UInt8 index)
     { 
         eFriendType ftype = (eFriendType)type;
@@ -48,6 +49,46 @@ namespace GObject
         st<<Stream::eos;
         m_owner->send(st);
     }
+    */
+
+    void FriendManager::SendFriendList()
+    {
+         UInt16 totalNum = 0;
+         for( UInt8 i = friend_normal; i < friend_max ; ++i)
+         {
+             totalNum += _friends[i].size();
+         }
+         if( totalNum == 0 )
+         {
+             return ;
+         }
+         Stream st(REP::FRIEND_LIST);
+         for(UInt8 index = friend_normal; index < friend_max; ++index)
+         {
+             GetFriendListStream((eFriendType)index,st);
+         }
+         st<<Stream::eos;
+         m_owner->send(st);
+    }
+
+
+    void FriendManager::GetFriendListStream(eFriendType type, Stream &st)
+    {
+        if( type < 0 || type >= friend_max )
+        {
+            return;
+        }
+        if( type == friend_normal )
+        {
+            st<<static_cast<UInt8>(m_owner->GetFriendMax());
+        }
+        st<<static_cast<UInt8>(_friends[type].size());
+        for( auto it = _friends[type].begin(); it != _friends[type].end(); ++it )
+        {
+            (*it)->GetSelfInfoStream(st);
+        }
+    }
+
 
 
     bool FriendManager::FindFriendByName(const std::string& name)
@@ -253,7 +294,8 @@ namespace GObject
             return true;
         return false;
     }
-
+    
+    /*
     void FriendManager::SendFriendBaseInfo()
     {
         Stream st(REP::FRIEND_BASEINFO);
@@ -264,4 +306,5 @@ namespace GObject
         m_owner->send(st);
 
     }
+    */
 }

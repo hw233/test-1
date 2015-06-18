@@ -87,8 +87,8 @@ namespace Battle
         };
 
         static UInt16 YPos[][11] = {
-            {120,120,120,108,108,192,192,36,36,264,264},
-            {120,120,120,108,108,192,192,36,36,264,264},
+            {120,120,120,192,192,108,108,264,264,36,36},
+            {120,120,120,192,192,108,108,264,264,36,36},
         };
 
 
@@ -114,7 +114,9 @@ namespace Battle
     { 
         _packet.init(0x81);
         InitFightersSide(0);
+        RandPosBegin(0);
         InitFightersSide(1);
+        RandPosBegin(1);
         //UInt32 time  = 0;
 
         GetBSEnterInfo(_packet);
@@ -206,7 +208,7 @@ namespace Battle
             default:
                 fgt =  new BattleRideFighter(bf,f,pointX,pointY);
         } 
-        fgt = new BattleShootFighter(bf,f,pointX,pointY);
+        //fgt = new BattleShootFighter(bf,f,pointX,pointY);
         if(!fgt)
             return NULL;
         fgt->AddSkill();
@@ -445,7 +447,37 @@ namespace Battle
             return ;
         if(_fgt[index]->GetClass() != 2 && _fgt[index]->GetClass() != 1)
             return ;
+        for(UInt8 i = 0; i < 5 ; ++i)
+        { 
+            UInt32 rand = uRand(99);
+            switch(i)
+            { 
+                case 0:
+                    {
+                        BattleFighter * fgt = _fighters[index][1+rand/50];
+                        setObjectXY(fgt->getPosX(),fgt->getPosY()-STEP,fgt);
 
-
+                        BattleFighter * fgt1 = _fighters[index][2-rand/50];
+                        setObjectXY(fgt1->getPosX(),fgt1->getPosY()+STEP,fgt1);
+                    }
+                    break;
+                case 1:
+                case 3:
+                    {
+                        BattleFighter * fgt = _fighters[index][3+rand/50];
+                        setObjectXY(fgt->getPosX(),fgt->getPosY()+STEP, fgt);
+                    }
+                    break;
+                case 2:
+                case 4:
+                    {
+                        BattleFighter * fgt = _fighters[index][3+rand/50];
+                        setObjectXY(fgt->getPosX(),fgt->getPosY()-STEP, fgt);
+                    }
+                    break;
+                default:
+                    break;
+            } 
+        }
     } 
 }

@@ -224,7 +224,7 @@ void OnFriendAddReq( GameMsgHdr& hdr,FriendAddReq& far)
         player->GetFriendManager()->AgreeAddFriend(far._name);
 }
 
-
+/*
 struct FriendListReq
 {
     UInt8 type;
@@ -238,6 +238,11 @@ void OnFriendListReq(GameMsgHdr& hdr,FriendListReq& flr)
     player->GetFriendManager()->SendFriendList(flr.type,flr.index);
 }
 
+void OnFriendListReq(GameMsgHdr& hdr,const void* data)
+{
+    MSG_QUERY_CONN_PLAYER(conn,player);
+    player->GetFriendManager()->SendFriendList();
+}
 struct FriendBaseInfoReq
 {
     MESSAGE_DEF(REQ::FRIEND_BASEINFO);
@@ -249,6 +254,8 @@ void OnFriendBaseInfoReq( GameMsgHdr& hdr,FriendBaseInfoReq& fbr)
     MSG_QUERY_CONN_PLAYER(conn,player);
     player->GetFriendManager()->SendFriendBaseInfo();
 }
+*/
+
 
 void OnChat(GameMsgHdr& hdr, const void * data)
 { 
@@ -580,6 +587,5 @@ void OnFindUp(GameMsgHdr& hdr, const void * data)
     st << Stream::eos;
     player->send(st);
 }
-
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

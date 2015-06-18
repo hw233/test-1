@@ -61,6 +61,10 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
         GameMsgHdr hdr(0x156,WORKER_THREAD_COUNTRY_1,player,sizeof(type));
         GLOBAL().PushMsg(hdr,&type);
     }
+    if(1)
+    {
+        player->GetFriendManager()->SendFriendList();
+    }
 
 	player->Login();
 	struct in_addr ip;

@@ -1,7 +1,9 @@
 #include "Clan.h"
 #include "Player.h"
+#include "MsgID.h"
 
 #define C_CHAT_MAX 30
+
 namespace GObject
 {
     Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_picIndex(0),_creater(creater) { } 
@@ -35,6 +37,16 @@ namespace GObject
         } 
 
         _applicant.push_back(pl);
+
+        Stream st(REP::CLAN_APPLY);
+        st << pl->GetName();
+        st << pl->GetVar(VAR_BATTLE_POINT);
+        st << static_cast<UInt8>(pl->GetLevel());
+        st << Stream::eos;
+
+        SendStreamOnPos(e_clan_header,st);
+        SendStreamOnPos(e_clan_header2,st);
+
         if(!update)
             DB1().PushUpdateData("REPLACE INTO  `player_apply_clan`(`clanId`, `playerId`,`time`) VALUES(%u, %" I64_FMT "u , %u)",_id, pl->getId(),TimeUtil::Now() );   //LIBOUInt64
         return 0;
@@ -59,8 +71,13 @@ namespace GObject
                     _players.push_back(pl);
                     pl->SetClan(this);
                     pl->SetClanPos(1);
-                    DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
+                    DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u)",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
                     DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
+                    Stream st(REP::CLAN_INFO);
+                    IsTheFounder(pl);
+                    GetClanInfo2(st);
+                    st << Stream::eos;
+                    pl->send(st);
                 }
                 _applicant.erase(it);
                 break;
@@ -219,5 +236,14 @@ namespace GObject
             }
         }
         return NULL;
+    } 
+
+    void Clan::SendStreamOnPos(UInt8 pos, Stream st)
+    { 
+        for(UInt8 i = 0; i < _players.size(); ++i)
+        { 
+            if(_players[i]->GetClanPos() == pos)
+                _players[i]->send(st);
+        } 
     } 
 }

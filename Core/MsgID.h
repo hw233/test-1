@@ -65,8 +65,9 @@ namespace REQ
     const UInt8 CLAN_LIST        = 0x70;
     const UInt8 CLAN_CREATE        = 0x71;
     //const UInt8 CLAN_FLASH        = 0x72;
-    const UInt8 CLAN_OPTION       = 0x73;
     const UInt8 CLAN_INFO       = 0x72;
+    const UInt8 CLAN_OPTION       = 0x73;
+    const UInt8 CLAN_APPLY       = 0x74;
 
 
     /*治理换将*/
@@ -298,7 +299,7 @@ namespace REQ
     /**帮派创建 */
     //const UInt8 CLAN_CREATE         = 0x62;// 0x92
     /**申请加入帮派 */
-    const UInt8 CLAN_APPLY          = 0x63;// 0x93
+    //const UInt8 CLAN_APPLY          = 0x63;// 0x93
     /**帮派成员操作 */
     const UInt8 CLAN_OPERATE        = 0x64;// 0x94
     /**帮派信息改变 */
@@ -603,6 +604,7 @@ namespace REP
 
     const UInt8 CLAN_INFO           = 0x72;
 
+    const UInt8 CLAN_APPLY         = 0x74;
 
 
 
