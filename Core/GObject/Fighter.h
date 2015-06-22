@@ -51,7 +51,7 @@ namespace GObject
             //Get
             inline UInt32 getId() { return _id; }
             inline Player * GetOwner() { return _owner; }
-            inline UInt8 GetClass() {return _class;}
+            inline UInt8 GetClass() {return _typeId;}
             inline UInt8 GetSex(){return _sex;}
             inline ItemWeapon * GetWeapon() { return _weapon; } 
             inline ItemArmor * GetArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }

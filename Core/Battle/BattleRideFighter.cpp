@@ -73,7 +73,7 @@ namespace Battle
                     _st << static_cast<UInt8>(0);
                     _st << static_cast<UInt16>(_battleTargetY);
                     isRunSend = true ;
-                    std::cout << " 回合数：" << static_cast<UInt32>(_nowTime);
+                    std::cout << " 回合数：" << (GetNowTime2());
                     std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
                     std::cout << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
                     std::cout << std::endl;
@@ -131,12 +131,12 @@ namespace Battle
     UInt16 BattleRideFighter::GetTargetDistance()
     { 
         if(!_target || !GetField())
-            return -1;
+            return -2;
         _target->SetNowTime(_nowTime);
         if(!_target->GetGone())
             _target->GoForward();
         if(CheckTarget())
-            return -1;
+            return -2;
         return GetField()->getDistance(this,_target);
     } 
 
@@ -179,7 +179,7 @@ namespace Battle
         if(!isRunSend)
         {
             if(uRand(100) < 40)  //XXX
-                return 1;
+                ;//return 1;
         } 
 
         if(!GetGone())

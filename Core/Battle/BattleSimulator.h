@@ -51,6 +51,7 @@ namespace Battle
             
             void RandPosBegin(UInt8);
 
+            void PosPrintf(UInt8 index);
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

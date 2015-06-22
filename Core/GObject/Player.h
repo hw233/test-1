@@ -221,7 +221,7 @@ namespace GObject
 
             void ChatForWorld(std::string text);
             void ChatForClan(std::string text);
-            void ChatForFriend(IDTYPE playerId, std::string text);
+            void ChatForFriend(std::string name, std::string text);
 
             void AddMail(UInt32 id, UInt8 update = 1);
             UInt8 ReciveMail(UInt32 id,UInt8 flag = 0);

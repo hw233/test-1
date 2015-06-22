@@ -26,7 +26,7 @@ namespace Battle
         EnterX = 0;
         EnterY = 0;
         _crickSum = 0;
-        _sideInBS = 0;
+        //_sideInBS = 0;
         return ;
     } 
 

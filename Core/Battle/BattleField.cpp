@@ -504,4 +504,37 @@ namespace Battle
                 std::cout << "战将编号:" << static_cast<UInt32>(_fighters[i][j]->GetBSNumber()) << std::endl;
         } 
     } 
+
+    void BattleField::BattleActionPrintf(UInt8 index)
+    { 
+        switch(index)    
+        { 
+            case 0:
+                { 
+                    std::cout << "准备攻击者 ";
+                    if(FieldAttack.begin() == FieldAttack.end())
+                        return ;
+                    std::vector<ActionPackage> vec = FieldAttack.begin()->second;
+                    std::cout << "time：" << FieldAttack.begin()->first << std::endl;
+                    for(UInt8 i = 0; i < vec.size(); ++i)
+                    { 
+                        std::cout << "战将编号" << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
+                    } 
+                } 
+                break;
+            case 1:
+                { 
+                    std::cout << "魔法行动列表:";
+                    if(FieldImage.begin() == FieldImage.end())
+                        return ;
+                    std::vector<ImagePackage> vec = FieldImage.begin()->second;
+                    std::cout << "time：" << FieldImage.begin()->first << std::endl;
+                    for(UInt8 i = 0; i < vec.size(); ++i)
+                    { 
+                        std::cout << " 战将编号: " << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
+                    } 
+                } 
+                break;
+        } 
+    } 
 }

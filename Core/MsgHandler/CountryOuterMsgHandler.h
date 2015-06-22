@@ -263,7 +263,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt8 opt = 0;
-    UInt64 playerId = 0;
+    std::string name;
     std::string context;
     br >> type >> opt;
     if(opt)
@@ -274,7 +274,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
 
     br >> context;
     if(type ==1)
-        br >>  playerId;
+        br >>  name;
 
     switch(type)
     { 
@@ -285,7 +285,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
             }
         case 1:
             {
-                player->ChatForFriend(playerId, context);
+                player->ChatForFriend(name, context);
                 break;
             }
         case 2:
@@ -499,8 +499,8 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
                 GObject::Player* pl = GObject::globalNamedPlayers[name];
                 if(!pl)
                     break;
-                if(!type)
-                    player->GetClan()->Allow(pl);
+                player->GetClan()->Allow(pl,type);
+                break;
             } 
         case 0x07:
             {

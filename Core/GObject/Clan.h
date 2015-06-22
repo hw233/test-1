@@ -71,7 +71,7 @@ namespace GObject
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;
-            ChatHold * chatHold;
+            ChatHold * _chatHold;
 
             UInt32 _id;
             std::string _name;

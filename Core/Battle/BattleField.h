@@ -120,6 +120,8 @@ namespace Battle
             void DelBattlePre();
 
             void FieldPrint();
+
+            void BattleActionPrintf(UInt8 index);
         protected:
 
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标

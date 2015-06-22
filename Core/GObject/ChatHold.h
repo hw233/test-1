@@ -20,13 +20,13 @@ namespace GObject
     class ChatHold
     {
         public:
-            ChatHold(UInt8 type,UInt8 max = 0):_type(type),CountMax(max){}
+            ChatHold(UInt8 type,UInt8 max = 0):_type(type),_countMax(max){ _lst.clear();}
             void InsertChat(Player * pl, std::string text);
             void GetStream(Stream& st,UInt8 count = 1);
         private:
-            std::list<ChatStruct>  lst;
+            std::list<ChatStruct> _lst;
             UInt8 _type;
-            UInt8 CountMax;
+            UInt8 _countMax;
     };
 }
 #endif // CHATHOLD_H_

@@ -464,14 +464,14 @@ namespace Battle
                 case 1:
                 case 3:
                     {
-                        BattleFighter * fgt = _fighters[index][3+rand/50];
+                        BattleFighter * fgt = _fighters[index][i*2 - 1+rand/50];
                         setObjectXY(fgt->getPosX(),fgt->getPosY()+STEP, fgt);
                     }
                     break;
                 case 2:
                 case 4:
                     {
-                        BattleFighter * fgt = _fighters[index][3+rand/50];
+                        BattleFighter * fgt = _fighters[index][i*2 - 1+rand/50];
                         setObjectXY(fgt->getPosX(),fgt->getPosY()-STEP, fgt);
                     }
                     break;
@@ -479,5 +479,16 @@ namespace Battle
                     break;
             } 
         }
+    } 
+    void BattleSimulator::PosPrintf(UInt8 index)
+    { 
+        for(UInt8 i = 0; i < 10; ++i)
+        { 
+            BattleFighter * fgt = _fgt[index]->getMyFighters(i);
+            if(!fgt || fgt->getHP() == 0)
+                return ;
+
+            std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt->getPosX()) << " , " << static_cast<UInt32>(fgt->getPosY()) << std::endl;
+        } 
     } 
 }

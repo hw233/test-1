@@ -6,7 +6,9 @@
 
 namespace GObject
 {
-    Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_picIndex(0),_creater(creater) { } 
+    Clan::Clan(UInt32 id, std::string name, Player* creater):_id(id),_name(name),_picIndex(0),_creater(creater) { 
+        _chatHold = NULL; 
+    } 
     
     void Clan::LoadClanInfo(Player* leader, std::string announcement,std::string announcement2, UInt8 personMax)
     { 
@@ -67,6 +69,7 @@ namespace GObject
         { 
             if(*it == pl)
             { 
+                _applicant.erase(it);
                 if(!type)
                 {
                     UInt32 now = TimeUtil::Now();
@@ -76,12 +79,11 @@ namespace GObject
                     DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u)",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
                     DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
                     Stream st(REP::CLAN_INFO);
-                    IsTheFounder(pl);
+                    st << IsTheFounder(pl);
                     GetClanInfo2(st);
                     st << Stream::eos;
                     pl->send(st);
                 }
-                _applicant.erase(it);
                 break;
             } 
         } 
@@ -103,9 +105,9 @@ namespace GObject
 
     ChatHold * Clan::GetChatHold()
     { 
-        if(!chatHold)
-            chatHold = new ChatHold(2,C_CHAT_MAX);
-        return chatHold;
+        if(!_chatHold)
+            _chatHold = new ChatHold(2,C_CHAT_MAX);
+        return _chatHold;
     } 
 
     std::vector<Player*>::iterator Clan::HasMember(Player* pl)
@@ -151,16 +153,17 @@ namespace GObject
     { 
         for(UInt8 i = 0; i < _players.size(); ++i)
         {
+            _players[i]->send(st);
+            continue;
             switch(index)
             { 
                 case 0:
                     {
-                        if(!_players[i]->GetRecChat(e_chat_clan))
-                            return ;
+                        if(_players[i]->GetRecChat(e_chat_clan))
+                            _players[i]->send(st);
                     }
                     break;
             } 
-            _players[index]->send(st);
         }
     } 
     void Clan::GetClanInfo(Stream& st)

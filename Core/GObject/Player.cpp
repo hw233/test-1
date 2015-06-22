@@ -314,9 +314,9 @@ namespace GObject
         st << Stream::eos;
         GetClan()->Boradcast(st,0);
     } 
-    void Player::ChatForFriend(IDTYPE playerId, std::string text)
+    void Player::ChatForFriend(std::string name, std::string text)
     { 
-        Player* pl = globalPlayers[playerId];
+        Player* pl = globalNamedPlayers[name];
         if(!pl)
             return ;
         if(!GetFriendManager()->HasFriend(pl))
@@ -332,6 +332,7 @@ namespace GObject
         pl->GetChatHold()->GetStream(st,1);
         st << Stream::eos;
         pl->send(st);
+        send(st);
     } 
 
     void Player::AddMail(UInt32 id, UInt8 update)
