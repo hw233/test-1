@@ -29,7 +29,7 @@ namespace Battle
             virtual UInt16 GetSpeed() {return 37;} 
             virtual UInt8 BeForAction();
         private:
-            BattleFighter * _target ; 
+            //BattleFighter * _target ; 
             UInt8 count; //控制来回次数
             bool isRunSend;
             bool isGone;

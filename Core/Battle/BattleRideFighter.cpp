@@ -132,9 +132,11 @@ namespace Battle
     { 
         if(!_target || !GetField())
             return -2;
+#if 0
         _target->SetNowTime(_nowTime);
         if(!_target->GetGone())
             _target->GoForward();
+#endif
         if(CheckTarget())
             return -2;
         return GetField()->getDistance(this,_target);
@@ -182,8 +184,8 @@ namespace Battle
                 ;//return 1;
         } 
 
-        if(!GetGone())
-            GoForward();
+        //if(!GetGone())
+        //    GoForward();
 
         BuildLocalStream(e_run);
         return 0;

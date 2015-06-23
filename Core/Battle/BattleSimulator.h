@@ -45,13 +45,15 @@ namespace Battle
             UInt8 doAction(float time = 0);
             UInt8 doAttack(float time = 0);
             UInt8 doImage(float time = 0);
-            UInt8 doObjectMove(float time = 0);
+            UInt8 doObjectMove(float time = 0, UInt8 cnt = 1);
             UInt8 ClearObjectPackage();
             UInt16 FighterAction(BattleFighter* bf,float curTime);
             
             void RandPosBegin(UInt8);
 
             void PosPrintf(UInt8 index);
+
+            void FighterMove(UInt8 index,UInt8 count);
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

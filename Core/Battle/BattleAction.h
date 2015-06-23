@@ -5,7 +5,7 @@
 #include "Config.h"
 #include <math.h>
 #include "Common/Stream.h"
-#define FIELD_WIDTH 1200
+#define FIELD_WIDTH 1520
 #define STEP 36
 #define FIELD_HIGH  10*STEP
 
@@ -26,7 +26,7 @@ namespace Battle
         BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
         BattleActionStream(float curtime, BattleObject*  bo, UInt16 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
         UInt16 GetCurTime(){return _curtime;}
-        UInt16 GetCurTime2(){return _curtime2;}
+        float GetCurTime2(){return _curtime2;}
         BattleObject* GetBattleObject(){ return _bo;}
         UInt16 GetParam(){ return _prarm;}
     };
@@ -173,11 +173,20 @@ ActionPackage(){}
                 int x3 =static_cast<int>(x);
                 int y3 =static_cast<int>(y);
                 int res = (abs((y1-y2)*x3+(x2-x1)*y3-y1*x2+x1*y2)/sqrt(((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2))));
+
+                int res1 = sqrt((x1-x3)*(x1-x3) + (y1-y3)*(y1-y3));
+                int res2 = sqrt((x2-x3)*(x2-x3) + (y2-y3)*(y2-y3));
+
+                if(!CanBeCounted(x,y))
+                    return static_cast<UInt16>(MIN(res1,res2));
+                //return static_cast<UInt16>(MIN_3(res,res1,res2));
+                
                 return static_cast<UInt16>(res);
             } 
 
-            bool CanBeCounted(UInt16 x, UInt16 y)
+            bool CanBeCounted(UInt16 x, UInt16 y)  //判断斜率是否相同
             { 
+                //return false;
                 int x1 =static_cast<int>(_x);
                 int y1 =static_cast<int>(_y);
                 int x2 =static_cast<int>(_x + _xAdd);
@@ -185,14 +194,21 @@ ActionPackage(){}
                 int x3 =static_cast<int>(x);
                 int y3 =static_cast<int>(y);
 
-                int res  = (x3-x1)*(x2-x3) + (y3 - y1)*(y2 - y3) ;
-                if(res == 0)
-                { 
-                    if(x == _x || y == _y)
-                        return false;
-                    return true;
-                } 
-                return res < 0;
+                int res1  = (x3-x1)*(x2-x1) + (y3 - y1)*(y2 - y1) ;
+                int res2  = (x3-x2)*(x1-x2) + (y3 - y2)*(y1 - y2) ;
+                
+                if(res1 < 0 || res2 < 0)
+                    return false;
+
+                return true;
+
+                //if(res == 0)
+                //{ 
+                //    if(x == _x || y == _y)
+                //        return false;
+                //    return true;
+                //} 
+                //return res < 0;
             }
 
             void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleObject* bo = NULL)  //飞行系
@@ -215,6 +231,8 @@ ActionPackage(){}
                 vec_struct.push_back(BattleActionStream(curtime, bo, param));
             } 
             UInt8 BuildStream(Stream& st);
+
+            bool CheckFighterAttacked(BattleObject * bo);
         public:
             std::vector< BattleActionStream >  vec_struct;
         private:

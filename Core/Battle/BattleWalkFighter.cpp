@@ -34,7 +34,7 @@ namespace Battle
             case e_run:
                 if(_target)
                 {
-                    _st << static_cast<UInt8>(_nowTime);
+                    _st << static_cast<UInt16>(GetNowTime2() * 100);
                     _st << GetBSNumber();
                     _st << static_cast<UInt8>(4);
                     _st << _target->GetBSNumber();

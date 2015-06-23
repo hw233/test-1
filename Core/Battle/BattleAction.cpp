@@ -20,8 +20,8 @@ namespace Battle
         if(_bo != NULL && bo != _bo)
             return false;
 
-        if(CanBeCounted(bo->getPosX(),bo->getPosY()))
-            return false;
+        //if(CanBeCounted(bo->getPosX(),bo->getPosY()))
+        //    return false;
 
         UInt16 advance = getDistance(bo->getPosX(), bo->getPosY());
 
@@ -36,7 +36,7 @@ namespace Battle
         if(!vec_struct.size())
             return 0;
         //st << static_cast<UInt8>(GetHappenTime()); 
-        st << static_cast<float>(GetHappenTime2()); 
+        st << static_cast<UInt16>(GetHappenTime2() * 100); 
         st << static_cast<UInt8>(GetBattleFighter()->GetBSNumber());
         st << static_cast<UInt8>(3);
         st << static_cast<UInt16>(GetSkillId());
@@ -96,6 +96,16 @@ namespace Battle
         } 
         _x = x;
         _y = y;
+    } 
+
+    bool ObjectPackage::CheckFighterAttacked(BattleObject * bo)
+    { 
+        for(UInt8 i = 0; i < vec_struct.size(); ++i)
+        { 
+            if(vec_struct[i].GetBattleObject() == bo)
+                return true;
+        } 
+        return false;
     } 
 }
 

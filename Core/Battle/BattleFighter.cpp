@@ -66,11 +66,10 @@ namespace Battle
         //普通攻击
     } 
 
-    void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
+    void BattleFighter::GoForward(UInt8 flag ,UInt8 count) // flag ===0  表示Y优先  flag ==1 表示斜线
     { 
-        SetGone(true);
-        if(!advance)
-            advance = GetSpeed();
+        //SetGone(true);
+        UInt16 advance = GetSpeed() * count;
         if(!PreGetObject())
             return ;
         flag = GetRideCount(); 
@@ -116,7 +115,7 @@ namespace Battle
         //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
         // } 
 
-        //BuildLocalStream(e_run);
+        BuildLocalStream(e_run);
     } 
 
     UInt16 BattleFighter::BeActed(BattleAction *  bAction)
@@ -125,6 +124,8 @@ namespace Battle
         UInt32 attack = bAction->GetAttack();
         UInt32 defend = GetDefend();
         UInt32 hpSub = attack - defend;
+        //TEST
+            hpSub = 400;
         makeDamage(hpSub);
 
         return hpSub;
@@ -170,7 +171,7 @@ namespace Battle
             case e_none:
                 break;
             case e_run:
-                GoForward(1);
+                //GoForward(1);
                 break;
             case e_attack_near:
             case e_attack_middle:
@@ -353,6 +354,7 @@ namespace Battle
     } 
     void BattleFighter::CheckBuff()
     { 
+        //BUFF 时间
         if(!bufflst.size())
             return ;
         std::list<BattleBuff>::iterator it = bufflst.begin();
@@ -399,7 +401,11 @@ namespace Battle
     UInt8 BattleFighter::NormolAttack()
     { 
         if(!_target)
-            return 0;
+        {
+            PreGetObject(); 
+            if(!_target)
+                return 0;
+        }
         { 
             ActionPackage ap(this,_nowTime2/*,_target*/);
             ap.PushObject(_target);
@@ -445,7 +451,7 @@ namespace Battle
 
         for(UInt8 i = 0 ; i < ss->radx ; ++i)
         {
-            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
             op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
             GetField()->InsertObjectPackage(op);
         }
