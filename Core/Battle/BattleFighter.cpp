@@ -353,6 +353,7 @@ namespace Battle
     } 
     void BattleFighter::CheckBuff()
     { 
+        //BUFF 时间
         if(!bufflst.size())
             return ;
         std::list<BattleBuff>::iterator it = bufflst.begin();
@@ -445,7 +446,7 @@ namespace Battle
 
         for(UInt8 i = 0 ; i < ss->radx ; ++i)
         {
-            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
             op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
             GetField()->InsertObjectPackage(op);
         }

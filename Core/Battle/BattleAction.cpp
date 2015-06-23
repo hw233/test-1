@@ -20,8 +20,8 @@ namespace Battle
         if(_bo != NULL && bo != _bo)
             return false;
 
-        if(CanBeCounted(bo->getPosX(),bo->getPosY()))
-            return false;
+        //if(CanBeCounted(bo->getPosX(),bo->getPosY()))
+        //    return false;
 
         UInt16 advance = getDistance(bo->getPosX(), bo->getPosY());
 
