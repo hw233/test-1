@@ -39,7 +39,7 @@ namespace Battle
     class BattleField
     {
         public:
-            BattleField(UInt16 fieldDistance = 1, UInt16 timeActionLimit = 80);
+            BattleField(UInt8 mapId1, UInt8 mapId2, UInt16 fieldDistance = 1, UInt16 timeActionLimit = 80);
             virtual ~BattleField();
             void clear();
             void reset();
@@ -129,6 +129,8 @@ namespace Battle
             //fieldType [FIELD_HIGH][FIELD_WIDTH];    //场地信息
             
             std::vector<BattleFighter* > _fighters[2];
+            UInt8 _mapId1;
+            UInt8 _mapId2;
             UInt16 _fieldDistance;
             UInt16 _timeActionLimit ;
 
@@ -147,6 +149,7 @@ namespace Battle
             std::list< ObjectPackage > FieldObject;  //物体型攻击 (定时炸弹类型的行为)
 
             std::map<float,std::vector<BattleFighter*> > BattlePre;
+
     };
 
 }

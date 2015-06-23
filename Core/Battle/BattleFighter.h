@@ -259,6 +259,9 @@ namespace Battle
             void BattlePrintf();
 
             virtual bool IsStoped(){return false;}
+
+            void AddKillCount(){ ++_killCount;}
+            UInt16 GetKillCount(){ return _killCount;}
         protected:
 
             UInt8 _crick;  //硬直
@@ -326,6 +329,7 @@ namespace Battle
 
             std::list<BattleBuff> bufflst;
             UInt8 _direction;
+            UInt16 _killCount;
         public:
             BattleObject * _target;
     };

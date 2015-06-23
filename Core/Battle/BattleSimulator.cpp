@@ -13,7 +13,7 @@
 #define ADVANCE_M 140
 namespace Battle
 {
-    BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance, bool rpt,UInt32 limitTime):BattleField(),_id(IDGenerator::gBattleOidGenerator1.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
+    BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance,UInt8 mapId1, UInt8 mapId2, bool rpt,UInt32 limitTime):BattleField(mapId1, mapId2),_id(IDGenerator::gBattleOidGenerator1.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
     { 
         _fgt[0] = bf;
         bf->SetSideInBS(0); 
@@ -178,6 +178,7 @@ namespace Battle
                 actCount += doAttack(time);
                 lastTime = time;
             }
+            _time = time;
         }
 
         actCount += ClearObjectPackage();
@@ -262,12 +263,17 @@ namespace Battle
                 continue; 
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
-                UInt16 param = bAction.GetObject(j)->BeActed(&bAction);
+                BattleObject * bo = bAction.GetObject(j);
+                if(bo->getHP() == 0)
+                    continue;
+                UInt16 param = bo->BeActed(&bAction);
                 _packet << static_cast<UInt16>(bAction.GetHappenTime2() * 100);
                 _packet << fgt->GetBSNumber();
                 _packet << static_cast<UInt8>(1);
                 _packet << static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber();
                 _packet << static_cast<UInt16>(param);
+                if(bo->getHP() == 0)
+                    fgt->AddKillCount();
                 ++count;
             }
             FighterAction(fgt,time1);
@@ -313,9 +319,9 @@ namespace Battle
             _packet << static_cast<UInt8>(2);
             _packet << static_cast<UInt16>(skillId);
 
-            //std::cout << " 回合数" << static_cast<UInt32>(bAction.GetHappenTime());
-            //std::cout << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
-            //std::cout << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
+            std::cout << " 回合数" << static_cast<float>(bAction.GetHappenTime2());
+            std::cout << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
+            std::cout << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
 
             UInt16 buffId = se->buffId;
             const GData::SkillBuff * sb = GData::skillBuffManager[buffId];
@@ -334,7 +340,7 @@ namespace Battle
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
                 BattleObject* bo = bAction.GetObject(j);
-                if(!bo)
+                if(!bo || !bo->getHP())
                     continue;
                 if(buffId && count && side)
                     bo->AddBuff(buffId);
@@ -344,6 +350,8 @@ namespace Battle
                 _packet << static_cast<UInt16>(param);
                 //std::cout << " 战将编号:" << static_cast<UInt32>(bo->GetBSNumber());
                 //std::cout << " 受伤数值:" << static_cast<UInt32>(param) << std::endl;
+                if(!bo->getHP())
+                    fgt->AddKillCount();
                 ++count;
             }
             float backCd = s->GetActionBackCd();
@@ -383,12 +391,17 @@ namespace Battle
                 BattleFighter * fgt = it->GetBattleFighter();
                 for(UInt8 i = 0; i < _fighters[!fgt->GetSideInBS()].size(); ++i)
                 { 
-                    if(it->CheckFighterAttacked(_fighters[!fgt->GetSideInBS()][i]))
+                    BattleFighter * ft = _fighters[!fgt->GetSideInBS()][i];
+                    if(it->CheckFighterAttacked(ft))
                         continue;
-                    if(it->CheckFighterInSCope(_fighters[!fgt->GetSideInBS()][i])) 
+                    if(it->CheckFighterInSCope(ft)) 
                     { 
+                        if(ft->getHP() == 0)
+                            continue;
                         UInt16 param = _fighters[!fgt->GetSideInBS()][i]->BeActed(&(*it));
                         it->InsertIntoPackage(time+index*0.1,_fighters[!fgt->GetSideInBS()][i], param);
+                        if(ft->getHP() == 0)
+                            fgt->AddKillCount();
                     } 
                 } 
                 it->GoNext();

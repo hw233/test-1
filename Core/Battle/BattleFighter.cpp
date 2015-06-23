@@ -16,6 +16,8 @@ namespace Battle
         setNumber(0);
 
         _nowTime = -1;
+        
+        _killCount = 0;
 
         m_mainFighter = NULL;
 
@@ -400,10 +402,10 @@ namespace Battle
         {
             return;
         }
-        for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
-        {
-            preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
-        }
+        //for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
+        //{
+        //    preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
+        //}
     }
 
 

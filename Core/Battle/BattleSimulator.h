@@ -25,7 +25,7 @@ namespace Battle
     class BattleSimulator : public BattleField 
     {
         public:
-            BattleSimulator(BattleFighter * bf, BattleFighter * bo,UInt8 distance = 1 , bool rpt = false,UInt32 limitTime = 80);
+            BattleSimulator(BattleFighter * bf, BattleFighter * bo,UInt8 distance = 1, UInt8 mapId1 = 0, UInt8 mapId2 = 0, bool rpt = false,UInt32 limitTime = 80);
             virtual ~BattleSimulator()  {}
             inline int getId() {return _id;} 
 
@@ -54,6 +54,8 @@ namespace Battle
             void PosPrintf(UInt8 index);
 
             void FighterMove(UInt8 index,UInt8 count);
+
+            float GetTime(){return _time;}
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];
@@ -61,6 +63,7 @@ namespace Battle
             Stream _packet;
             UInt32 _limitTime;
             UInt8 _distance;
+            float _time;
     };
 }
 #endif // BATTLESIMULATOR_H_

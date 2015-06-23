@@ -52,6 +52,8 @@ namespace GObject
     
     UInt32 Player::GetVar(UInt32 id)
     {
+        if(this == NULL)
+            return 0;
         return m_pVars->GetVar(id);
     }
 
@@ -537,7 +539,7 @@ namespace GObject
         globalNamedClans.add(clan->GetName(), clan);
         SetClanPos(1);
         clan->LoadPlayer(this,1);
-        DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0,0);
+        DB2().PushUpdateData("INSERT INTO `clan`(`clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax`,`battleRoomId`,`clanFame`,`conquests`,`forceId`) VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0,0);
 
         //Stream st(REP::CLAN_OPTION);
         //st << static_cast<UInt8>(0x02);
