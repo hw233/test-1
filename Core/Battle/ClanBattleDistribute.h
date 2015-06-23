@@ -20,6 +20,9 @@ namespace GData
     class BattleMapInfo;
 }
 
+
+#define INIT_SOLDIER_NUM 10
+
 namespace Battle
 {
     class DistributeInfo   //军团战某个位置上的信息
@@ -34,9 +37,12 @@ namespace Battle
             UInt8  GetPosY() const { return posy;}
             void   SetPosX(UInt8 px)  { posx = px ; }
             void   SetPosY(UInt8 py)  { posy = py ; }
+            void   SetSoldierNum(UInt8 num) { soldierNum = num;}
+            UInt8  GetSoldierNum() const { return soldierNum;}
         private:
             UInt64 playerId;
-            UInt16 fighterId;
+            UInt16 fighterId;  //战将Id
+            UInt8  soldierNum; //小兵各数
             UInt8  posx;
             UInt8  posy;
     };
@@ -64,7 +70,7 @@ namespace Battle
         public:
             ~BattleDistribute() { _room2Distribute.clear();}
             bool PutFighter(UInt8 mapId,GObject::Player* player,UInt16 fighterId, UInt8 x, UInt8 y,bool flag);
-            bool CancelPutFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y); 
+            bool RemoveFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y); 
             bool MoveFighter(UInt8 mapId,GObject::Player* player,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty);
             DistributeInfo* GetDistributeInfo(UInt32 roomId, UInt8 mapId, UInt8 x, UInt8 y);
             void RemoveDistributeInfo(UInt32 roomId,UInt8 mapId,DistributeInfo* info);
@@ -79,6 +85,7 @@ namespace Battle
             void  NoticeAlliesAddFighter(GObject::Player* player, UInt16 fighterId);
             void  NoticeAlliesDelFighter(GObject::Player* player,UInt8 mapId,UInt8 posx,UInt8 posy);
             void  NoticeAlliesMoveFighter(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId,UInt8 destx,UInt8 desty);
+            void  UpdateDistributeInfo(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt8 soldierNum);
             map<UInt32,std::vector<MapDistributeInfo*>> GetData() const { return _room2Distribute;}
 
         private:

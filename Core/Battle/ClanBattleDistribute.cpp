@@ -108,6 +108,7 @@ namespace Battle
             DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
             if( info == NULL )
                 return false;
+            info->SetSoldierNum(INIT_SOLDIER_NUM);
             std::vector<DistributeInfo*> vecDistributeInfo;
             vecDistributeInfo.push_back(info);
             MapDistributeInfo* mapdistribute  = new(std::nothrow) MapDistributeInfo(mapId);
@@ -124,6 +125,7 @@ namespace Battle
               {
                     //更新数据
                     DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
+                    info->SetSoldierNum(INIT_SOLDIER_NUM);
                     if( info == NULL )
                         return false;
                     std::vector<DistributeInfo*> vecDistributeInfo;
@@ -146,6 +148,7 @@ namespace Battle
                     else
                     {
                         DistributeInfo* info = new DistributeInfo(player->GetId(),fighterId,x,y);
+                        info->SetSoldierNum(INIT_SOLDIER_NUM);
                         vecInfo.push_back(info);
                         for( auto it = vecMapDistributeInfo.begin() ; it != vecMapDistributeInfo.end() ; ++it )
                         {
@@ -182,7 +185,7 @@ namespace Battle
     }
 
     //取消放将
-    bool BattleDistribute::CancelPutFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y)
+    bool BattleDistribute::RemoveFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y)
     {
         bool status = Check(player);
         if( !status )
@@ -458,7 +461,7 @@ namespace Battle
             //敌方  只发势力Id
             st<<static_cast<UInt8>(enemyForce.size());
 
-            if( !enemyForce.empty() )
+            if(!enemyForce.empty() )
             {
                 for( auto it = enemyForce.begin(); it != enemyForce.end(); ++it )
                 {
@@ -466,7 +469,7 @@ namespace Battle
                 }
             }
             UInt32 reportId = Battle::report2IdTable.GetRecentReportId(roomId,mapId);
-            if( reportId != 0 )
+            if( room->GetStage() == 1 )
             {
                 st<<static_cast<UInt32>(reportId);
             }
@@ -617,6 +620,15 @@ namespace Battle
              (*it)->send(st);
          }
 
+    }
+
+    void BattleDistribute::UpdateDistributeInfo(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt8 soldierNum)
+    {
+        UInt32 roomId = GetBattleRoomId(player);
+        DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
+        if( info == NULL)
+            return;
+        info->SetSoldierNum(soldierNum);
     }
 
 }

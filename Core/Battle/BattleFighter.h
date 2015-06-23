@@ -259,6 +259,8 @@ namespace Battle
             void BattlePrintf();
 
             virtual bool IsStoped(){return false;}
+
+            GObject::Player* GetOwner() const { return _fighter->GetOwner();}   //by qsj
         protected:
 
             UInt8 _crick;  //硬直

@@ -228,9 +228,10 @@ namespace GObject
     //好友推荐
     void FriendManager::RecommandFriend()
     {
-        DB7().PushUpdateData("delete from friends where type = %u",friend_recommand);
+        DB7().PushUpdateData("delete from `friends` where `type` = %u and  `playerId` = %"I64_FMT"u ",friend_recommand,m_owner->GetId() );
         _friends[friend_recommand].clear();
         UInt8 num = GetFriendNum(friend_normal);
+
         if(num >= m_owner->GetFriendMax())
         {
             cout<<"玩家的好友列表已满 不能推荐了"<<endl;

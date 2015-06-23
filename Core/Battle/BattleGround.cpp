@@ -8,6 +8,8 @@
 #include "Script/lua_tinker.h"
 #include "Battle/Report2Id.h"
 #include "Common/URandom.h"
+#include "Battle/ClanBattleDistribute.h"
+
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
 
@@ -267,6 +269,9 @@ namespace Battle
             UInt8 rand = uRand(20);
             _pack << static_cast<UInt8>(mx) << static_cast<UInt8>(my) << static_cast<UInt8>(rand)<<static_cast<UInt8>(0); //无战斗发生
             _oneRoundCostTime += rand;
+             
+            //排布信息同步
+            Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my);
         }
         else
         {
@@ -308,15 +313,35 @@ namespace Battle
             UInt8 win = 0;
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
-             
+            
+            /*
             if( win != 2 )
             {
                 currentBf->setHP(100);
                 (target.bo)->setHP(100);
                 win = 2;
             }
+            */
             _pack << win << reportId;
 
+            //往排布那边同步战将数据
+            if( currentBf->getHP() <= 0 )
+            {
+                Battle::battleDistribute.RemoveFighter(_mapId,currentBf->GetOwner(),currentBf->GetId(),x,y);
+            }
+            else
+            {
+                Battle::battleDistribute.UpdateDistributeInfo(_mapId,currentBf->GetOwner(),x,y,3);
+            }
+
+            if( target.bo->getHP() <= 0 )
+            {
+                Battle::battleDistribute.RemoveFighter(_mapId,(target.bo)->GetOwner(),(target.bo)->GetId(),x,y);
+            }
+            else
+            {
+                Battle::battleDistribute.UpdateDistributeInfo(_mapId,(target.bo)->GetOwner(),x,y,3);
+            }
             //cout
             TestCoutBattleS(target.bo);
             std::cout << std::endl;

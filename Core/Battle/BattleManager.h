@@ -45,6 +45,7 @@ namespace Battle
             std::vector<SingleBattle*> GetSingleBattles() { return singleBattles;}
             void StartAllGroundWithOneRound();
             UInt8 GetStage();
+            UInt32 GetRoomId() const { return roomId;}
         private:
             UInt32 roomId;
             std::vector<SingleBattle*> singleBattles;
