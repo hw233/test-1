@@ -54,7 +54,7 @@ namespace Battle
             std::cout << " 被击者：" << static_cast<UInt32>(vec_struct[i].GetBattleObject()->GetBSNumber()) << " 位置: " << static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosX()) <<" , "<< static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosY());
             std::cout << std::endl;
 
-            st << static_cast<UInt8>(vec_struct[i].GetCurTime());
+            st << static_cast<UInt8>(vec_struct[i].GetCurTime2());
             st << static_cast<UInt16>(vec_struct[i].GetBattleObject()->GetBSNumber());
             st << static_cast<UInt16>(vec_struct[i].GetParam());
         } 

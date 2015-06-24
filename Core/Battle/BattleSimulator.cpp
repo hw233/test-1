@@ -165,13 +165,13 @@ namespace Battle
                     cnt = (time - lastTime)/0.1;
                 if(cnt == 0)
                     cnt = 1;
-                FighterMove(0,cnt);
-                FighterMove(1,cnt);
                 std::cout << "Now time:"  << time <<std::endl;
-                if(time > 20 || GetWin() < 3)
+                if(time > 20 || GetWin() < 4)
                 {
                     break; 
                 }
+                FighterMove(0,cnt);
+                FighterMove(1,cnt);
                 actCount += doAction(time);
                 actCount += doObjectMove(time, (time - lastTime) / 0.1);  //每回合
                 actCount += doImage(time);   
@@ -196,7 +196,9 @@ namespace Battle
             return 0;
         if(!_fgt[1] || !_fgt[1]->getHP())
             return 1;
-        return 3;
+        if(_fgt[0]->IsStoped() || _fgt[1]->IsStoped())
+            return 3;
+        return -1;
     } 
 
     BattleFighter* BattleSimulator::CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY)

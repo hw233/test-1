@@ -66,7 +66,7 @@ namespace Battle
         //UInt16 _condition ;  // 触发条件编号
         //UInt16 _scpoe ;      // 触发范围编号
         //UInt16 _effect ;     // 触发效果编号
-        UInt8 _cd;           //行动cd  
+        float _cd;           //行动cd  //BATTLE2
         UInt8 _priority ;  //触发优先级
     };
     struct lt_absort
@@ -252,6 +252,8 @@ namespace Battle
             virtual UInt8 BeForAction() { PreGetObject(); return 0;};
 
             void BattlePrintf();
+
+            virtual bool IsStoped(){return false;}
         protected:
 
             UInt8 _crick;  //硬直

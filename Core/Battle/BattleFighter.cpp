@@ -234,7 +234,7 @@ namespace Battle
         { 
             //--(it->_cd); 
             //if(it->_cd == 0)
-            if(it->_cd >= GetNowTime2())   //BATTLE2
+            if(it->_cd <= GetNowTime2())   //BATTLE2
             { 
                 preActionList.push_back((*it));
                 it = preActionCD.erase(it);
@@ -262,7 +262,7 @@ namespace Battle
                 result = it;
             }
         }   
-        if(/*priority != 0*/ flag && GData::skillManager[res._skillId])
+        if(/*priority != 0*/ flag && GData::skillManager[result->_skillId])
         { 
             res = *result;
             res._cd = GData::skillManager[res._skillId]->GetCd() + GetNowTime2(); //BATTLE2
