@@ -12,8 +12,60 @@ namespace GObject
 
 
 #define BATTLEGROUND_MAN 32
+
+#define DAY_MAX 7
+
 namespace Battle
 {
+
+    class SingleBattle   //一个城市的战斗
+    {
+        public:
+            ~SingleBattle() { delete ground;}
+            void SetNextStartTime(UInt32 t) { nextStartTime = t;}
+            UInt32 GetNextStartTime() const { return nextStartTime;}
+            void StartBattle();
+            void StartOneRound();
+            SingleBattle(UInt32 battleId,UInt8 mapId,UInt8 limit);
+            bool IsStop() const { return ground->CheckIsStop();}
+            UInt16 GetOneRoundTimeCost() const { return ground->GetOneRoundTimeCost();}
+            void EnterBattleGround(GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y);
+        private:
+            UInt32 nextStartTime;  //下一次开始战术的时间
+            BattleGround* ground;
+    };
+
+
+    class RoomBattle  //一个房间 管理一个战役的许多个城市
+    {
+        public:
+            RoomBattle(UInt32 id) : roomId(id){ singleBattles.clear(); }
+            void InsertSingleBattle(SingleBattle* singBt); 
+            void StartAllGround();
+            std::vector<SingleBattle*> GetSingleBattles() { return singleBattles;}
+            void StartAllGroundWithOneRound();
+            UInt8 GetStage();
+        private:
+            UInt32 roomId;
+            std::vector<SingleBattle*> singleBattles;
+    };
+
+
+    class BattleManager
+    {
+        public:
+            BattleManager() { roomBattleList.clear();}
+            void InsertRoomBattle(RoomBattle* roomBattle);
+            void StartAll();
+            void StartAllWithOneRound();
+            std::vector<RoomBattle*> GetRoomBattleList() { return roomBattleList;}
+        private:
+            std::vector<RoomBattle*> roomBattleList;
+    };
+
+    extern BattleManager battleManager;
+
+    /*
     class BattleManager
     {
         public:
@@ -37,6 +89,7 @@ namespace Battle
             FastMutex _mutex2;
             std::map<UInt32,BattleGround*>  _map;
     };
+    */
 }
 #endif // BATTLEMANAGER_H_
 

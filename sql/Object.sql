@@ -172,6 +172,7 @@ CREATE TABLE `clan_battle_room` (
     `battleId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '战役Id',
     `clans`    varchar(1024) NOT NULL DEFAULT '' COMMENT '军团id们',
     `fighterNum` int(3) unsigned NOT NULL DEFAULT '0' COMMENT '某一势力的战将数量',
+    `buildTime`  int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建房间的时间',
     PRIMARY KEY (`roomId`,`forceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -195,3 +196,16 @@ CREATE TABLE `clan_battle_order` (
     `order` tinyint(3)  NOT NULL DEFAULT '0' COMMENT '军团令',
     PRIMARY KEY (`roomId`,`forceId`,`mapId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `report2id`; 
+CREATE TABLE `report2id` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `cityId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '城市Id',
+    `actId`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '回合Id',
+    `reportId` int(10)  NOT NULL DEFAULT '0' COMMENT '战术战报Id',
+    `time`  int(10) NOT NULL DEFAULT '0' COMMENT '战术时间',
+    PRIMARY KEY (`roomId`,`cityId`,`actId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

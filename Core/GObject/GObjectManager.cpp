@@ -24,6 +24,7 @@
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleComment.h"
 #include "Battle/ClanOrder.h"
+#include "Battle/Report2Id.h"
 
 namespace GObject
 {
@@ -123,6 +124,11 @@ namespace GObject
         if( !loadClanBattleOrder())
         {
             fprintf(stderr, "clanBattle comment error!\n");
+            std::abort();
+        }
+        if( !loadReport2Id())
+        {
+            fprintf(stderr, "load report2id error!\n");
             std::abort();
         }
     } 
@@ -533,7 +539,7 @@ namespace GObject
         LoadingCounter lc("Loading ClanBattleRooms");
         lc.reset(1000);
         DBClanBattleRoom room;
-        if(execu->Prepare("SELECT `roomId`,`forceId`,`battleId`,`clans` `fighterNum` FROM `clan_battle_room`", room) != DB::DB_OK)
+        if(execu->Prepare("SELECT `roomId`,`forceId`,`battleId`,`clans`,`fighterNum`,`buildTime` FROM `clan_battle_room`", room) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
@@ -543,7 +549,7 @@ namespace GObject
             {
                 vecClan.push_back(::atoi(st[i].c_str()));
             }
-            Battle::clanBattleRoomManager.loadBattleRoom(room.roomId,room.battleId,room.forceId,vecClan,room.fighterNum);
+            Battle::clanBattleRoomManager.loadBattleRoom(room.roomId,room.forceId,room.battleId,vecClan,room.fighterNum,room.buildTime);
             lc.advance();
         }
         lc.finalize();
@@ -581,6 +587,24 @@ namespace GObject
         while(execu->Next() == DB::DB_OK)
         {
             Battle::roomOrderManager.loadAllClanOrders(order.roomId,order.forceId,order.mapId,order.order);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadReport2Id()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading report2id");
+        lc.reset(1000);
+        DBReport2Id report2Id;
+        if(execu->Prepare("SELECT `roomId`,`cityId`,`actId`,`reportId`,`time` FROM `report2id`",report2Id) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Battle::report2IdTable.Insert(report2Id.roomId,report2Id.cityId,report2Id.actId,report2Id.reportId,report2Id.time);
             lc.advance();
         }
         lc.finalize();

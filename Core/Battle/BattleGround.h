@@ -6,7 +6,6 @@
 #include "Common/Stream.h"
 #include "Server/OidGenerator.h"
 #include "GObject/AStar.h"
-
 #define GROUND_LENGTH 20
 
 namespace GObject
@@ -18,7 +17,7 @@ namespace GObject
 
 namespace Battle
 {
-#define PLAYERMAX 10
+#define PLAYERMAX 5
     struct BattleInfo
     {
         UInt16 _round;
@@ -43,8 +42,8 @@ namespace Battle
     {
         UInt8 x;
         UInt8 y;
+        Ascoord(const UInt8 vx,const UInt8 vy):x(vx),y(vy) {}
         Ascoord() {}
-        Ascoord(UInt8 vx,UInt8 vy):x(vx),y(vy) {}
         inline bool operator == ( const Ascoord p)
         {
             return (this->x == p.x && this->y == p.y );
@@ -96,24 +95,65 @@ namespace Battle
         UInt8  posy;
 
     };
+    
 
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID())
+            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID()),_actId(0),_isFirstRound(true),_oneRoundCostTime(0)
             {
-                map_player.clear();
+                //map_player.clear();
+                currentBf = NULL;
+                map2fighter.clear();
+                _camp2pos.clear();
+                camp2fighters.clear();
                 InitMapFight(mapId);
+                _closeList.clear();
+                _openList.clear();
+                battleIds.clear();
+                _aroundAscoord.clear();
+                map2fighter.clear();
             }
             ~BattleGround()
             {
+                //delete [] _mapFighters;
+                for(UInt8 j = 0; j < _y ; ++j)
+                {
+                    for(UInt8 i = 0 ; i < _x ; ++i )
+                    {
+                        if( _mapFighters[i+j*_x] != NULL )
+                        {
+                            delete _mapFighters[i+j*_x];
+                        }
+                    }
+
+                }
+                _mapFighters = NULL;
+
                 delete [] _mapGround;
-                delete [] _mapFighters;
-                delete [] _mapFlag;
+                _mapGround = NULL;
+
+                delete []_mapCamp;
+                _mapGround = NULL;
+
+                for( auto it = map2fighter.begin(); it != map2fighter.end(); ++it )
+                {
+                    for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
+                    {
+                        delete (*iter);
+                    }
+                }
+
+                map2fighter.clear();
+                _aroundAscoord.clear();
+                battleIds.clear();
+                num2pos.clear();
+                camp2fighters.clear();
+                _closeList.clear();
+                _openList.clear();
             }
 
             void InitMapFight(UInt8 mapId);
-            void PushPlayer(GObject::Player*,UInt8,UInt8 flag );
             void PushBattleInfo(const BattleInfo& bi);
             void PushFighter(GObject::Player*, UInt16 ,UInt8,UInt8);
             void SetCampActId();
@@ -125,12 +165,18 @@ namespace Battle
             void SetBattleIndex();
             UInt8 GetSpecialDirection();
             void  FightOneRound();
+            void  SetEachPosNumber();
+            UInt8 GetBattleIndex(UInt8 x,UInt8 y );
+            BattleFighter* GetMinBattleIndexFighter(std::list<BattleFighter*> listFighter);
+            bool SomeCampIsAllDie(UInt8 campId);
+            bool CheckIsStop();
+            void MakePreStartInfo();
+            UInt16 GetOneRoundTimeCost() const { return _oneRoundCostTime;}
             //对象移动
             void Move();
             //产生战报信息
             void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport);
             void FighterMove(BattleFighter *, UInt8 x ,UInt8 y);
-            //void GetTarget(UInt8,const UInt8& ,const UInt8&,UInt8 flag = 0 );
             //void GetTargetBo(UInt8 x ,UInt8 y ,UInt8 step = 0);
             UInt8 GetRideSub(const UInt8& posx ,const UInt8& posy);
 
@@ -138,14 +184,13 @@ namespace Battle
             void setObject(UInt8 x , UInt8 y ,BattleFighter * bf,UInt8 flag = 0);
             void preStart();
             void start();
+            void GetJoinPlayers(std::set<GObject::Player*>& setPlayer);
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
 
             UInt8 GetFactAttackDis();
             UInt8 GetCampInfo(UInt8 index) { return _mapCamp[index];}
-            std:: vector<Ascoord> GetSameCamp(UInt8 side);
-            void  GetPutPosition(UInt8 side,UInt8 &x,UInt8 &y);
 
             void GetNearEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecEnemy); 
             void Analyse(std::list<Ascoord>path,Ascoord& target);
@@ -194,18 +239,19 @@ namespace Battle
             UInt8 _x;
             UInt8 _y;
             UInt8 _mapId;
-            std::map<UInt8 ,std::list<GObject::Player *> >  map_player;
+            //std::map<UInt8 ,std::list<GObject::Player *> >  map_player;
             
-            std::map<UInt8, std::list<FighterInfo*>> map2fighter;  //战将及所属玩家  对应的阵营
-            std::map<UInt8, std::list<Ascoord>> _camp2pos;  //阵营对应的布阵位置  直接按照行动力顺序进行布局
+            std::map<UInt8, std::vector<FighterInfo*>> map2fighter;  //战将及所属玩家  对应的阵营
+            std::map<UInt8, std::list<Ascoord>> _camp2pos;  //阵营对应的布阵位置  直接按照行动顺序进行布局
 
             UInt8 * _mapGround;  //地图信息  可以设置战场的环境
-            UInt8 * _mapFlag;    
+            //UInt8 * _mapFlag;    
             UInt8 * _mapCamp;    //地图阵营信息
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
-
+            std::map<UInt8,Ascoord> num2pos; //地图位置对应编号
             //来一个记录战将分布的结构 满足
-            std::list<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
+            std::map<UInt8,std::list<BattleFighter*>> camp2fighters;
+            //std::list<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;
 
             std::vector<TargetInfo> _vecTarget;
@@ -214,15 +260,16 @@ namespace Battle
 
             UInt16 _maxID;
             UInt32 _battleNum;
-
+            
+            UInt16 _actId;
+            bool   _isFirstRound;
+            UInt16 _oneRoundCostTime; //一回合消耗的时间
             //一下全是跟A*算法  有关的东西
             Ascoord _start;
             Ascoord _end;
             std::list<Node>  _closeList;
             std::list<Node>  _openList;
             std::vector<Ascoord> _aroundAscoord;
-
-
     };
 }
 #endif // BATTLEGROUND_H_

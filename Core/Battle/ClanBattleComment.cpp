@@ -10,10 +10,22 @@ namespace Battle
 
     void RoomComment::InsertComments(UInt8 forceId,UInt8 mapId,UInt64 playerId,std::string comment)
     {
-        SingleComment* Comment = new SingleComment(forceId,mapId,playerId,comment);
+        SingleComment* Comment = new(std::nothrow) SingleComment(forceId,mapId,playerId,comment);
         if( Comment == NULL )
             return;
         comments.push_back(Comment);
+    }
+
+    void RoomComment::DeleteSingleComment(SingleComment* sc)
+    {
+        for( auto it = comments.begin(); it != comments.end(); ++it )
+        {
+            if( (*it) == sc )
+            {
+                it = comments.erase(it);
+            }
+        }
+
     }
 
     SingleComment* RoomComment::GetSingleComment(UInt8 forceId,UInt8 mapId)
@@ -35,8 +47,9 @@ namespace Battle
         if( roomComment == NULL )
         {
             std::vector<SingleComment*> vecSingleComment;
-            vecSingleComment.push_back(new SingleComment(forceId,mapId,playerId,comment));
-            roomComment = new RoomComment(roomId,vecSingleComment);
+            vecSingleComment.push_back(new(std::nothrow) SingleComment(forceId,mapId,playerId,comment));
+            roomComment = new(std::nothrow) RoomComment(roomId);
+            roomComment->SetRoomComment(vecSingleComment);
         }
         else
         {
@@ -64,9 +77,9 @@ namespace Battle
         if( comment.size() > 100 )
             return false;
         UInt32 commentTime = player->GetVar(GObject::VAR_CLANBATTLE_COMMENT_TIME);
+        UInt32 now = TimeUtil::Now();
         if( commentTime > 0 )
         {
-            UInt32 now = TimeUtil::Now();
             if( now - commentTime < 3*60 )
             {
                 return false;
@@ -76,13 +89,21 @@ namespace Battle
         if( roomComment == NULL )
         {
             std::vector<SingleComment*> vecSingleComment;
-            vecSingleComment.push_back(new SingleComment(forceId,mapId,playerId,comment));
-            roomComment = new RoomComment(roomId,vecSingleComment);
+            vecSingleComment.push_back(new(std::nothrow) SingleComment(forceId,mapId,playerId,comment));
+            roomComment = new(std::nothrow) RoomComment(roomId);
+            roomComment->SetRoomComment(vecSingleComment);
         }
         else
         {
+            SingleComment* sc = roomComment->GetSingleComment(forceId,mapId);
+            if( sc != NULL )
+            {
+                delete sc;
+                roomComment->DeleteSingleComment(sc);
+            }
             roomComment->InsertComments(forceId,mapId,playerId,comment);
         }
+        player->SetVar(GObject::VAR_CLANBATTLE_COMMENT_TIME,now+10);
         room2comments[roomId] = roomComment;
         //更新数据库
         DB7().PushUpdateData("REPLACE INTO `clan_battle_comment`(`roomId`,`forceId`,`mapId`,`playerId`,`message`) value(%u,%u,%u,%"I64_FMT"u,'%s')",roomId,forceId,mapId,playerId,comment.c_str());

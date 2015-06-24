@@ -5,6 +5,53 @@ namespace Battle
 
     ClanBattleRoomManager clanBattleRoomManager;
 
+
+    void ClanBattleRoom::SetStage(UInt32 t)
+    {
+        //报名之后的第二天10点为战术推演阶段 
+        //由报名时间得到
+        time_t time = buildTime;
+        tm* tt=localtime(&time);
+        UInt8 hour = tt->tm_hour;
+        UInt8 min = tt->tm_min;
+
+
+        UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
+        if( t < sday )
+        {
+            stage = 0;
+        }
+        else if ( t > sday && t < sday + 1*86400)
+        {
+            stage = 1;
+        }
+        else if(  t > sday+1*86400 && t < sday+2*86400)
+        {
+            stage = 0;
+        }
+        else if(  t > sday+2*86400 && t < sday+3*86400 )
+        {
+            stage = 1;
+        }
+        else if(  t > sday+4*86400 && t < sday+5*86400 )
+        {
+            stage = 0;
+        }
+        else if(  t > sday+5*86400 && t < sday+6*86400 )
+        {
+            stage = 1;
+        }
+        else if(  t > sday+6*86400 && t < sday+7*86400 )
+        {
+            stage = 2;
+        }
+        else
+        {
+            stage = 3;
+        }
+
+    }
+
     void ClanBattleRoom::InsertClan(UInt8 forceId,UInt32 clanId,UInt32 num )
     {
         //更新数据库
@@ -35,13 +82,13 @@ namespace Battle
         std::string clans(buff);
         if( vecClan.size() == 1)
         {
-            DB7().PushUpdateData("INSERT INTO  `clan_battle_room`(`roomId`, `forceId`,`battleId`,`clans`,`fighterNum`) VALUES(%u, %u ,%u , '%s',%u)",roomId,forceId,battleId,clans.c_str(),totalNum);
+            DB7().PushUpdateData("INSERT INTO  `clan_battle_room`(`roomId`,`forceId`,`battleId`,`clans`,`fighterNum`,`buildTime`) VALUES(%u, %u ,%u, '%s',%u, %u)",roomId,forceId,battleId,clans.c_str(),totalNum,buildTime);
         }
         if( vecClan.size() > 1 )
         {
-            DB7().PushUpdateData("delete from `clan_battle_room`  where roomId=%u",roomId);
+            DB7().PushUpdateData("delete from `clan_battle_room`  where roomId=%u AND forceId=%u",roomId,forceId);
 
-            DB7().PushUpdateData("INSERT INTO  `clan_battle_room`(`roomId`, `forceId`,`battleId`,`clans`,`fighterNum`) VALUES(%u, %u ,%u , '%s',%u)",roomId,forceId,battleId,clans.c_str(),totalNum);
+            DB7().PushUpdateData("INSERT INTO  `clan_battle_room`(`roomId`, `forceId`,`battleId`,`clans`,`fighterNum`,`buildTime`) VALUES(%u, %u ,%u,'%s',%u,%u)",roomId,forceId,battleId,clans.c_str(),totalNum,buildTime);
         }
         GObject::Clan* clan = GObject::globalClan[clanId];
         if( clan == NULL )
@@ -55,8 +102,7 @@ namespace Battle
         DB7().PushUpdateData("update clan set battleRoomId = %u , forceId = %u where clanId=%u",roomId,forceId,clanId);
 
     }
-
-
+    
     bool ClanBattleRoomManager::CreateRoom(GObject::Player* player)
     {
         GObject::Clan* clan = player->GetClan();
@@ -76,7 +122,9 @@ namespace Battle
         {
             return false;
         }
+        UInt32 now = TimeUtil::Now();
         ClanBattleRoom* room = new ClanBattleRoom(clanId,battleId);
+        room->SetBuildTime(now);
         room->InsertClan(1,clanId,memberNum);
         _roomList.push_back(room);
         return true;
@@ -139,7 +187,7 @@ namespace Battle
         return true;
     }
 
-    void ClanBattleRoomManager::loadBattleRoom(UInt32 roomId,UInt8 battleId,UInt8 forceId,std::vector<UInt32> vecClan,UInt8 fighterNum)
+    void ClanBattleRoomManager::loadBattleRoom(UInt32 roomId,UInt8 battleId,UInt8 forceId,std::vector<UInt32> vecClan,UInt8 fighterNum,UInt32 buildTime)
     {
         ClanBattleRoom* room = GetBattleRoom(roomId);
         if( room == NULL )
@@ -148,6 +196,7 @@ namespace Battle
         }
         room->InsertClans(forceId,vecClan);
         room->InsertFighterNum(forceId,fighterNum);
+        room->SetBuildTime(buildTime);
         _roomList.push_back(room);
     }
 

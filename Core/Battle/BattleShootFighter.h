@@ -11,9 +11,18 @@ namespace Battle
         public:
             BattleShootFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
                 BattleFighter(3,bf,f,pointX,pointY),_target(NULL)
-        { 
+            { 
 
-        } 
+            }
+            
+            /*
+            virtual ~BattleShootFighter() 
+            {
+                std::cout<<" shootFighter destroy "<<std::endl;
+            }
+            */
+
+
             virtual void Action();
             virtual bool PreGetObject(); 
             //virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);

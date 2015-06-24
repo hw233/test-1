@@ -36,11 +36,19 @@ namespace Battle
     class RoomComment
     {
         public:
-            RoomComment(UInt32 id,std::vector<SingleComment*>vecComment) : roomId(id), comments(vecComment) {} 
+            RoomComment(UInt32 id) : roomId(id)
+            {
+                comments.clear();
+            } 
+            void SetRoomComment(std::vector<SingleComment*> vecComment)
+            {
+                comments = vecComment;
+            }
             UInt32 GetRoomId() const { return roomId;}
             std::vector<SingleComment*> GetComments() const { return comments;}
             void InsertComments(UInt8 forceId,UInt8 mapId,UInt64 playerId,std::string comment);
             SingleComment* GetSingleComment(UInt8 forceId,UInt8 mapId);
+            void DeleteSingleComment(SingleComment* sc);
         private:
             UInt32 roomId;
             std::vector<SingleComment*> comments;

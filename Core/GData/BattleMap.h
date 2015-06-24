@@ -7,7 +7,11 @@ namespace GData
     class SingleMapInfo 
     {
         public:
-            SingleMapInfo(UInt8 id,UInt8 f,std::vector<UInt8> l) : mapId(id),force(f),links(l) {}
+            SingleMapInfo(UInt8 id,UInt8 f) : mapId(id),force(f)
+            {
+                links.clear();
+            }
+            void SetLinks(std::vector<UInt8> vecLinks) { links = vecLinks;}
             ~SingleMapInfo() { mapId = 0 ; force = 0 ; links.clear();}
             UInt8 GetMapId() const { return mapId;}
             UInt8 GetForce() const { return force;}
@@ -21,7 +25,11 @@ namespace GData
     class BattleMapInfo
     {
         public:
-            BattleMapInfo(UInt8 id, std::vector<SingleMapInfo*> info )  : battleId(id), battleMapInfo(info){}
+            BattleMapInfo(UInt8 id )  : battleId(id)
+            {
+                battleMapInfo.clear();
+            }
+            void SetSingleMapInfo(std::vector<SingleMapInfo*> vecSingleInfo) { battleMapInfo = vecSingleInfo;}
             ~BattleMapInfo() { battleId = 0 ; battleMapInfo.clear();}
             UInt8 GetBattleId() const { return battleId;}
             SingleMapInfo* GetSingleMapInfo(UInt8 mapId);

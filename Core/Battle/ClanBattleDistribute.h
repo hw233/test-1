@@ -25,9 +25,7 @@ namespace Battle
     class DistributeInfo   //军团战某个位置上的信息
     {
         public:
-            DistributeInfo(UInt64 p,UInt16 f,UInt8 px,UInt8 py) : playerId(p) , fighterId(f) , posx(px) , posy(py)  {
-                std::cout << static_cast<UInt32> (count ++ )<< std::endl;
-            }
+            DistributeInfo(UInt64 p,UInt16 f,UInt8 px,UInt8 py) : playerId(p) , fighterId(f) , posx(px) , posy(py)  {}
             ~DistributeInfo() {}
             UInt64 GetPlayerId() const { return playerId;}
             UInt16 GetFighterId() const { return fighterId;}
@@ -41,7 +39,6 @@ namespace Battle
             UInt16 fighterId;
             UInt8  posx;
             UInt8  posy;
-            static UInt32 count ;
     };
 
 
@@ -49,8 +46,10 @@ namespace Battle
     class MapDistributeInfo   //一张地图的排布
     {
         public:
-            MapDistributeInfo(UInt8 id,std::vector<DistributeInfo*> vecDis) : mapId(id),vecDistributeInfo(vecDis) {}
-            ~MapDistributeInfo() { vecDistributeInfo.clear();}
+            MapDistributeInfo(UInt8 id) : mapId(id)
+            {
+                vecDistributeInfo.clear();
+            }
             UInt8 GetMapId() const { return mapId;}
             std::vector<DistributeInfo*> GetDistributeInfo() const { return vecDistributeInfo;}
             void SetDistributeInfo(std::vector<DistributeInfo*> vecInfo ) { vecDistributeInfo = vecInfo;}

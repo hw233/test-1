@@ -2,14 +2,13 @@
 #include"ClanBattleRoom.h"
 #include"ClanOrder.h"
 #include"ClanBattleComment.h"
-
+#include"Battle/Report2Id.h"
 #include"MsgID.h"
 
 namespace Battle
 {
     BattleDistribute battleDistribute;
   
-    UInt32 DistributeInfo::count = 0;
     bool BattleDistribute::Check(GObject::Player* player)
     {
         GObject::Clan* clan = player->GetClan();
@@ -106,10 +105,15 @@ namespace Battle
         std::vector<MapDistributeInfo*> vecMapDistributeInfo = _room2Distribute[roomId];
         if( vecMapDistributeInfo.empty() )
         {
-            DistributeInfo* info = new DistributeInfo(player->GetId(),fighterId,x,y);
+            DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
+            if( info == NULL )
+                return false;
             std::vector<DistributeInfo*> vecDistributeInfo;
             vecDistributeInfo.push_back(info);
-            MapDistributeInfo* mapdistribute  = new MapDistributeInfo(mapId,vecDistributeInfo);
+            MapDistributeInfo* mapdistribute  = new(std::nothrow) MapDistributeInfo(mapId);
+            if( mapdistribute == NULL )
+                return false;
+            mapdistribute->SetDistributeInfo(vecDistributeInfo);
             vecMapDistributeInfo.push_back(mapdistribute);
             _room2Distribute[roomId] = vecMapDistributeInfo;
         }
@@ -119,10 +123,15 @@ namespace Battle
               if( mapDistribute == NULL )
               {
                     //更新数据
-                    DistributeInfo* info = new DistributeInfo(player->GetId(),fighterId,x,y);
+                    DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
+                    if( info == NULL )
+                        return false;
                     std::vector<DistributeInfo*> vecDistributeInfo;
                     vecDistributeInfo.push_back(info);
-                    MapDistributeInfo* mapdistribute  = new MapDistributeInfo(mapId,vecDistributeInfo);
+                    MapDistributeInfo* mapdistribute  = new(std::nothrow) MapDistributeInfo(mapId);
+                    if( mapdistribute == NULL )
+                        return false;
+                    mapdistribute->SetDistributeInfo(vecDistributeInfo);
                     vecMapDistributeInfo.push_back(mapdistribute);
                     _room2Distribute[roomId] = vecMapDistributeInfo;
               }
@@ -238,6 +247,7 @@ namespace Battle
                 DB7().PushUpdateData("delete from `clan_battle_pos` where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",mapId,info->GetPlayerId(),info->GetFighterId());
                 GObject::Player* player = GObject::globalPlayers[info->GetPlayerId()];
                 player->DelClanBattleFighter(mapId,info->GetFighterId(),info->GetPosX(),info->GetPosY());
+                delete info;
             }
         }
     }
@@ -393,6 +403,8 @@ namespace Battle
         //GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
 
         //UInt8 citys = info->GetMapNum();
+        //
+        st<<static_cast<UInt8>(room->GetStage());
         st<<static_cast<UInt8>(forceId);
         std::vector<MapDistributeInfo*> vecMapDistributeInfo = _room2Distribute[roomId];
         st<<static_cast<UInt8>(vecMapDistributeInfo.size());  //有人的发 没人的不发
@@ -403,7 +415,8 @@ namespace Battle
         std::set<UInt8> enemyForce;
         for(auto it = vecMapDistributeInfo.begin(); it != vecMapDistributeInfo.end(); ++it)
         {
-            st<<static_cast<UInt8>((*it)->GetMapId());
+            UInt8 mapId = (*it)->GetMapId();
+            st<<static_cast<UInt8>(mapId);
             UInt8 count = 0;
             size_t offset = st.size();
             st<<static_cast<UInt8>(count);
@@ -452,7 +465,11 @@ namespace Battle
                     st<<static_cast<UInt8>(*it);
                 }
             }
-
+            UInt32 reportId = Battle::report2IdTable.GetRecentReportId(roomId,mapId);
+            if( reportId != 0 )
+            {
+                st<<static_cast<UInt32>(reportId);
+            }
         }
 
         //留言
@@ -539,8 +556,6 @@ namespace Battle
          UInt8 mapId = fighterInfo->GetMapId();
          UInt8 posx  = fighterInfo->GetPosX();
          UInt8 posy  = fighterInfo->GetPosY();
-         GObject::Clan* clan = player->GetClan();
-         UInt8 forceId = clan->GetBattleForceId();
 
          for( auto it = playerSet.begin(); it != playerSet.end(); ++it)
          {
@@ -554,7 +569,6 @@ namespace Battle
              st<<static_cast<UInt16>(fighterId);
              st<<static_cast<UInt8>(posx);
              st<<static_cast<UInt8>(posy);
-             st<<static_cast<UInt8>(forceId);
              st<<Stream::eos;
              (*it)->send(st);
          }

@@ -18,6 +18,7 @@
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleComment.h"
 #include "Battle/ClanOrder.h"
+#include "Battle/Report2Id.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -180,9 +181,6 @@ void OnClanBattleAddFighter(GameMsgHdr& hdr, const void * data)
        st<<static_cast<UInt16>(fighterId);
        st<<static_cast<UInt8>(posx);
        st<<static_cast<UInt8>(posy);
-       GObject::Clan* clan = player->GetClan();
-       UInt8 forceId = clan->GetBattleForceId();
-       st<<static_cast<UInt8>(forceId);
        st<<Stream::eos;
        player->send(st);
     }
@@ -324,6 +322,35 @@ void OnClanBattleOrder(GameMsgHdr& hdr,const void* data)
     {
         Battle::roomOrderManager.NoticeOtherAllies(player,mapId,order);
     }
+}
+
+
+void OnClanBattleReport(GameMsgHdr& hdr, const void * data)
+{
+    /*
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    GObject::Clan* clan = player->GetClan();
+    UInt32 roomId = clan->GetClanBattleRoomId();
+    std::vector<Battle::Report2Id*> vecReport = Battle::report2IdTable.GetReportIds(roomId);
+    Stream st(REP::CLAN_BATTLE_REPORT);
+    if( vecReport.empty())
+    {
+        st<<static_cast<UInt8>(0);
+    }
+    else
+    {
+        st<<static_cast<UInt8>(vecReport.size());
+        for(auto it = vecReport.begin(); it != vecReport.end(); ++it )
+        {
+            st<<static_cast<UInt8>((*it)->GetCityId());
+            st<<static_cast<UInt32>((*it)->GetReportId());
+        }
+    }
+    st<<Stream::eos;
+    player->send(st);
+    */
 }
 
 

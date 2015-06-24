@@ -1,6 +1,8 @@
 forest = require("MapInfo/forest")
 campaign_1 = require("MapInfo/campaign_1")
 template9  = require("MapInfo/template_9x9")
+
+
 name2table= {
     [1] = forest,
     [2] = forest,
@@ -32,26 +34,30 @@ function GetMapHeight(mapId)
 end
 
 
-id2force ={
-    [0] = 3,    --zhong li
-    [56] = 1,   --force one
-    [57] = 2    --force two
-}
-
-id2form = {
-    [0] =  1,     --grass
-    [63] = 2,    --town
-    [62] = 3,    --forest
-    [64] = 4,    --hill
-    [65] = 0
-}
 function GetLayers(mapId)
     return name2table[mapId].layers
 end
 
+
+function GetTileSetsWithGid(mapId)
+    local tileset = {}
+    local tilesets = GetTileSets(mapId)
+    print(#tilesets)
+    for i = 1, #tilesets do
+        local gid = tilesets[i].firstgid
+        local name = tilesets[i].name
+        tileset[gid] = name
+    end
+    return tileset
+end
+
+
+
 function GetTileSets(mapId)
     return name2table[mapId].tilesets
 end
+
+
 
 function GetForceInfo(mapId)   --get force info from map
     local layers = GetLayers(mapId)
@@ -71,6 +77,43 @@ function GetMapInfo(mapId)
     end
 end
 
+--get foceid 
+function GetForce2Id(mapId)
+    local tilesets = GetTileSets(mapId)
+    local forceWithId = {}
+    for i=1,#tilesets do
+        if tilesets[i].name == "tiles" then
+            local firstgid = tilesets[i].firstgid
+            local tiles = tilesets[i].tiles
+            for j=1,#tiles do
+               local id = tiles[j].id
+               local forceId = firstgid+id
+               local force = tiles[j].properties["force"]
+               forceWithId[forceId] = tonumber(force)
+            end
+        end
+    end
+    return forceWithId
+end
+
+--0 uncross 1 grass 2 forest 3 town 4 hill
+function GetForm2Id(mapId)
+    local tilesets = GetTileSets(mapId)
+    local formWithId = {}
+    for i=1,#tilesets do
+        if tilesets[i].name == "map" then
+            local firstgid = tilesets[i].firstgid
+            local tiles = tilesets[i].tiles
+            for j=1,#tiles do
+                local id = tiles[j].id
+                local tileId = id+firstgid
+                formWithId[tileId] = id+2
+            end
+        end
+    end
+    return formWithId
+end
+
 
 --get landform info
 function GetMap(mapId)
@@ -81,11 +124,14 @@ function GetMap(mapId)
     local height = GetMapHeight(mapId)
     table.insert(Map,width)
     table.insert(Map,height)
+    local formWithId = GetForm2Id(mapId)
     for i=1,#map do
         if map[i] == 0 and force[i] == 0 then
             table.insert(Map,0)
-        else
-            table.insert(Map,id2form[map[i]])
+        else if map[i] == 0 then
+            table.insert(Map,1)
+        end
+            table.insert(Map,formWithId[map[i]])
         end
     end
     return Map
@@ -97,11 +143,12 @@ function GetForce(mapId)
     local Force = {}
     local force = GetForceInfo(mapId)
     local map   = GetMapInfo(mapId)
+    local forceWithId = GetForce2Id(mapId)
     for i=1,#map do
-        if map[i] == 0 and force[i] == 0 then
+        if force[i] == 0 then
             table.insert(Force,0)
         else
-            table.insert(Force,id2force[force[i]])
+            table.insert(Force,forceWithId[force[i]])
         end
     end
     return Force
@@ -176,6 +223,7 @@ function GetAllForceNum()
     return ForceNumAll
 end
 
+
 function GetAllDirect2Force()
     local directionAll = {}
     for i=1,#name2table do
@@ -184,3 +232,23 @@ function GetAllDirect2Force()
     end
     return directionAll
 end
+
+
+--[[
+local table = GetTileSetsWithGid(1)
+for k,v in pairs(table) do
+    print(k..":"..v)
+end
+
+local b = GetForce(1)
+print(#b)
+for i=1,#b do
+    print("the value is"..b[i])
+end
+
+local c = GetMap(1)
+print(#c)
+for i=1,#c do
+    print("the tile is"..c[i])
+end
+--]]

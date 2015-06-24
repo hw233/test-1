@@ -20,6 +20,7 @@ namespace GData
     {
         public:
             BattleAward(UInt8 i,UInt32 e,UInt32 m): mapId(i),exp(e),money(m) {}
+            ~BattleAward() { vecItem.clear();}
             UInt8 GetMapId() const {   return mapId;  }
             UInt32 GetMoney() const {   return money;  }
             UInt32 GetExp()  const {   return exp; }
@@ -50,6 +51,8 @@ namespace GData
                 }
                 return _BattleAwardTable[mapId];
             }
+
+            ~BattleAwardTable() { delete []_BattleAwardTable;}
 
         private:
             BattleAward* _BattleAwardTable[AWARD_MAX];

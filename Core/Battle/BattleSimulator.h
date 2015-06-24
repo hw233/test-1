@@ -26,7 +26,7 @@ namespace Battle
     {
         public:
             BattleSimulator(BattleFighter * bf, BattleFighter * bo,UInt8 distance = 1 , bool rpt = false,UInt32 limitTime = 80);
-            virtual ~BattleSimulator() {};
+            virtual ~BattleSimulator()  {}
             inline int getId() {return _id;} 
 
             void start(UInt8 prevWin = 0xFF, bool checkEnh = true);   

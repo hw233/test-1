@@ -18,9 +18,22 @@ namespace Battle
         return NULL;
     }
 
+    void RoomOrder::DeleteOrder(Order* order)
+    {
+        for(auto it = orders.begin(); it != orders.end();++it)
+        {
+            if( *it == order)
+            {
+                it = orders.erase(it);
+            }
+        }
+    }
+
     void RoomOrder::InsertOrder(UInt8 forceId,UInt8 mapId,UInt8 order)
     {
-        Order* newOrder = new Order(forceId,mapId,order);
+        Order* newOrder = new(std::nothrow) Order(forceId,mapId,order);
+        if( newOrder == NULL)
+            return;
         orders.push_back(newOrder);
     }
 
@@ -30,8 +43,11 @@ namespace Battle
         if( roomOrder == NULL )
         {
             std::vector<Order*> vecOrder;
-            vecOrder.push_back(new Order(forceId,mapId,order));
-            roomOrder = new RoomOrder(roomId,vecOrder);
+            vecOrder.push_back(new(std::nothrow) Order(forceId,mapId,order));
+            roomOrder = new(std::nothrow) RoomOrder(roomId);
+            if( roomOrder == NULL )
+                return;
+            roomOrder->SetRoomOrder(vecOrder);
         }
         else
         {
@@ -60,11 +76,20 @@ namespace Battle
         std::vector<Order*> vecOrder;
         if( roomOrder == NULL )
         {
-            vecOrder.push_back(new Order(forceId,mapId,order));
-            roomOrder = new RoomOrder(roomId,vecOrder);
+            vecOrder.push_back(new(std::nothrow) Order(forceId,mapId,order));
+            roomOrder = new(std::nothrow) RoomOrder(roomId);
+            if( roomOrder == NULL)
+                return false;
+            roomOrder->SetRoomOrder(vecOrder);
         }
         else
         {
+            Order* pOrder = roomOrder->GetOrder(mapId,forceId);
+            if( pOrder != NULL )
+            {
+                roomOrder->DeleteOrder(pOrder);
+                delete pOrder;
+            }
             roomOrder->InsertOrder(forceId,mapId,order);
         }
 

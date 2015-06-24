@@ -30,11 +30,19 @@ namespace Battle
     class RoomOrder
     {
         public:
-            RoomOrder(UInt32 id,std::vector<Order*> os) : roomId(id), orders(os) {}
+            RoomOrder(UInt32 id) : roomId(id)
+            {
+                orders.clear();
+            }
+            void SetRoomOrder(std::vector<Order*> vecOrder)
+            {
+                orders = vecOrder;
+            }
             UInt32 GetRoomId() const { return roomId;}
             void SetRoomId(UInt32 id) { roomId = id;}
             Order* GetOrder(UInt8 mapId,UInt8 forceId);
             void InsertOrder(UInt8 forceId,UInt8 mapId,UInt8 order);
+            void DeleteOrder(Order* order);
             std::vector<Order*> GetOrders() const { return orders;}
         private:
             UInt32 roomId;

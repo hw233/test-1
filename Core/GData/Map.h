@@ -22,12 +22,17 @@ namespace GData
     class MapInfo
     {
         public:
-            MapInfo(UInt8 w,UInt8 h,UInt8 cn,vecInfo t,vecInfo c) : width(w),height(h),campNum(cn),tileInfo(t),campInfo(c) {}
+            MapInfo(UInt8 w,UInt8 h,UInt8 cn) : width(w),height(h),campNum(cn)
+            {
+                camp2direction.clear();
+            }
             UInt8 GetWidth() const { return width;}
             UInt8 GetHeight() const { return height;}
             vecInfo GetTileInfo() const { return tileInfo;}
             vecInfo GetCampInfo() const { return campInfo;}
             UInt8 GetCampNum() const { return campNum;}
+            void SetCampInfo(vecInfo info) { campInfo = info;}
+            void SetTileInfo(vecInfo info) { tileInfo = info;}
             void InsertCampDir(UInt8 campId,UInt8 dir) { camp2direction[campId] = dir ;}
             UInt8 GetAttackDirect(UInt8 side) { return camp2direction[side];}
         private:
@@ -41,6 +46,7 @@ namespace GData
     class MapTable
     {
         public:
+            ~MapTable() { delete []_mapInfo;}
             void loadMapInfo(UInt8 mapId,MapInfo* info);
             MapInfo* GetMapInfo(UInt8 mapId);
         private:

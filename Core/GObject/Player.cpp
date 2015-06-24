@@ -710,6 +710,7 @@ namespace GObject
         {
             if( (*it)->GetMapId() == mapId && (*it)->GetFighterId() == fighterId )
             {
+                delete (*it);
                 it = _vecClanBattleFighter.erase(it);
                 break;
             }

@@ -25,11 +25,14 @@ namespace Battle
         Water = 255
     };
 
+
     class BattleObject
     {
         public:
             BattleObject(UInt8 c, UInt8 px, UInt8 py/*, BattleField * field*/): _cls(c), _hp(0), _pointX(px), _pointY(py)/*,_field(field) */{}
-            virtual ~BattleObject() {};
+            virtual ~BattleObject() 
+            { 
+            };
 
             //inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
 

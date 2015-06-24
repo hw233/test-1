@@ -874,7 +874,7 @@ return {
       spacing = 0,
       margin = 0,
       image = "D:/threekingdoms_svn/ClientConfig/tilemaps/ui/tiles.png",
-      imagewidth = 378,
+      imagewidth = 945,
       imageheight = 149,
       tileoffset = {
         x = 2,
@@ -903,7 +903,7 @@ return {
     },
     {
       name = "plus_normal",
-      firstgid = 58,
+      firstgid = 61,
       tilewidth = 78,
       tileheight = 82,
       spacing = 0,
@@ -921,7 +921,7 @@ return {
     },
     {
       name = "map",
-      firstgid = 59,
+      firstgid = 62,
       tilewidth = 192,
       tileheight = 228,
       spacing = 0,
@@ -2213,9 +2213,9 @@ return {
       properties = {},
       encoding = "lua",
       data = {
-        0, 58, 58, 0, 0,
-        58, 58, 0, 0, 0,
-        0, 58, 58, 0, 0
+        0, 61, 61, 0, 0,
+        61, 61, 0, 0, 0,
+        0, 61, 61, 0, 0
       }
     },
     {
@@ -2230,9 +2230,9 @@ return {
       properties = {},
       encoding = "lua",
       data = {
-        0, 0, 60, 0, 0,
-        0, 0, 59, 0, 0,
-        0, 0, 0, 61, 0
+        0, 0, 63, 0, 0,
+        0, 0, 62, 0, 0,
+        0, 0, 0, 64, 0
       }
     },
     {

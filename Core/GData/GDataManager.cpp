@@ -349,7 +349,9 @@ namespace GData
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.prob,monsterInfo.itemId,monsterInfo.itemNum);
+            GObject::Monster* mon = new(std::nothrow) GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.prob,monsterInfo.itemId,monsterInfo.itemNum);
+            if( mon == NULL )
+                return false;
             GObject::monsterTable.InsertMonster(mon);
             lc.advance();
         }
@@ -382,6 +384,7 @@ namespace GData
 
             if( AllTile.size() != AllForce.size() )
             {
+                lua_close(L);
                 return false;
             }
             //处理这个table
@@ -401,7 +404,16 @@ namespace GData
                 {
                     campInfo.push_back(static_cast<UInt8>(force.get<UInt8>(j+1)));
                 }
-                MapInfo* info = new MapInfo(width,height,forceNum,tileInfo,campInfo);
+                MapInfo* info = new(std::nothrow) MapInfo(width,height,forceNum);
+                if( info == NULL )
+                {
+                    lua_close(L);
+                    return false;
+                }
+
+                info->SetTileInfo(tileInfo);
+                info->SetCampInfo(campInfo);
+
                 lua_tinker::table direct = AllDirection.get<lua_tinker::table>(i+1);
                 std::vector<UInt8> vecForceId;
                 std::vector<UInt8> vecDirection;
@@ -426,6 +438,7 @@ namespace GData
 
             }
         }
+        lua_close(L);
         return true;
     }
 
@@ -441,7 +454,9 @@ namespace GData
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            GData::BattleAward* award = new GData::BattleAward(AwardInfo.mapId,AwardInfo.exp,AwardInfo.moneyNum);
+            GData::BattleAward* award = new(std::nothrow) GData::BattleAward(AwardInfo.mapId,AwardInfo.exp,AwardInfo.moneyNum);
+            if( award == NULL )
+                return false;
             std::vector<UInt32> vecId;
             std::vector<UInt32> vecNum;
             StringTokenizer st(AwardInfo.itemIds,",");
@@ -479,7 +494,9 @@ namespace GData
 
         while(execu->Next() == DB::DB_OK)
         {
-            GData::ClanBattleBase* base = new ClanBattleBase(battleBase.battleId,battleBase.explimit,battleBase.forcenum,battleBase.playermin,battleBase.playermax);
+            GData::ClanBattleBase* base = new(std::nothrow) ClanBattleBase(battleBase.battleId,battleBase.explimit,battleBase.forcenum,battleBase.playermin,battleBase.playermax);
+            if( base == NULL )
+                return false;
             GData::clanBattleBaseTable.InsertBase(base);
             lc.advance();
         }
@@ -508,6 +525,7 @@ namespace GData
 
             if( AllBattleMap.size() == 0 )
             {
+                lua_close(L);
                 return false;
             }
             //处理这个table
@@ -529,15 +547,18 @@ namespace GData
                     {
                         links.push_back(static_cast<UInt8>(Links.get<UInt8>(k+1)));
                     }
-                    GData::SingleMapInfo* singleInfo = new SingleMapInfo(mapId,force,links);
+                    GData::SingleMapInfo* singleInfo = new(std::nothrow) SingleMapInfo(mapId,force);
+                    singleInfo->SetLinks(links);
                     links.clear();
                     mapInfo.push_back(singleInfo);
                 }
-                GData::BattleMapInfo* battleMapInfo = new BattleMapInfo(i+1,mapInfo);
+                GData::BattleMapInfo* battleMapInfo = new(std::nothrow) BattleMapInfo(i+1);
+                battleMapInfo->SetSingleMapInfo(mapInfo);
                 mapInfo.clear();
                 GData::battleMapTable.loadBattleMap(battleMapInfo);
             }
         }
+        lua_close(L);
         return true;
     }
 }

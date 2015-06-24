@@ -231,6 +231,7 @@ namespace Battle
         }
         return NULL;
     } 
+
     void BattleFighter::InsertFighterInfo(Stream& st,UInt8 flag)  //0表示入场信息，1 表示散仙战斗编号
     {
         if(m_mainFighter)
@@ -244,7 +245,10 @@ namespace Battle
         st << static_cast<UInt16>(GetId());
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
+        st << static_cast<UInt8>(10);
     }
+
+
     BattleField* BattleFighter::GetField()
     { 
         if(m_mainFighter && m_mainFighter != this) 
@@ -316,39 +320,49 @@ namespace Battle
     void BattleFighter::AddSkill() 
     { 
         preActionList.push_back(GetBaseActionNum());
-        if(_fighter!=NULL)
+        if( _fighter == NULL )
         {
-            for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
-                preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
+            return;
         }
-    } 
+        for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
+        {
+            preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
+        }
+    }
+
+
+    UInt8 baseData[3][2] = {
+        {1,2},
+        {1,2},
+        {2,2}
+    };
 
     UInt8 BattleFighter::GetMovePower()
     {
-        lua_State * L = lua_open();
+        //lua_State * L = lua_open();
         //luaOpen_base(L);
         //luaOpen_string(L);
         //luaOpen_table(L);
-        luaL_openlibs(L);
-        std::string path = cfg.scriptPath+"items/map.lua";
-        lua_tinker::dofile(L,path.c_str());
+        //luaL_openlibs(L);
+        //std::string path = cfg.scriptPath+"items/map.lua";
+        //lua_tinker::dofile(L,path.c_str());
         UInt8 stype = GetTypeId();
-        UInt8 power = lua_tinker::call<UInt8>(L,"GetMovePower",stype); 
+        UInt8 power = baseData[stype-1][1]; //lua_tinker::call<UInt8>(L,"GetMovePower",stype); 
         return power;
     }
 
 
     UInt8 BattleFighter::GetAttackRange()
     {
-        lua_State * L = lua_open();
+        //lua_State * L = lua_open();
         //luaOpen_base(L);
         //luaOpen_string(L);
         //luaOpen_table(L);
-        luaL_openlibs(L);
-        std::string path = cfg.scriptPath+"items/map.lua";
-        lua_tinker::dofile(L,path.c_str());
+        //luaL_openlibs(L);
+        //std::string path = cfg.scriptPath+"items/map.lua";
+        //lua_tinker::dofile(L,path.c_str());
         UInt8 stype = GetTypeId();
-        UInt8 range = lua_tinker::call<UInt8>(L,"GetAttackRange",stype); 
+        UInt8 range = baseData[stype-1][0]; //lua_tinker::call<UInt8>(L,"GetAttackRange",stype); 
         return range;
     }
 
