@@ -19,7 +19,10 @@
 #include "Version.h"
 #include "GObject/GVar.h"
 #include "GObject/Mail.h"
+#include "GObject/Fighter.h"
 #include "Server/OidGenerator.h"
+#include "Battle/BattleSimulator.h"
+#include "Battle/BattleFighter.h"
 
 GMHandler gmHandler;
 
@@ -30,6 +33,7 @@ GMHandler::GMHandler()
     Reg(3, "mail", &GMHandler::OnSendMail);
     Reg(3, "addfighter", &GMHandler::OnAddFighter);
     Reg(3, "addmoney",&GMHandler::OnAddMoney);
+    Reg(3, "battle",&GMHandler::OnBattle);
     _printMsgPlayer = NULL;
 }
 
@@ -158,3 +162,43 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
     UInt32 num = atoi(args[1].c_str());
     player->AddMoney(id , num);
 }
+
+void GMHandler::OnBattle( GObject::Player * player, std::vector<std::string>& args)
+{
+    if( args.size() != 2 )
+        return;
+    UInt16 id1 = atoi(args[0].c_str());
+    GObject::Fighter* fgt1 = GObject::globalFighters[id1];
+    if(!fgt1)
+        return ;
+    UInt16 id2 = atoi(args[1].c_str());
+    GObject::Fighter* fgt2 = GObject::globalFighters[id2];
+    if(!fgt2)
+        return ;
+    Battle::BattleFighter * bf1 = Battle::BattleSimulator::CreateFighter(fgt1->GetClass(),NULL,fgt1, 0, 0);
+    Battle::BattleFighter * bf2 = Battle::BattleSimulator::CreateFighter(fgt2->GetClass(),NULL,fgt2, 0, 0);
+    
+    Battle::BattleSimulator bsim(bf1,bf2,1);
+    bsim.start();
+    UInt32 BattleReport = bsim.getId();
+    cout << "GM命令 战斗ID " << BattleReport << std::endl;
+}
+
+void GMHandler::Battle(UInt16 id1, UInt16 id2)
+{ 
+
+    GObject::Fighter* fgt1 = GObject::globalFighters[id1];
+    if(!fgt1)
+        return ;
+    GObject::Fighter* fgt2 = GObject::globalFighters[id2];
+    if(!fgt2)
+        return ;
+    Battle::BattleFighter * bf1 = Battle::BattleSimulator::CreateFighter(fgt1->GetClass(),NULL,fgt1, 0, 0);
+    Battle::BattleFighter * bf2 = Battle::BattleSimulator::CreateFighter(fgt2->GetClass(),NULL,fgt2, 0, 0);
+    
+    Battle::BattleSimulator bsim(bf1,bf2,1);
+    bsim.start();
+    UInt32 BattleReport = bsim.getId();
+    cout << "GM命令 战斗ID " << BattleReport << std::endl;
+} 
+

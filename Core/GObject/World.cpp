@@ -11,6 +11,7 @@
 #include <time.h>
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleRoom.h"
+#include "MsgHandler/GMHandler.h"
 
 
 #define W_CHAT_MAX 20
@@ -66,6 +67,8 @@ namespace GObject
         AddTimer(1* 1000, world_clanBattle_putFighters, this, 10*1000);
 
         AddTimer(5*1000,World_clanBattle_OneRound,this,70*1000);
+
+        //GMHandler::Battle(1,2);
 
         return true; 
     }

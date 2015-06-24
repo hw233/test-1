@@ -27,6 +27,7 @@ private:
 public:
     GObject::Player* _printMsgPlayer;
 
+    static void Battle(UInt16 fighterId1, UInt16 fighterId2) ;
 private:
 
 	void OnAddExp(GObject::Player *, std::vector<std::string>&);
@@ -35,6 +36,7 @@ private:
 	void OnSendMail(GObject::Player *, std::vector<std::string>&);
     void OnAddFighter( GObject::Player * player, std::vector<std::string>& args );
     void OnAddMoney(GObject::Player *player,std::vector<std::string>&);
+    void OnBattle(GObject::Player *player,std::vector<std::string>&);
 
 };
 

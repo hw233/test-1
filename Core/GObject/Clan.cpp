@@ -247,7 +247,7 @@ namespace GObject
                 cl->SetLevel(1);
                 globalClan.add(cl->GetId(),cl);
                 globalNamedClans.add(cl->GetName(), cl);
-                DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",cl->GetId(),cl->GetName().c_str(),0,cl->GetAnnouncement().c_str(), cl->GetAnnouncement2().c_str(), 0,0,1,0,cl->GetPersonMax());
+                DB2().PushUpdateData("INSERT INTO `clan`(`clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax`) VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",cl->GetId(),cl->GetName().c_str(),0,cl->GetAnnouncement().c_str(), cl->GetAnnouncement2().c_str(), 0,0,1,0,cl->GetPersonMax());
                 return cl;
             }
             else if(cl->GetClanNumberCount() < cl->GetPersonMax())

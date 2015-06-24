@@ -28,7 +28,7 @@ namespace Battle
     {
         ground->PushFighter(player,fighterId,x,y);
     }
-
+    
     void RoomBattle::InsertSingleBattle(SingleBattle* singBt)
     {
         singleBattles.push_back(singBt);

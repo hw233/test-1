@@ -260,7 +260,18 @@ namespace Battle
 
             virtual bool IsStoped(){return false;}
 
+            void AddKillCount(){ ++_killCount;}
+            UInt16 GetKillCount(){ return _killCount;}
+
             GObject::Player* GetOwner() const { return _fighter->GetOwner();}   //by qsj
+            //设置某一小兵的血量
+            void SetSoldierHp(UInt8 index,UInt32 hp);
+            //获得某一小兵的血量
+            UInt32 GetSoldierHp(UInt8 index);
+            //设置主将血量
+            //void SetMainFighterHP(UInt32 hp);
+            //获得主将血量
+            //UInt32 GetMainFighterHP() const { return m_mainFighter->getHP();}
         protected:
 
             UInt8 _crick;  //硬直
@@ -328,6 +339,7 @@ namespace Battle
 
             std::list<BattleBuff> bufflst;
             UInt8 _direction;
+            UInt16 _killCount;
         public:
             BattleObject * _target;
     };

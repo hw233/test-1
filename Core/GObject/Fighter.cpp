@@ -11,6 +11,7 @@ namespace GObject
     { 
         //memSet(_armor, 0, 5 * sizeof(ItemEquip *));
         memset(_armor, 0, sizeof(_armor));
+        m_baseSkills.clear();
     } 
 
     void Fighter::SetLevelAndExp(UInt8 l , UInt64 e)   
@@ -67,6 +68,8 @@ namespace GObject
 
     FVarSystem* Fighter::GetFVar() 
     {
+        if(!_owner)
+            return NULL;
         if(!fVarSystem)
             fVarSystem = new FVarSystem(_owner->getId(),getId());
         return fVarSystem;

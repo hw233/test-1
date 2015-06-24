@@ -228,6 +228,14 @@ namespace Battle
         }
     }
 
+    static UInt8 priority [4][4] = {
+        {1,2,3,4},
+        {1,2,3,4},
+        {1,2,3,4},
+        {1,2,3,4}
+    };
+
+
     void BattleGround::Move()
     {
         //选择对象
@@ -266,9 +274,12 @@ namespace Battle
             std::cout <<" 移动到 "<<  static_cast<UInt32>(mx)<< " , " << static_cast<UInt32>(my) <<std::endl;
             currentBf->InsertFighterInfo(_pack);  //Stream
 
-            UInt8 rand = uRand(20);
-            _pack << static_cast<UInt8>(mx) << static_cast<UInt8>(my) << static_cast<UInt8>(rand)<<static_cast<UInt8>(0); //无战斗发生
-            _oneRoundCostTime += rand;
+            //UInt8 rand = uRand(255);
+            _pack << static_cast<UInt8>(mx);
+            _pack << static_cast<UInt8>(my);
+            _pack << static_cast<UInt8>(currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>(0); //无战斗发生
+            _oneRoundCostTime += currentBf->GetNowTime2();
              
             //排布信息同步
             Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my);
@@ -299,13 +310,13 @@ namespace Battle
             currentBf->SetGroundX(ax);
             currentBf->SetGroundY(ay);
             
-            UInt8 rand = uRand(20);
+            //UInt8 rand = uRand(255);
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(ax) << static_cast<UInt8>(ay);
-            _pack << static_cast<UInt8>(rand);
+            _pack << static_cast<UInt8>(currentBf->GetNowTime2());
             _pack << static_cast<UInt8>(1);
 
-            _oneRoundCostTime +=rand; 
+            _oneRoundCostTime += currentBf->GetNowTime2();
 
             //currentBf->InsertFighterInfo(_pack);
             target.bo->InsertFighterInfo(_pack);
@@ -314,14 +325,6 @@ namespace Battle
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
             
-            /*
-            if( win != 2 )
-            {
-                currentBf->setHP(100);
-                (target.bo)->setHP(100);
-                win = 2;
-            }
-            */
             _pack << win << reportId;
 
             //往排布那边同步战将数据
@@ -331,7 +334,14 @@ namespace Battle
             }
             else
             {
-                Battle::battleDistribute.UpdateDistributeInfo(_mapId,currentBf->GetOwner(),x,y,3);
+                Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),x,y,currentBf->getHP());
+                std::map<UInt8,UInt32> id2hp;
+                for( UInt8 i = 0 ; i < 10 ; ++i )
+                {
+                   UInt32 hp = currentBf->GetSoldierHp(i);
+                   id2hp[i] = hp;
+                }
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,id2hp);
             }
 
             if( target.bo->getHP() <= 0 )
@@ -340,7 +350,16 @@ namespace Battle
             }
             else
             {
-                Battle::battleDistribute.UpdateDistributeInfo(_mapId,(target.bo)->GetOwner(),x,y,3);
+                //更新主将的血量
+                Battle::battleDistribute.UpdateMainFighterHP(_mapId,(target.bo)->GetOwner(),x,y,(target.bo)->getHP());
+                //更新小兵们的血量
+                std::map<UInt8,UInt32> id2hp;
+                for( UInt8 i = 0 ; i < 10 ; ++i )
+                {
+                   UInt32 hp = (target.bo)->GetSoldierHp(i);
+                   id2hp[i] = hp;
+                }
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,(target.bo)->GetOwner(),x,y,id2hp);
             }
             //cout
             TestCoutBattleS(target.bo);
@@ -512,12 +531,6 @@ namespace Battle
 
     void BattleGround::ShootCurrentPosAttack()
     {
-        static UInt8 priority [4][4] = {
-            {1,2,3,4},
-            {1,2,3,4},
-            {1,2,3,4},
-            {1,2,3,4}
-        };
         UInt8 x = currentBf->GetGroundX();
         UInt8 y = currentBf->GetGroundY();
         Ascoord pos = Ascoord(x,y);
@@ -671,12 +684,6 @@ namespace Battle
     void BattleGround::BowAnalyse(std::list<Ascoord> path,Ascoord target)
     {
         std::reverse(path.begin(),path.end());
-        static UInt8 priority [4][4] = {
-                          {1,2,3,4},
-                          {1,2,3,4},
-                          {1,2,3,4},
-                          {1,2,3,4}
-                      };
         //按照这个路径走一下  获得总的一个行动力消耗 走到可攻击点就行了
         UInt8 cost = 0;
         Ascoord attack;
@@ -705,15 +712,9 @@ namespace Battle
         }
     }
 
+    //按照这个路径走一下  获得总的一个行动力消耗 走到可攻击点就行了
     void BattleGround::Analyse(std::list<Ascoord> path,Ascoord& target)
     {
-        static UInt8 priority [4][4] = {
-                          {1,2,3,4},
-                          {1,2,3,4},
-                          {1,2,3,4},
-                          {1,2,3,4}
-                      };
-        //按照这个路径走一下  获得总的一个行动力消耗 走到可攻击点就行了
         UInt8 cost = 0;
         Ascoord attack;
         std::reverse(path.begin(),path.end());
@@ -776,17 +777,8 @@ namespace Battle
 
     UInt8 BattleGround::GetRideSub(const UInt8& posx ,const UInt8& posy)
     { 
-         //TODO  返回消耗 (考虑周围敌军情况)
-        //lua_State * L = lua_open();
-        //luaOpen_base(L);
-        //luaOpen_string(L);
-        //luaOpen_table(L);
-        //luaL_openlibs(L);
-        // std::string path = cfg.scriptPath+"items/map.lua";
-        // lua_tinker::dofile(L,path.c_str());
          UInt8 stype = currentBf->GetTypeId();
          UInt8 form = _mapGround[posx+posy*_x];
-         //UInt8 rideSub = lua_tinker::call<UInt8>(L,"GetRideSub",stype,form); 
          UInt8 sub = RideSub[stype-1][form-1];
          return sub;
     }
@@ -830,6 +822,17 @@ namespace Battle
         bf->SetBattleIndex(actId);
         //bf->InsertFighterInfo(_pack,1);
         std::cout << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
+
+        //设置主将及小兵的血量
+        UInt32 roomId = _id-_mapId;
+        Battle::DistributeInfo* info =Battle::battleDistribute.GetDistributeInfo(roomId,_mapId,x,y);
+        UInt32 mainFighterHP = info->GetMainFighterHP();
+        bf->setHP(mainFighterHP);
+        std::map<UInt8,UInt32> id2hp = info->GetSoldiersHP();
+        for( auto it = id2hp.begin(); it != id2hp.end(); ++it )
+        {
+           bf->SetSoldierHp(it->first,it->second);
+        }
         return bf;
     } 
 

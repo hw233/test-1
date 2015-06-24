@@ -11,7 +11,7 @@
 namespace Battle
 {
 
-    BattleField::BattleField(UInt16 fieldDistance, UInt16 timeActionLimit):_fieldDistance(fieldDistance),_timeActionLimit(timeActionLimit)
+    BattleField::BattleField(UInt8 mapId1, UInt8 mapId2, UInt16 fieldDistance, UInt16 timeActionLimit):_mapId1(mapId1),_mapId2(mapId2),_fieldDistance(fieldDistance),_timeActionLimit(timeActionLimit)
     {
         //memset(_objs, 0, sizeof(_objs));
     }
@@ -207,8 +207,8 @@ namespace Battle
 
     void BattleField::GetBSEnterInfo(Stream& st)
     { 
-        return ;
-        st << static_cast<UInt8>(1);
+        st << static_cast<UInt8>(_mapId1);
+        st << static_cast<UInt8>(_mapId2);
         for(UInt8 i= 0; i < 2; ++i)
         { 
             st << static_cast<UInt8>(_fighters[i].size());

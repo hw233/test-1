@@ -60,7 +60,7 @@ namespace Battle
         switch(type)
         {
             case e_run:
-                if(1)
+                if(1)//GetBSNumber() == 0 || GetBSNumber() == 11)
                 {
                     std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
                     std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);

@@ -30,6 +30,8 @@ namespace GObject
 
     UInt32 FVarSystem::GetFVar(UInt32 id, UInt32 now)
     {
+        if(this == NULL)
+            return 0;
         if(id >= FVAR_MAX || m_FVars[id] == 0) return 0;
 
         if(CheckReset(id , now)) DelFVar(id);

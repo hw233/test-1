@@ -16,6 +16,8 @@ namespace Battle
         setNumber(0);
 
         _nowTime = -1;
+        
+        _killCount = 0;
 
         m_mainFighter = NULL;
 
@@ -400,10 +402,10 @@ namespace Battle
         {
             return;
         }
-        for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
-        {
-            preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
-        }
+        //for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
+        //{
+        //    preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
+        //}
     }
 
 
@@ -509,4 +511,30 @@ namespace Battle
     { 
        TRACE_LOG("战将编号%d ,技能编号：%d",GetBSNumber(),_ab._skillId);
     } 
+
+
+    void BattleFighter::SetSoldierHp(UInt8 index,UInt32 hp)
+    {
+        if( index < 0 || index >= MYFIGHTERMAX)
+        {
+            return;
+        }
+        m_fighters[index]->setHP(hp);
+    }
+
+    UInt32 BattleFighter::GetSoldierHp(UInt8 index)
+    {
+        if( index < 0 || index >= MYFIGHTERMAX )
+        {
+            return 0;
+        }
+        return m_fighters[index]->getHP();
+    }
+    
+    /*
+    void BattleFighter::SetMainFighterHP(UInt32 hp)
+    {
+        m_mainFighter->setHP(hp);
+    }
+    */
 }

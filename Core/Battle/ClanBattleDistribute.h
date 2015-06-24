@@ -28,7 +28,7 @@ namespace Battle
     class DistributeInfo   //军团战某个位置上的信息
     {
         public:
-            DistributeInfo(UInt64 p,UInt16 f,UInt8 px,UInt8 py) : playerId(p) , fighterId(f) , posx(px) , posy(py)  {}
+            DistributeInfo(UInt64 p,UInt16 f,UInt8 px,UInt8 py) : playerId(p) , fighterId(f) , posx(px) , posy(py),mainFighterHP(0)  {}
             ~DistributeInfo() {}
             UInt64 GetPlayerId() const { return playerId;}
             UInt16 GetFighterId() const { return fighterId;}
@@ -37,14 +37,21 @@ namespace Battle
             UInt8  GetPosY() const { return posy;}
             void   SetPosX(UInt8 px)  { posx = px ; }
             void   SetPosY(UInt8 py)  { posy = py ; }
-            void   SetSoldierNum(UInt8 num) { soldierNum = num;}
-            UInt8  GetSoldierNum() const { return soldierNum;}
+            //void   SetSoldierNum(UInt8 num) { soldierNum = num;}
+            //UInt8  GetSoldierNum() const { return soldierNum;}
+            void   SetSoldiersHP();
+            void   SetMainFighterHP( UInt32 hp ) { mainFighterHP = hp;}
+            UInt32   GetMainFighterHP() { return mainFighterHP;}
+            void   SetSoldiersHP(std::map<UInt8,UInt32> id2hp) { index2hp = id2hp;}
+            std::map<UInt8,UInt32> GetSoldiersHP() { return index2hp;}
         private:
             UInt64 playerId;
             UInt16 fighterId;  //战将Id
-            UInt8  soldierNum; //小兵各数
             UInt8  posx;
             UInt8  posy;
+            //UInt8  soldierNum; //小兵各数
+            UInt32 mainFighterHP; //主将血量
+            std::map<UInt8,UInt32> index2hp;  //小兵对应的血量
     };
 
 
@@ -85,9 +92,9 @@ namespace Battle
             void  NoticeAlliesAddFighter(GObject::Player* player, UInt16 fighterId);
             void  NoticeAlliesDelFighter(GObject::Player* player,UInt8 mapId,UInt8 posx,UInt8 posy);
             void  NoticeAlliesMoveFighter(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId,UInt8 destx,UInt8 desty);
-            void  UpdateDistributeInfo(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt8 soldierNum);
             map<UInt32,std::vector<MapDistributeInfo*>> GetData() const { return _room2Distribute;}
-
+            void UpdateMainFighterHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt32 hp);
+            void UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::map<UInt8,UInt32>id2hp);
         private:
             map<UInt32,std::vector<MapDistributeInfo*>> _room2Distribute;
     };
