@@ -8,6 +8,8 @@
 #include "Server/OidGenerator.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "GData/BattleAward.h"
+#include "Battle/ClanBattleRoom.h"
 #include "FVar.h"
 
 #define P_CHAT_MAX 10
@@ -269,11 +271,9 @@ namespace GObject
         for(;it != _fighters.end();++it)
         { 
             (it->second)->MakeFighterInfo(st);
-        } 
-        
-        st<<static_cast<UInt8>(1);     
+        }
+        st << static_cast<UInt8>(GetJoinClanBattle());
         std::cout << "获得玩家信息：" << GetName() << std::endl;
-
     }
 
     ChatHold* Player::GetChatHold()
@@ -529,11 +529,15 @@ namespace GObject
         clan->LoadClanInfo(this,"","",50);
         clan->SetPicIndex(picIndex);
         clan->SetLevel(1);
+        clan->SetClanBattleRoomId(0);
+        clan->SetBattleForceId(0);
+        clan->SetClanFame(0);
+        clan->SetConquests(0);
         globalClan.add(clan->GetId(),clan);
         globalNamedClans.add(clan->GetName(), clan);
         SetClanPos(1);
         clan->LoadPlayer(this,1);
-        DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,50);
+        DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0,0);
 
         //Stream st(REP::CLAN_OPTION);
         //st << static_cast<UInt8>(0x02);
@@ -629,7 +633,108 @@ namespace GObject
         if(freeMax > Count )
             return freeMax - Count;
         return 0;
-    } 
+    }
+
+    void Player::GiveBattleAward(UInt8 mapId)
+    {
+        GData::BattleAward* award = GData::battleAwardTable.GetBattleAward(mapId);
+        if( award == NULL )
+        {
+            return;
+        }
+
+        //判断背包情况
+        UInt8 status = 0;
+        //发奖励
+        UInt32 moneyNum = award->GetMoney();
+        AddMoney(1,moneyNum);
+        std::vector<GData::ItemInfo> vecItem = award->GetItems();
+        for( auto it = vecItem.begin() ; it != vecItem.end() ; ++it )
+        {
+            GetPackage()->AddItem((*it).itemId,(*it).itemNum);
+        }
+        UInt32 exp = award->GetExp();
+        SetVar(VAR_EXP,GetVar(VAR_EXP)+exp);
+
+        //
+        Stream st(REP::BATTLE_AWARD);
+        st<<static_cast<UInt8>(status);
+        st<<Stream::eos;
+        send(st);
+    }
+    /*
+    UInt8 Player::OpenClanBattle()
+    {
+        Clan* clan = GetClan();
+        if( clan == NULL )
+        {
+            std::cout<<"sorry you have no clan"<<std::endl;
+            return 0;
+        }
+        UInt8 pos = GetClanPos();  //只有会长和副会长才能开启军团战
+        if( pos < 2 )
+        {
+            std::cout<<"sorry have no root"<<std::endl;
+            return 1;
+        }
+        UInt8 status = clan->GetClanBattleStatus();
+        if( status != 0 )
+        {
+            std::cout<<"sorry have opened"<<std::endl;
+            return 2;
+        }
+        clan->SetClanBattleStatus(1);
+        DB7().PushUpdateData( "update clan set `clanBattleStatus`= %u where clanId = %u ",static_cast<UInt8>(1),clan->GetId());
+        return 3;
+    }
+    */
+
+    UInt8 Player::SignUpClanBattle()   //报名军团战
+    {
+        Clan* clan = GetClan();
+        if( clan == NULL )
+        {
+            return 1;
+        }
+
+        UInt32 roomId  = clan->GetClanBattleRoomId();
+        UInt8 pos =  GetClanPos();
+        if(roomId == 0 )
+        {
+            //开启军团战
+            if( pos < 2 )
+            {
+                SetJoinClanBattle(1);
+                DB7().PushUpdateData( "update clan_player set `isClanBattle`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId()); 
+                Battle::clanBattleRoomManager.EnterRoom(this);
+                return 0;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+        else
+        {
+            UInt8 isJoin = GetJoinClanBattle();
+            if( isJoin != 0 )
+            {
+                return 3;
+            }
+            SetJoinClanBattle(1);
+            DB7().PushUpdateData( "update clan_player set `isClanBattle`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId());
+            return 0;
+        }
+    }
+
+    void Player::InsertClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
+    {
+        ClanBattleFighter* battleInfo = new ClanBattleFighter(mapId,fighterId,posx,posy);
+        if( battleInfo == NULL )
+            return;
+        _vecClanBattleFighter.push_back(battleInfo);
+    }
+
     UInt8 Player::UpFighter(UInt16 fighterId)
     { 
         static UInt32 cost[] = {5 ,15 ,30 ,50 ,75 ,105 ,140 ,180 ,225 ,275 ,330 ,390 ,455 ,525 ,600 ,680 ,765 ,855 ,950 ,1050};
@@ -647,4 +752,32 @@ namespace GObject
 
     UInt8 Player::GetLevel() { return getMainFighter()->GetLevel();}
 
+    void Player::DelClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
+    {
+        for( auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it )
+        {
+            if( (*it)->GetMapId() == mapId && (*it)->GetFighterId() == fighterId )
+            {
+                delete (*it);
+                it = _vecClanBattleFighter.erase(it);
+                break;
+            }
+        }
+    }
+
+    ClanBattleFighter* Player::GetClanBattleFighter(UInt16 fighterId)
+    {
+        if( fighterId <= 0 )
+        {
+            return NULL;
+        }
+        for(auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it)
+        {
+             if( (*it)->GetFighterId() == fighterId)
+             {
+                 return (*it);
+             }
+        }
+        return NULL;
+    }
 }

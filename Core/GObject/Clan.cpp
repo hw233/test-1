@@ -202,9 +202,9 @@ namespace GObject
             st << pl->GetName();
             st << static_cast<UInt32>(pl->GetVar(VAR_BATTLE_POINT));
             st << static_cast<UInt8>(pl->GetLevel());
-        } 
-        st << static_cast<UInt32>(0);
-        st << static_cast<UInt32>(0);
+        }
+        st << static_cast<UInt32>(GetConquests()); 
+        st << static_cast<UInt32>(GetClanFame());
     } 
 
     UInt8 Clan::GetPosCount(UInt8 pos)
@@ -217,6 +217,21 @@ namespace GObject
         } 
         return count;
     } 
+
+
+    std::vector<Player*> Clan::GetJoinClanBattlePlayer()
+    {
+        std::vector<Player*> vecPlayer;
+        for( auto it = _players.begin(); it != _players.end(); ++it )
+        {
+            if( (*it)->GetJoinClanBattle())
+            {
+                vecPlayer.push_back(*it);
+            }
+        }
+        return vecPlayer;
+    }
+
     Clan* Clan::GetBossClan()
     { 
         for(UInt32 i = 0; i < 100; ++i)

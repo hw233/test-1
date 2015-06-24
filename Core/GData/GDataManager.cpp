@@ -15,7 +15,12 @@
 #include "GData/Map.h"
 #include "GObject/Monster.h"
 #include "Common/LoadingCounter.h"
-
+#include "Script/lua_tinker.h"
+#include "Server/Cfg.h"
+#include "Server/WorldServer.h"
+#include "GData/BattleAward.h"
+#include "GData/ClanBattleBase.h"
+#include "GData/BattleMap.h"
 namespace GData
 {
     //静态成员申明区
@@ -74,14 +79,34 @@ namespace GData
             std::abort();
         }
 
-        if (!LoadMapInfo())  
+        /*if (!LoadMapInfo())  
+        {
+            fprintf(stderr, "Load LoadMapInfo Error !\n");
+            std::abort();
+        }*/
+        if (!LoadMonster())  
+        {
+            fprintf(stderr, "Load Monster Error !\n");
+            std::abort();
+        }
+        if( ! LoadMapConfig() )
         {
             fprintf(stderr, "Load LoadMapInfo Error !\n");
             std::abort();
         }
-        if (!LoadMonster())  
+        if (!LoadBattleAwardData())  
         {
-            fprintf(stderr, "Load LoadMonster Error !\n");
+            fprintf(stderr, "Load BattleAward Error !\n");
+            std::abort();
+        }
+        if( !LoadClanBattleBase())
+        {
+            fprintf(stderr, "Load ClanBattleBase Error !\n");
+            std::abort();
+        }
+        if( !LoadBattleMap() )
+        {
+            fprintf(stderr, "Load BattleMap Error !\n");
             std::abort();
         }
 
@@ -230,7 +255,6 @@ namespace GData
             fgt->SetBaseAttr(dbfb.hp,dbfb.attack,dbfb.defend,dbfb.magatk,dbfb.magdef,dbfb.critical, dbfb.criticalDef, dbfb.hit, dbfb.evade);
 
             fgt->SetSkill(dbfb.skills);
-
             GObject::globalFighters.add(fgt);
         }    
 
@@ -296,7 +320,8 @@ namespace GData
         }
         return true;
     } 
-
+    
+    /*
     bool GDataManager::LoadMapInfo()
     { 
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -310,6 +335,7 @@ namespace GData
         }
         return true;
     } 
+    */
 
 
     bool GDataManager::LoadMonster()
@@ -323,11 +349,216 @@ namespace GData
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            GObject::Monster* mon = new GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.prob,monsterInfo.itemId,monsterInfo.itemNum);
+            GObject::Monster* mon = new(std::nothrow) GObject::Monster(monsterInfo.id,monsterInfo.groupId,monsterInfo.name,monsterInfo.power,monsterInfo.money,monsterInfo.prob,monsterInfo.itemId,monsterInfo.itemNum);
+            if( mon == NULL )
+                return false;
             GObject::monsterTable.InsertMonster(mon);
             lc.advance();
         }
         lc.finalize();
+        return true;
+    }
+
+    bool GDataManager::LoadMapConfig()
+    {
+        lua_State * L = lua_open();
+        vecInfo tileInfo;
+        vecInfo campInfo;
+        luaL_openlibs(L);
+        {
+            if(!cfg.scriptPath.empty())
+            {
+                lua_tinker::table pkg = lua_tinker::get<lua_tinker::table>(L, "package");
+                const char * path = pkg.get<const char *>("path");
+                std::string newpath = path;
+                newpath = newpath + ";" + cfg.scriptPath + "?.lua" + ";" + cfg.scriptPath + "?/init.lua";
+                pkg.set("path", newpath.c_str());
+            }
+
+            std::string path = cfg.scriptPath+"ParseMapInfo.lua";
+            lua_tinker::dofile(L,path.c_str());
+            lua_tinker::table AllTile = lua_tinker::call<lua_tinker::table>(L,"GetAllMap"); 
+            lua_tinker::table AllForce = lua_tinker::call<lua_tinker::table>(L,"GetAllForce"); 
+            lua_tinker::table AllForceNum = lua_tinker::call<lua_tinker::table>(L,"GetAllForceNum");
+            lua_tinker::table AllDirection = lua_tinker::call<lua_tinker::table>(L,"GetAllDirect2Force");
+
+            if( AllTile.size() != AllForce.size() )
+            {
+                lua_close(L);
+                return false;
+            }
+            //处理这个table
+            for(UInt8 i = 0; i < AllTile.size(); ++i)
+            {
+                //TODO
+                lua_tinker::table map = AllTile.get<lua_tinker::table>(i+1);
+                UInt8 width = static_cast<UInt8>(map.get<UInt8>(1));
+                UInt8 height = static_cast<UInt8>(map.get<UInt8>(2));
+                UInt8 forceNum = static_cast<UInt8>(AllForceNum.get<UInt8>(i+1));  //势力的数量
+                for( UInt8 j = 2 ; j < map.size() ; ++j )
+                {
+                   tileInfo.push_back(static_cast<UInt8>(map.get<UInt8>(j+1)));
+                }
+                lua_tinker::table force = AllForce.get<lua_tinker::table>(i+1);
+                for(UInt8 j = 0 ; j < force.size() ; ++j )
+                {
+                    campInfo.push_back(static_cast<UInt8>(force.get<UInt8>(j+1)));
+                }
+                MapInfo* info = new(std::nothrow) MapInfo(width,height,forceNum);
+                if( info == NULL )
+                {
+                    lua_close(L);
+                    return false;
+                }
+
+                info->SetTileInfo(tileInfo);
+                info->SetCampInfo(campInfo);
+
+                lua_tinker::table direct = AllDirection.get<lua_tinker::table>(i+1);
+                std::vector<UInt8> vecForceId;
+                std::vector<UInt8> vecDirection;
+                for( UInt8 j = 0; j < direct.size(); ++j )
+                {
+                    if( j % 2 == 0 )
+                    {
+                        vecForceId.push_back(static_cast<UInt8>(direct.get<UInt8>(j+1)));
+                    }
+                    else
+                    {
+                        vecDirection.push_back(static_cast<UInt8>(direct.get<UInt8>(j+1)));
+                    }
+                }
+                for(UInt8 j = 0 ; j < vecForceId.size(); ++j)
+                {
+                    info->InsertCampDir(vecForceId[j],vecDirection[j]);
+                }
+                GData::mapTable.loadMapInfo(i+1,info);  //第0位不存数据
+                tileInfo.clear();
+                campInfo.clear();
+
+            }
+        }
+        lua_close(L);
+        return true;
+    }
+
+
+    bool GDataManager::LoadBattleAwardData()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading BattleAward");
+        lc.reset(1000);
+        DBBattleAward AwardInfo;
+        if(execu->Prepare("SELECT `mapId`,`exp`,`moneyNum`,`itemIds`,`itemNums` FROM `battleAward`", AwardInfo) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::BattleAward* award = new(std::nothrow) GData::BattleAward(AwardInfo.mapId,AwardInfo.exp,AwardInfo.moneyNum);
+            if( award == NULL )
+                return false;
+            std::vector<UInt32> vecId;
+            std::vector<UInt32> vecNum;
+            StringTokenizer st(AwardInfo.itemIds,",");
+            for(UInt8 i = 0; i < st.count(); ++i)
+                vecId.push_back(::atoi(st[i].c_str()));
+
+            StringTokenizer st1(AwardInfo.itemNums,",");
+            for(UInt8 i = 0; i < st1.count(); ++i)
+                vecNum.push_back(::atoi(st[i].c_str()));
+
+            if( vecId.size() != vecNum.size() )
+                return false;
+            std::vector<ItemInfo> vecItem;
+            for(UInt8 i = 0 ; i < vecId.size() ; ++i )
+            {
+              vecItem.push_back(ItemInfo(vecId[i],vecNum[i]));
+            }
+            award->SetItems(vecItem);
+            GData::battleAwardTable.InsertBattleAward(award);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GDataManager::LoadClanBattleBase()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Clan BattleBase");
+        lc.reset(1000);
+        DBClanBattleBase battleBase;
+        if(execu->Prepare("SELECT `battleId`,`explimit`,`forcenum`,`playermin`,`playermax` FROM `corps_campaign_base`", battleBase) != DB::DB_OK)
+            return false;
+
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::ClanBattleBase* base = new(std::nothrow) ClanBattleBase(battleBase.battleId,battleBase.explimit,battleBase.forcenum,battleBase.playermin,battleBase.playermax);
+            if( base == NULL )
+                return false;
+            GData::clanBattleBaseTable.InsertBase(base);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+
+    bool GDataManager::LoadBattleMap()
+    {
+        lua_State * L = lua_open();
+        luaL_openlibs(L);
+        {
+            if(!cfg.scriptPath.empty())
+            {
+                lua_tinker::table pkg = lua_tinker::get<lua_tinker::table>(L, "package");
+                const char * path = pkg.get<const char *>("path");
+                std::string newpath = path;
+                newpath = newpath + ";" + cfg.scriptPath + "?.lua" + ";" + cfg.scriptPath + "?/init.lua";
+                pkg.set("path", newpath.c_str());
+            }
+
+            std::string path = cfg.scriptPath+"paseCampaignMap.lua";
+            lua_tinker::dofile(L,path.c_str());
+            lua_tinker::table AllBattleMap = lua_tinker::call<lua_tinker::table>(L,"GetAllBattleMap"); 
+
+            if( AllBattleMap.size() == 0 )
+            {
+                lua_close(L);
+                return false;
+            }
+            //处理这个table
+            std::vector<UInt8> links;
+            std::vector<GData::SingleMapInfo*> mapInfo;
+
+            for(UInt8 i = 0; i < AllBattleMap.size(); ++i)
+            {
+                //TODO
+
+                lua_tinker::table battleMap = AllBattleMap.get<lua_tinker::table>(i+1);
+                for(UInt8 j = 0 ; j < battleMap.size() ; ++j)
+                {
+                    lua_tinker::table singleMap = battleMap.get<lua_tinker::table>(j+1);
+                    UInt8 mapId = singleMap.get<UInt8>(1);
+                    UInt8 force = singleMap.get<UInt8>(2);
+                    lua_tinker::table Links = singleMap.get<lua_tinker::table>(3);
+                    for(UInt8 k = 0 ; k < Links.size() ;  ++k )
+                    {
+                        links.push_back(static_cast<UInt8>(Links.get<UInt8>(k+1)));
+                    }
+                    GData::SingleMapInfo* singleInfo = new(std::nothrow) SingleMapInfo(mapId,force);
+                    singleInfo->SetLinks(links);
+                    links.clear();
+                    mapInfo.push_back(singleInfo);
+                }
+                GData::BattleMapInfo* battleMapInfo = new(std::nothrow) BattleMapInfo(i+1);
+                battleMapInfo->SetSingleMapInfo(mapInfo);
+                mapInfo.clear();
+                GData::battleMapTable.loadBattleMap(battleMapInfo);
+            }
+        }
+        lua_close(L);
         return true;
     }
 }

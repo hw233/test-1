@@ -222,4 +222,25 @@ CREATE TABLE `item_template2` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `battleAward`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `battleAward` (
+      `mapId` tinyint(3) NOT NULL DEFAULT '1' COMMENT '地图ID',
+      `exp`   int(10) NOT NULL DEFAULT '0' COMMENT '经验',
+      `moneyNum`   int(10) NOT NULL DEFAULT '0' COMMENT '铜钱数量',
+      `itemIds`  varchar(255) NOT NULL,
+      `itemNums`  varchar(255) NOT NULL,
+      PRIMARY KEY (`mapId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `corps_campaign_base`;
+CREATE TABLE `corps_campaign_base` (
+      `battleId` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '战役Id',
+      `explimit` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '军团声望限制',
+      `forcenum`   int(10) unsigned NOT NULL DEFAULT '0' COMMENT '一张战役地图上的势力的个数',
+      `playermin`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '玩家个数下限',
+      `playermax`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '玩家的个数上限',
+      PRIMARY KEY (`battleId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

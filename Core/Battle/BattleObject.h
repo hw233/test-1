@@ -7,8 +7,8 @@ namespace Battle
 {
     enum 
     {
-        Rider = 1 ,   //骑将
-        Walker = 2 ,  //步将
+        Walker = 1 ,  //步将
+        Rider = 2 ,   //骑将
         shooter = 3 , //弓将
         adviser = 4 , //谋将
 
@@ -24,11 +24,15 @@ namespace Battle
         Tree = 254,
         Water = 255
     };
+
+
     class BattleObject
     {
         public:
             BattleObject(UInt8 c, UInt8 px, UInt8 py/*, BattleField * field*/): _cls(c), _hp(0), _pointX(px), _pointY(py)/*,_field(field) */{}
-            virtual ~BattleObject() {};
+            virtual ~BattleObject() 
+            { 
+            };
 
             //inline void setSideAndPos(UInt8 s, UInt8 p) { _side = s; _pos = p; }
 

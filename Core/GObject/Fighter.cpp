@@ -56,7 +56,14 @@ namespace GObject
         return fgt;
     }
 
-    UInt8 Fighter::GetSide(){ if(_owner) return _owner->GetBattleSide(); return 0;}
+    UInt8 Fighter::GetSide()
+    { 
+        if(_owner)
+        {
+            return _owner->GetBattleSide();
+        }
+        return 0;
+    }
 
     FVarSystem* Fighter::GetFVar() 
     {

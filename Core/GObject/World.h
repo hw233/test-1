@@ -38,6 +38,9 @@ namespace GObject
             static void World_Test( World * );
             static void World_Govern_SendInfo(World *); //每一小时发一组怪物id以及胜负 给客户端 
             static void World_Govern_SendAward(World *);//每2min客户端自己给玩家发送一次奖励
+            static void world_clanBattle_putFighters(World* );//军团战放入战将
+            static void World_clanBattle_OneRound(World*);  //军团战战术一回合
+            static void World_clanBattle_stageCheck(World*); //军团战阶段检测
 
         public:
 

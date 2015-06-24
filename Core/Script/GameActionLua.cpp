@@ -95,7 +95,6 @@ namespace Script
         //CLASS_DEF(GameActionLua, RunItemTaskAction);
         //CLASS_DEF(GameActionLua, GetSharpDay);
         //CLASS_DEF(GameActionLua, GetPlayerPtr);
-        //
         CLASS_ADD(Player);
         CLASS_DEF(Player, GetVar);
         CLASS_DEF(Player, GetVarS);
@@ -253,7 +252,6 @@ namespace Script
         return TimeUtil::SharpDay(0, now);
     }
 
-
     UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
     {
         return Run<UInt16>(NULL,"GetGovernDropMoney", res);
@@ -270,11 +268,31 @@ namespace Script
         return Run<UInt16>(NULL, "GetRandFighter");
     }
 
+    UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息
+    {
+        return Run<UInt8>(NULL,"GetInfo",mapId,x,y);
+    }
+
     UInt32 GameActionLua::RandMonster(UInt8 group)
     {
         return Run<UInt32>(NULL,"RandMonster",group);
     }
 
+
+    UInt8 GameActionLua::GetRideSub(UInt8 stype, UInt8 landform)
+    {
+        return Run<UInt8>(NULL, "GetRideSub",stype,landform);
+    }
+
+    UInt8 GameActionLua::GetAttackRange(UInt8 stype)
+    {
+        return Run<UInt8>(NULL,"GetAttackRange",stype);
+    }
+
+    UInt8 GameActionLua::GetMovePower(UInt8 stype)
+    {
+        return Run<UInt8>(NULL,"GetMovePower",stype);
+    }
 
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)
     //{

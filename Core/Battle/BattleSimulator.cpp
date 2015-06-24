@@ -190,14 +190,14 @@ namespace Battle
 
     UInt8 BattleSimulator::GetWin()
     { 
-        if(_fgt[0]&& _fgt[0]->getHP() == 0 && _fgt[1] && _fgt[1]->getHP() == 0)
-            return 2;
-        if(!_fgt[0] || !_fgt[0]->getHP())
-            return 0;
-        if(!_fgt[1] || !_fgt[1]->getHP())
-            return 1;
-        if(_fgt[0]->IsStoped() || _fgt[1]->IsStoped())
+        if( _fgt[0] && _fgt[0]->getHP() == 0 && _fgt[1] && _fgt[1]->getHP()==0 )
             return 3;
+        if( !_fgt[0] || _fgt[0]->getHP() <= 0 )
+            return 1;
+        if( !_fgt[1] || _fgt[1]->getHP() <= 0 )
+            return 0;
+        if(_fgt[0]->IsStoped() || _fgt[1]->IsStoped())
+            return 2;
         return -1;
     } 
 
@@ -210,14 +210,19 @@ namespace Battle
         { 
             case 1:
                 fgt = new BattleRideFighter(bf,f,pointX,pointY);
+                break;
             case 2:
                 fgt = new BattleWalkFighter(bf,f,pointX,pointY);
+                break;
             case 3:
                 fgt =  new BattleShootFighter(bf,f,pointX,pointY);
+                break;
             case 4:
                 fgt =  new BattleAdviceFighter(bf,f,pointX,pointY);
+                break;
             default:
                 fgt =  new BattleRideFighter(bf,f,pointX,pointY);
+                break;
         } 
         //fgt = new BattleShootFighter(bf,f,pointX,pointY);
         if(!fgt)

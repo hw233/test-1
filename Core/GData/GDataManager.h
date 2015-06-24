@@ -22,8 +22,13 @@ namespace GData
             static bool LoadFighterBase();
             static bool LoadSkillData();
             static bool LoadSkillBuff();
-            static bool LoadMapInfo();
+            //static bool LoadMapInfo();
             static bool LoadMonster();
+            static bool LoadMapConfig();
+            static bool LoadBattleAwardData();
+            static bool LoadClanBattleBase();
+            static bool LoadBattleMap();
+
         private:
 
     };

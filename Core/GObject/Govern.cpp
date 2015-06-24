@@ -17,6 +17,9 @@ namespace GObject
          {
              m_fighter = NULL;
          }
+         //memset(_speedUpId2Num,0,sizeof(_speedUpId2Num));
+         //memset(_offLineId2Num,0,sizeof(_offLineId2Num));
+         //memset(_vecGovernInfo,0,sizeof(_vecGovernInfo));
     }
 
 
@@ -111,8 +114,6 @@ namespace GObject
         Monster* mon = monsterTable.GetMonster(groupId,monsterId);
         return mon;
     }
-
-
 
     UInt8 GovernManager::FightWithMonster(Monster* mon)
     {
@@ -216,6 +217,7 @@ namespace GObject
         for(UInt8 i=begin ;i < _vecGovernInfo.size(); ++i )
         {
             st<<static_cast<UInt32>(_vecGovernInfo[i].monsterId);
+
             bool isGet = _vecGovernInfo[i].isGet;
             UInt8 res = _vecGovernInfo[i].res;
             res = res | (isGet << 4);
@@ -258,10 +260,9 @@ namespace GObject
 
 
 
-
     void GovernManager::GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,bool isGet, std::vector<ItemInfo>& vecItem)
     {
-        if(res <= 0  || res > 5 )
+        if(res <= 0  || res >= 5 )
         {
             return ;
         }

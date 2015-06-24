@@ -1,13 +1,18 @@
 #include "AStar.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
+
 namespace GObject
 {
     AStar::AStar():
 	    m_numSurround(6)
     {
-
+        //memset(m_map,0 ,m_col*m_row*sizeof(UInt8));
+        //memset(m_battleInfo, 0 , m_col*m_row*sizeof(UInt8));
 	    for(UInt8 i = 0 ; i<6 ; ++i)
         {
-		    m_gAdd[i] = 10;
+		    //m_gAdd[i] = 10;
             m_surround[i] = Ascoord(0,0);
         }
 	    ClearObstacles();
@@ -33,6 +38,22 @@ namespace GObject
             m_surround[4] = Ascoord(coord._x-1,coord._y-1);
             m_surround[5] = Ascoord(coord._x,coord._y-1);
         }
+    }
+
+    UInt8 AStar::GetGValue(Ascoord& coord)
+    {
+        
+        /*
+        if( coord._x >= m_row || coord._y >= m_col)
+        {
+            return 0xFF;
+        }
+        //先从地图中把相应的坐标的地形读取出来
+        UInt8 landform = m_map[coord._x+coord._y*m_row];
+        UInt8 g = GameAction()->GetRide(landform);
+        */
+        return 10;
+
     }
 
     void AStar::ClearObstacles()
@@ -65,8 +86,9 @@ namespace GObject
 			    coord  = sd._coord;
                 getAround(sd._coord);
 			    coord = m_surround[i];  //6方向获取周围的点
+                UInt8 g = GetGValue(coord);
 			
-			    if(judgeSurround(coord,sd._coord,sd._g+m_gAdd[i]))
+			    if(judgeSurround(coord,sd._coord,sd._g+g))
 				    return true;
 		    }
 	    }
@@ -77,7 +99,7 @@ namespace GObject
     //G值  即起点到当前节点的消耗
     bool AStar::judgeSurround(const Ascoord& coord,const Ascoord& parentCoord,UInt8 G)
     {
-	    if(coord._x>=0 && coord._x< m_col && coord._y>=0 && coord._y< m_row && !isInList(m_closeList,coord) /*&& !IsObstacle(coord)*/)
+	    if(coord._x >= 0 && coord._x < m_row && coord._y >= 0 && coord._y < m_col && !isInList(m_closeList,coord) && !IsObstacle(coord))
 	    {
 		    StepData* pSD = findFromList(m_openList,coord); //判断将要加入的节点是否已在open表中
 		    if (pSD && pSD->_g > G)   //如果在 判断G值  比较新G值的大小  如果比原来的要小的话  更新路径
@@ -118,7 +140,7 @@ namespace GObject
 
 		    i++;
 
-		    while(i!=end)
+		    while(i != end)
 		    {
 			    if(pSD->_g+pSD->_h > i->_g+i->_h)
 			    {
@@ -224,8 +246,10 @@ namespace GObject
 	    return true;
     }
 
+
+
     bool AStar::IsObstacle(const Ascoord& coord)
     {
-        return m_map[coord._x + coord._y * m_row ] == 0 ;
+        return false;
     }
 }

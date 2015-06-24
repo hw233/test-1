@@ -109,6 +109,10 @@ CREATE TABLE `clan` (
     `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `contribute` int(10) unsigned NOT NULL DEFAULT '0',
     `personMax` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `battleRoomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '公会战房间id',
+    `clanFame` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '公会声望',
+    `conquests` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '公会战绩',
+    `forceId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '公会战所属势力',
     PRIMARY KEY (`clanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -119,6 +123,7 @@ CREATE TABLE `clan_player` (
     `position` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `contribute` int(10) unsigned NOT NULL DEFAULT '0',
     `enterTime` int(10) unsigned NOT NULL DEFAULT '0',
+    `isClanBattle` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否参加公会战',
     PRIMARY KEY (`clanId`,`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -142,14 +147,6 @@ CREATE TABLE `player_apply_clan` (
     PRIMARY KEY (`ClanId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `govern_offlinegain` ;
-CREATE TABLE `govern_offlinegain` (
-    `playerId` bigint(20) unsigned NOT NULL,
-    `itemId` int(10) unsigned NOT NULL DEFAULT '0',
-    `itemNum` bigint(20) unsigned NOT NULL DEFAULT '0',
-    PRIMARY KEY(`playerId`,`itemId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `reportid`; 
 CREATE TABLE `reportid` (
     `maxid` int(10) unsigned NOT NULL DEFAULT '0',
@@ -157,5 +154,58 @@ CREATE TABLE `reportid` (
     PRIMARY KEY (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `clan_battle_pos`; 
+CREATE TABLE `clan_battle_pos` (
+    `mapId`    tinyint(3)  unsigned NOT NULL DEFAULT '0' COMMENT '地图id',
+    `playerId` bigint(20) unsigned NOT NULL COMMENT '玩家Id',
+    `fighterId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '战将id',
+    `posx`     int(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图上的坐标x',
+    `posy`     int(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图上的坐标y',
+    PRIMARY KEY (`mapId`,`playerId`,`fighterId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `clan_battle_room`; 
+CREATE TABLE `clan_battle_room` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `forceId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '势力Id',
+    `battleId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '战役Id',
+    `clans`    varchar(1024) NOT NULL DEFAULT '' COMMENT '军团id们',
+    `fighterNum` int(3) unsigned NOT NULL DEFAULT '0' COMMENT '某一势力的战将数量',
+    `buildTime`  int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建房间的时间',
+    PRIMARY KEY (`roomId`,`forceId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `clan_battle_comment`; 
+CREATE TABLE `clan_battle_comment` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `forceId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '势力Id',
+    `mapId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图id',
+    `playerId` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '留言者Id',
+    `message` varchar(1024) NOT NULL DEFAULT '' COMMENT '留言',
+    PRIMARY KEY (`roomId`,`forceId`,`mapId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `clan_battle_order`; 
+CREATE TABLE `clan_battle_order` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `forceId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '势力Id',
+    `mapId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图id',
+    `order` tinyint(3)  NOT NULL DEFAULT '0' COMMENT '军团令',
+    PRIMARY KEY (`roomId`,`forceId`,`mapId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `report2id`; 
+CREATE TABLE `report2id` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `cityId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '城市Id',
+    `actId`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '回合Id',
+    `reportId` int(10)  NOT NULL DEFAULT '0' COMMENT '战术战报Id',
+    `time`  int(10) NOT NULL DEFAULT '0' COMMENT '战术时间',
+    PRIMARY KEY (`roomId`,`cityId`,`actId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

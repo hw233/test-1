@@ -60,6 +60,16 @@ namespace GObject
             void SetAnnouncement(std::string announcement){ _announcement = announcement;}
             void SetAnnouncement2(std::string announcement){ _announcement2 = announcement;}
 
+            UInt32 GetClanBattleRoomId() { return _clanBattleRoomId; }
+            void  SetClanBattleRoomId(UInt32 roomId) { _clanBattleRoomId = roomId; }
+            UInt8 GetMemberNum() const { return _players.size();}
+            UInt32 GetClanFame() const { return _clanFame;}   //公会声望
+            void SetClanFame(UInt32 fame) { _clanFame = fame;}
+            void SetConquests(UInt32 conquest) { _conquests = conquest;}
+            UInt32 GetConquests() const { return _conquests;} //公会战绩
+            UInt8  GetBattleForceId() const { return _forceId;}
+            void SetBattleForceId(UInt8 forceId) { _forceId = forceId;}
+            std::vector<Player*> GetJoinClanBattlePlayer();
             UInt16 GetClanNumberCount(){ return _players.size();}
 
             void SendStreamOnPos(UInt8 pos, Stream st);
@@ -85,6 +95,10 @@ namespace GObject
             Player* _leader;
 
             UInt8 _personMax;
+            UInt32 _clanBattleRoomId;
+            UInt32 _clanFame;
+            UInt32 _conquests;
+            UInt8  _forceId;
     };
 }
 #endif // CLAN_H_

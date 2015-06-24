@@ -155,6 +155,25 @@ namespace GData
         UInt32 itemId;
         UInt8  itemNum;
     };
+
+    struct DBBattleAward
+    {
+        UInt8 mapId;
+        UInt32 exp;
+        UInt32 moneyNum;
+        std::string itemIds;
+        std::string itemNums;
+    };
+
+
+    struct DBClanBattleBase
+    {
+        UInt8 battleId;
+        UInt32 explimit;
+        UInt8 forcenum;
+        UInt8 playermin;
+        UInt8 playermax;
+    };
 }
 namespace DB
 {
@@ -333,6 +352,28 @@ namespace DB
           UInt16, prob,
           UInt32, itemId,
           UInt8,  itemNum
+       )
+       SPECIALEND()
+
+       SPECIALBEGIN(GData::DBBattleAward)
+       SPECIALDEF(5)
+       (
+          UInt8, mapId,
+          UInt32, exp,
+          UInt32, moneyNum,
+          std::string, itemIds,
+          std::string, itemNums
+       )
+       SPECIALEND()
+
+       SPECIALBEGIN(GData::DBClanBattleBase)
+       SPECIALDEF(5)
+       (
+          UInt8, battleId,
+          UInt32, explimit,
+          UInt8, forcenum,
+          UInt8, playermin,
+          UInt8, playermax
        )
        SPECIALEND()
 }

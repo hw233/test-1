@@ -9,6 +9,9 @@
 #include "ChatHold.h"
 #include "Clan.h"
 #include <time.h>
+#include "Battle/ClanBattleDistribute.h"
+#include "Battle/ClanBattleRoom.h"
+
 
 #define W_CHAT_MAX 20
 
@@ -56,6 +59,13 @@ namespace GObject
 
         AddTimer(10*60*1000, World_Govern_SendInfo,this,(s+1)*1000);
         AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second+3)*1000);
+
+
+        AddTimer(30*60*1000,World_clanBattle_stageCheck,this,5*1000);
+
+        AddTimer(86400 * 1000, world_clanBattle_putFighters, this, 10*1000);
+
+        AddTimer(5*1000,World_clanBattle_OneRound,this,70*1000);
 
 
         return true; 
@@ -112,7 +122,7 @@ namespace GObject
         ns._para = "192.168.88.250";
         LoginMsgHdr hdr1(0xE1, WORKER_THREAD_LOGIN, 8500, 1212121 , sizeof(ns)); 
         GLOBAL().PushMsg(hdr1, &ns);
-        UInt32 BattleId = Battle::battleManager.CreateBattleGround();
+        //UInt32 BattleId = Battle::battleManager.CreateBattleGround();
         /*
         for(UInt8 i = 1; i < 10 ;++i)
         {
@@ -123,18 +133,20 @@ namespace GObject
             Battle::battleManager.EnterBattleGround(BattleId,pl,i);
         }
         */
+        /*
+        UInt8 flag = 1;
         UInt8 i = 1;
         for(auto it = globalPlayerVec.begin(); it != globalPlayerVec.end(); ++it)
         {
-            if( i >= 10 )
+            if( i > 11 )
                 break;
-            Player * pl = (*it);
-            if(!pl)
-                continue;
-            Battle::battleManager.EnterBattleGround(BattleId,pl,i);
-            ++i;
+            Player* pl = *it;
+            Battle::battleManager.EnterBattleGround(BattleId,pl,i, flag);
+            i++;
+            flag = !flag;
         }
         Battle::battleManager.StartGround(BattleId);
+        */
     }
 
     void World::World_Govern_SendInfo(World* world)
@@ -171,4 +183,103 @@ namespace GObject
         }
     }
 
+
+    
+    void World::world_clanBattle_putFighters(World* world)
+    {
+        std::cout<<"put fighters"<<std::endl;
+        map<UInt32,std::vector<Battle::MapDistributeInfo*>> room2Distribute = Battle::battleDistribute.GetData();
+        for( auto it = room2Distribute.begin(); it != room2Distribute.end(); ++it )
+        {
+            UInt32 roomId = it->first;
+            Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+            if( room->GetStage() == 1 )
+            {
+                Battle::RoomBattle* roomBattle = new Battle::RoomBattle(roomId);
+                for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
+                {
+                    UInt8 mapId = (*iter)->GetMapId();
+                    Battle::SingleBattle* singleBattle = new Battle::SingleBattle(roomId,mapId,4);
+                    singleBattle->SetNextStartTime(0);
+                    //Battle::campaignManager.InsertBattleManager(roomId,mapId,0);
+                    std::vector<Battle::DistributeInfo*> vecInfo = (*iter)->GetDistributeInfo();
+                    for( auto iterator = vecInfo.begin(); iterator != vecInfo.end(); ++iterator )
+                    {
+                        //放将进入战场
+                        UInt64 playerId = (*iterator)->GetPlayerId();
+                        UInt16 fighterId = (*iterator)->GetFighterId();
+                        UInt8  posx = (*iterator)->GetPosX();
+                        UInt8  posy = (*iterator)->GetPosY();
+                        GObject::Player* player = GObject::globalPlayers[playerId];
+                        if( player == NULL )
+                            continue;
+                        //Battle::campaignManager.EnterBattleGround(roomId,mapId,player,fighterId,posx,posy);
+                        singleBattle->EnterBattleGround(player,fighterId,posx,posy);
+                    }
+                    roomBattle->InsertSingleBattle(singleBattle);
+                }
+                Battle::battleManager.InsertRoomBattle(roomBattle);
+            }
+        }
+        //Battle::battleManager.StartAll();
+    }
+
+    
+    //军团战战术一回合
+    void World::World_clanBattle_OneRound(World* world)
+    {
+        //
+        std::vector<Battle::RoomBattle*>  roomBattleList = Battle::battleManager.GetRoomBattleList();
+        if( roomBattleList.empty())
+            return;
+        for( auto it = roomBattleList.begin(); it != roomBattleList.end(); ++it)
+        {
+            UInt8 stage = (*it)->GetStage();
+            if( stage != 1 )
+                continue;
+            std::vector<Battle::SingleBattle*> vecSingleBatte = (*it)->GetSingleBattles();
+            for( auto iter = vecSingleBatte.begin(); iter != vecSingleBatte.end(); ++iter)
+            {
+                /*
+                if( (*iter)->IsStop() )
+                    continue;
+                    */
+                UInt32 nextActTime = (*iter)->GetNextStartTime(); 
+                UInt32 now = TimeUtil::Now();
+                if( nextActTime == 0 )
+                {
+                    (*iter)->StartOneRound();
+                    UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
+                    std::cout<<"这一回合的战术消耗 "<<static_cast<UInt32>(timeCost)<<" 秒"<<std::endl;
+                    (*iter)->SetNextStartTime(timeCost+now);
+                }
+                else
+                {
+                    if( fabs( now - (*iter)->GetNextStartTime() ) < 5  )
+                    {
+
+                        (*iter)->StartOneRound();
+                        UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
+                        std::cout<<"这一回合的战术消耗 "<<static_cast<UInt32>(timeCost)<<" 秒"<<std::endl;
+                        (*iter)->SetNextStartTime(timeCost+now);
+                    }
+                }
+            }
+        }
+    }
+
+
+    //判断军团战属于哪一个阶段
+    void World::World_clanBattle_stageCheck(World* world)
+    {
+        std::vector<Battle::ClanBattleRoom*> vecRoom = Battle::clanBattleRoomManager.GetRoomList();
+        for( auto it = vecRoom.begin(); it != vecRoom.end(); ++it )
+        {
+            UInt8 stage = (*it)->GetStage();
+            if( stage == 2 )
+                continue;
+            UInt32 now = TimeUtil::Now();
+            (*it)->SetStage(now);
+        }
+    }
 }

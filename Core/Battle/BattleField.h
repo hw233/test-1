@@ -68,6 +68,7 @@ namespace Battle
                     return NULL;
                 return _objs[side][idx];
             }
+
             inline void deleteObject(UInt16 side, UInt16 idx)
             {
                 if(side < 0 || side > 1 || idx < 0 || idx > 24)

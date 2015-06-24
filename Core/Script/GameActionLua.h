@@ -35,7 +35,12 @@ namespace Script
         public:
             const char* GetItemName(UInt32 itemId);
             const char* GetGreatFighterName(UInt32 fgtId);
+            UInt8  GetInfo(UInt8 mapId,UInt8 x , UInt8 y );
             UInt16 GetRandFighter();
+            UInt8  GetRideSub(UInt8 stype, UInt8 landform);
+            UInt8  GetAttackRange(UInt8 stype);
+            UInt8  GetMovePower(UInt8 stype);
+
 
         public:
             template <typename R> 

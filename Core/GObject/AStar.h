@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "Config.h"
+#include "../Battle/BattleObject.h"
 
 namespace GObject
 {
@@ -14,15 +15,9 @@ namespace GObject
 	    int _x;
 	    int _y;
 
-	    Ascoord()
-	    {
-	    }
+	    Ascoord() {}
 	
-	    Ascoord(int x,int y):
-		    _x(x),
-		    _y(y)
-	    {
-	    }
+	    Ascoord(int x,int y): _x(x),_y(y) {}
 
 	    inline bool operator == (const Ascoord& coord)const
 	    {
@@ -49,41 +44,29 @@ namespace GObject
 	    Ascoord _coord;
 	    Ascoord _parentCoord;
 
-	    StepData()
-	    {
-	    }
+	    StepData() {}
 
 	    StepData(const Ascoord& coord):
-		    _coord(coord)
-	    {
-	    }
+		    _coord(coord){}
     };
 
     class AStar
     {
     public:
         AStar();
-
 	    bool SetMapSize(UInt8 row,UInt8 col);
-
 	    bool ComputeRoute();
-
 	    bool GetRoute(std::vector<Ascoord>* list);
-
 	    void SetObstacle(const Ascoord& coord);
-
 	    void CancleObstacle(const Ascoord& coord);
-
+        UInt8 GetGValue(Ascoord& coord);
 	    void ClearObstacles();
-
 	    bool IsObstacle(const Ascoord& coord);
-	
-	    void  SetStart(const Ascoord& coord)  {m_start  = coord;}
-	    void  SetTarget(const Ascoord& coord) {m_target = coord;}
-	    const Ascoord& GetStart()            {return m_start;}
-	    const Ascoord& GetTarget()           {return m_target;}
+	    void  SetStart(const Ascoord& coord)  {  m_start  = coord;  }
+	    void  SetTarget(const Ascoord& coord) {  m_target = coord;  }
+	    const Ascoord& GetStart()            {   return m_start;  }
+	    const Ascoord& GetTarget()           {   return m_target; }
         void  SetMap(UInt8* map);
-
     private:
         UInt8*  m_map;
 

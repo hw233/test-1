@@ -10,12 +10,19 @@ namespace Battle
     {
         public:
             BattleShootFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
-                BattleFighter(3,bf,f,pointX,pointY)
-        { 
+                BattleFighter(3,bf,f,pointX,pointY),_target(NULL)
+            { 
 
-        } 
-            //virtual void Action();
-            virtual bool PreGetObject(); 
+            }
+            
+            /*
+            virtual ~BattleShootFighter() 
+            {
+                std::cout<<" shootFighter destroy "<<std::endl;
+            }
+            */
+            virtual void Action() {}
+            virtual bool PreGetObject();
             //virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance() {return 0;};
             virtual void resetBattleStatue();
@@ -25,7 +32,7 @@ namespace Battle
             //virtual UInt8 NormolImage();
             //virtual UInt8 NormolObject();
         private:
-            //BattleObject * _target;
+            BattleObject * _target;
     };
 }
 

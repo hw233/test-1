@@ -8,6 +8,9 @@
 #include "GObject/Fighter.h"
 #include "BattleAction.h"
 #include "Battle/BattleSimulator.h"
+#include "Script/GameActionLua.h"
+#include "GObject/Country.h"
+
 namespace Script
 {
     class BattleFormula;
@@ -97,6 +100,7 @@ namespace Battle
             void SetGroundY(UInt8 y){_groundY = y;}
             UInt8 GetGroundX(){ return _groundX;}
             UInt8 GetGroundY(){ return _groundY;}
+            UInt8 GetTypeId() { return _fighter->GetTypeId();}
 
             virtual void Action();  //行动
             //移动
@@ -119,9 +123,10 @@ namespace Battle
 
             BattleField * GetField();
 
-            UInt8 GetRide(){ return 3 ;} //TODO
+            UInt8 GetMovePower();
             UInt8 GetClass(){ return _fighter->GetClass();}
-            UInt8 GetDistance(){ return 1;}   //攻击距离BattleGround
+            UInt8 GetAttackRange();
+            UInt8 GetDistance(){ return 1;}   //
             UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
 
             void setNumber(UInt8 num){ _number = num;}

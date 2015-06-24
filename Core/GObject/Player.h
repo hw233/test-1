@@ -39,6 +39,7 @@
 namespace Battle
 {
     class BattleSimulator;
+    class ClanBattleRoom;
 }
 namespace Script
 {
@@ -70,6 +71,21 @@ namespace GObject
         UInt32 packSize;  //背包空间
         lineup line[6];
     };
+
+
+    struct ClanBattleFighter
+    {
+        ClanBattleFighter(UInt8 m,UInt16 f,UInt8 px,UInt8 py) : mapId(m),fighterId(f),posx(px),posy(py) {}
+        UInt16 GetFighterId() const { return fighterId;}
+        UInt8  GetMapId() const { return mapId;}
+        UInt8  GetPosX()  const { return posx;}
+        UInt8  GetPosY()  const { return posy;}
+        UInt8 mapId;
+        UInt16 fighterId;
+        UInt8 posx;
+        UInt8 posy;
+    };
+
     class VarSystem;
     class FriendManager ;
     class Fighter;
@@ -199,6 +215,7 @@ namespace GObject
             void SetRecChat(UInt8 type, UInt8 v){ recChat |= (!!v << type);}
             UInt8 GetRecChat(UInt8 type){ return recChat&(1<<type);}
 
+
             //业务逻辑
             UInt8 Enchant(UInt8 number);
 
@@ -250,6 +267,17 @@ namespace GObject
 
             UInt8 GetFreeSearch();
 
+            void GiveBattleAward(UInt8 mapId);
+
+            //军团战相关
+            UInt8 SignUpClanBattle();   //报名军团战
+            UInt8 GetClanBattleStatue();  //0未报名   1已报名
+            void  InsertClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy); //加载军团战参战战将信息
+            void  DelClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy);  //删除军团战某一参战战将信息
+            ClanBattleFighter* GetClanBattleFighter(UInt16 fighterId);
+            void SetJoinClanBattle(UInt8 status) { _isClanBattle = status ; }
+            UInt8 GetJoinClanBattle() const { return _isClanBattle;}
+
             UInt8 UpFighter(UInt16 fighterId);
     private:
             //IDTYPE _id;
@@ -264,6 +292,7 @@ namespace GObject
 
             //Clan
             UInt8 _clanPos;  //职位
+            UInt8 _isClanBattle; //是否参加军团战
 
 
             //功能类
@@ -290,6 +319,8 @@ namespace GObject
 
             //治理相关
             GovernManager* m_governManager;
+
+            std::vector<ClanBattleFighter*> _vecClanBattleFighter;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

@@ -576,6 +576,18 @@ void OnSendGovernResult(GameMsgHdr& hdr,const void * data)
     player->GetGovernManager()->SendGovernResult(type);
 }
 
+
+//推图战役奖励
+void OnFarWardAward(GameMsgHdr& hdr,const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 mapId = 0;
+    br >> mapId;
+    player->GiveBattleAward(mapId);
+}
+
+
 void OnFindUp(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;

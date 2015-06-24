@@ -35,6 +35,8 @@ require("items/Awards")
 --require("items/ZhenYuan")
 --require("salePriceLimit")
 require("items/GovernAward")
+require("items/map")
+require("ParseMapInfo")
 --require("AirBook")
 --require("forceCommitArena")
 
