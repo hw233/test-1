@@ -13,6 +13,7 @@
 #include "kingnet_analyzer.h"
 #endif
 #include "World.h"
+#include "ChatHold.h"
 namespace Script
 {
     class WorldScript;
@@ -30,6 +31,7 @@ namespace GObject
             void UnInit();
             std::string GetLogName();
             inline Script::BattleFormula* getBattleFormula() {return _battleFormula;}
+            ChatHold* GetChatHold(){return chatHold;}
 
         private:
             static void World_Midnight_Check( World * );
@@ -45,7 +47,7 @@ namespace GObject
         private:
             Script::BattleFormula * _battleFormula;
             Script::WorldScript * _worldScript;
-            //ChatHold* chatHold;
+            ChatHold* chatHold;
     };
 }
 #endif // WORLD_H_

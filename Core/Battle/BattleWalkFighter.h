@@ -9,16 +9,20 @@ namespace Battle
     {
         public:
             BattleWalkFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
-                BattleFighter(1,bf,f,pointX,pointY),_target(NULL)
+                BattleFighter(1,bf,f,pointX,pointY)
         { 
 
         } 
-            virtual void Action();
+            //virtual void Action();
             virtual bool PreGetObject(); 
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance();
             virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 4;}
+            virtual UInt16 GetSpeed() {return 37;} 
+            //virtual UInt8 NormolAttack();
+            //virtual UInt8 NormolImage();
+            //virtual UInt8 NormolObject();
         private:
             BattleObject* _target; 
     };

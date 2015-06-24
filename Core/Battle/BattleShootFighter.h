@@ -21,14 +21,16 @@ namespace Battle
                 std::cout<<" shootFighter destroy "<<std::endl;
             }
             */
-
-
-            virtual void Action();
-            virtual bool PreGetObject(); 
+            virtual void Action() {}
+            virtual bool PreGetObject();
             //virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance() {return 0;};
             virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 6;}
+
+            virtual UInt8 NormolAttack();
+            //virtual UInt8 NormolImage();
+            //virtual UInt8 NormolObject();
         private:
             BattleObject * _target;
     };

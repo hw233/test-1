@@ -7,6 +7,7 @@
 #include "Battle/BattleManager.h"
 #include "Player.h"
 #include "ChatHold.h"
+#include "Clan.h"
 #include <time.h>
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleRoom.h"
@@ -20,7 +21,7 @@ namespace GObject
     UInt8 time = 0;
     bool World::Init()
     {
-        //chatHold = new ChatHold(W_CHAT_MAX);
+        chatHold = new ChatHold(0,W_CHAT_MAX);
 
         std::string path = cfg.scriptPath + "World/main.lua";
         TimeUtil::TimeAdd(GVAR.GetVar(GVAR_TIMEADD));

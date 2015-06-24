@@ -21,6 +21,7 @@ namespace GObject
         e_attr_criticalDef = 5,
         e_attr_hit = 6,
         e_attr_evade = 7,
+        e_attr_hp = 8,
         e_attr_max
     };
 
@@ -51,7 +52,7 @@ namespace GObject
             //Get
             inline UInt32 getId() { return _id; }
             inline Player * GetOwner() { return _owner; }
-            inline UInt8 GetClass() {return _class;}
+            inline UInt8 GetClass() {return _typeId;}
             inline UInt8 GetSex(){return _sex;}
             inline ItemWeapon * GetWeapon() { return _weapon; } 
             inline ItemArmor * GetArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
@@ -62,9 +63,12 @@ namespace GObject
 
             UInt32 GetVar(UInt32 num);
             void SetVar(UInt32 num, UInt32 val);
+            void AddVar(UInt32 num, UInt32 val);
 
             void SetRad(UInt16 rad) { _bodySize = rad;} 
             UInt16 GetRad() { return _bodySize;}
+
+            UInt8 GetLevel(){return _level;}
 
             void SetSpeed(UInt16 speed){ _speed = speed;}
 
@@ -86,26 +90,32 @@ namespace GObject
 
             UInt32 GetFighterAttr(UInt8 index)
             { 
+                static UInt32 baseUp[]= {20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+                UInt32 up = GetVar(27); // 星级（品质）编号
+                if(up >= 20)
+                    return 0;
+                if(index >= e_attr_max)
+                    return 0;
                 switch(index)
                 { 
                     case e_attr_attack:
-                        return _attack;
+                        return _attack * (baseUp[up] + 100)/100;
                     case e_attr_magatk:
-                        return _magatk;
+                        return _magatk * (baseUp[up] + 100)/100;
                     case e_attr_defend:
-                        return _defend;
+                        return _defend * (baseUp[up] + 100)/100;
                     case e_attr_magdef:
-                        return _magdef;
+                        return _magdef * (baseUp[up] + 100)/100;
                     case e_attr_critical:
-                        return _critical;
+                        return _critical * (baseUp[up] + 100)/100;
                     case e_attr_criticalDef:
-                        return _criticalDef;
+                        return _criticalDef * (baseUp[up] + 100)/100;
                     case e_attr_hit:
-                        return _hit;
+                        return _hit * (baseUp[up] + 100)/100;
                     case e_attr_evade:
-                        return _evade;
-                    case e_attr_max:
-                        return _hp;
+                        return _evade * (baseUp[up] + 100)/100;
+                    case e_attr_hp:
+                        return _hp * (baseUp[up] + 100)/100;
                 } 
                 return 0;
             } 
@@ -115,7 +125,7 @@ namespace GObject
             //强化更新
             void updateEuipmentLoad(UInt8 index);
             UInt32 GetEquipmentUpgradeLoad(UInt8 index);
-            UInt32 GetTotalPower() const;  //获得总战力
+            UInt32 GetTotalPower() ;  //获得总战力
             std::string GetName() const { return _name;}
 
             std::vector<UInt16> m_baseSkills;

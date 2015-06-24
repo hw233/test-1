@@ -10,6 +10,7 @@
 #include "Country.h"
 #include "GData/BattleAward.h"
 #include "Battle/ClanBattleRoom.h"
+#include "FVar.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -39,7 +40,8 @@ namespace GObject
         Stream * st = reinterpret_cast<Stream * >(ptr);
         if(pl->GetRecChat(e_chat_world))
             return true;
-        pl->send(*st);
+        if(pl->isOnline())
+            pl->send(*st);
         return true;
     } 
 
@@ -190,7 +192,7 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
-        if(1)
+        if(!GetClan())
         {
            Stream st(REP::CLAN_LIST);
            SendClanListinfo(st);
@@ -205,6 +207,28 @@ namespace GObject
             st << Stream::eos;
             send(st);
         }
+        if(0 && GetRecChat(e_chat_world))
+        { 
+            Stream st(REP::CHAT);
+            WORLD().GetChatHold()->GetStream(st,10);
+            st << Stream::eos;
+            send(st);
+        } 
+
+        if(0 && GetRecChat(e_chat_friend))
+        { 
+            Stream st(REP::CHAT);
+            GetChatHold()->GetStream(st,10);
+            st << Stream::eos;
+            send(st);
+        } 
+        if(GetRecChat(e_chat_clan))
+        { 
+            Stream st(REP::CHAT);
+            GetClan()->GetChatHold()->GetStream(st,10);
+            st << Stream::eos;
+            send(st);
+        } 
     } 
     void Player::PutFighters( Battle::BattleGround& bsim, int side, bool fullhp ,UInt16 fighterId)
     { 
@@ -248,18 +272,15 @@ namespace GObject
         { 
             (it->second)->MakeFighterInfo(st);
         }
-        } 
-        st<<static_cast<UInt8>(1);     
         st << static_cast<UInt8>(GetJoinClanBattle());
         std::cout << "获得玩家信息：" << GetName() << std::endl;
-
     }
 
     ChatHold* Player::GetChatHold()
     { 
         if(!chatHold)
         { 
-            chatHold = new ChatHold(P_CHAT_MAX);
+            chatHold = new ChatHold(1,P_CHAT_MAX);
         } 
         return chatHold;
     } 
@@ -269,9 +290,12 @@ namespace GObject
         // 聊天协议添加
         //NETWORK()->Broadcast(st);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(0);
-        st << GetName();
-        st << text;
+        //st << static_cast<UInt8>(0);
+        //st << GetName();
+        //st << text;
+        WORLD().GetChatHold()->InsertChat(this,text);
+        WORLD().GetChatHold()->GetStream(st,1);
+        st << Stream::eos;
         globalPlayers.enumerate(enum_send_chat,&st);
         //WORLD()->GetChatHold()->InsertChat(this, text);
     } 
@@ -281,17 +305,18 @@ namespace GObject
         if(!GetClan())
             return ;
 
+        GetClan()->GetChatHold()->InsertChat(this,text);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(e_chat_world);
-        st << GetName();
-        st << text;
+        GetClan()->GetChatHold()->GetStream(st,1);
+        //st << static_cast<UInt8>(e_chat_world);
+        //st << GetName();
+        //st << text;
         st << Stream::eos;
         GetClan()->Boradcast(st,0);
-        GetClan()->GetChatHold()->InsertChat(this,text);
     } 
-    void Player::ChatForFriend(IDTYPE playerId, std::string text)
+    void Player::ChatForFriend(std::string name, std::string text)
     { 
-        Player* pl = globalPlayers[playerId];
+        Player* pl = globalNamedPlayers[name];
         if(!pl)
             return ;
         if(!GetFriendManager()->HasFriend(pl))
@@ -301,11 +326,13 @@ namespace GObject
 
         pl->GetChatHold()->InsertChat(this, text);
         Stream st(REP::CHAT);
-        st << static_cast<UInt8>(e_chat_friend);
-        st << GetName();
-        st << text;
+        //st << static_cast<UInt8>(e_chat_friend);
+        //st << GetName();
+        //st << text;
+        pl->GetChatHold()->GetStream(st,1);
         st << Stream::eos;
         pl->send(st);
+        send(st);
     } 
 
     void Player::AddMail(UInt32 id, UInt8 update)
@@ -472,6 +499,8 @@ namespace GObject
         //Stream st(StreamHand);
         //UInt8 count = 0;
         //size_t offect = st.size();
+        Clan::GetBossClan();
+
         st << static_cast<UInt16>(globalClan.size());
         globalClan.enumerate(GetClanListInfo, &st);
         //GlobalClans::iterator it = globalClan.begin();
@@ -495,6 +524,8 @@ namespace GObject
         if(money < ClanCreateMoney)
             return 2;
         Clan* clan = new Clan(IDGenerator::gClanOidGenerator.ID(), name, this);
+        if(!clan)
+            return 3;
         clan->LoadClanInfo(this,"","",50);
         clan->SetPicIndex(picIndex);
         clan->SetLevel(1);
@@ -503,17 +534,16 @@ namespace GObject
         clan->SetClanFame(0);
         clan->SetConquests(0);
         globalClan.add(clan->GetId(),clan);
-        if(!clan)
-            return 3;
+        globalNamedClans.add(clan->GetName(), clan);
         SetClanPos(1);
         clan->LoadPlayer(this,1);
         DB2().PushUpdateData("INSERT INTO `clan` VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0,0);
 
-        Stream st(REP::CLAN_OPTION);
-        st << static_cast<UInt8>(0x02);
-        clan->GetClanInfo(st);
-        st << Stream::eos;
-        send(st);
+        //Stream st(REP::CLAN_OPTION);
+        //st << static_cast<UInt8>(0x02);
+        //clan->GetClanInfo(st);
+        //st << Stream::eos;
+        //send(st);
 
         return 0;
     } 
@@ -705,6 +735,23 @@ namespace GObject
         _vecClanBattleFighter.push_back(battleInfo);
     }
 
+    UInt8 Player::UpFighter(UInt16 fighterId)
+    { 
+        static UInt32 cost[] = {5 ,15 ,30 ,50 ,75 ,105 ,140 ,180 ,225 ,275 ,330 ,390 ,455 ,525 ,600 ,680 ,765 ,855 ,950 ,1050};
+        Fighter *fgt = findFighter(fighterId);
+        if(!fgt)
+            return 1;
+        UInt8 quality = fgt->GetVar(FVAR_QUALITY);
+        if(quality >= 20)
+            return 2;
+        if(cost[quality] != GetPackage()->DelItem(fighterId + 40000 , cost[quality]))
+            return 3;
+        fgt->AddVar(FVAR_QUALITY,1);
+        return 0;
+    } 
+
+    UInt8 Player::GetLevel() { return getMainFighter()->GetLevel();}
+
     void Player::DelClanBattleFighter(UInt8 mapId,UInt16 fighterId,UInt8 posx,UInt8 posy)
     {
         for( auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it )
@@ -732,6 +779,5 @@ namespace GObject
              }
         }
         return NULL;
-
     }
 }

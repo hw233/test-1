@@ -104,14 +104,14 @@ namespace GData
         public:
             SkillBuff(UInt16 id , const std::string& name)
                 : ObjectBaseT<UInt16>(id,name) { } 
-            void SetCount(UInt8 count1){ count = count1;}
+            void SetCount(float count1){ count = count1;}
             void SetSide(UInt8 side1){ side = side1;}
             void SetType(UInt8 type1){ type = type1;}
         public:
             std::vector<UInt8> attrIds;
             std::vector<UInt8> valueP;
             std::vector<UInt16> value;
-            UInt8 count;
+            float count;
             UInt8 side;
             UInt8 type;
     } ;
@@ -140,7 +140,7 @@ namespace GData
             const SkillCondition * GetSkillCondition() const {return skillConditionManager[_conditionId];} 
             const SkillScope * GetSkillScope() const {return skillScopeManager[_scopeId];}
             const SkillEffect * GetSkillEffect() const {return skillEffectManager[_effectId];}
-            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId,UInt16 cd, UInt16 actionCd, UInt16 actionBackCd, UInt16 mpCost)
+            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, float cd,float actionBeforeCd, float actionCd, float actionBackCd, UInt16 mpCost)
             { 
                 _conditionId = conditionId;
                 _scopeId = scopeId;
@@ -151,12 +151,14 @@ namespace GData
                 _mpCost = mpCost;
             } 
 #endif
-            UInt16 GetCd() const {return _cd;}
-            UInt16 GetActionCd() const { return _actionCd;}
-            UInt16 GetActionBackCd() const { return _actionBackCd;}
+            float GetCd() const {return _cd;}
+            float GetActionCd() const { return _actionCd + _actionBeforedCd;}
+            float GetActionCd1() const { return _actionBeforedCd;}
+            float GetActionCd2() const { return _actionCd;}
+            float GetActionBackCd() const { return _actionBackCd;}
             UInt16 GetMpCost() const { return _mpCost;}
         private:
-#ifdef Skill
+#ifdef SkillT
             SkillCondition * _sc;
             SkillScope * _ss;
             SkillEffect * _se;
@@ -166,9 +168,10 @@ namespace GData
             UInt16 _effectId;
 #endif
 
-            UInt16 _cd;
-            UInt16 _actionCd;
-            UInt16 _actionBackCd;
+            float _cd;
+            float _actionBeforedCd;
+            float _actionCd;
+            float _actionBackCd;
             UInt16 _mpCost;
     };
 

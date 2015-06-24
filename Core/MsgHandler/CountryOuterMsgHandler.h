@@ -263,7 +263,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt8 opt = 0;
-    UInt64 playerId = 0;
+    std::string name;
     std::string context;
     br >> type >> opt;
     if(opt)
@@ -274,7 +274,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
 
     br >> context;
     if(type ==1)
-        br >>  playerId;
+        br >>  name;
 
     switch(type)
     { 
@@ -285,7 +285,7 @@ void OnChat(GameMsgHdr& hdr, const void * data)
             }
         case 1:
             {
-                player->ChatForFriend(playerId, context);
+                player->ChatForFriend(name, context);
                 break;
             }
         case 2:
@@ -402,7 +402,15 @@ void OnClanCreate(GameMsgHdr& hdr, const void * data)
     std::string name;
     UInt8 index;
     br >> name >> index;
-    player->CreateClan(name ,index);
+    UInt8 res = player->CreateClan(name ,index);
+    Stream st(REP::CLAN_CREATE);
+    st << static_cast<UInt8>(res);
+    if(player->GetClan())
+        st << static_cast<UInt32>(player->GetClan()->GetId());
+    else
+        st << static_cast<UInt32>(0);
+    st << Stream::eos;
+    player->send(st);
 }
 
 void OnClanOption(GameMsgHdr& hdr, const void * data)
@@ -455,13 +463,15 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
             {
                 std::string announcement;
                 br >> announcement;
-                if(player->GetClan())
+                UInt8 res = 0;
+                if(player->GetClan() && player->GetClanPos() <= 2)
                 { 
                     player->GetClan()->SetAnnouncement(announcement);
+                    res = 1;
                 } 
                 Stream st(REP::CLAN_OPTION);
                 st << static_cast<UInt8>(0x04);
-                st << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(res);
                 st << Stream::eos;
                 player->send(st);
             }
@@ -491,8 +501,8 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
                 GObject::Player* pl = GObject::globalNamedPlayers[name];
                 if(!pl)
                     break;
-                if(!type)
-                    player->GetClan()->Allow(pl);
+                player->GetClan()->Allow(pl,type);
+                break;
             } 
         case 0x07:
             {
@@ -578,5 +588,18 @@ void OnFarWardAward(GameMsgHdr& hdr,const void * data )
 }
 
 
+void OnFindUp(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt16 fighterId = 0;
+    br >> fighterId;
+    UInt8 res = player->UpFighter(fighterId);
+    Stream st(REP::UP_FIGHTER);
+    st << res;
+    st << fighterId;
+    st << Stream::eos;
+    player->send(st);
+}
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

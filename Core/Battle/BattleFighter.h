@@ -69,7 +69,7 @@ namespace Battle
         //UInt16 _condition ;  // 触发条件编号
         //UInt16 _scpoe ;      // 触发范围编号
         //UInt16 _effect ;     // 触发效果编号
-        UInt8 _cd;           //行动cd  
+        float _cd;           //行动cd  //BATTLE2
         UInt8 _priority ;  //触发优先级
     };
     struct lt_absort
@@ -104,7 +104,7 @@ namespace Battle
 
             virtual void Action();  //行动
             //移动
-             void GoForward(UInt8 flag = 0 ,UInt16 advance = 0);
+             void GoForward(UInt8 flag = 0 ,UInt8 count = 0);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
@@ -134,7 +134,7 @@ namespace Battle
 
             void setMainFighter(BattleFighter * bf){
                 m_mainFighter = bf;
-                setHP(m_mainFighter->getHP());
+                setHP(1000);//m_mainFighter->getHP());
                 for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
                 { 
                     attrBase[i] = m_mainFighter->GetBattleAttr(i);
@@ -165,15 +165,17 @@ namespace Battle
 
             virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
 
-            void SetNowTime(UInt32 time ){ if(_nowTime != time ) SetGone(false); _nowTime = time;}
-            UInt8  GetNowTime() { return _nowTime;}
+            void SetNowTime(UInt16 time ){ /*if(_nowTime != time ) SetGone(false);*/ _nowTime = time;}
+            float  GetNowTime() { return _nowTime;}
 
+            void SetNowTime(float time ){ /*if(_nowTime2 != time ) SetGone(false);*/ _nowTime2 = time;}
+            float  GetNowTime2() { return _nowTime2;}
             //Virtual 
             virtual bool PreGetObject(){ return false;}  //设定攻击对象，以及战斗
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance(){ return -1;}
 
-            UInt16 GetSpeed() {return 37;} 
+            virtual UInt16 GetSpeed() {return 0;} 
 
             virtual void resetBattleStatue() = 0;
 
@@ -242,11 +244,26 @@ namespace Battle
             void AddBuff(UInt16 buffId);
             void CheckBuff();
             void AddSkill() ;
+            
+            //BattleAction
+            virtual UInt8 NormolAttack();
+            virtual UInt8 NormolImage();
+            virtual UInt8 NormolObject();
 
+            BattleObject * GetTarget(){ return _target;};
+
+            void SetBattleDirection(UInt8 direct){ if(_direction == direct) return; _direction = direct;}
+            virtual UInt8 GetBattleDirection(){return _direction;}  //1左2右0全部
+            virtual UInt8 BeForAction() { PreGetObject(); return 0;};
+
+            void BattlePrintf();
+
+            virtual bool IsStoped(){return false;}
         protected:
+
             UInt8 _crick;  //硬直
-            UInt8 _actionLast ;   //动作持续
-            UInt8 _actionBackLast ;   //动作收招持续
+            float _actionLast ;   //动作持续
+            float _actionBackLast ;   //动作收招持续
             //std::list<BattleObject*>  targetList; //对象列表 (待解)
             UInt8 _actionType;  // 动作类型
 
@@ -292,7 +309,8 @@ namespace Battle
 
             UInt16 _battleIndex;
 
-            UInt32 _nowTime; //行动时间
+            UInt16 _nowTime; //行动时间
+            float _nowTime2; //行动时间
 
             UInt16 _minX;  //入场X坐标  //TODO
             UInt16 _minY;  //入场Y坐标  //TODO
@@ -307,6 +325,9 @@ namespace Battle
             UInt32 attrSub[e_attr_max];
 
             std::list<BattleBuff> bufflst;
+            UInt8 _direction;
+        public:
+            BattleObject * _target;
     };
 
 }

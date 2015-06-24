@@ -385,7 +385,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->SetSessionID(hdr.sessionID);
             //Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
-            // TEST cl->SetPlayer(pl);
+            cl->SetPlayer(pl);
 
             DB1().PushUpdateData("insert into `player_id` values(%" I64_FMT "u,'%s','%s')",playerId, nu.phoneId.c_str() ,nu.accounts.c_str());
 

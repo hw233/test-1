@@ -100,12 +100,17 @@ namespace GObject
     { 
         GetFVar()->SetFVar(num,val);
     } 
+
+    void Fighter::AddVar(UInt32 num, UInt32 val)
+    { 
+        GetFVar()->AddFVar(num,val);
+    } 
     void Fighter::MakeFighterInfo(Stream& st)
     { 
        st << static_cast<UInt16>(getId());
        st << static_cast<UInt8>(0);  //状态
        st << static_cast<UInt8>(0);  //品质
-       st << static_cast<UInt8>(0);  //星级
+       st << static_cast<UInt8>(GetVar(FVAR_QUALITY));  //星级
        st << static_cast<UInt8>(0);  //星级经验
        for(UInt8 i = 0; i < 6; ++i) 
        { 
@@ -153,8 +158,17 @@ namespace GObject
         return value; 
     } 
 
-    UInt32 Fighter::GetTotalPower() const
+    UInt32 Fighter::GetTotalPower() 
     {
-        return _hp+_attack+_defend+_magatk+_magdef+_critical+_criticalDef+_hit+_evade;
+        //return (_hp+_attack+_defend+_magatk+_magdef+_critical+_criticalDef+_hit+_evade) * (GetVar(FVAR_QUALITY)+1);
+        return GetFighterAttr(e_attr_hp) 
+            + GetFighterAttr(e_attr_attack)
+            + GetFighterAttr(e_attr_magatk)
+            + GetFighterAttr(e_attr_defend)
+            + GetFighterAttr(e_attr_magdef)
+            + GetFighterAttr(e_attr_critical)
+            + GetFighterAttr(e_attr_criticalDef)
+            + GetFighterAttr(e_attr_hit)
+            + GetFighterAttr(e_attr_evade);
     }
 }

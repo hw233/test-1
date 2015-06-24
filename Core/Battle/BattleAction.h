@@ -5,9 +5,9 @@
 #include "Config.h"
 #include <math.h>
 #include "Common/Stream.h"
-#define FIELD_WIDTH 1440
-#define FIELD_HIGH  9*60
-#define STEP 60
+#define FIELD_WIDTH 1520
+#define STEP 36
+#define FIELD_HIGH  10*STEP
 
 #define MIN(x,y) x>y?y:x
 #define MIN_3(x,y,z) MIN((MIN(x,y)),z)
@@ -20,13 +20,17 @@ namespace Battle
     struct BattleActionStream
     {
         UInt16 _curtime;
+        float _curtime2;
         BattleObject* _bo;
         UInt16 _prarm ;
         BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
+        BattleActionStream(float curtime, BattleObject*  bo, UInt16 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
         UInt16 GetCurTime(){return _curtime;}
+        float GetCurTime2(){return _curtime2;}
         BattleObject* GetBattleObject(){ return _bo;}
         UInt16 GetParam(){ return _prarm;}
     };
+
     class BattleAction
     {
         public:
@@ -38,6 +42,7 @@ namespace Battle
             virtual  BattleFighter * GetBattleFighter(){return NULL;}
             virtual  bool CanCounter() {return true;}
             virtual UInt16 GetHappenTime(){ return 0;}
+            virtual float GetHappenTime2(){ return 0;}
             virtual UInt16 GetObjectSize(){return 0;}
             virtual BattleObject* GetObject(UInt16 index){return NULL;}
     };
@@ -49,7 +54,11 @@ namespace Battle
         {
             vec_bo.clear();
         }
-            ActionPackage(){}
+            ActionPackage(BattleFighter * bf,float time/*,BattleObject* bo*/):_bf(bf),_time2(time)//,_bo(bo)
+        {
+            vec_bo.clear();
+        }
+ActionPackage(){}
             ~ActionPackage(){}
             UInt32 GetAttack(); //{if(!_bf) return 0; return _bf->GetAttack();}
             UInt32 GetHit(); //{ if(!_bf) return 0; return _bf->GetHit();}
@@ -60,6 +69,7 @@ namespace Battle
             void PushObject(BattleObject* bo); // { vec_bo.push_back(bo);}
             UInt16 GetObjectSize(); //{return vec_bo.size();}
             UInt16 GetHappenTime(); //{return _time;}
+            float GetHappenTime2(); //{return _time;}
 
             BattleObject* GetObject(UInt16 index) ;//{if(index > vec_bo.size())return NULL; return vec_bo[index];}
 
@@ -68,6 +78,7 @@ namespace Battle
             std::vector<BattleObject *> vec_bo;
             BattleFighter * _bf; //攻击发起者
             UInt16 _time;
+            float _time2;
             //UInt8 _type;   //0 表示根据本包内容组织 1 表示根据攻击发起者进行组织(bf为NULL 或死亡，本次攻击失效)
     };
 
@@ -75,6 +86,7 @@ namespace Battle
     {
         public:
             ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time){}
+            ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time2(time){}   // BATTLE2
             UInt32 GetAttack(){return _attack;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
@@ -83,6 +95,7 @@ namespace Battle
             bool CanCounter() {return true;}
             UInt16 GetSkillId(){ return _skillId;}
             UInt16 GetHappenTime(){ return _time;}
+            float GetHappenTime2(){ return _time2;}
             UInt16 GetObjectSize(){return vec_bo.size();}
             BattleObject* GetObject(UInt16 index){if(index > vec_bo.size()) return NULL ; return vec_bo[index];}
             void PushObject(BattleObject* bo) { vec_bo.push_back(bo);}
@@ -100,12 +113,14 @@ namespace Battle
             UInt16 skillScopeId;
             BattleFighter * _bf; //攻击发起者
             UInt16 _time;
+            float _time2;
 
     };
     class ObjectPackage : public BattleAction
     { 
         public:
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
             UInt32 GetAttack(){return _attack;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
@@ -114,6 +129,7 @@ namespace Battle
             bool CanCounter() {return true;}
             UInt16 GetSkillId(){ return _skillId;}
             UInt16 GetHappenTime(){ return _time;}
+            float GetHappenTime2(){ return _time2;}
 
             UInt16 GetPosX() {return _x;}
             UInt16 GetPosY() {return _y;}
@@ -125,12 +141,19 @@ namespace Battle
                     --_count;
                     return;
                 } 
+                if(_bo != NULL)
+                { 
+                    GoForTarget();
+                    return ;
+                } 
 
                 if(_xAdd)
                     _x += _xAdd * _flagX - _xAdd * !_flagX;
                 if(_yAdd)
                     _y += _yAdd * _flagY - _yAdd * !_flagY;
             } 
+
+            void GoForTarget();
 
             bool CanExit()
             { 
@@ -150,11 +173,20 @@ namespace Battle
                 int x3 =static_cast<int>(x);
                 int y3 =static_cast<int>(y);
                 int res = (abs((y1-y2)*x3+(x2-x1)*y3-y1*x2+x1*y2)/sqrt(((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2))));
+
+                int res1 = sqrt((x1-x3)*(x1-x3) + (y1-y3)*(y1-y3));
+                int res2 = sqrt((x2-x3)*(x2-x3) + (y2-y3)*(y2-y3));
+
+                if(!CanBeCounted(x,y))
+                    return static_cast<UInt16>(MIN(res1,res2));
+                //return static_cast<UInt16>(MIN_3(res,res1,res2));
+                
                 return static_cast<UInt16>(res);
             } 
 
-            bool CanBeCounted(UInt16 x, UInt16 y)
+            bool CanBeCounted(UInt16 x, UInt16 y)  //判断斜率是否相同
             { 
+                //return false;
                 int x1 =static_cast<int>(_x);
                 int y1 =static_cast<int>(_y);
                 int x2 =static_cast<int>(_x + _xAdd);
@@ -162,17 +194,24 @@ namespace Battle
                 int x3 =static_cast<int>(x);
                 int y3 =static_cast<int>(y);
 
-                int res  = (x3-x1)*(x2-x3) + (y3 - y1)*(y2 - y3) ;
-                if(res == 0)
-                { 
-                    if(x == _x || y == _y)
-                        return false;
-                    return true;
-                } 
-                return res < 0;
+                int res1  = (x3-x1)*(x2-x1) + (y3 - y1)*(y2 - y1) ;
+                int res2  = (x3-x2)*(x1-x2) + (y3 - y2)*(y1 - y2) ;
+                
+                if(res1 < 0 || res2 < 0)
+                    return false;
+
+                return true;
+
+                //if(res == 0)
+                //{ 
+                //    if(x == _x || y == _y)
+                //        return false;
+                //    return true;
+                //} 
+                //return res < 0;
             }
 
-            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad)  //飞行系
+            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleObject* bo = NULL)  //飞行系
             { 
                 _x = x;
                 _y = y;
@@ -181,16 +220,19 @@ namespace Battle
                 _flagX = flagX;
                 _flagY = flagY;
                 _rad = rad;
+                _bo = bo;
             } 
 
             void setObjectTime(UInt8 count ) { _count = count;}
 
             bool CheckFighterInSCope(BattleObject* bo);  //非指向性
-            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt16 param)
+            void InsertIntoPackage(float curtime , BattleObject* bo , UInt16 param)
             { 
                 vec_struct.push_back(BattleActionStream(curtime, bo, param));
             } 
             UInt8 BuildStream(Stream& st);
+
+            bool CheckFighterAttacked(BattleObject * bo);
         public:
             std::vector< BattleActionStream >  vec_struct;
         private:
@@ -203,7 +245,9 @@ namespace Battle
 
             //            UInt16 skillScopeId;
             BattleFighter * _bf; //攻击发起者
+            BattleObject * _bo; //受击者
             UInt16 _time;
+            float _time2;
 
             UInt16 _x ;
             UInt16 _y ;
@@ -212,7 +256,7 @@ namespace Battle
 
             UInt8  _flagX;
             UInt8  _flagY;
-            UInt16 _rad;
+            UInt16 _rad;   //物体距离
 
             UInt8 _count;
 

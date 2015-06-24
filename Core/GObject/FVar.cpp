@@ -74,7 +74,8 @@ namespace GObject
 
         CheckReset(id , now);
         m_FVars[id] += data;
-        UpdateDB(id);
+        //UpdateDB(id);
+        ReplaceDB(id);
     }
 
     void FVarSystem::LoadFVar(UInt32 id, UInt32 data, UInt32 overTime)

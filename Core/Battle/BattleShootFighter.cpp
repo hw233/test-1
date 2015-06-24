@@ -1,84 +1,22 @@
 #include "BattleShootFighter.h"
+#include "GData/SkillTable.h"
 #include <math.h>
 
 #define TRIANGLE_Z(x,y) static_cast<UInt16>(sqrt(x*x + y*y))
+#define SUB(x,y) (x>y?x-y:y-x)
 namespace Battle
 { 
-    void BattleShootFighter::Action()
-    { 
-        _st.clear();
-        UpdateActionList();
-        //硬直
-        if(_crick)
-        {
-            --_crick;
-            return ;
-        }
-        //动作行为
-        if(_actionLast)
-        { 
-            --_actionLast;
-            return ;
-        } 
-
-        if(_actionBackLast)
-        { 
-            --_actionBackLast;
-            return ;
-        } 
-
-        GetActionFromField();
-
-        switch(_actionType)
-        { 
-            case e_none:
-                break;
-            case e_run:
-                GoForward(1);
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-                {
-                    if(_target)
-                    {
-                        UInt16 targetX = _target->getPosX();
-                        UInt16 targetY = _target->getPosY();
-                        UInt16 targetZ = TRIANGLE_Z(targetX , targetY) ;
-                        ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                        op.setObjectDirection(getPosX(),getPosY(),targetX>getPosX(),targetY>getPosY(),100*targetX/targetZ, 100*targetY/targetZ, 50);
-                        op.setObjectTime(_actionLast);
-                    }
-                } 
-                break;
-                //
-            //魔法
-            case e_image_attack:
-            case e_image_therapy:
-                { 
-                    if(_ab._skillId)
-                    {
-                        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                        GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId);
-                        GetField()->InsertTimeBattleAction(_nowTime+(_actionLast?_actionLast:1),ip);
-                    }
-                } 
-                break;
-            case e_attack_counter:
-                break;
-            default:
-                break;
-        } 
-    } 
     bool BattleShootFighter::PreGetObject()
     { 
-        return true;
         if(!_target || !_target->getHP())
         {
             _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
-            //BuildLocalStream(e_run);
         }
-        SetBattleTargetPos(_target->getPosX(),_target->getPosY());
+        if(_target)
+        {
+            SetBattleTargetPos(_target->getPosX(),_target->getPosY());
+            std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
+        }
         return 0;
     } 
 
@@ -92,8 +30,28 @@ namespace Battle
         EnterX = 0;
         EnterY = 0;
         _crickSum = 0;
-        _sideInBS = 0;
+        //_sideInBS = 0;
         return ;
+    } 
+
+    UInt8 BattleShootFighter::NormolAttack()
+    { 
+        if(!_target)
+            return 0;
+        {
+            UInt16 targetX = _target->getPosX();
+            UInt16 targetY = _target->getPosY();
+            UInt16 targetZ = TRIANGLE_Z(SUB(targetX , getPosX()), SUB(targetY, getPosY())) ;
+            if(targetZ == 0)
+                targetZ = 1;
+            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+            op.setObjectDirection(getPosX(),getPosY(),targetX>getPosX(),targetY>getPosY(),100*SUB(targetX,getPosX())/targetZ, 100*SUB(targetY,getPosY())/targetZ, 50 , _target);
+            op.setObjectTime(_actionLast);
+            GetField()->InsertObjectPackage(op);
+
+            GetField()->InsertBattlePre(GetNowTime2() + 0.1, this);
+        }
+        return 1;
     } 
 } 
 

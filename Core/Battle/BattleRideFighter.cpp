@@ -2,119 +2,6 @@
 #include "GData/SkillTable.h"
 namespace Battle
 { 
-    void BattleRideFighter::Action()
-    { 
-        if(!getHP())
-            return ;
-        _st.clear();
-        UpdateActionList();
-        //硬直
-        if(_crick)
-        {
-            --_crick;
-            return ;
-        }
-
-        if(!isRunSend)
-        {
-            if(uRand(100) < 40)  //XXX
-                return ;
-        } 
-
-        if(!GetGone())
-            GoForward();
-
-        BuildLocalStream(e_run);
-
-        if(_actionLast)
-        { 
-            --_actionLast;
-            return ;
-        } 
-
-        if(_actionBackLast)
-        { 
-            --_actionBackLast;
-            return ;
-        } 
-
-        GetActionFromField();
-
-        switch(_actionType)
-        { 
-            case e_none:
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-                {
-                    if(_target)
-                    { 
-                        //UInt16 parm = (_target)->BeActed(MakeActionEffect());//ActionPackage(_actionType, _hit, _wreck, _critical, this));
-                        ActionPackage ap(this,_nowTime/*,_target*/);
-                        ap.PushObject(_target);
-                        //XXX
-                        
-                        GetField()->InsertTimeBattleAction( _nowTime + _actionLast ,ap );
-                        //BuildLocalStream(0,parm);
-                        //(_target)->AppendFighterStream(_st);
-                        _actionType = e_none;
-                    } 
-                }
-                break;
-            case e_image_attack:
-            case e_image_therapy:
-                { 
-                    const GData::Skill * s = GData::skillManager[_ab._skillId];
-                    if(!s)
-                        return ;
-                    ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                    GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
-                    GetField()->InsertTimeBattleAction(_nowTime+s->GetActionCd(),ip);
-                } 
-                break;
-            case e_attack_counter:
-                break;
-            case e_object_image:
-                { 
-                    {
-                        const GData::SkillScope* ss =GData::skillManager[_ab._skillId]->GetSkillScope();
-                        if(!ss)
-                            return ;
-
-                        UInt16 myY = getPosY();
-
-                        UInt8  minNumber = ss->radx / 2 ;  //radx 表示数量(一般情况为奇数) rady表示间隔 x,y作为上下闭合区间
-                        UInt16 width = ss->x + ss->y;
-                        UInt16 minY  =  0;
-                        if(myY > ((width * ss->rady + width)*minNumber + ss->y))
-                            minY = myY - ((width * ss->rady + width)*minNumber);
-
-                        //COUNT << " 战将编号：" << static_cast<UInt32>(GetBSNumber());
-                        //COUNT << std::endl;
-                        //COUNT << " 施放技能 半月斩 ";
-                        //COUNT << std::endl;
-                        for(UInt8 i = 0 ; i < ss->radx ; ++i)
-                        {
-                            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-                            op.setObjectDirection(getPosX(),minY + (ss->rady+1)*i*width,GetBattleDirection(),0,100, 0, 50);
-                            GetField()->InsertObjectPackage(op);
-
-                            //COUNT << " 范围 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width - 25) << " 到 " << static_cast<UInt32>(minY + (ss->rady+1)*i*width + 25);
-                            //COUNT << std::endl;
-                        }
-                        //COUNT << std::endl;
-                    }
-
-                } 
-                break;
-            default:
-                {
-                }
-                break;
-        } 
-    } 
-
     bool BattleRideFighter::PreGetObject()
     { 
         PreGetObject1() ;
@@ -175,9 +62,9 @@ namespace Battle
             case e_run:
                 if(1)
                 {
-                    //COUNT<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    //COUNT<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
-                    //COUNT<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
+                    std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
+                    std::cout<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
                 }
                 if(!isRunSend)
                 {
@@ -186,10 +73,10 @@ namespace Battle
                     _st << static_cast<UInt8>(0);
                     _st << static_cast<UInt16>(_battleTargetY);
                     isRunSend = true ;
-                    //COUNT << " 回合数：" << static_cast<UInt32>(_nowTime);
-                    //COUNT << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    //COUNT << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
-                    //COUNT << std::endl;
+                    std::cout << " 回合数：" << (GetNowTime2());
+                    std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    std::cout << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
+                    std::cout << std::endl;
                 } 
                 break;
             case e_attack_near:
@@ -244,12 +131,14 @@ namespace Battle
     UInt16 BattleRideFighter::GetTargetDistance()
     { 
         if(!_target || !GetField())
-            return -1;
+            return -2;
+#if 0
         _target->SetNowTime(_nowTime);
         if(!_target->GetGone())
             _target->GoForward();
+#endif
         if(CheckTarget())
-            return -1;
+            return -2;
         return GetField()->getDistance(this,_target);
     } 
 
@@ -286,5 +175,20 @@ namespace Battle
             return GetSideInBS();
         return 2;
     } 
+
+     UInt8 BattleRideFighter::BeForAction()
+     { 
+        if(!isRunSend)
+        {
+            if(uRand(100) < 40)  //XXX
+                ;//return 1;
+        } 
+
+        //if(!GetGone())
+        //    GoForward();
+
+        BuildLocalStream(e_run);
+        return 0;
+     } 
 } 
 

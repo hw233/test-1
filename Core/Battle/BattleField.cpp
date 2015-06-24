@@ -7,6 +7,7 @@
 #include <math.h>
 
 #define SUB(x,y) (x>y)?(x-y):(y-x)
+#define Min(x,y) (x>y)?(y):(x)
 namespace Battle
 {
 
@@ -70,10 +71,16 @@ namespace Battle
         } 
         return NULL;
     } 
-    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY)
+    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY, BattleFighter* cur)
     { 
         if(side > 1)
             return NULL;
+        //std::cout << "选择的Side:" << static_cast<UInt32>(side) << std::endl;
+        //FieldPrint();
+        if(cur!= NULL && cur->GetSideInBS() == side)
+        {
+            std::cout << "The Same Side "  << std::endl;
+        }
         UInt16 max = -1;
         UInt8 res = -1;
         for(UInt8 i = 0; i < _fighters[side].size(); ++i)
@@ -152,10 +159,13 @@ namespace Battle
         UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
         UInt16 ady = y1>y2?(y1-y2):(y2-y1)*1.0;
 
-        if(ady >= 34 + bf->GetRad()+rad)
+        if(ady >= 34)// + bf->GetRad()+rad)   改
             return -1;
         if(adx <= bf->GetRad()+ rad)
+        {
+            std::cout << "adx:" << static_cast<UInt32>(adx) << " Rad1:" << static_cast<UInt32>(bf->GetRad()) << " Rad2" << static_cast<UInt32>(rad) <<std::endl;
             return 0;
+        }
         return adx - bf->GetRad()- rad;
 
 
@@ -173,7 +183,10 @@ namespace Battle
                 if(bo == _fighters[j][i])
                     continue ;
                 if(getDistance(_fighters[j][i],x,y,bo->GetRad()) == 0)
+                {
+                    std::cout << "位置冲突: " << static_cast<UInt32>(x) << " , " << static_cast<UInt32>(y) << " 和 " << static_cast<UInt32>(_fighters[j][i]->getPosX()) << " , " << static_cast<UInt32>(_fighters[j][i]->getPosY()) <<  std::endl;
                     return false;  
+                }
             } 
         }
         bo->SetMinXY(x,y);
@@ -194,6 +207,7 @@ namespace Battle
 
     void BattleField::GetBSEnterInfo(Stream& st)
     { 
+        return ;
         st << static_cast<UInt8>(1);
         for(UInt8 i= 0; i < 2; ++i)
         { 
@@ -381,6 +395,44 @@ namespace Battle
         return FieldImage[time];
     } 
 
+    //BATTLE@
+   void BattleField::InsertTimeBattleAction(float time , ActionPackage ba)
+    { 
+        if(FieldAttack.begin() != FieldAttack.end() && time < FieldAttack.begin()->first)
+            return ;
+        FieldAttack[time].push_back(ba);
+    } 
+
+    std::vector<ActionPackage> BattleField::GetTimeBattleAction(float& time)
+    { 
+        std::vector<ActionPackage> vec;
+        if(FieldAttack.begin() != FieldAttack.end())
+        {
+            time = FieldAttack.begin()->first;
+            vec = FieldAttack.begin()->second;
+        }
+        return vec;
+    } 
+
+
+    //BATTLE@
+    void BattleField::InsertTimeBattleAction(float time , ImagePackage ip)
+    { 
+        if(FieldImage.begin() != FieldImage.end() && time < FieldImage.begin()->first)
+            return ;
+        FieldImage[time].push_back(ip);
+    } 
+    std::vector<ImagePackage> BattleField::GetTimeBattleImage(float& time)
+    { 
+        std::vector<ImagePackage> vec;
+        if(FieldImage.begin() != FieldImage.end())
+        {
+            time = FieldImage.begin()->first;
+            vec = FieldImage.begin()->second;
+        }
+        return vec;
+    } 
+
 
     void BattleField::InsertObjectPackage(ObjectPackage ba)
     { 
@@ -391,4 +443,98 @@ namespace Battle
         return FieldObject;
     } 
 
+    float BattleField::GetMinTime()
+    { 
+        float min1 = 100;
+        float min2 = 100;
+        float min3 = 100;
+        if(FieldAttack.begin() != FieldAttack.end())
+            min1 = FieldAttack.begin()->first;
+        if(FieldImage.begin() != FieldImage.end())
+            min2 = FieldImage.begin()->first;
+        if(BattlePre.begin() != BattlePre.end())
+            min3 = BattlePre.begin()->first;
+        return Min(Min(min1,min2),min3);
+    } 
+    void BattleField::DelBattleAction()
+    { 
+        if(FieldAttack.begin() == FieldAttack.end())
+            return ;
+        FieldAttack.erase(FieldAttack.begin());
+
+    } 
+    void BattleField::DelBattleImage()
+    { 
+        if(FieldImage.begin() == FieldImage.end())
+            return ;
+        FieldImage.erase(FieldImage.begin());
+    } 
+
+    std::vector<BattleFighter* > BattleField::GetBattlePre(float& time)
+    { 
+        std::vector<BattleFighter*> vec;
+        if(BattlePre.begin() != BattlePre.end())
+        {
+            time = BattlePre.begin()->first;
+            vec = BattlePre.begin()->second;
+        }
+        return vec;
+    } 
+
+    void BattleField::DelBattlePre()
+    { 
+       if(BattlePre.begin() == BattlePre.end()) 
+           return ;
+       BattlePre.erase(BattlePre.begin());
+    } 
+
+    void BattleField::InsertBattlePre(float time, BattleFighter* fgt)
+    { 
+        if(BattlePre.begin() != BattlePre.end() && time < BattlePre.begin()->first)
+            return ;
+        BattlePre[time].push_back(fgt);
+    } 
+
+    void BattleField::FieldPrint()
+    { 
+        for(UInt8 i = 0; i < 2; ++i)
+        { 
+            std::cout << "Side" << static_cast<UInt32>(i) << std::endl;
+            for(UInt8 j = 0; j < _fighters[i].size(); ++j)
+                std::cout << "战将编号:" << static_cast<UInt32>(_fighters[i][j]->GetBSNumber()) << std::endl;
+        } 
+    } 
+
+    void BattleField::BattleActionPrintf(UInt8 index)
+    { 
+        switch(index)    
+        { 
+            case 0:
+                { 
+                    std::cout << "准备攻击者 ";
+                    if(FieldAttack.begin() == FieldAttack.end())
+                        return ;
+                    std::vector<ActionPackage> vec = FieldAttack.begin()->second;
+                    std::cout << "time：" << FieldAttack.begin()->first << std::endl;
+                    for(UInt8 i = 0; i < vec.size(); ++i)
+                    { 
+                        std::cout << "战将编号" << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
+                    } 
+                } 
+                break;
+            case 1:
+                { 
+                    std::cout << "魔法行动列表:";
+                    if(FieldImage.begin() == FieldImage.end())
+                        return ;
+                    std::vector<ImagePackage> vec = FieldImage.begin()->second;
+                    std::cout << "time：" << FieldImage.begin()->first << std::endl;
+                    for(UInt8 i = 0; i < vec.size(); ++i)
+                    { 
+                        std::cout << " 战将编号: " << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
+                    } 
+                } 
+                break;
+        } 
+    } 
 }

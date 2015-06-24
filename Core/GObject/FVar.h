@@ -54,6 +54,7 @@ namespace GObject
         FVAR_CRITICAL     = 24,    //暴击
         FVAR_EVADE        = 25,    //闪避
         FVAR_AFFAIRS_STATUS = 26,  //内政的状态  0 空闲  1 治理 2 开垦 3 
+        FVAR_QUALITY = 27,
 
         FVAR_MAX
     };

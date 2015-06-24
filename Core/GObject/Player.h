@@ -227,7 +227,7 @@ namespace GObject
             std::string getSource() { return NULL;}
             UInt8 getVipLevel() const { return 1;}
             UInt8 GetSex() const { return 1;}
-            UInt8 GetLevel() const { return 1;}
+            UInt8 GetLevel() ;// const { return getMainFighter()->GetLevel();}
             
             Clan* GetClan() const { return clan;}
             void SetClan(Clan* cl) { clan = cl;}
@@ -238,7 +238,7 @@ namespace GObject
 
             void ChatForWorld(std::string text);
             void ChatForClan(std::string text);
-            void ChatForFriend(IDTYPE playerId, std::string text);
+            void ChatForFriend(std::string name, std::string text);
 
             void AddMail(UInt32 id, UInt8 update = 1);
             UInt8 ReciveMail(UInt32 id,UInt8 flag = 0);
@@ -278,6 +278,7 @@ namespace GObject
             void SetJoinClanBattle(UInt8 status) { _isClanBattle = status ; }
             UInt8 GetJoinClanBattle() const { return _isClanBattle;}
 
+            UInt8 UpFighter(UInt16 fighterId);
     private:
             //IDTYPE _id;
             std::string _accounts;

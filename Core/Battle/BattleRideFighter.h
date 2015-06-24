@@ -9,24 +9,29 @@ namespace Battle
     {
         public:
             BattleRideFighter(Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):
-                BattleFighter(2,bf,f,pointX,pointY),_target(NULL),count(0),isRunSend(false)
+                BattleFighter(2,bf,f,pointX,pointY),count(0),isRunSend(false)
         { 
 
         } 
-            virtual void Action();
+            //virtual void Action();
             virtual bool PreGetObject(); 
             void PreGetObject1();
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance();
             virtual void resetBattleStatue();
-            UInt8 GetBattleDirection();
             UInt8 CheckTarget();
             virtual void SetGone(bool v){ isGone = v;}
             virtual bool GetGone(){return isGone;}
             virtual UInt8 GetRideCount() {return count-1;}
             virtual UInt16 GetBaseActionNum(){return 5;}
+            virtual UInt8 GetBattleDirection();
+
+            virtual UInt16 GetSpeed() {return 37;} 
+            virtual UInt8 BeForAction();
+
+            virtual bool IsStoped() {return count > 2;}
         private:
-            BattleFighter * _target ; 
+            //BattleFighter * _target ; 
             UInt8 count; //控制来回次数
             bool isRunSend;
             bool isGone;
