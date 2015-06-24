@@ -463,7 +463,7 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
             {
                 std::string announcement;
                 br >> announcement;
-                if(player->GetClan())
+                if(player->GetClan() && player->GetClanPos() <= 2)
                 { 
                     player->GetClan()->SetAnnouncement(announcement);
                 } 

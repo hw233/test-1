@@ -75,7 +75,7 @@ namespace GObject
                     UInt32 now = TimeUtil::Now();
                     _players.push_back(pl);
                     pl->SetClan(this);
-                    pl->SetClanPos(1);
+                    pl->SetClanPos(5);
                     DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u)",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
                     DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
                     Stream st(REP::CLAN_INFO);
