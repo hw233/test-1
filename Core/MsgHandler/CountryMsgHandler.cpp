@@ -20,7 +20,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG(GameMsgHdr, OnBattleReportReq0);
     MSG_REG(GameMsgHdr, OnBattleReportReq1);
 
-    MSG_REG(GameMsgHdr, OnFriendListReq);
+    //MSG_REG_2(GameMsgHdr,REQ::FRIEND_LIST, OnFriendListReq);
 
     MSG_REG(GameMsgHdr, OnFriendFindReq);
 
@@ -32,7 +32,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG(GameMsgHdr, OnFriendRecommandReq);
 
-    MSG_REG(GameMsgHdr, OnFriendBaseInfoReq);
+    //MSG_REG(GameMsgHdr, OnFriendBaseInfoReq);
 
     MSG_REG_2(GameMsgHdr, REQ::CHAT, OnChat);
 

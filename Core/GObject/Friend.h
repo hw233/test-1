@@ -23,8 +23,9 @@ namespace GObject
         public:
             FriendManager(Player *pl):m_owner(pl){}
             void AddFriend(UInt8 index , Player* friendOne);
-            void SendFriendList(UInt8 type,UInt8 index);
-            void GetAllFriendStream(Stream &st);
+            //void SendFriendList(UInt8 type,UInt8 index);
+            void SendFriendList();
+            void GetFriendListStream(eFriendType type, Stream &st);
 
             bool FindFriendByName(const std::string& name); 
             bool FindFriendById(UInt64 playerId);
@@ -44,7 +45,7 @@ namespace GObject
 
             bool IsInList(eFriendType type,Player *pl);
             bool HasFriend(Player* pl);
-            void SendFriendBaseInfo();
+            //void SendFriendBaseInfo();
         private:
             std::set<Player *> _friends[friend_max];
             Player* m_owner;
