@@ -463,13 +463,15 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
             {
                 std::string announcement;
                 br >> announcement;
+                UInt8 res = 0;
                 if(player->GetClan() && player->GetClanPos() <= 2)
                 { 
                     player->GetClan()->SetAnnouncement(announcement);
+                    res = 1;
                 } 
                 Stream st(REP::CLAN_OPTION);
                 st << static_cast<UInt8>(0x04);
-                st << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(res);
                 st << Stream::eos;
                 player->send(st);
             }

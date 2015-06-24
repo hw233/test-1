@@ -66,7 +66,7 @@ namespace Battle
         //UInt16 _condition ;  // 触发条件编号
         //UInt16 _scpoe ;      // 触发范围编号
         //UInt16 _effect ;     // 触发效果编号
-        UInt8 _cd;           //行动cd  
+        float _cd;           //行动cd  //BATTLE2
         UInt8 _priority ;  //触发优先级
     };
     struct lt_absort
@@ -100,7 +100,7 @@ namespace Battle
 
             virtual void Action();  //行动
             //移动
-             void GoForward(UInt8 flag = 0 ,UInt16 advance = 0);
+             void GoForward(UInt8 flag = 0 ,UInt8 count = 0);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
@@ -160,10 +160,10 @@ namespace Battle
 
             virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
 
-            void SetNowTime(UInt16 time ){ if(_nowTime != time ) SetGone(false); _nowTime = time;}
+            void SetNowTime(UInt16 time ){ /*if(_nowTime != time ) SetGone(false);*/ _nowTime = time;}
             float  GetNowTime() { return _nowTime;}
 
-            void SetNowTime(float time ){ if(_nowTime2 != time ) SetGone(false); _nowTime2 = time;}
+            void SetNowTime(float time ){ /*if(_nowTime2 != time ) SetGone(false);*/ _nowTime2 = time;}
             float  GetNowTime2() { return _nowTime2;}
             //Virtual 
             virtual bool PreGetObject(){ return false;}  //设定攻击对象，以及战斗
@@ -252,6 +252,8 @@ namespace Battle
             virtual UInt8 BeForAction() { PreGetObject(); return 0;};
 
             void BattlePrintf();
+
+            virtual bool IsStoped(){return false;}
         protected:
 
             UInt8 _crick;  //硬直

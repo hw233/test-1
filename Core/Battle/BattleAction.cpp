@@ -36,7 +36,7 @@ namespace Battle
         if(!vec_struct.size())
             return 0;
         //st << static_cast<UInt8>(GetHappenTime()); 
-        st << static_cast<float>(GetHappenTime2()); 
+        st << static_cast<UInt16>(GetHappenTime2() * 100); 
         st << static_cast<UInt8>(GetBattleFighter()->GetBSNumber());
         st << static_cast<UInt8>(3);
         st << static_cast<UInt16>(GetSkillId());
@@ -54,7 +54,7 @@ namespace Battle
             std::cout << " 被击者：" << static_cast<UInt32>(vec_struct[i].GetBattleObject()->GetBSNumber()) << " 位置: " << static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosX()) <<" , "<< static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosY());
             std::cout << std::endl;
 
-            st << static_cast<UInt8>(vec_struct[i].GetCurTime());
+            st << static_cast<UInt8>(vec_struct[i].GetCurTime2());
             st << static_cast<UInt16>(vec_struct[i].GetBattleObject()->GetBSNumber());
             st << static_cast<UInt16>(vec_struct[i].GetParam());
         } 
@@ -96,6 +96,16 @@ namespace Battle
         } 
         _x = x;
         _y = y;
+    } 
+
+    bool ObjectPackage::CheckFighterAttacked(BattleObject * bo)
+    { 
+        for(UInt8 i = 0; i < vec_struct.size(); ++i)
+        { 
+            if(vec_struct[i].GetBattleObject() == bo)
+                return true;
+        } 
+        return false;
     } 
 }
 

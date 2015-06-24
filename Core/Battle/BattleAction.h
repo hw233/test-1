@@ -5,7 +5,7 @@
 #include "Config.h"
 #include <math.h>
 #include "Common/Stream.h"
-#define FIELD_WIDTH 1200
+#define FIELD_WIDTH 1520
 #define STEP 36
 #define FIELD_HIGH  10*STEP
 
@@ -26,7 +26,7 @@ namespace Battle
         BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
         BattleActionStream(float curtime, BattleObject*  bo, UInt16 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
         UInt16 GetCurTime(){return _curtime;}
-        UInt16 GetCurTime2(){return _curtime2;}
+        float GetCurTime2(){return _curtime2;}
         BattleObject* GetBattleObject(){ return _bo;}
         UInt16 GetParam(){ return _prarm;}
     };
@@ -231,6 +231,8 @@ ActionPackage(){}
                 vec_struct.push_back(BattleActionStream(curtime, bo, param));
             } 
             UInt8 BuildStream(Stream& st);
+
+            bool CheckFighterAttacked(BattleObject * bo);
         public:
             std::vector< BattleActionStream >  vec_struct;
         private:

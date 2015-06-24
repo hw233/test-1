@@ -13,7 +13,7 @@ attacker:	0 1 2 3 4
 5 6 7 8 9
 */
 
-#define FIELD_WIDTH 1200
+#define FIELD_WIDTH 1520
 #define STEP 36
 #define FIELD_HIGH  10*STEP
 

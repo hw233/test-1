@@ -60,7 +60,7 @@ namespace Battle
         switch(type)
         {
             case e_run:
-                if(1)
+                if(GetBSNumber() == 0 || GetBSNumber() == 11)
                 {
                     std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
                     std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
@@ -132,9 +132,11 @@ namespace Battle
     { 
         if(!_target || !GetField())
             return -2;
+#if 0
         _target->SetNowTime(_nowTime);
         if(!_target->GetGone())
             _target->GoForward();
+#endif
         if(CheckTarget())
             return -2;
         return GetField()->getDistance(this,_target);
@@ -182,8 +184,8 @@ namespace Battle
                 ;//return 1;
         } 
 
-        if(!GetGone())
-            GoForward();
+        //if(!GetGone())
+        //    GoForward();
 
         BuildLocalStream(e_run);
         return 0;
