@@ -33,7 +33,7 @@ namespace GObject
             _players.push_back(pl);
             pl->SetClan(this);
             pl->SetClanPos(1);  //普通成员
-            DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
+            DB1().PushUpdateData("REPLACE INTO  `clan_player`(`clanId`, `playerId`,`position`,`contribute`,`enterTime`,`personMax`) VALUES(%u, %" I64_FMT "u ,%u , 0, %u,50",_id, pl->getId(),pl->GetClanPos(),now );   //LIBOUInt64
             //DB1().PushUpdateData("DELETE FROM player_apply_clan where `playerId` = %" I64_FMT "u",pl->getId() );   //LIBOUInt64
             return 0;
         } 
@@ -274,5 +274,11 @@ namespace GObject
                 return false;
         } 
         return true;
+    } 
+    void Clan::DelClanMember(Player* opter ,Player* bo)
+    { 
+        if(opter->GetClanPos() > 2)        
+            return ;
+        DelMember(bo);
     } 
 }

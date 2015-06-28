@@ -53,7 +53,7 @@ namespace Battle
 
             void PosPrintf(UInt8 index);
 
-            void FighterMove(UInt8 index,UInt8 count);
+            UInt8 FighterMove(UInt8 index,float lastTime, float cutTime);
 
             float GetTime(){return _time;}
         private:

@@ -49,6 +49,7 @@ namespace Battle
             BattleFighter * target = static_cast<BattleFighter* >(GetField()->GetTargetForRide(!GetSideInBS(),getPosX(),getPosY(),direction));
             if(target)
                 _target = target;
+            BuildLocalStream(e_run);
         }
     } 
 
@@ -60,7 +61,7 @@ namespace Battle
         switch(type)
         {
             case e_run:
-                if(1)//GetBSNumber() == 0 || GetBSNumber() == 11)
+                if(0)//GetBSNumber() == 0 || GetBSNumber() == 11)
                 {
                     std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
                     std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
@@ -68,7 +69,7 @@ namespace Battle
                 }
                 if(!isRunSend)
                 {
-                    _st << static_cast<UInt8>(_nowTime);
+                    _st << static_cast<UInt16>(GetNowTime2()*1.0/100);
                     (_st << GetBSNumber());
                     _st << static_cast<UInt8>(0);
                     _st << static_cast<UInt16>(_battleTargetY);
@@ -85,6 +86,7 @@ namespace Battle
             case e_image_attack:
             case e_image_therapy:
                 {
+                    break;
                     //for(;it!=targetList.end();++it)
                     { 
                         if(_target)
@@ -112,6 +114,7 @@ namespace Battle
                 break;
             case e_be_attacked:
                 {
+                    break;
                     _st << static_cast<UInt8>(_nowTime);
                     _st << GetBSNumber();
                     _st << static_cast<UInt8>(2);
@@ -181,7 +184,7 @@ namespace Battle
         if(!isRunSend)
         {
             if(uRand(100) < 40)  //XXX
-                ;//return 1;
+                return 1;
         } 
 
         //if(!GetGone())

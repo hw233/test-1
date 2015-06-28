@@ -72,6 +72,8 @@ namespace GObject
 
             void SetSpeed(UInt16 speed){ _speed = speed;}
 
+            UInt16 GetSpeed(){return _speed;}
+
             void SetBaseAttr(UInt32 hp,UInt32 attack , UInt32 defend, UInt32 magatk, UInt32 magdef, UInt32 critical,UInt32 criticalDef,UInt32 hit, UInt32 evade) 
             { 
                 _hp = hp;

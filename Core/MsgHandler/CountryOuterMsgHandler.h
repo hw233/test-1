@@ -451,10 +451,10 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
                 GObject::Clan* clan = GObject::globalClan[clanId];
                 if(!clan)
                     break;
-                UInt8 res = clan->Apply(player);
+                clan->Apply(player);
                 Stream st(REP::CLAN_OPTION);
-                st << static_cast<UInt8>(1);
-                st << res;
+                st << static_cast<UInt8>(3);
+                st << clanId;
                 st << Stream::eos;
                 player->send(st);
                 break;
@@ -514,7 +514,10 @@ void OnClanOption(GameMsgHdr& hdr, const void * data)
                     break;
                 if(!player->GetClan() || player->GetClan() != pl->GetClan() || player->GetClanPos() > 2)
                     break;
-                player->GetClan()->ChangePosition(player, pl, num);
+                if(!num)
+                    player->GetClan()->DelClanMember(player,pl);
+                else
+                    player->GetClan()->ChangePosition(player, pl, num);
             }
     } 
 }
@@ -602,4 +605,3 @@ void OnFindUp(GameMsgHdr& hdr, const void * data)
     player->send(st);
 }
 #endif // _COUNTRYOUTERMSGHANDLER_H_
-
