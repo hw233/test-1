@@ -12,6 +12,7 @@
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleRoom.h"
 #include "MsgHandler/GMHandler.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 
 #define W_CHAT_MAX 20
@@ -186,21 +187,25 @@ namespace GObject
     }
 
 
-    static std::map<UInt32,UInt8> map2IsPut;   
-
     void World::world_clanBattle_putFighters(World* world)
     {
         map<UInt32,std::vector<Battle::MapDistributeInfo*>> room2Distribute = Battle::battleDistribute.GetData();
         for( auto it = room2Distribute.begin(); it != room2Distribute.end(); ++it )
         {
             UInt32 roomId = it->first;
-            Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
-            if( room->GetStage() == 1 )
+            Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+            if( status->GetStage() != 1 )
+                continue;
+            Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
+            if( roomBattle == NULL )
             {
-                if( map2IsPut[roomId] == 2 )
+
+                if(false)
                     continue;
+                //放将之前把之前的删掉
+                //TODO
                 std::cout<<"put fighters"<<std::endl;
-                Battle::RoomBattle* roomBattle = new Battle::RoomBattle(roomId);
+                roomBattle = new Battle::RoomBattle(roomId);
                 for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
                 {
                     UInt8 mapId = (*iter)->GetMapId();
@@ -222,7 +227,11 @@ namespace GObject
                     roomBattle->InsertSingleBattle(singleBattle);
                 }
                 Battle::battleManager.InsertRoomBattle(roomBattle);
-                map2IsPut[roomId] = 2 ;   //用2代表已经放过将了
+                roomBattle->SetIsPutFighter(true);
+            }
+            else
+            {
+                //删除原来的  
             }
         }
     }
@@ -253,7 +262,6 @@ namespace GObject
                 {
                     (*iter)->StartOneRound();
                     UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
-                    std::cout<<"这一回合的战术消耗 "<<static_cast<UInt32>(timeCost)<<" 秒"<<std::endl;
                     (*iter)->SetNextStartTime(timeCost+now);
                 }
                 else
@@ -263,7 +271,6 @@ namespace GObject
 
                         (*iter)->StartOneRound();
                         UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
-                        std::cout<<"这一回合的战术消耗 "<<static_cast<UInt32>(timeCost)<<" 秒"<<std::endl;
                         (*iter)->SetNextStartTime(timeCost+now);
                     }
                 }
@@ -275,22 +282,14 @@ namespace GObject
     //判断军团战属于哪一个阶段
     void World::World_clanBattle_stageCheck(World* world)
     {
-        std::vector<Battle::ClanBattleRoom*> vecRoom = Battle::clanBattleRoomManager.GetRoomList();
-        for( auto it = vecRoom.begin(); it != vecRoom.end(); ++it )
+        std::vector<Battle::RoomAllCityStatus*> vecData = Battle::roomAllCityStatusManager.GetData();
+        for( auto it = vecData.begin(); it != vecData.end(); ++it )
         {
             UInt8 stage = (*it)->GetStage();
             if( stage == 2 )
                 continue;
             UInt32 now = TimeUtil::Now();
             (*it)->SetStage(now);
-            if( (*it)->GetStage() == 0 )
-            {
-               map2IsPut[(*it)->GetRoomId()] = 0;
-            }
-            if( (*it)->GetStage() == 1 && map2IsPut[(*it)->GetRoomId()] == 0 )
-            {
-               map2IsPut[(*it)->GetRoomId()] = 1;  //已处于战争阶段  可以放将了
-            }
         }
     }
 }

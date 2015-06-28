@@ -189,6 +189,14 @@ namespace GObject
         UInt32 reportId;
         UInt32 time;
     };
+
+    struct DBCityStatus
+    {
+        UInt32 roomId;
+        UInt8  battleId;
+        UInt8  cityId;
+        UInt8  ownforce;
+    };
 }
 namespace DB
 {
@@ -407,6 +415,16 @@ namespace DB
         UInt16,actId,
         UInt32, reportId,
         UInt32, time
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBCityStatus)
+    SPECIALDEF(4)
+    (
+        UInt32, roomId,
+        UInt8, battleId,
+        UInt8, cityId,
+        UInt8, ownforce
     )
     SPECIALEND()
 }

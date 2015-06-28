@@ -1,56 +1,12 @@
 #include"ClanBattleRoom.h"
 #include"GData/ClanBattleBase.h"
+#include"Battle/ClanBattleCityStatus.h"
+
 namespace Battle
 {
 
     ClanBattleRoomManager clanBattleRoomManager;
 
-
-    void ClanBattleRoom::SetStage(UInt32 t)
-    {
-        //报名之后的第二天10点为战术推演阶段 
-        //由报名时间得到
-        time_t time = buildTime;
-        tm* tt=localtime(&time);
-        UInt8 hour = tt->tm_hour;
-        UInt8 min = tt->tm_min;
-
-
-        UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
-        if( t < sday )
-        {
-            stage = 0;
-        }
-        else if ( t > sday && t < sday + 1*86400)
-        {
-            stage = 1;
-        }
-        else if(  t > sday+1*86400 && t < sday+2*86400)
-        {
-            stage = 0;
-        }
-        else if(  t > sday+2*86400 && t < sday+3*86400 )
-        {
-            stage = 1;
-        }
-        else if(  t > sday+4*86400 && t < sday+5*86400 )
-        {
-            stage = 0;
-        }
-        else if(  t > sday+5*86400 && t < sday+6*86400 )
-        {
-            stage = 1;
-        }
-        else if(  t > sday+6*86400 && t < sday+7*86400 )
-        {
-            stage = 2;
-        }
-        else
-        {
-            stage = 3;
-        }
-
-    }
 
     void ClanBattleRoom::InsertClan(UInt8 forceId,UInt32 clanId,UInt32 num )
     {
@@ -127,6 +83,8 @@ namespace Battle
         room->SetBuildTime(now);
         room->InsertClan(1,clanId,memberNum);
         _roomList.push_back(room);
+
+        Battle::roomAllCityStatusManager.InsertRoomAllCityStatus(clanId,battleId);
         return true;
     }
 

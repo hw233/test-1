@@ -277,9 +277,9 @@ namespace Battle
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>(currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>(  20/*currentBf->GetNowTime2()*/);
             _pack << static_cast<UInt8>(0); //无战斗发生
-            _oneRoundCostTime += currentBf->GetNowTime2();
+            _oneRoundCostTime += 20 /*currentBf->GetNowTime2()*/;
              
             //排布信息同步
             Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my);
@@ -313,10 +313,10 @@ namespace Battle
             //UInt8 rand = uRand(255);
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(ax) << static_cast<UInt8>(ay);
-            _pack << static_cast<UInt8>(currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>(20/*currentBf->GetNowTime2()*/);
             _pack << static_cast<UInt8>(1);
 
-            _oneRoundCostTime += currentBf->GetNowTime2();
+            _oneRoundCostTime +=20 /*currentBf->GetNowTime2()*/;
 
             //currentBf->InsertFighterInfo(_pack);
             target.bo->InsertFighterInfo(_pack);
@@ -327,6 +327,10 @@ namespace Battle
             
             _pack << win << reportId;
 
+            //增加击杀人数
+            currentBf->GetOwner()->AddClanBattleKillCount(currentBf->GetKillCount());
+            (target.bo)->GetOwner()->AddClanBattleKillCount((target.bo)->GetKillCount());
+
             //往排布那边同步战将数据
             if( currentBf->getHP() <= 0 )
             {
@@ -335,13 +339,13 @@ namespace Battle
             else
             {
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),x,y,currentBf->getHP());
-                std::map<UInt8,UInt32> id2hp;
+                std::vector<UInt32> vecHP;
                 for( UInt8 i = 0 ; i < 10 ; ++i )
                 {
                    UInt32 hp = currentBf->GetSoldierHp(i);
-                   id2hp[i] = hp;
+                   vecHP.push_back(hp);
                 }
-                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,id2hp);
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,vecHP);
             }
 
             if( target.bo->getHP() <= 0 )
@@ -353,13 +357,13 @@ namespace Battle
                 //更新主将的血量
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,(target.bo)->GetOwner(),x,y,(target.bo)->getHP());
                 //更新小兵们的血量
-                std::map<UInt8,UInt32> id2hp;
+                std::vector<UInt32> vecHP;
                 for( UInt8 i = 0 ; i < 10 ; ++i )
                 {
                    UInt32 hp = (target.bo)->GetSoldierHp(i);
-                   id2hp[i] = hp;
+                   vecHP.push_back(hp);
                 }
-                Battle::battleDistribute.UpdateSoldiersHP(_mapId,(target.bo)->GetOwner(),x,y,id2hp);
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,(target.bo)->GetOwner(),x,y,vecHP);
             }
             //cout
             TestCoutBattleS(target.bo);
@@ -828,10 +832,12 @@ namespace Battle
         Battle::DistributeInfo* info =Battle::battleDistribute.GetDistributeInfo(roomId,_mapId,x,y);
         UInt32 mainFighterHP = info->GetMainFighterHP();
         bf->setHP(mainFighterHP);
-        std::map<UInt8,UInt32> id2hp = info->GetSoldiersHP();
-        for( auto it = id2hp.begin(); it != id2hp.end(); ++it )
+        std::vector<UInt32> vecHP = info->GetSoldiersHP();
+        UInt8 index = 0;
+        for( auto it = vecHP.begin(); it != vecHP.end(); ++it )
         {
-           bf->SetSoldierHp(it->first,it->second);
+           bf->SetSoldierHp(index,(*it));
+           ++index;
         }
         return bf;
     } 
@@ -935,8 +941,7 @@ namespace Battle
         }
         ++_actId;
         camp2fighters_copy.clear();
-
-        std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<std::endl;
+        std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
         _pack.data<UInt16>(offset) = actCount;
         UInt32 now = TimeUtil::Now();
         _pack << static_cast<UInt32>(now);
@@ -1593,5 +1598,36 @@ namespace Battle
             }
         }
         return -1;
+    }
+
+    //返回的是胜利方的势力Id
+    UInt8 BattleGround::GetWin()
+    {
+        //现在就是两个阵营 多个阵营以后修改
+        UInt8 aliveCampNum = 0;
+        std::vector<UInt8> vecAliveCamp; //依然还有人的势力
+        for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it)
+        {
+            if( ! SomeCampIsAllDie(it->first))
+            {
+                ++aliveCampNum;
+                vecAliveCamp.push_back(it->first);
+            }
+        }
+
+        //进行结果处理
+        if( aliveCampNum == 0 )
+        {
+            //全死了
+            return 0;
+        }
+        else if ( aliveCampNum == 1)
+        {
+            return (vecAliveCamp.back());
+        }
+        else
+        {
+            return 1;
+        }
     }
 }

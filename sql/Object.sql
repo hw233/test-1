@@ -204,8 +204,17 @@ CREATE TABLE `report2id` (
     `cityId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '城市Id',
     `actId`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '回合Id',
     `reportId` int(10)  NOT NULL DEFAULT '0' COMMENT '战术战报Id',
-    `time`  int(10) NOT NULL DEFAULT '0' COMMENT '战术时间',
+    `time`  int(10) NOT NULL DEFAULT '0' COMMENT '战术发生时间',
     PRIMARY KEY (`roomId`,`cityId`,`actId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `clan_battle_citystatus`; 
+CREATE TABLE `clan_battle_citystatus` (
+    `roomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间Id',
+    `battleId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '战役Id',
+    `cityId` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '城市Id',
+    `ownforce`  tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '这座城被哪个势力占领了',
+    PRIMARY KEY (`roomId`,`cityId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

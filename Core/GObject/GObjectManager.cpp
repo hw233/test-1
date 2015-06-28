@@ -25,6 +25,7 @@
 #include "Battle/ClanBattleComment.h"
 #include "Battle/ClanOrder.h"
 #include "Battle/Report2Id.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 namespace GObject
 {
@@ -129,6 +130,11 @@ namespace GObject
         if( !loadReport2Id())
         {
             fprintf(stderr, "load report2id error!\n");
+            std::abort();
+        }
+        if( !loadClanBattleAllCityStatus() )
+        {
+            fprintf(stderr, "load city status error!\n");
             std::abort();
         }
     } 
@@ -611,6 +617,24 @@ namespace GObject
         return true;
     }
 
+
+    bool GObjectManager::loadClanBattleAllCityStatus()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading clanBattle all city status");
+        lc.reset(1000);
+        DBCityStatus cityStatus;
+        if(execu->Prepare("SELECT `roomId`,`battleId`,`cityId`,`ownforce` FROM `clan_battle_citystatus`",cityStatus) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Battle::roomAllCityStatusManager.loadCityStatus(cityStatus.roomId,cityStatus.battleId,cityStatus.cityId,cityStatus.ownforce);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
     //关于equipment的提取，
     /*
        ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )

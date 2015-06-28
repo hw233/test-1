@@ -3,6 +3,8 @@
 #include"ClanOrder.h"
 #include"ClanBattleComment.h"
 #include"Battle/Report2Id.h"
+#include"Battle/ClanBattleCityStatus.h"
+
 #include"MsgID.h"
 
 namespace Battle
@@ -13,7 +15,7 @@ namespace Battle
     {
         for( UInt8 i = 0 ; i < INIT_SOLDIER_NUM ; ++i )
         {
-           index2hp[i] = 100;  //小兵的血量暂时定为100
+             SoldiersHP.push_back(100);//小兵的血量暂时定为100
         }
     }
 
@@ -416,8 +418,8 @@ namespace Battle
         //GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
 
         //UInt8 citys = info->GetMapNum();
-        //
-        st<<static_cast<UInt8>(room->GetStage());
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        st<<static_cast<UInt8>(status->GetStage());
         st<<static_cast<UInt8>(forceId);
         std::vector<MapDistributeInfo*> vecMapDistributeInfo = _room2Distribute[roomId];
         st<<static_cast<UInt8>(vecMapDistributeInfo.size());  //有人的发 没人的不发
@@ -476,7 +478,7 @@ namespace Battle
                 }
             }
             UInt32 reportId = Battle::report2IdTable.GetRecentReportId(roomId,mapId);
-            if( room->GetStage() == 1 )
+            if( status->GetStage() == 1 )
             {
                 st<<static_cast<UInt32>(reportId);
             }
@@ -635,13 +637,13 @@ namespace Battle
         info->SetMainFighterHP(hp);
     }
 
-    void BattleDistribute::UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::map<UInt8,UInt32>id2hp)
+    void BattleDistribute::UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32>vecHP)
     {
         UInt32 roomId = GetBattleRoomId(player);
         DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
         if( info == NULL)
             return;
-        info->SetSoldiersHP(id2hp);
+        info->SetSoldiersHP(vecHP);
     }
 
 }

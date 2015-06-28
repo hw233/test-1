@@ -234,6 +234,9 @@ namespace Battle
             void  GetAround(const Ascoord& p,std::vector<Ascoord>&vecAscoord);
             bool  IsInAround(const Ascoord& p , const Ascoord& t);
 
+            //下面这些是跟战役结算相关的
+            UInt8 GetWin();   //获得一场战役的结果
+
         private:
             UInt32 _id;
             UInt8 _x;
