@@ -8,6 +8,7 @@
 #include "Battle/BattleAdviceFighter.h"
 #include "Battle/BattleReport.h"
 #include "GData/SkillTable.h"
+#include "Battle/BattleAnalyze.h"
 
 #define ADVANCE 120
 #define ADVANCE_M 140
@@ -87,8 +88,8 @@ namespace Battle
         };
 
         static UInt16 YPos[][11] = {
-            {180,180,180,252,252,108,108,364,364,36,36},
-            {180,180,180,252,252,108,108,364,364,36,36},
+            {180,180,180,108,108,252,252,36,36,324,324},
+            {180,180,180,108,108,252,252,36,36,324,324},
         };
 
 
@@ -129,7 +130,7 @@ namespace Battle
         //for(UInt8 i = 0; i < _limitTime ; ++i)
         {
             //std::cout << "回合数:: " << static_cast<UInt32>(i) << std::endl <<std::endl;
-            for(UInt8 j = 0; j < 20; ++j)
+            for(UInt8 j = 0; j < 22; ++j)
             {
                 index = !index;
                 bf[index] = getMyFighters(index,j/2);
@@ -148,34 +149,33 @@ namespace Battle
 
                 // actCount +=
                 //FighterAction(bf[index],0);//->AppendFighterStream(_packet);
-                UInt32 rand = uRand(3);
+                UInt32 rand = uRand(10) ;
                 InsertBattlePre(rand * 0.1, bf[index]);
+                bf[index]->SetBeginTime(rand*0.1);
                 //std::cout << "战报id: " << static_cast<UInt32>(_id) << "包大小：" << static_cast<UInt32>(_packet.size()) << std::endl;
             }
 
-            UInt8 count = 0;
-            float lastTime = 0;
+            //UInt8 count = 0;
+            float lastTime = 0.1;
             float time = 0;
-            while(count< 80)
+            while(1)
             {
-                count ++;
+                //count ++;
                 time = GetMinTime();
-                UInt8 cnt = 0;
-                if(time > lastTime)
-                    cnt = (time - lastTime)/0.1;
-                if(cnt == 0)
-                    cnt = 1;
                 std::cout << "Now time:"  << time <<std::endl;
+                std::cout << "HP:" <<static_cast<UInt32>(_fgt[0]->getHP()) << std::endl;
                 if(time > 20 || GetWin() < 4)
                 {
                     break; 
                 }
-                FighterMove(0,cnt);
-                FighterMove(1,cnt);
+                actCount += FighterMove(0,lastTime,time);
+                actCount += FighterMove(1,lastTime,time);
                 actCount += doAction(time);
                 actCount += doObjectMove(time, (time - lastTime) / 0.1);  //每回合
                 actCount += doImage(time);   
                 actCount += doAttack(time);
+
+                std::cout << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
                 lastTime = time;
             }
             _time = time;
@@ -187,6 +187,7 @@ namespace Battle
         _packet << Stream::eos;
 
         battleReport1.addReport(_id,_packet);
+        BattleAnalyze::Analyze(_packet);
     } 
 
     UInt8 BattleSimulator::GetWin()
@@ -209,10 +210,10 @@ namespace Battle
         BattleFighter * fgt = NULL;
         switch(Class)
         { 
-            case 1:
+            case 2:
                 fgt = new BattleRideFighter(bf,f,pointX,pointY);
                 break;
-            case 2:
+            case 1:
                 fgt = new BattleWalkFighter(bf,f,pointX,pointY);
                 break;
             case 3:
@@ -238,7 +239,9 @@ namespace Battle
         float time1 = 0;
         std::vector<Battle::ActionPackage> vec = GetTimeBattleAction(time1);
         if(time1 > time)
+        { 
             return 0;
+        } 
 
         if(!vec.size())
             return 0;
@@ -268,14 +271,19 @@ namespace Battle
                     continue;
                 UInt16 param = bo->BeActed(&bAction);
                 _packet << static_cast<UInt16>(bAction.GetHappenTime2() * 100);
-                _packet << fgt->GetBSNumber();
+                _packet << static_cast<UInt8>(fgt->GetBSNumber());
                 _packet << static_cast<UInt8>(1);
-                _packet << static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber();
+                _packet << static_cast<UInt8>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
                 _packet << static_cast<UInt16>(param);
+                std::cout << "时间：" << bAction.GetHappenTime2();
+                std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber());
+                std::cout << " 攻击 战将编号:" << static_cast<UInt32>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
+                std::cout << "伤害：" << static_cast<UInt32>(param) << std::endl; 
                 if(bo->getHP() == 0)
                     fgt->AddKillCount();
                 ++count;
             }
+#if 0
             FighterAction(fgt,time1);
             float cd = 0.1;
             const GData::Skill* s = GData::skillManager[fgt->GetBaseActionNum()];
@@ -283,6 +291,7 @@ namespace Battle
                 cd = s->GetActionBackCd();
 
             InsertBattlePre(time1 + cd, fgt);
+#endif
         } 
 
         DelBattleAction();
@@ -295,7 +304,9 @@ namespace Battle
         float time1 = 0;
         std::vector<Battle::ImagePackage> vec = GetTimeBattleImage(time1);
         if(time1 > time)
+        {
             return 0;
+        }
 
         if(!vec.size())
             return 0;
@@ -451,16 +462,19 @@ namespace Battle
         float time1 = 0;
         std::vector<BattleFighter* > vec = GetBattlePre(time1);
         if(time1 > time)
-            return 1;
+        {
+            return 0;
+        }
+        UInt8 count = 0;
 
         if(!vec.size())
-            return 1;
+            return 0;
         for(UInt8 i = 0; i < vec.size(); ++i)
         { 
-            FighterAction(vec[i],time1);
+            count +=FighterAction(vec[i],time1);
         } 
         DelBattlePre();
-        return 0;
+        return count;
     } 
 
     void BattleSimulator::RandPosBegin(UInt8 index)
@@ -480,23 +494,27 @@ namespace Battle
                     {
                         BattleFighter * fgt = _fighters[index][1+rand/50];
                         setObjectXY(fgt->getPosX(),fgt->getPosY()-STEP,fgt);
+                        fgt->SetHighSpeed(false);
 
                         BattleFighter * fgt1 = _fighters[index][2-rand/50];
                         setObjectXY(fgt1->getPosX(),fgt1->getPosY()+STEP,fgt1);
+                        fgt1->SetHighSpeed(true);
                     }
                     break;
                 case 1:
                 case 3:
                     {
                         BattleFighter * fgt = _fighters[index][i*2 + 1+rand/50];
-                        setObjectXY(fgt->getPosX(),fgt->getPosY()+STEP, fgt);
+                        setObjectXY(fgt->getPosX(),fgt->getPosY()-STEP, fgt);
+                        _fighters[index][i*2 + 2 - rand/50]->SetHighSpeed(true);
                     }
                     break;
                 case 2:
                 case 4:
                     {
                         BattleFighter * fgt = _fighters[index][i*2 + 1+rand/50];
-                        setObjectXY(fgt->getPosX(),fgt->getPosY()-STEP, fgt);
+                        setObjectXY(fgt->getPosX(),fgt->getPosY()+STEP, fgt);
+                        fgt->SetHighSpeed(true);
                     }
                     break;
                 default:
@@ -516,18 +534,26 @@ namespace Battle
         } 
     } 
 
-    void BattleSimulator::FighterMove(UInt8 index,UInt8 count)
+    UInt8 BattleSimulator::FighterMove(UInt8 index,float lastTime, float time)
     { 
         if(index > 1)
-            return ;
+            return 0;
         UInt8 cls = _fgt[index]->GetClass();
         if(cls != 2 && cls != 1)
-            return ;
+            return 0;
+        UInt8 num = 0;
         for(UInt8 i = 0; i < _fighters[index].size(); ++i)
         { 
             if(_fighters[index][i])
-                _fighters[index][i]->GoForward(2 - cls, count);
+            {
+                if(_fighters[index][i]->GetBeginTime() + 0.001 > time)
+                    continue;
+                _fighters[index][i]->GoForward(2 - cls, static_cast<UInt16>((time - lastTime)*_fighters[index][i]->GetSpeed()*10));
+                num += _fighters[index][i]->AppendFighterStream(_packet);
+            }
         } 
-
+        if(num)
+            std::cout << "武将移动数量" << static_cast<UInt32>(num) << std::endl;
+        return num;
     } 
 }

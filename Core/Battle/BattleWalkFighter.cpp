@@ -6,11 +6,15 @@ namespace Battle
     { 
         if(!_target || !_target->getHP())
         {
-            _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
+            if(!_count)
+                _target = GetField()->GetTargetForRide(!GetSideInBS(), getPosX(),getPosY(), 2);
+            else
+                _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
+            ++_count;
             BuildLocalStream(e_run);
         }
         SetBattleTargetPos(_target->getPosX(),_target->getPosY());
-        return 0;
+        return true;
     } 
 
     UInt16 BattleWalkFighter::GetTargetDistance()
@@ -22,7 +26,7 @@ namespace Battle
 
     void BattleWalkFighter::BuildLocalStream(UInt8 wait, UInt8 param)
     {
-        _st.reset();
+        //_st.reset();
         //_st << static_cast<UInt8>(ACTION_HAPPEN); //即使起作用
         //_st << static_cast<UInt8>(getPosX());
         //_st << static_cast<UInt8>(getPosY());
@@ -38,9 +42,9 @@ namespace Battle
                     _st << GetBSNumber();
                     _st << static_cast<UInt8>(4);
                     _st << _target->GetBSNumber();
-                    std::cout << "时间点" << GetNowTime2() << std::endl;
+                    std::cout << "时间点" << static_cast<float>(GetNowTime2()) << std::endl;
                     std::cout << "战将编号" << static_cast<UInt32>(GetBSNumber()) << std::endl;
-                    std::cout << "目标编号" << _target->GetBSNumber() << std::endl;
+                    std::cout << "目标编号" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
                 }
                 break;
             case e_attack_near:
@@ -76,8 +80,21 @@ namespace Battle
         EnterY = 0;
         _crickSum = 0;
         //_sideInBS = 0;
+        _count = 0;
+        _isHighSpeed = false;
         return ;
     } 
 
+    UInt16 BattleWalkFighter::GetSpeed()
+    { 
+        if(_count < 2 && _fighter == NULL)
+        {
+            if((GetBSNumber() == 0 && GetHighSpeed()) || (GetBSNumber() == 1 && !GetHighSpeed()))             
+                return GetBaseSpeed()*12/100;
+            else 
+                return GetBaseSpeed()*4/100;
+        }
+        return GetBaseSpeed()/10;
+    } 
 } 
 

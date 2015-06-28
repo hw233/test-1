@@ -16,6 +16,8 @@ namespace Battle
         setNumber(0);
 
         _nowTime = -1;
+
+        _beginTime = 0;
         
         _killCount = 0;
 
@@ -69,10 +71,10 @@ namespace Battle
         //普通攻击
     } 
 
-    void BattleFighter::GoForward(UInt8 flag ,UInt8 count) // flag ===0  表示Y优先  flag ==1 表示斜线
+    void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
     { 
         //SetGone(true);
-        UInt16 advance = GetSpeed() * count;
+        //UInt16 advance = GetSpeed() * count;
         if(!PreGetObject())
             return ;
         flag = GetRideCount(); 
@@ -113,12 +115,11 @@ namespace Battle
             SetBattleDirection(1);
         else 
             SetBattleDirection(0);
-        // if(1 ||GetBSNumber() == 0 || GetBSNumber() == 7)
-        // { 
-        //     std::cout << "时间:" << static_cast<UInt32>(_nowTime) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
-        // } 
+         if(GetBSNumber() == 0 || GetBSNumber() == 11)
+         { 
+           std::cout << "XXXXX时间:" << static_cast<float>(GetNowTime2()) << " 战将" << static_cast<UInt32>(GetBSNumber()) << "编号  x坐标:" << static_cast<UInt32>(getPosX()) << std::endl;
+         } 
 
-        BuildLocalStream(e_run);
     } 
 
     UInt16 BattleFighter::BeActed(BattleAction *  bAction)
@@ -128,7 +129,7 @@ namespace Battle
         UInt32 defend = GetDefend();
         UInt32 hpSub = attack - defend;
         //TEST
-            hpSub = 400;
+            hpSub = 200;
         makeDamage(hpSub);
 
         return hpSub;
@@ -138,7 +139,7 @@ namespace Battle
     { 
         if(!getHP())
             return ;
-        _st.clear();
+        //_st.clear();
         UpdateActionList();
         //硬直
         if(_crick)
@@ -257,8 +258,8 @@ namespace Battle
             return res;
         for(ActionSort::iterator it = preActionList.begin(); it != preActionList.end(); ++it)
         {   
-            if(advance < GetSpeed()*2 * GData::skillManager[it->_skillId]->GetActionCd())
-                continue;
+            //if(advance < GetSpeed()*2 * GData::skillManager[it->_skillId]->GetActionCd())
+            //   continue;
             if(GData::skillManager[it->_skillId]->GetSkillCondition()->MeetCondition(advance,priority)) //XXX
             {
                 flag = true;
@@ -271,6 +272,10 @@ namespace Battle
             res._cd = GData::skillManager[res._skillId]->GetCd() + GetNowTime2(); //BATTLE2
             preActionList.erase(result);
             preActionCD.push_back(res);
+        } 
+        if(GetBSNumber() == 0 || GetBSNumber() == 11)
+        { 
+            std::cout << "!!!!时间:" << static_cast<float>(GetNowTime2()) << "战将编号:" << static_cast<UInt32>(GetBSNumber()) << " 动作选择：" << static_cast<UInt32>(res._skillId) << std::endl;
         } 
         return res;
     } 
@@ -397,15 +402,16 @@ namespace Battle
    
     void BattleFighter::AddSkill() 
     { 
-        preActionList.push_back(GetBaseActionNum());
         if( _fighter == NULL )
         {
+            preActionList.push_back(GetBaseActionNum());
             return;
         }
-        //for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
-        //{
-        //    preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
-        //}
+        for(UInt8 i = 0; i < _fighter->m_baseSkills.size(); ++i)
+        {
+            preActionList.push_back(ActionBase(_fighter->m_baseSkills[i]));
+            break;
+        }
     }
 
 
@@ -456,9 +462,11 @@ namespace Battle
             ActionPackage ap(this,_nowTime2/*,_target*/);
             ap.PushObject(_target);
 
-            GetField()->InsertTimeBattleAction( _nowTime2 + _actionLast ,ap );
+            GetField()->InsertTimeBattleAction( GetNowTime2() + _actionLast ,ap );
             _actionType = e_none;
-            std::cout << "战将编号: " << static_cast<UInt32>(GetBSNumber()) << "普通攻击对象编号:" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
+            std::cout << "战将编号: " << static_cast<UInt32>(GetBSNumber()) << "位置: (" << static_cast<UInt32>(getPosX()) << "," << static_cast<UInt32>(getPosY())<< ") 普通攻击对象编号:" << static_cast<UInt32>(_target->GetBSNumber()) << " 位置：(" << static_cast<UInt32>(_target->getPosX()) << " , "<< static_cast<UInt32>(_target->getPosY()) << " )"<< std::endl;
+            GetField()->InsertBattlePre(GetNowTime2() + _actionLast + _actionBackLast,this);
+            std::cout <<"战将编号：" << static_cast<UInt32>(GetBSNumber())<< "普通攻击发起，行动列表添加到时间" <<  static_cast<float>(GetNowTime2() + _actionLast + _actionBackLast)<< std::endl;
         } 
         return 1;
     } 

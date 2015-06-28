@@ -104,7 +104,7 @@ namespace Battle
 
             virtual void Action();  //行动
             //移动
-             void GoForward(UInt8 flag = 0 ,UInt8 count = 0);
+             void GoForward(UInt8 flag = 0 ,UInt16 count = 0);
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
@@ -175,7 +175,15 @@ namespace Battle
             virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance(){ return -1;}
 
-            virtual UInt16 GetSpeed() {return 0;} 
+            UInt16 GetBaseSpeed() 
+            {
+                if(_fighter) 
+                    return _fighter->GetSpeed();
+                if(m_mainFighter) 
+                    return m_mainFighter->GetBaseSpeed();
+                return 200; 
+            } 
+            virtual UInt16 GetSpeed() {return GetBaseSpeed()/10; } 
 
             virtual void resetBattleStatue() = 0;
 
@@ -262,6 +270,11 @@ namespace Battle
 
             void AddKillCount(){ ++_killCount;}
             UInt16 GetKillCount(){ return _killCount;}
+
+            virtual void SetHighSpeed(bool v){ }//_isHighSpeed = v;}
+
+            void SetBeginTime(float time) { _beginTime = time ;}
+            float GetBeginTime(){return _beginTime;}
         protected:
 
             UInt8 _crick;  //硬直
@@ -294,16 +307,6 @@ namespace Battle
             UInt8 _stoic;
             UInt8 _stoicLev;
 
-            //UInt32 _attack_near;
-            //UInt32 _attack_distance;
-            //UInt32 _attack_image;
-            //UInt32 _defend;
-            //UInt32 _defend_image;
-            //UInt32 _critical; //暴击 
-            //UInt32 _defend_critical; //抗暴
-            //UInt32 _hit;  //命中
-            //UInt32 _evade;  //闪避
-
             UInt32 _wreck; //破击
             UInt32 _parry;  //格挡
 
@@ -314,6 +317,7 @@ namespace Battle
 
             UInt16 _nowTime; //行动时间
             float _nowTime2; //行动时间
+            float _beginTime;
 
             UInt16 _minX;  //入场X坐标  //TODO
             UInt16 _minY;  //入场Y坐标  //TODO
@@ -330,6 +334,7 @@ namespace Battle
             std::list<BattleBuff> bufflst;
             UInt8 _direction;
             UInt16 _killCount;
+
         public:
             BattleObject * _target;
     };
