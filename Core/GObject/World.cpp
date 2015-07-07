@@ -98,6 +98,7 @@ namespace GObject
 
     void World::World_Test( World * world )
     { 
+#if 0
         struct NewUserStruct  
         {
             UInt64 phoneId;
@@ -126,6 +127,7 @@ namespace GObject
         ns._para = "192.168.88.250";
         LoginMsgHdr hdr1(0xE1, WORKER_THREAD_LOGIN, 8500, 1212121 , sizeof(ns)); 
         GLOBAL().PushMsg(hdr1, &ns);
+#endif
         //UInt32 BattleId = Battle::battleManager.CreateBattleGround();
         /*
         for(UInt8 i = 1; i < 10 ;++i)
