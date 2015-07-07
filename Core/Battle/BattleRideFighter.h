@@ -25,8 +25,9 @@ namespace Battle
             virtual UInt8 GetRideCount() {return count-1;}
             virtual UInt16 GetBaseActionNum(){return 5;}
             virtual UInt8 GetBattleDirection();
+            //virtual UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
 
-            virtual UInt16 GetSpeed() {return 37;} 
+//            virtual UInt16 GetSpeed() {return 37;} 
             virtual UInt8 BeForAction();
 
             virtual bool IsStoped() {return count > 2;}

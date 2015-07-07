@@ -281,7 +281,7 @@ namespace Battle
             _pack << static_cast<UInt8>(my);
             _pack << static_cast<UInt8>( currentBf->GetNowTime2());
             _pack << static_cast<UInt8>(0); //无战斗发生
-            _oneRoundCostTime += currentBf->GetNowTime2();
+            _oneRoundCostTime += ceil((currentBf->GetNowTime()*1.0)/100);
              
         }
         else
@@ -318,7 +318,7 @@ namespace Battle
             _pack << static_cast<UInt8>( currentBf->GetNowTime2());
             _pack << static_cast<UInt8>(1);
 
-            _oneRoundCostTime += currentBf->GetNowTime2();
+            _oneRoundCostTime += ceil((currentBf->GetNowTime()*1.0)/100);
 
             //currentBf->InsertFighterInfo(_pack);
             target.bo->InsertFighterInfo(_pack);

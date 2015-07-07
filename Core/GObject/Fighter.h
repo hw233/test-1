@@ -130,6 +130,8 @@ namespace GObject
             UInt32 GetTotalPower() ;  //获得总战力
             std::string GetName() const { return _name;}
 
+            std::vector<UInt16> GetBaseSkills(){return m_baseSkills;}
+
             std::vector<UInt16> m_baseSkills;
     private:
             UInt32 _id;

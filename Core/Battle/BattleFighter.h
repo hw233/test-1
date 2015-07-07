@@ -25,6 +25,17 @@ namespace Battle
 #define  ACTION_HAPPEN 1  //动作立即起作用
 #define  MYFIGHTERMAX 10
 #define  A_SUB_B(x,y) (x)>(y)?(x)-(y):0
+
+    enum
+    {
+        e_fighter = 0,
+        e_walk = 1,
+        e_ride = 2,
+        e_shoot = 3,
+        e_advice = 4,
+        e_fighter_max
+    };
+
     enum 
     {
         e_none = 0, //待机
@@ -69,7 +80,7 @@ namespace Battle
         //UInt16 _condition ;  // 触发条件编号
         //UInt16 _scpoe ;      // 触发范围编号
         //UInt16 _effect ;     // 触发效果编号
-        float _cd;           //行动cd  //BATTLE2
+        UInt16 _cd;           //行动cd  //BATTLE2
         UInt8 _priority ;  //触发优先级
     };
     struct lt_absort
@@ -95,12 +106,12 @@ namespace Battle
             inline UInt8 GetActionLast(){ return _actionLast;}  //获得当前状态
             inline UInt8 GetActionBackLast(){ return _actionBackLast;}  //获得当前状态
 
-            UInt8 GetSide() {return _fighter->GetSide();}
+            UInt8 GetSide() { if(_fighter) return _fighter->GetSide(); if(m_mainFighter) m_mainFighter->GetSide();return 0;}
             void SetGroundX(UInt8 x){_groundX = x;}
             void SetGroundY(UInt8 y){_groundY = y;}
             UInt8 GetGroundX(){ return _groundX;}
             UInt8 GetGroundY(){ return _groundY;}
-            UInt8 GetTypeId() { return _fighter->GetTypeId();}
+            UInt8 GetTypeId() { if(_fighter) return _fighter->GetTypeId(); if(m_mainFighter) m_mainFighter->GetTypeId(); return 0;}
 
             virtual void Action();  //行动
             //移动
@@ -124,10 +135,10 @@ namespace Battle
             BattleField * GetField();
 
             UInt8 GetMovePower();
-            UInt8 GetClass(){ return _fighter->GetClass();}
+            UInt8 GetClass(){ if(_fighter) return _fighter->GetClass(); if(m_mainFighter) return m_mainFighter->GetClass(); return 0; }
             UInt8 GetAttackRange();
             UInt8 GetDistance(){ return 1;}   //
-            UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
+            virtual UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
 
             void setNumber(UInt8 num){ _number = num;}
             UInt8 getNumber(){ return _number; }
@@ -139,6 +150,7 @@ namespace Battle
                 { 
                     attrBase[i] = m_mainFighter->GetBattleAttr(i);
                 } 
+                AddSkill();
             }
 
             void PutBattleFighters(BattleSimulator& bsim);
@@ -166,7 +178,7 @@ namespace Battle
             virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
 
             void SetNowTime(UInt16 time ){ /*if(_nowTime != time ) SetGone(false);*/ _nowTime = time;}
-            float  GetNowTime() { return _nowTime;}
+            UInt16  GetNowTime() { return _nowTime;}
 
             void SetNowTime(float time ){ /*if(_nowTime2 != time ) SetGone(false);*/ _nowTime2 = time;}
             float  GetNowTime2() { return _nowTime2;}
@@ -183,7 +195,16 @@ namespace Battle
                     return m_mainFighter->GetBaseSpeed();
                 return 200; 
             } 
-            virtual UInt16 GetSpeed() {return GetBaseSpeed()/10; } 
+            std::vector<UInt16> GetBaseSkills()
+            {
+                std::vector<UInt16> vec;
+                if(_fighter)
+                    vec = _fighter->GetBaseSkills();
+                else if(m_mainFighter)
+                    vec = m_mainFighter->GetBaseSkills();
+                return vec;
+            }
+            virtual UInt16 GetSpeed() { return GetBaseSpeed();}
 
             virtual void resetBattleStatue() = 0;
 
@@ -282,7 +303,7 @@ namespace Battle
             //UInt32 GetMainFighterHP() const { return m_mainFighter->getHP();}
             virtual void SetHighSpeed(bool v){ }//_isHighSpeed = v;}
 
-            void SetBeginTime(float time) { _beginTime = time ;}
+            void SetBeginTime(UInt16 time) { _beginTime = time ;}
             float GetBeginTime(){return _beginTime;}
 
             UInt8 GetFighterNum() 
@@ -297,6 +318,13 @@ namespace Battle
                 }
                 return count;
             }
+            void SetCachePx(UInt16 cache) { _cachePx = cache ;}
+            UInt16 GetCachePx(){ return _cachePx;}
+
+            //如果可以移动返回false ， 不可以移动返回true
+            virtual bool CanMove() { return true; } // return _canMove;}
+            virtual void SetMove(bool v) {}// _canMove = v;}
+
         protected:
 
             UInt8 _crick;  //硬直
@@ -339,7 +367,7 @@ namespace Battle
 
             UInt16 _nowTime; //行动时间
             float _nowTime2; //行动时间
-            float _beginTime;
+            UInt16 _beginTime;
 
             UInt16 _minX;  //入场X坐标  //TODO
             UInt16 _minY;  //入场Y坐标  //TODO
@@ -357,8 +385,10 @@ namespace Battle
             UInt8 _direction;
             UInt16 _killCount;
 
+            UInt16 _cachePx;
+
         public:
-            BattleObject * _target;
+            BattleFighter * _target;
     };
 
 }

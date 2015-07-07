@@ -71,6 +71,7 @@ namespace GObject
 
         //GMHandler::Battle(1,2);
 
+        //GMHandler::Battle(2,1007);
         return true; 
     }
 
@@ -238,6 +239,8 @@ namespace GObject
             return;
         for( auto it = roomBattleList.begin(); it != roomBattleList.end(); ++it)
         {
+            if( roomBattleList.empty() )
+                break;
             UInt8 stage = (*it)->GetStage();
             if( stage != 1 )
                 continue;
@@ -267,22 +270,7 @@ namespace GObject
                             (*iter)->SetNextStartTime(timeCost+now);
                         }
                     }
-
-                    //打完一回合以后判断是否已经打完  打完的话 回收空间
-                    if( (*iter)->IsStop() )
-                    {
-                        Battle::SingleBattle* p = *iter;
-                        iter = vecSingleBatte.erase(iter);
-                        delete p;
-                        p  = NULL;
-                        continue;
-                    }
                 }
-                if( vecSingleBatte.empty())
-                {
-                    it = roomBattleList.erase(it);
-                }
-
             }
         }
     }

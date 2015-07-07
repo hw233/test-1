@@ -42,20 +42,22 @@ namespace Battle
             static BattleFighter* CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY);
 
             //AfterAction
-            UInt8 doAction(float time = 0);
-            UInt8 doAttack(float time = 0);
-            UInt8 doImage(float time = 0);
-            UInt8 doObjectMove(float time = 0, UInt8 cnt = 1);
+            UInt8 doAction(UInt16 time = 0);
+            UInt8 doAttack(UInt16 time = 0);
+            UInt8 doImage(UInt16 time = 0);
+            UInt8 doObjectMove(UInt16 time = 0, UInt8 cnt = 1);
             UInt8 ClearObjectPackage();
-            UInt16 FighterAction(BattleFighter* bf,float curTime);
+            UInt16 FighterAction(BattleFighter* bf,UInt16 curTime);
             
             void RandPosBegin(UInt8);
 
             void PosPrintf(UInt8 index);
 
-            UInt8 FighterMove(UInt8 index,float lastTime, float cutTime);
+            UInt8 FighterMove(UInt8 index, UInt16 lastTime, UInt16 cutTime);
 
-            float GetTime(){return _time;}
+            UInt16 GetTime(){return _time;}
+
+            bool GetStop();
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];
@@ -63,7 +65,8 @@ namespace Battle
             Stream _packet;
             UInt32 _limitTime;
             UInt8 _distance;
-            float _time;
+            UInt16 _time;
+            UInt16 _complate[2];
     };
 }
 #endif // BATTLESIMULATOR_H_

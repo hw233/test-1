@@ -7,13 +7,13 @@ namespace Battle
         PreGetObject1() ;
         if(!_target)
             return false;
-        if(getPosX() <= GetMinX() - GetSideInBS()*1000 || getPosX() >= (GetMinX()+(!GetSideInBS())*1000))
+        if(!count || getPosX() <= 100 || getPosX() >= (FIELD_WIDTH - 100) )
         {
             switch(count)
             {
                 case 0:
                     {
-                        _battleTargetX = (getPosX() > FIELD_WIDTH/2) ? 0:FIELD_WIDTH;
+                        _battleTargetX = (getPosX() > (FIELD_WIDTH)/2) ? 100:(FIELD_WIDTH-100);
                         break;
                     }
                 case 1:
@@ -31,10 +31,15 @@ namespace Battle
                     return false ;
             }
             count++;
+            std::cout << "战将编号：" << static_cast<UInt32>(GetBSNumber()) << "目的地：" << static_cast<UInt32>(_battleTargetX) << " , " << static_cast<UInt32>(_battleTargetY) << std::endl;
         }
 
+
         if(!_battleTargetY)
+        {
             _battleTargetY = _target->getPosY();
+        }
+        BuildLocalStream(e_run);
         return true;
     } 
 
@@ -49,7 +54,6 @@ namespace Battle
             BattleFighter * target = static_cast<BattleFighter* >(GetField()->GetTargetForRide(!GetSideInBS(),getPosX(),getPosY(),direction));
             if(target)
                 _target = target;
-            BuildLocalStream(e_run);
         }
     } 
 
@@ -61,7 +65,7 @@ namespace Battle
         switch(type)
         {
             case e_run:
-                if(0)//GetBSNumber() == 0 || GetBSNumber() == 11)
+                if(GetBSNumber() == 0 || GetBSNumber() == 11)
                 {
                     std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
                     std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
@@ -69,12 +73,12 @@ namespace Battle
                 }
                 if(!isRunSend)
                 {
-                    _st << static_cast<UInt16>(GetNowTime2()*1.0/100);
+                    _st << static_cast<UInt16>(GetNowTime());
                     (_st << GetBSNumber());
                     _st << static_cast<UInt8>(0);
                     _st << static_cast<UInt16>(_battleTargetY);
                     isRunSend = true ;
-                    std::cout << " 回合数：" << (GetNowTime2());
+                    std::cout << " 回合数：" << static_cast<UInt32>(GetNowTime());
                     std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
                     std::cout << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
                     std::cout << std::endl;
@@ -181,6 +185,7 @@ namespace Battle
 
      UInt8 BattleRideFighter::BeForAction()
      { 
+         return 0;
         if(!isRunSend)
         {
             if(uRand(100) < 40)  //XXX
@@ -190,7 +195,6 @@ namespace Battle
         //if(!GetGone())
         //    GoForward();
 
-        BuildLocalStream(e_run);
         return 0;
      } 
 } 

@@ -8,14 +8,18 @@ namespace Battle
 { 
     bool BattleShootFighter::PreGetObject()
     { 
-        if(!_target || !_target->getHP())
+        if(!_target)// || !_target->getHP())
+        {
+            _target = GetField()->GetTargetForRide(!GetSideInBS(),getPosX(),getPosY(),2);
+        }
+        if(!_target->getHP())
         {
             _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
+            std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
         }
         if(_target)
         {
             SetBattleTargetPos(_target->getPosX(),_target->getPosY());
-            std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
         }
         return 0;
     } 
@@ -34,10 +38,16 @@ namespace Battle
         return ;
     } 
 
-    UInt8 BattleShootFighter::NormolAttack()
+    UInt8 BattleShootFighter::NormolObject()
     { 
+        //BattleFighter::NormolAttack();
         if(!_target)
-            return 0;
+        {
+            PreGetObject();
+            if(!_target)
+                return 0;
+        }
+
         {
             UInt16 targetX = _target->getPosX();
             UInt16 targetY = _target->getPosY();
@@ -45,11 +55,11 @@ namespace Battle
             if(targetZ == 0)
                 targetZ = 1;
             ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
-            op.setObjectDirection(getPosX(),getPosY(),targetX>getPosX(),targetY>getPosY(),100*SUB(targetX,getPosX())/targetZ, 100*SUB(targetY,getPosY())/targetZ, 50 , _target);
-            op.setObjectTime(_actionLast);
+            op.setObjectDirection(getPosX(),getPosY(),targetX>getPosX(),targetY>getPosY(),80*SUB(targetX,getPosX())/targetZ, 80*SUB(targetY,getPosY())/targetZ, 50 , _target);
+            op.setObjectCount(1); //设置穿透数量
             GetField()->InsertObjectPackage(op);
 
-            GetField()->InsertBattlePre(GetNowTime2() + 0.1, this);
+            GetField()->InsertBattlePre(GetNowTime() + 4, this);
         }
         return 1;
     } 

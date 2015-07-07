@@ -57,12 +57,37 @@ void BattleAnalyze::Analyze(Stream br)
                 break;
             case 2:
             case 3:
+                {
+                    UInt16 skillId = 0;
+                    br >> skillId;
+                    UInt8 count = 0;
+                    br >> count;
+                    for(UInt8 i =0; i< count; ++i)
+                    { 
+                        UInt16 time = 0;
+                        UInt8 fgtBSNumber = 0;
+                        UInt16 param = 0;
+                        br >> time >> fgtBSNumber >> param;
+                        std::cout<< "伤害产生时间点" << static_cast<UInt32>(time) << "攻击战将：" << static_cast<UInt32>(fgtBSNumber) << "伤害:" << static_cast<UInt32>(param) << std::endl;
+
+                    } 
+                }
+                break;
             case 4:
                 {
                     UInt8 fgtId = 0;
                     br >> fgtId;
                     std::cout << "攻击战将：" << static_cast<UInt32>(fgtId) << std::endl;//<< "伤害:" << static_cast<UInt32>(param) << std::endl;
                 }
+                break;
+
+            case 5:
+                { 
+                    UInt8 fgtBSNumber = 0;
+                    UInt16 param = 0;
+                    br >> fgtBSNumber >> param;
+                    std::cout << "弓箭手攻击战将：" << static_cast<UInt32>(fgtBSNumber) <<  "伤害:" << static_cast<UInt32>(param) << std::endl;
+                } 
                 break;
             default:
                 std::cout << "error type" << std::endl;
