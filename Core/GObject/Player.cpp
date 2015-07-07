@@ -275,6 +275,7 @@ namespace GObject
             (it->second)->MakeFighterInfo(st);
         }
         st << static_cast<UInt8>(GetJoinClanBattle());
+        st << static_cast<UInt32>(TimeUtil::Now());
         std::cout << "获得玩家信息：" << GetName() << std::endl;
     }
 

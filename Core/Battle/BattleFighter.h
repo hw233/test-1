@@ -284,6 +284,19 @@ namespace Battle
 
             void SetBeginTime(float time) { _beginTime = time ;}
             float GetBeginTime(){return _beginTime;}
+
+            UInt8 GetFighterNum() 
+            {
+                UInt8 count = 0;
+                for( UInt8 i = 0; i < MYFIGHTERMAX ; ++i )
+                {
+                    if( m_fighters[i] !=  NULL && m_fighters[i]->getHP() > 0  )
+                    {
+                          ++count;
+                    }
+                }
+                return count;
+            }
         protected:
 
             UInt8 _crick;  //硬直

@@ -24,37 +24,37 @@ namespace Battle
 
         UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
         UInt8 newStage = 0;
-        if( t < sday )
+        if( t <= sday )
         {
             newStage = 0;
         }
-        else if ( t > sday && t < sday + 1*86400)
+        else if ( t > sday && t <= sday + 1*86400)
         {
             newStage = 1;
         }
-        else if(  t > sday+1*86400 && t < sday+2*86400)
+        else if(  t > sday+1*86400 && t <= sday+2*86400)
         {
             newStage = 0;
         }
-        else if(  t > sday+2*86400 && t < sday+3*86400 )
+        else if(  t > sday+2*86400 && t <= sday+3*86400 )
         {
             newStage = 1;
         }
-        else if(  t > sday+4*86400 && t < sday+5*86400 )
+        else if( t >  sday+3*86400 && t <= sday+4*86400 )
         {
             newStage = 0;
         }
-        else if(  t > sday+5*86400 && t < sday+6*86400 )
+        else if(  t > sday+4*86400 && t <= sday+5*86400 )
         {
             newStage = 1;
         }
-        else if(  t > sday+6*86400 && t < sday+7*86400 )
+        else if(  t > sday+5*86400 && t <= sday+6*86400 )
         {
             newStage = 2;
         }
         else
         {
-            newStage = 3;
+            newStage = 0;
         }
 
         if( newStage != stage )

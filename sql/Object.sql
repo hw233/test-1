@@ -162,6 +162,8 @@ CREATE TABLE `clan_battle_pos` (
     `fighterId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '战将id',
     `posx`     int(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图上的坐标x',
     `posy`     int(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图上的坐标y',
+    `mainFighterHP` int(3) unsigned NOT NULL DEFAULT '0' COMMENT '主将血量',
+    `soldiersHP` varchar(1024) NOT NULL DEFAULT '' COMMENT '小兵们的血量',
     PRIMARY KEY (`mapId`,`playerId`,`fighterId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

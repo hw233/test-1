@@ -138,8 +138,8 @@ namespace Battle
                 if(!bf[0] && !bf[1])          
                     break;
 
-                //if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
-                //    continue;
+                if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
+                    continue;
                 //if(_distance > bf[index]->GetDistance())
                 //    continue;
 

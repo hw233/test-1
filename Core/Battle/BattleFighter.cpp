@@ -331,7 +331,7 @@ namespace Battle
         st << static_cast<UInt16>(GetId());
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
-        st << static_cast<UInt8>(10);
+        st << static_cast<UInt8>(GetFighterNum());
     }
 
 
@@ -527,12 +527,16 @@ namespace Battle
         {
             return;
         }
+        if( m_fighters[index] == NULL )
+        {
+            return;
+        }
         m_fighters[index]->setHP(hp);
     }
 
     UInt32 BattleFighter::GetSoldierHp(UInt8 index)
     {
-        if( index < 0 || index >= MYFIGHTERMAX )
+        if( index < 0 || index >= MYFIGHTERMAX || m_fighters[index] == NULL )
         {
             return 0;
         }

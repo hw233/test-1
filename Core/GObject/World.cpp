@@ -67,7 +67,7 @@ namespace GObject
 
         AddTimer(1* 1000, world_clanBattle_putFighters, this, 10*1000);
 
-        AddTimer(5*1000,World_clanBattle_OneRound,this,70*1000);
+        AddTimer(5*1000,World_clanBattle_OneRound,this,30*1000);
 
         //GMHandler::Battle(1,2);
 
@@ -199,10 +199,6 @@ namespace GObject
             Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
             if( roomBattle == NULL )
             {
-
-                if(false)
-                    continue;
-                //放将之前把之前的删掉
                 //TODO
                 std::cout<<"put fighters"<<std::endl;
                 roomBattle = new Battle::RoomBattle(roomId);
@@ -229,10 +225,6 @@ namespace GObject
                 Battle::battleManager.InsertRoomBattle(roomBattle);
                 roomBattle->SetIsPutFighter(true);
             }
-            else
-            {
-                //删除原来的  
-            }
         }
     }
 
@@ -250,30 +242,47 @@ namespace GObject
             if( stage != 1 )
                 continue;
             std::vector<Battle::SingleBattle*> vecSingleBatte = (*it)->GetSingleBattles();
+            if( vecSingleBatte.empty() )
+                continue;
             for( auto iter = vecSingleBatte.begin(); iter != vecSingleBatte.end(); ++iter)
             {
-                /*
-                if( (*iter)->IsStop() )
-                    continue;
-                */
-                UInt32 nextActTime = (*iter)->GetNextStartTime(); 
-                UInt32 now = TimeUtil::Now();
-                if( nextActTime == 0 )
+                if( (*iter) != NULL)
                 {
-                    (*iter)->StartOneRound();
-                    UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
-                    (*iter)->SetNextStartTime(timeCost+now);
-                }
-                else
-                {
-                    if( fabs( now - (*iter)->GetNextStartTime() ) <= 5  )
+                    UInt32 nextActTime = (*iter)->GetNextStartTime(); 
+                    if( nextActTime == 0 )
                     {
-
                         (*iter)->StartOneRound();
                         UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
+                        UInt32 now = TimeUtil::Now();
                         (*iter)->SetNextStartTime(timeCost+now);
                     }
+                    else
+                    {
+                        UInt32 now = TimeUtil::Now();
+                        if( fabs( now - (*iter)->GetNextStartTime() ) <= 5  )
+                        {
+
+                            (*iter)->StartOneRound();
+                            UInt16 timeCost = (*iter)->GetOneRoundTimeCost();
+                            (*iter)->SetNextStartTime(timeCost+now);
+                        }
+                    }
+
+                    //打完一回合以后判断是否已经打完  打完的话 回收空间
+                    if( (*iter)->IsStop() )
+                    {
+                        Battle::SingleBattle* p = *iter;
+                        iter = vecSingleBatte.erase(iter);
+                        delete p;
+                        p  = NULL;
+                        continue;
+                    }
                 }
+                if( vecSingleBatte.empty())
+                {
+                    it = roomBattleList.erase(it);
+                }
+
             }
         }
     }

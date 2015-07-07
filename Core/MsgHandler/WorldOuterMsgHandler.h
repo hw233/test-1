@@ -216,7 +216,7 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
     UInt8 res = false;
     if( curMapId == mapId )
     {
-        res = Battle::battleDistribute.MoveFighter(mapId,player,fighterInfo->GetPosX(),fighterInfo->GetPosY(),posx,posy);
+        res = Battle::battleDistribute.MoveFighter(mapId,player,fighterInfo->GetPosX(),fighterInfo->GetPosY(),posx,posy,0);
     }
     else
     {
