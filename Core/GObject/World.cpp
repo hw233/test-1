@@ -68,7 +68,7 @@ namespace GObject
 
         AddTimer(5*1000,World_clanBattle_OneRound,this,70*1000);
 
-        GMHandler::Battle(1,2);
+        GMHandler::Battle(2,1007);
         return true; 
     }
 

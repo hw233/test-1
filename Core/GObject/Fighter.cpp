@@ -84,7 +84,7 @@ namespace GObject
 
     void Fighter::SetSkill(std::string skill)
     { 
-        StringTokenizer tk(skill, ",");
+        StringTokenizer tk(skill, ";");
         if(!tk.count())
             return ;
         for(UInt8 i = 0; i < tk.count(); ++i)

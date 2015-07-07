@@ -5,7 +5,7 @@
 #include "Config.h"
 #include <math.h>
 #include "Common/Stream.h"
-#define FIELD_WIDTH 1520
+#define FIELD_WIDTH 1720
 #define STEP 36
 #define FIELD_HIGH  10*STEP
 
@@ -58,7 +58,7 @@ namespace Battle
         {
             vec_bo.clear();
         }
-ActionPackage(){}
+            ActionPackage(){}
             ~ActionPackage(){}
             UInt32 GetAttack(); //{if(!_bf) return 0; return _bf->GetAttack();}
             UInt32 GetHit(); //{ if(!_bf) return 0; return _bf->GetHit();}
@@ -72,7 +72,6 @@ ActionPackage(){}
             float GetHappenTime2(); //{return _time;}
 
             BattleObject* GetObject(UInt16 index) ;//{if(index > vec_bo.size())return NULL; return vec_bo[index];}
-
         private: 
             //UInt16 skillScopeId;
             std::vector<BattleObject *> vec_bo;
@@ -126,6 +125,7 @@ ActionPackage(){}
             UInt32 GetWreck() {return _wreck;}
             UInt32 GetCritical() {return _critical;}
             BattleFighter * GetBattleFighter(){return _bf;}
+            BattleFighter * GetTargetFighter(){return _bo;}
             bool CanCounter() {return true;}
             UInt16 GetSkillId(){ return _skillId;}
             UInt16 GetHappenTime(){ return _time;}
@@ -136,11 +136,7 @@ ActionPackage(){}
 
             void GoNext()
             { 
-                if(_count)
-                { 
-                    --_count;
-                    return;
-                } 
+                 
                 if(_bo != NULL)
                 { 
                     GoForTarget();
@@ -157,9 +153,11 @@ ActionPackage(){}
 
             bool CanExit()
             { 
+                if(!_count)
+                    return true;
                 if(_x > FIELD_WIDTH || _y > FIELD_HIGH)
                     return true;
-                if(!_xAdd && !_yAdd && _count ==0)
+                if(!_xAdd && !_yAdd)
                     return true;
                 return false;
             } 
@@ -180,7 +178,7 @@ ActionPackage(){}
                 if(!CanBeCounted(x,y))
                     return static_cast<UInt16>(MIN(res1,res2));
                 //return static_cast<UInt16>(MIN_3(res,res1,res2));
-                
+
                 return static_cast<UInt16>(res);
             } 
 
@@ -196,7 +194,7 @@ ActionPackage(){}
 
                 int res1  = (x3-x1)*(x2-x1) + (y3 - y1)*(y2 - y1) ;
                 int res2  = (x3-x2)*(x1-x2) + (y3 - y2)*(y1 - y2) ;
-                
+
                 if(res1 < 0 || res2 < 0)
                     return false;
 
@@ -211,7 +209,7 @@ ActionPackage(){}
                 //return res < 0;
             }
 
-            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleObject* bo = NULL)  //飞行系
+            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleFighter* bo = NULL)  //飞行系
             { 
                 _x = x;
                 _y = y;
@@ -223,12 +221,17 @@ ActionPackage(){}
                 _bo = bo;
             } 
 
-            void setObjectTime(UInt8 count ) { _count = count;}
+            void setObjectCount(UInt8 count ) { _count = count;}
 
             bool CheckFighterInSCope(BattleObject* bo);  //非指向性
-            void InsertIntoPackage(float curtime , BattleObject* bo , UInt16 param)
+            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt16 param)
             { 
-                vec_struct.push_back(BattleActionStream(curtime, bo, param));
+                if(_count)
+                { 
+                    --_count;
+                    vec_struct.push_back(BattleActionStream(curtime, bo, param));
+                }
+                return ;
             } 
             UInt8 BuildStream(Stream& st);
 
@@ -245,7 +248,7 @@ ActionPackage(){}
 
             //            UInt16 skillScopeId;
             BattleFighter * _bf; //攻击发起者
-            BattleObject * _bo; //受击者
+            BattleFighter * _bo; //受击者
             UInt16 _time;
             float _time2;
 

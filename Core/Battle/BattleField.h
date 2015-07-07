@@ -13,7 +13,7 @@ attacker:	0 1 2 3 4
 5 6 7 8 9
 */
 
-#define FIELD_WIDTH 1520
+#define FIELD_WIDTH 1720
 #define STEP 36
 #define FIELD_HIGH  10*STEP
 
@@ -81,8 +81,8 @@ namespace Battle
             }
             */
 
-            BattleObject * GetTarget(UInt8 side , UInt16 posX , UInt16 posY, BattleFighter* cur = NULL);
-            BattleObject * GetTargetForRide(UInt8 side , UInt16 posX , UInt16 posY,UInt8 direction = 2);
+            BattleFighter * GetTarget(UInt8 side , UInt16 posX , UInt16 posY, BattleFighter* cur = NULL);
+            BattleFighter * GetTargetForRide(UInt8 side , UInt16 posX , UInt16 posY,UInt8 direction = 2);
             void GetTargetList(UInt8 side, BattleFighter* bf, std::vector<BattleObject *>& vec, UInt16 , UInt8 flag = 0);
 
             inline UInt16 GetTimeActionLimit() { return _timeActionLimit;}
@@ -93,17 +93,18 @@ namespace Battle
             void InsertTimeBattleAction(UInt16 time , ImagePackage ip);
             void InsertObjectPackage(ObjectPackage ba);
 
-            std::vector<ActionPackage> GetTimeBattleAction(UInt16 time);
-            std::vector<ImagePackage> GetTimeBattleImage(UInt16 time);
+            std::vector<ActionPackage> GetTimeBattleAction(UInt16& time);
+            std::vector<ImagePackage> GetTimeBattleImage(UInt16& time);
 
             void InsertTimeBattleAction(float time , ActionPackage);
             std::vector<ActionPackage> GetTimeBattleAction(float& time);
 
             void InsertTimeBattleAction(float time , ImagePackage ip);
-            void InsertBattlePre(float time, BattleFighter* fgt);
+            void InsertBattlePre(UInt16 time, BattleFighter* fgt);
 
             std::vector<ImagePackage> GetTimeBattleImage(float& time);
-            std::vector<BattleFighter*> GetBattlePre(float& time);
+
+            std::vector<BattleFighter*> GetBattlePre(UInt16& time);    //BATTLE1
 
         protected:
             bool anyObjectInRow(UInt16, UInt16);
@@ -114,7 +115,7 @@ namespace Battle
             BattleFighter *getMyFighters(UInt8 side, UInt8 index);
             std::list<ObjectPackage>& GetObjectpackage();
 
-            float GetMinTime();
+            UInt16 GetMinTime();
 
             void DelBattleImage();
             void DelBattleAction();
@@ -134,22 +135,21 @@ namespace Battle
             UInt16 _fieldDistance;
             UInt16 _timeActionLimit ;
 
-            /*
             std::map<UInt16,std::vector<ActionPackage> > FieldAttack;  //攻击
 
             std::map<UInt16,std::vector<ImagePackage> > FieldImage;  //延迟性buff (定时炸弹类型的行为)
 
             std::list< ObjectPackage > FieldObject;  //物体型攻击 (定时炸弹类型的行为)
-            */
 
+            /*
             std::map<float,std::vector<ActionPackage> > FieldAttack;  //攻击
 
             std::map<float,std::vector<ImagePackage> > FieldImage;  //延迟性buff (定时炸弹类型的行为)
 
             std::list< ObjectPackage > FieldObject;  //物体型攻击 (定时炸弹类型的行为)
 
-            std::map<float,std::vector<BattleFighter*> > BattlePre;
-
+            */
+            std::map<UInt16,std::vector<BattleFighter*> > BattlePre;
     };
 
 }

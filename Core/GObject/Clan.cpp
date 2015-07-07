@@ -140,12 +140,13 @@ namespace GObject
             return -1;
         if(HasMember(pl) == _players.end())
             return 2;
-        if(opter->GetClanPos() <= pl->GetClanPos() || opter->GetClanPos() <= pos)
+        if(opter->GetClanPos() >= pl->GetClanPos())// || opter->GetClanPos() <= pos)
             return 1;
-        if(GetPosCount(pos) < posLimit[pos - 1])
+        if(GetPosCount(pos) >= posLimit[pos - 1])
             return 3;
 
         pl->SetClanPos(pos);
+        DB1().PushUpdateData("UPDATE `clan_player` set `position` = %u WHERE `clanId` = %u, `playerId` = %" I64_FMT "u ",pos, _id, pl->getId());   //LIBOUInt64
         return 0;
     } 
 
@@ -266,6 +267,7 @@ namespace GObject
                 _players[i]->send(st);
         } 
     } 
+
     bool Clan::CheckApplicant(Player* pl)
     { 
         for(UInt8 i = 0; i < _applicant.size(); ++i)
@@ -275,10 +277,13 @@ namespace GObject
         } 
         return true;
     } 
+
     void Clan::DelClanMember(Player* opter ,Player* bo)
     { 
         if(opter->GetClanPos() > 2)        
             return ;
         DelMember(bo);
+        bo->SetClan(NULL);
+        bo->SetClanPos(0);
     } 
 }

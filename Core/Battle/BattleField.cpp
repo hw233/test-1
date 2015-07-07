@@ -25,7 +25,7 @@ namespace Battle
 
     }
 
-    BattleObject * BattleField::GetTargetForRide(UInt8 side, UInt16 posX ,UInt16 posY,UInt8 direction)
+    BattleFighter * BattleField::GetTargetForRide(UInt8 side, UInt16 posX ,UInt16 posY,UInt8 direction)
     { 
         if(side > 1)
             return NULL;
@@ -71,7 +71,7 @@ namespace Battle
         } 
         return NULL;
     } 
-    BattleObject * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY, BattleFighter* cur)
+    BattleFighter * BattleField::GetTarget(UInt8 side, UInt16 posX ,UInt16 posY, BattleFighter* cur)
     { 
         if(side > 1)
             return NULL;
@@ -85,7 +85,7 @@ namespace Battle
         UInt8 res = -1;
         for(UInt8 i = 0; i < _fighters[side].size(); ++i)
         { 
-            if(!_fighters[side][i])
+            if(!_fighters[side][i] || !_fighters[side][i]->getHP())
                 continue;
             if(_fighters[side][i]->getClass() > eFighter)
                 return NULL;
@@ -139,8 +139,8 @@ namespace Battle
         UInt16 y2 = bo->getPosY()*1.0;
         UInt16 adx = x1>x2?(x1-x2):(x2-x1)*1.0;
         UInt16 ady = y1>y2?(y1-y2):(y2-y1)*1.0;
-        if(ady >= 34 + (bf->GetRad()+bo->GetRad()))
-            return -1;
+        //if(ady >= 34 + (bf->GetRad()+bo->GetRad()))
+        //    return -1;
         if(adx <= (bf->GetRad()+bo->GetRad()))
             return 0;
         return adx - (bf->GetRad()+bo->GetRad());
@@ -382,18 +382,30 @@ namespace Battle
         FieldAttack[time].push_back(ba);
     } 
 
-    std::vector<ActionPackage> BattleField::GetTimeBattleAction(UInt16 time)
+    std::vector<ActionPackage> BattleField::GetTimeBattleAction(UInt16& time)
     { 
-        return FieldAttack[time];
+        std::vector<ActionPackage> vec;
+        if(FieldAttack.begin() != FieldAttack.end())
+        {
+            time = FieldAttack.begin()->first;
+            vec = FieldAttack.begin()->second;
+        }
+        return vec;
     } 
 
     void BattleField::InsertTimeBattleAction(UInt16 time , ImagePackage ip)
     { 
         FieldImage[time].push_back(ip);
     } 
-    std::vector<ImagePackage> BattleField::GetTimeBattleImage(UInt16 time)
+    std::vector<ImagePackage> BattleField::GetTimeBattleImage(UInt16& time)
     { 
-        return FieldImage[time];
+        std::vector<ImagePackage> vec;
+        if(FieldImage.begin() != FieldImage.end())
+        {
+            time = FieldImage.begin()->first;
+            vec = FieldImage.begin()->second;
+        }
+        return vec;
     } 
 
     //BATTLE@
@@ -444,11 +456,11 @@ namespace Battle
         return FieldObject;
     } 
 
-    float BattleField::GetMinTime()
+    UInt16 BattleField::GetMinTime()
     { 
-        float min1 = 100;
-        float min2 = 100;
-        float min3 = 100;
+        UInt16 min1 = 10000;
+        UInt16 min2 = 10000;
+        UInt16 min3 = 10000;
         if(FieldAttack.begin() != FieldAttack.end())
             min1 = FieldAttack.begin()->first;
         if(FieldImage.begin() != FieldImage.end())
@@ -471,7 +483,7 @@ namespace Battle
         FieldImage.erase(FieldImage.begin());
     } 
 
-    std::vector<BattleFighter* > BattleField::GetBattlePre(float& time)
+    std::vector<BattleFighter* > BattleField::GetBattlePre(UInt16& time)
     { 
         std::vector<BattleFighter*> vec;
         if(BattlePre.begin() != BattlePre.end())
@@ -489,7 +501,7 @@ namespace Battle
        BattlePre.erase(BattlePre.begin());
     } 
 
-    void BattleField::InsertBattlePre(float time, BattleFighter* fgt)
+    void BattleField::InsertBattlePre(UInt16 time, BattleFighter* fgt)
     { 
         //if(BattlePre.begin() != BattlePre.end() && time < BattlePre.begin()->first)
         //    return ;

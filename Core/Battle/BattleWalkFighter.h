@@ -13,6 +13,7 @@ namespace Battle
         { 
             _count = 0;
             _isHighSpeed = false;
+            _canMove = true;
         } 
             //virtual void Action();
             virtual bool PreGetObject(); 
@@ -24,12 +25,17 @@ namespace Battle
             //virtual UInt8 NormolAttack();
             //virtual UInt8 NormolImage();
             //virtual UInt8 NormolObject();
-             void SetHighSpeed(bool v){ _isHighSpeed = v; }
+            void SetHighSpeed(bool v){ _isHighSpeed = v; if(v) std::cout << "战将编号" << static_cast<UInt32>(GetBSNumber()) << " 速度:" << static_cast<UInt32>(GetSpeed()) << std::endl;}
             bool GetHighSpeed(){return _isHighSpeed;}
+
+            virtual bool CanMove() {  return _canMove;}
+            virtual void SetMove(bool v) { _canMove = v;}
+
         private:
             //BattleObject* _target; 
             UInt8 _count;
             bool _isHighSpeed;  //是否为左快的行 (步兵专用)
+            bool _canMove;
     };
 }
 #endif // BATTLEWALKFIGHTER_H_
