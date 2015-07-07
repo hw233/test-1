@@ -505,7 +505,7 @@ namespace Battle
     { 
         //if(BattlePre.begin() != BattlePre.end() && time < BattlePre.begin()->first)
         //    return ;
-        BattlePre[time].push_back(fgt);
+        BattlePre[time + 4].push_back(fgt);
     } 
 
     void BattleField::FieldPrint()

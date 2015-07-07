@@ -151,8 +151,8 @@ namespace GData
                 _mpCost = mpCost;
             } 
 #endif
-            UInt16 GetCd() const {return _cd;}
-            UInt16 GetActionCd() const { return _actionCd + _actionBeforedCd;}
+            UInt16 GetCd() const {return _cd;}  //技能冷却时间
+            UInt16 GetActionCd() const { return _actionBeforedCd+_actionCd;}
             UInt16 GetActionCd1() const { return _actionBeforedCd;}
             UInt16 GetActionCd2() const { return _actionCd;}
             UInt16 GetActionBackCd() const { return _actionBackCd;}
@@ -169,9 +169,9 @@ namespace GData
 #endif
 
             UInt16 _cd;
-            UInt16 _actionBeforedCd;
-            UInt16 _actionCd;
-            UInt16 _actionBackCd;
+            UInt16 _actionBeforedCd;  //技能前置
+            UInt16 _actionCd;         //技能动作开始时间
+            UInt16 _actionBackCd;     //技能后置
             UInt16 _mpCost;
     };
 

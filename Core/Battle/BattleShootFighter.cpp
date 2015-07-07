@@ -59,7 +59,7 @@ namespace Battle
             op.setObjectCount(1); //设置穿透数量
             GetField()->InsertObjectPackage(op);
 
-            GetField()->InsertBattlePre(GetNowTime() + 4, this);
+            GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast, this);
         }
         return 1;
     } 
