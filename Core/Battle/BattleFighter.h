@@ -292,11 +292,32 @@ namespace Battle
             void AddKillCount(){ ++_killCount;}
             UInt16 GetKillCount(){ return _killCount;}
 
+            GObject::Player* GetOwner() const { return _fighter->GetOwner();}   //by qsj
+            //设置某一小兵的血量
+            void SetSoldierHp(UInt8 index,UInt32 hp);
+            //获得某一小兵的血量
+            UInt32 GetSoldierHp(UInt8 index);
+            //设置主将血量
+            //void SetMainFighterHP(UInt32 hp);
+            //获得主将血量
+            //UInt32 GetMainFighterHP() const { return m_mainFighter->getHP();}
             virtual void SetHighSpeed(bool v){ }//_isHighSpeed = v;}
 
             void SetBeginTime(UInt16 time) { _beginTime = time ;}
             float GetBeginTime(){return _beginTime;}
 
+            UInt8 GetFighterNum() 
+            {
+                UInt8 count = 0;
+                for( UInt8 i = 0; i < MYFIGHTERMAX ; ++i )
+                {
+                    if( m_fighters[i] !=  NULL && m_fighters[i]->getHP() > 0  )
+                    {
+                          ++count;
+                    }
+                }
+                return count;
+            }
             void SetCachePx(UInt16 cache) { _cachePx = cache ;}
             UInt16 GetCachePx(){ return _cachePx;}
 

@@ -25,7 +25,7 @@ namespace GObject
     GlobalNamedClans globalNamedClans;
 
     //GlobalNamedPlayers globalAccountsPlayers;
-    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10)
+    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),clanBattleKillCount(0)
     {
         m_pVars = new VarSystem(id);
         m_Package = new Package(this); 
@@ -275,6 +275,7 @@ namespace GObject
             (it->second)->MakeFighterInfo(st);
         }
         st << static_cast<UInt8>(GetJoinClanBattle());
+        st << static_cast<UInt32>(TimeUtil::Now());
         std::cout << "获得玩家信息：" << GetName() << std::endl;
     }
 
@@ -637,6 +638,7 @@ namespace GObject
         return 0;
     }
 
+    //推图奖励
     void Player::GiveBattleAward(UInt8 mapId)
     {
         GData::BattleAward* award = GData::battleAwardTable.GetBattleAward(mapId);

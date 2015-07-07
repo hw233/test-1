@@ -30,10 +30,12 @@ namespace GData
                 battleMapInfo.clear();
             }
             void SetSingleMapInfo(std::vector<SingleMapInfo*> vecSingleInfo) { battleMapInfo = vecSingleInfo;}
+            std::vector<SingleMapInfo*> GetSingleMapInfos() { return battleMapInfo;}
             ~BattleMapInfo() { battleId = 0 ; battleMapInfo.clear();}
             UInt8 GetBattleId() const { return battleId;}
             SingleMapInfo* GetSingleMapInfo(UInt8 mapId);
             UInt8 GetMapNum() const { return battleMapInfo.size();}
+            UInt8 GetBornCity(UInt8 forceId);
         private:
             UInt8 battleId;
             std::vector<SingleMapInfo*> battleMapInfo;

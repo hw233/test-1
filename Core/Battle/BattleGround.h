@@ -80,10 +80,9 @@ namespace Battle
     {
         BattleFighter * bo;
         Ascoord attack;  //攻击点
-        Ascoord goal;    //目标点
         UInt8 cost;    //行动力消耗
         UInt8 pri;     //攻击优先级
-        TargetInfo(BattleFighter* b, Ascoord a,Ascoord g,UInt8 c,UInt8 p): bo(b),attack(a),goal(g),cost(c),pri(p) {}
+        TargetInfo(BattleFighter* b, Ascoord a,UInt8 c,UInt8 p): bo(b),attack(a),cost(c),pri(p) {}
     };
 
     struct FighterInfo
@@ -167,7 +166,7 @@ namespace Battle
             void  FightOneRound();
             void  SetEachPosNumber();
             UInt8 GetBattleIndex(UInt8 x,UInt8 y );
-            BattleFighter* GetMinBattleIndexFighter(std::list<BattleFighter*> listFighter);
+            BattleFighter* GetMinBattleIndexFighter(std::vector<BattleFighter*> listFighter);
             bool SomeCampIsAllDie(UInt8 campId);
             bool CheckIsStop();
             void MakePreStartInfo();
@@ -184,7 +183,6 @@ namespace Battle
             void setObject(UInt8 x , UInt8 y ,BattleFighter * bf,UInt8 flag = 0);
             void preStart();
             void start();
-            void GetJoinPlayers(std::set<GObject::Player*>& setPlayer);
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
@@ -234,6 +232,9 @@ namespace Battle
             void  GetAround(const Ascoord& p,std::vector<Ascoord>&vecAscoord);
             bool  IsInAround(const Ascoord& p , const Ascoord& t);
 
+            //下面这些是跟战役结算相关的
+            UInt8 GetWin();   //获得一场战役的结果
+
         private:
             UInt32 _id;
             UInt8 _x;
@@ -250,7 +251,7 @@ namespace Battle
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
             std::map<UInt8,Ascoord> num2pos; //地图位置对应编号
             //来一个记录战将分布的结构 满足
-            std::map<UInt8,std::list<BattleFighter*>> camp2fighters;
+            std::map<UInt8,std::vector<BattleFighter*>> camp2fighters;
             //std::list<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;
 
@@ -264,6 +265,7 @@ namespace Battle
             UInt16 _actId;
             bool   _isFirstRound;
             UInt16 _oneRoundCostTime; //一回合消耗的时间
+            std::set<GObject::Player*> setPlayer;
             //一下全是跟A*算法  有关的东西
             Ascoord _start;
             Ascoord _end;

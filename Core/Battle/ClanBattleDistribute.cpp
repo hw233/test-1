@@ -3,12 +3,23 @@
 #include"ClanOrder.h"
 #include"ClanBattleComment.h"
 #include"Battle/Report2Id.h"
+#include"Battle/ClanBattleCityStatus.h"
+
 #include"MsgID.h"
 
 namespace Battle
 {
     BattleDistribute battleDistribute;
-  
+
+    void DistributeInfo::SetSoldiersHP()
+    {
+        for( UInt8 i = 0 ; i < INIT_SOLDIER_NUM ; ++i )
+        {
+             SoldiersHP.push_back(100);//小兵的血量暂时定为100
+        }
+    }
+
+
     bool BattleDistribute::Check(GObject::Player* player)
     {
         GObject::Clan* clan = player->GetClan();
@@ -28,8 +39,6 @@ namespace Battle
         }
         return true;
     }
-
-
 
     //有坐标来获得该坐标的排布信息
     DistributeInfo* BattleDistribute::GetDistributeInfo(std::vector<DistributeInfo*> &vecDistributeInfo,UInt8 x,UInt8 y)
@@ -60,7 +69,8 @@ namespace Battle
     
 
     //放将
-    bool BattleDistribute::PutFighter(UInt8 mapId,GObject::Player* player,UInt16 fighterId, UInt8 x, UInt8 y,bool flag)
+    //特殊说明一下这个tag  在放将初期需要检查阵营和位置是否一致   但在打的阶段开打以后就不需要这个检测了
+    bool BattleDistribute::PutFighter(UInt8 mapId,GObject::Player* player,UInt16 fighterId, UInt8 x, UInt8 y,bool flag,UInt8 tag)
     {
         bool status = Check(player);
         if( !status )
@@ -95,10 +105,13 @@ namespace Battle
 
         GObject::Clan* clan = player->GetClan();
         UInt8 side = clan->GetBattleForceId();
-
-        if( campInfo[x+y*width] != side )  //放到敌人的阵营了
+        
+        if( tag == 0 )
         {
-            return false;
+            if( campInfo[x+y*width] != side )  //放到敌人的阵营了
+            {
+                return false;
+            }
         }
 
         //下面判断该点上是不是有人
@@ -108,6 +121,7 @@ namespace Battle
             DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
             if( info == NULL )
                 return false;
+            //info->SetSoldierNum(INIT_SOLDIER_NUM);
             std::vector<DistributeInfo*> vecDistributeInfo;
             vecDistributeInfo.push_back(info);
             MapDistributeInfo* mapdistribute  = new(std::nothrow) MapDistributeInfo(mapId);
@@ -124,6 +138,9 @@ namespace Battle
               {
                     //更新数据
                     DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
+                    //info->SetSoldierNum(INIT_SOLDIER_NUM);
+                    info->SetMainFighterHP(1000);
+                    info->SetSoldiersHP();
                     if( info == NULL )
                         return false;
                     std::vector<DistributeInfo*> vecDistributeInfo;
@@ -146,6 +163,9 @@ namespace Battle
                     else
                     {
                         DistributeInfo* info = new DistributeInfo(player->GetId(),fighterId,x,y);
+                        info->SetMainFighterHP(1000);
+                        info->SetSoldiersHP();
+                        //info->SetSoldierNum(INIT_SOLDIER_NUM);
                         vecInfo.push_back(info);
                         for( auto it = vecMapDistributeInfo.begin() ; it != vecMapDistributeInfo.end() ; ++it )
                         {
@@ -163,7 +183,7 @@ namespace Battle
         if( flag )
         {
             player->InsertClanBattleFighter(mapId,fighterId,x,y);
-            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos` value(%u,%"I64_FMT"u,%u,%u,%u)",mapId,player->GetId(),fighterId,x,y);
+            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`mapId`,`playerId`,`fighterId`,`posx`,`posy`) value(%u,%"I64_FMT"u,%u,%u,%u)",mapId,player->GetId(),fighterId,x,y);
         }
         return true;
     }
@@ -182,7 +202,7 @@ namespace Battle
     }
 
     //取消放将
-    bool BattleDistribute::CancelPutFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y)
+    bool BattleDistribute::RemoveFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y)
     {
         bool status = Check(player);
         if( !status )
@@ -207,8 +227,6 @@ namespace Battle
         }
         return true;
     }
-
-
 
     void BattleDistribute::RemoveDistributeInfo(UInt32 roomId,UInt8 mapId,DistributeInfo* info)
     {
@@ -282,7 +300,7 @@ namespace Battle
 
 
     //交换战将
-    bool BattleDistribute::MoveFighter(UInt8 mapId,GObject::Player* player,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty)
+    bool BattleDistribute::MoveFighter(UInt8 mapId,GObject::Player* player,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty,UInt8 tag)
     {
         UInt32 roomId = GetBattleRoomId(player);
         if( roomId == 0 )
@@ -297,7 +315,7 @@ namespace Battle
         if( destInfo == NULL )
         {
             RemoveDistributeInfo(roomId,mapId,currentInfo);
-            PutFighter(mapId,player,currentInfo->GetFighterId(),destx,desty,true);
+            PutFighter(mapId,player,currentInfo->GetFighterId(),destx,desty,true,tag);
         }
         else
         {
@@ -312,12 +330,11 @@ namespace Battle
             if( campInfo[curx+cury*width] != 0 && campInfo[destx+desty*width] != 0 && campInfo[curx+cury*width] == campInfo[destx+desty*width])
             {
                 RemoveDistributeInfo(roomId,mapId,currentInfo);
-                PutFighter(mapId,player,destInfo->GetFighterId(),curx,cury,true);
+                PutFighter(mapId,player,destInfo->GetFighterId(),curx,cury,true,tag);
             
                 RemoveDistributeInfo(roomId,mapId,destInfo);
-                PutFighter(mapId,player,currentInfo->GetFighterId(),destx,desty,true);
+                PutFighter(mapId,player,currentInfo->GetFighterId(),destx,desty,true,tag);
             }
-
         }
         return true;
     }
@@ -403,13 +420,11 @@ namespace Battle
         //GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
 
         //UInt8 citys = info->GetMapNum();
-        //
-        st<<static_cast<UInt8>(room->GetStage());
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        st<<static_cast<UInt8>(status->GetStage());
         st<<static_cast<UInt8>(forceId);
         std::vector<MapDistributeInfo*> vecMapDistributeInfo = _room2Distribute[roomId];
         st<<static_cast<UInt8>(vecMapDistributeInfo.size());  //有人的发 没人的不发
-       
-
 
         //自己的排布情况
         std::set<UInt8> enemyForce;
@@ -433,7 +448,6 @@ namespace Battle
             }
             st.data<UInt8>(offset) = count;
             
-
             //同盟方
             size_t off = st.size();
             UInt8 allies = 0; 
@@ -458,25 +472,63 @@ namespace Battle
             //敌方  只发势力Id
             st<<static_cast<UInt8>(enemyForce.size());
 
-            if( !enemyForce.empty() )
+
+            //在己方势力范围上的敌人(上一次战斗移动至此)
+            GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
+            UInt8 width = mapInfo->GetWidth();
+            vecInfo campInfo = mapInfo->GetCampInfo();
+           
+
+            std::map<UInt8,std::vector<InMyZoneEnemy>> force2InMyZoneEnemy;
+            for( auto iter = vecDistributeInfo.begin(); iter != vecDistributeInfo.end(); ++iter)
             {
-                for( auto it = enemyForce.begin(); it != enemyForce.end(); ++it )
+                UInt8 forceid = GetForceId((*iter)->GetPlayerId());
+                if( forceid != forceId )  //人不属于自己
                 {
-                    st<<static_cast<UInt8>(*it);
+                    UInt8 x = (*iter)->GetPosX();
+                    UInt8 y = (*iter)->GetPosY();
+                    if( campInfo[x+y*width] == forceId )  //但地方是自己的
+                    {
+                        if( force2InMyZoneEnemy[forceid].empty())
+                        {
+                            std::vector<InMyZoneEnemy> vecInMyZoneEnemy;
+                            vecInMyZoneEnemy.push_back(InMyZoneEnemy((*iter)->GetFighterId(),x,y));
+                            force2InMyZoneEnemy[forceid] = vecInMyZoneEnemy;
+                        }
+                        else
+                        {
+                            force2InMyZoneEnemy[forceid].push_back(InMyZoneEnemy((*iter)->GetFighterId(),x,y));
+                        }
+                    }
                 }
             }
+
+            for( auto it = enemyForce.begin(); it != enemyForce.end(); ++it )
+            {
+                st<<static_cast<UInt8>(*it);
+                std::vector<InMyZoneEnemy> vecInMyZoneEnemy = force2InMyZoneEnemy[*it];
+                st<<static_cast<UInt8>( vecInMyZoneEnemy.size());
+                if( !vecInMyZoneEnemy.empty())
+                 {
+                     for(auto iter = vecInMyZoneEnemy.begin(); iter != vecInMyZoneEnemy.end();  ++iter )
+                     {
+                         st<<static_cast<UInt16>((*iter).fighterId);
+                         st<<static_cast<UInt8>((*iter).x);
+                         st<<static_cast<UInt8>((*iter).y);
+                     }
+                 }
+            }
+
             UInt32 reportId = Battle::report2IdTable.GetRecentReportId(roomId,mapId);
-            if( reportId != 0 )
+            if( status->GetStage() == 1 )
             {
                 st<<static_cast<UInt32>(reportId);
             }
         }
-
         //留言
         Battle::roomCommentManager.GetAllisComment(player,st);
         //军团令
         Battle::roomOrderManager.GetClanOrder(player,st);
-
     }
 
     UInt8 BattleDistribute::GetForceId(UInt64 playerId)
@@ -536,7 +588,6 @@ namespace Battle
             {
                 playerSet.insert(*it);
             }
-
         }
     }
 
@@ -617,6 +668,62 @@ namespace Battle
              (*it)->send(st);
          }
 
+    }
+
+    void BattleDistribute::UpdateMainFighterHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt32 hp)
+    {
+        UInt32 roomId = GetBattleRoomId(player);
+        DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
+        if( info == NULL)
+            return;
+        info->SetMainFighterHP(hp);
+        //更新数据库
+        DB7().PushUpdateData("update `clan_battle_pos`  set `mainFighterHP` = %u where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hp, mapId,info->GetPlayerId(),info->GetFighterId());
+
+    }
+
+    void BattleDistribute::UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32>vecHP)
+    {
+        UInt32 roomId = GetBattleRoomId(player);
+        DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
+        if( info == NULL)
+            return;
+        info->SetSoldiersHP(vecHP);
+        char buff[1024];
+        UInt8 offset = 0 ;
+        for(auto it = vecHP.begin(); it != vecHP.end() ; ++it )
+        {
+            offset += sprintf(buff+offset,"%d,",(*it));
+        }
+        buff[offset-1] = NULL;
+        std::string hps(buff);
+        DB7().PushUpdateData("update `clan_battle_pos`  set `soldiersHP` = '%s' where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hps.c_str(), mapId,info->GetPlayerId(),info->GetFighterId());
+    }
+
+
+   
+    void BattleDistribute::SetMainFighterAndSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP)
+    {
+        UInt32 roomId = GetBattleRoomId(player);
+        DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
+        if( info == NULL )
+            return;
+        if( vecSoldiersHP.empty() || vecSoldiersHP.size() == 1 )
+        {
+            info->SetSoldiersHP();
+        }
+        else
+        {
+            info->SetSoldiersHP(vecSoldiersHP);
+        }
+        if( mainFighterHP == 0 )
+        {
+            info->SetMainFighterHP(1000);
+        }
+        else
+        {
+            info->SetMainFighterHP(mainFighterHP);
+        }
     }
 
 }

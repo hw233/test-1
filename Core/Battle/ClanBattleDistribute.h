@@ -20,12 +20,24 @@ namespace GData
     class BattleMapInfo;
 }
 
+
+#define INIT_SOLDIER_NUM 10
+
 namespace Battle
 {
+
+    struct InMyZoneEnemy
+    {
+        InMyZoneEnemy(UInt16 id,UInt8 rhs,UInt8 lhs) : fighterId(id) , x(rhs) , y( lhs) {}
+        UInt16 fighterId;
+        UInt8 x;
+        UInt8 y;
+    };
+
     class DistributeInfo   //军团战某个位置上的信息
     {
         public:
-            DistributeInfo(UInt64 p,UInt16 f,UInt8 px,UInt8 py) : playerId(p) , fighterId(f) , posx(px) , posy(py)  {}
+            DistributeInfo(UInt64 p,UInt16 f,UInt8 px,UInt8 py) : playerId(p) , fighterId(f) , posx(px) , posy(py),mainFighterHP(0)  {}
             ~DistributeInfo() {}
             UInt64 GetPlayerId() const { return playerId;}
             UInt16 GetFighterId() const { return fighterId;}
@@ -34,11 +46,18 @@ namespace Battle
             UInt8  GetPosY() const { return posy;}
             void   SetPosX(UInt8 px)  { posx = px ; }
             void   SetPosY(UInt8 py)  { posy = py ; }
+            void   SetSoldiersHP();
+            void   SetMainFighterHP( UInt32 hp ) { mainFighterHP = hp;}
+            UInt32   GetMainFighterHP() { return mainFighterHP;}
+            void   SetSoldiersHP(std::vector<UInt32> vecHP ) { SoldiersHP = vecHP;}
+            std::vector<UInt32> GetSoldiersHP() { return SoldiersHP;}
         private:
             UInt64 playerId;
-            UInt16 fighterId;
+            UInt16 fighterId;  //战将Id
             UInt8  posx;
             UInt8  posy;
+            UInt32 mainFighterHP; //主将血量
+            std::vector<UInt32> SoldiersHP;//小兵们的血量
     };
 
 
@@ -63,9 +82,9 @@ namespace Battle
     {
         public:
             ~BattleDistribute() { _room2Distribute.clear();}
-            bool PutFighter(UInt8 mapId,GObject::Player* player,UInt16 fighterId, UInt8 x, UInt8 y,bool flag);
-            bool CancelPutFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y); 
-            bool MoveFighter(UInt8 mapId,GObject::Player* player,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty);
+            bool PutFighter(UInt8 mapId,GObject::Player* player,UInt16 fighterId, UInt8 x, UInt8 y,bool flag,UInt8 tag = 0 );
+            bool RemoveFighter(UInt8 mapId, GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y); 
+            bool MoveFighter(UInt8 mapId,GObject::Player* player,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty,UInt8 tag);
             DistributeInfo* GetDistributeInfo(UInt32 roomId, UInt8 mapId, UInt8 x, UInt8 y);
             void RemoveDistributeInfo(UInt32 roomId,UInt8 mapId,DistributeInfo* info);
             UInt32 GetBattleRoomId(GObject::Player* player);
@@ -80,7 +99,9 @@ namespace Battle
             void  NoticeAlliesDelFighter(GObject::Player* player,UInt8 mapId,UInt8 posx,UInt8 posy);
             void  NoticeAlliesMoveFighter(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId,UInt8 destx,UInt8 desty);
             map<UInt32,std::vector<MapDistributeInfo*>> GetData() const { return _room2Distribute;}
-
+            void UpdateMainFighterHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt32 hp);
+            void UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecHP);
+            void SetMainFighterAndSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP);
         private:
             map<UInt32,std::vector<MapDistributeInfo*>> _room2Distribute;
     };

@@ -216,7 +216,7 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
     UInt8 res = false;
     if( curMapId == mapId )
     {
-        res = Battle::battleDistribute.MoveFighter(mapId,player,fighterInfo->GetPosX(),fighterInfo->GetPosY(),posx,posy);
+        res = Battle::battleDistribute.MoveFighter(mapId,player,fighterInfo->GetPosX(),fighterInfo->GetPosY(),posx,posy,0);
     }
     else
     {
@@ -261,7 +261,7 @@ void OnClanBattleDelFighter(GameMsgHdr& hdr,const void * data)
 
     if( fighterInfo->GetMapId() != mapId)
         return;
-    bool res =  Battle::battleDistribute.CancelPutFighter(mapId,player,fighterId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
+    bool res =  Battle::battleDistribute.RemoveFighter(mapId,player,fighterId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
     if( res == false )
     {
         Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);

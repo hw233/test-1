@@ -20,7 +20,7 @@ project "Server.ASSS"
         links { "event" }
     configuration "not vs*"
     	buildoptions { "-std=c++0x" }
-        links { "mysqlclient" }
+        links { "pthread", "mysqlclient", "z" }
     configuration { "Debug", "not vs*"}
     	buildoptions { "-pg" }
         linkoptions { "-pg" }
@@ -80,7 +80,7 @@ project "JsonProxy.ASSS"
         links { "event" }
     configuration "not vs*"
     	buildoptions { "-std=c++0x" }
-        links { "mysqlclient" }
+        links { "mysqlclient", "z" }
     configuration { "Debug", "not vs*"}
     	buildoptions { "-pg" }
         linkoptions { "-pg" }

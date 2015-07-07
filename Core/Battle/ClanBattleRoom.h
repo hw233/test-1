@@ -20,7 +20,7 @@ namespace Battle
     class ClanBattleRoom
     {
         public:
-            ClanBattleRoom(UInt32 id,UInt8 bId) : roomId(id) , battleId(bId) , stage(0) {}
+            ClanBattleRoom(UInt32 id,UInt8 bId) : roomId(id) , battleId(bId){}
             ~ClanBattleRoom() { roomId = 0 ; battleId = 0; force2num.clear(); force2clans.clear();}
             void InsertClan(UInt8 forceId,UInt32 clanId,UInt32 num );
             UInt32 GetRoomId() const { return roomId; }
@@ -37,14 +37,10 @@ namespace Battle
             std::vector<UInt32> GetAllyClans(UInt8 forceId) { return force2clans[forceId];}
             void SetBuildTime(UInt32 time) { buildTime = time;}
             UInt32 GetBuildTime() const { return buildTime;}
-            UInt8 GetStage() const { return stage;}
-            void  SetStage(UInt8 s) { stage = s;}
-            void  SetStage(UInt32 t);
         private:
             UInt32 roomId;    //以创建者的军团id作为roomId
             UInt8  battleId;  //战役Id
             UInt32 buildTime; //房间创建的时间
-            UInt8  stage;     //军团战阶段  0战术配置  1战术推演  2 结束 
             std::map<UInt8,UInt32> force2num;   //势力对应的人数
             std::map<UInt8,std::vector<UInt32>> force2clans; //势力对应的公会
     };

@@ -31,6 +31,23 @@ namespace GData
         return NULL;
     }
 
+
+    //获得出生点信息
+    UInt8 BattleMapInfo::GetBornCity(UInt8 forceId)
+    {
+        //一种势力只能有一个势力
+        for( auto it = battleMapInfo.begin(); it != battleMapInfo.end() ; ++it )
+        {
+            if( (*it)->GetForce() == forceId )
+            {
+                return (*it)->GetMapId();
+            }
+        }
+        return 0;
+    }
+
+
+
     void BattleMapTable::loadBattleMap(BattleMapInfo * info)
     {
         if( info == NULL )

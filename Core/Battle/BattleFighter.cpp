@@ -340,7 +340,7 @@ namespace Battle
         st << static_cast<UInt16>(GetId());
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
-        st << static_cast<UInt8>(10);
+        st << static_cast<UInt8>(GetFighterNum());
     }
 
 
@@ -522,4 +522,34 @@ namespace Battle
     { 
         TRACE_LOG("战将编号%d ,技能编号：%d",GetBSNumber(),_ab._skillId);
     } 
+
+
+    void BattleFighter::SetSoldierHp(UInt8 index,UInt32 hp)
+    {
+        if( index < 0 || index >= MYFIGHTERMAX)
+        {
+            return;
+        }
+        if( m_fighters[index] == NULL )
+        {
+            return;
+        }
+        m_fighters[index]->setHP(hp);
+    }
+
+    UInt32 BattleFighter::GetSoldierHp(UInt8 index)
+    {
+        if( index < 0 || index >= MYFIGHTERMAX || m_fighters[index] == NULL )
+        {
+            return 0;
+        }
+        return m_fighters[index]->getHP();
+    }
+    
+    /*
+    void BattleFighter::SetMainFighterHP(UInt32 hp)
+    {
+        m_mainFighter->setHP(hp);
+    }
+    */
 }

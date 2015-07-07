@@ -1,5 +1,6 @@
 #include "BattleManager.h"
 #include "Battle/ClanBattleRoom.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 namespace Battle
 {
@@ -28,7 +29,7 @@ namespace Battle
     {
         ground->PushFighter(player,fighterId,x,y);
     }
-
+    
     void RoomBattle::InsertSingleBattle(SingleBattle* singBt)
     {
         singleBattles.push_back(singBt);
@@ -62,10 +63,10 @@ namespace Battle
 
     UInt8 RoomBattle::GetStage()
     {
-        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
-        if( room == NULL )
-            return 0;
-        return (room->GetStage());
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        if( status == NULL )
+            return -1;
+        return (status->GetStage());
     }
 
     void BattleManager::InsertRoomBattle(RoomBattle* roomBattle)
@@ -83,5 +84,17 @@ namespace Battle
             delete (*it);
             (*it) = NULL;
         }
+    }
+
+    RoomBattle* BattleManager::GetRoomBattle(UInt32 roomId)
+    {
+        for( auto it = roomBattleList.begin(); it != roomBattleList.end(); ++it )
+        {
+            if( (*it)->GetRoomId() == roomId )
+            {
+                return (*it);
+            }
+        }
+        return NULL;
     }
 }

@@ -152,6 +152,8 @@ namespace GObject
         UInt16 fighterId;
         UInt8  posx;
         UInt8 posy;
+        UInt32 mainFighterHP;
+        std::string soldiersHP;
     };
 
     struct DBClanBattleRoom
@@ -188,6 +190,14 @@ namespace GObject
         UInt16  actId;
         UInt32 reportId;
         UInt32 time;
+    };
+
+    struct DBCityStatus
+    {
+        UInt32 roomId;
+        UInt8  battleId;
+        UInt8  cityId;
+        UInt8  ownforce;
     };
 }
 namespace DB
@@ -357,13 +367,15 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBClanBattlePos)
-    SPECIALDEF(5)
+    SPECIALDEF(7)
     (
         UInt8 , mapId,
         UInt64, playerId,
         UInt16, fighterId,
         UInt8, posx,
-        UInt8, posy
+        UInt8, posy,
+        UInt32, mainFighterHP,
+        std::string,soldiersHP
     )
     SPECIALEND()
 
@@ -407,6 +419,16 @@ namespace DB
         UInt16,actId,
         UInt32, reportId,
         UInt32, time
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBCityStatus)
+    SPECIALDEF(4)
+    (
+        UInt32, roomId,
+        UInt8, battleId,
+        UInt8, cityId,
+        UInt8, ownforce
     )
     SPECIALEND()
 }

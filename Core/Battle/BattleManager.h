@@ -39,14 +39,20 @@ namespace Battle
     class RoomBattle  //一个房间 管理一个战役的许多个城市
     {
         public:
-            RoomBattle(UInt32 id) : roomId(id){ singleBattles.clear(); }
+            RoomBattle(UInt32 id) : roomId(id), isPutFighter(false) { singleBattles.clear(); }
             void InsertSingleBattle(SingleBattle* singBt); 
             void StartAllGround();
             std::vector<SingleBattle*> GetSingleBattles() { return singleBattles;}
             void StartAllGroundWithOneRound();
             UInt8 GetStage();
+            UInt32 GetRoomId() const { return roomId;}
+            UInt8 GetBattleResult();  //战役结果
+            void BattleSettlement();  //战役结算
+            bool GetIsPutFighter() const { return isPutFighter;}
+            void SetIsPutFighter(bool isPut) { isPutFighter = isPut;}
         private:
             UInt32 roomId;
+            bool isPutFighter;
             std::vector<SingleBattle*> singleBattles;
     };
 
@@ -59,6 +65,7 @@ namespace Battle
             void StartAll();
             void StartAllWithOneRound();
             std::vector<RoomBattle*> GetRoomBattleList() { return roomBattleList;}
+            RoomBattle* GetRoomBattle(UInt32 roomId);
         private:
             std::vector<RoomBattle*> roomBattleList;
     };

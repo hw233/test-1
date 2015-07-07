@@ -25,6 +25,7 @@
 #include "Battle/ClanBattleComment.h"
 #include "Battle/ClanOrder.h"
 #include "Battle/Report2Id.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 namespace GObject
 {
@@ -129,6 +130,11 @@ namespace GObject
         if( !loadReport2Id())
         {
             fprintf(stderr, "load report2id error!\n");
+            std::abort();
+        }
+        if( !loadClanBattleAllCityStatus() )
+        {
+            fprintf(stderr, "load city status error!\n");
             std::abort();
         }
     } 
@@ -517,14 +523,21 @@ namespace GObject
         LoadingCounter lc("Loading ClanApply");
         lc.reset(1000);
         DBClanBattlePos cbp;
-        if(execu->Prepare("SELECT `mapId`,`playerId`,`fighterId`,`posx`,`posy` FROM `clan_battle_pos`", cbp) != DB::DB_OK)
+        if(execu->Prepare("SELECT `mapId`,`playerId`,`fighterId`,`posx`,`posy` , `mainFighterHP`,`soldiersHP` FROM `clan_battle_pos`", cbp) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
             Player* player = globalPlayers[cbp.playerId];
             if(!player)
                 continue;
-            Battle::battleDistribute.PutFighter(cbp.mapId,player,cbp.fighterId,cbp.posx,cbp.posy,0);
+            Battle::battleDistribute.PutFighter(cbp.mapId,player,cbp.fighterId,cbp.posx,cbp.posy,0,1);
+            std::vector<UInt32> vecSoldierHP;
+            StringTokenizer st(cbp.soldiersHP,",");
+            for( UInt8 i =0 ; i < st.count() ; ++i )
+            {
+                vecSoldierHP.push_back(::atoi(st[i].c_str()));
+            }
+            Battle::battleDistribute.SetMainFighterAndSoldiersHP(cbp.mapId,player,cbp.posx,cbp.posy,vecSoldierHP,cbp.mainFighterHP);
             player->InsertClanBattleFighter(cbp.mapId,cbp.fighterId,cbp.posx,cbp.posy);
             lc.advance();
         }
@@ -611,6 +624,24 @@ namespace GObject
         return true;
     }
 
+
+    bool GObjectManager::loadClanBattleAllCityStatus()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading clanBattle all city status");
+        lc.reset(1000);
+        DBCityStatus cityStatus;
+        if(execu->Prepare("SELECT `roomId`,`battleId`,`cityId`,`ownforce` FROM `clan_battle_citystatus`",cityStatus) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Battle::roomAllCityStatusManager.loadCityStatus(cityStatus.roomId,cityStatus.battleId,cityStatus.cityId,cityStatus.ownforce);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
     //关于equipment的提取，
     /*
        ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )
