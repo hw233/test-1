@@ -28,7 +28,7 @@ function skillScope()
                 printf(",");
             else if (NR >= ENVIRON["lines"])
                 printf(";");
-            printf("\n");
+            printf(\n);
         }
         END {
         }

@@ -334,8 +334,8 @@ namespace Battle
             std::cout << std::endl;
 
             //增加击杀人数
-            currentBf->GetOwner()->AddClanBattleKillCount(currentBf->GetKillCount());
-            (target.bo)->GetOwner()->AddClanBattleKillCount((target.bo)->GetKillCount());
+            currentBf->GetOwner()->AddClanBattleKillCount(currentBf->GetKillCount1());
+            (target.bo)->GetOwner()->AddClanBattleKillCount((target.bo)->GetKillCount1());
 
             //往排布那边同步战将数据
             //自己

@@ -146,6 +146,7 @@ namespace GData
                 _scopeId = scopeId;
                 _effectId = effectId;
                 _cd = cd ;
+                _actionBeforedCd = actionBeforeCd;
                 _actionCd = actionCd;
                 _actionBackCd = actionBackCd;
                 _mpCost = mpCost;

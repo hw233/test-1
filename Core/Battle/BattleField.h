@@ -96,13 +96,8 @@ namespace Battle
             std::vector<ActionPackage> GetTimeBattleAction(UInt16& time);
             std::vector<ImagePackage> GetTimeBattleImage(UInt16& time);
 
-            void InsertTimeBattleAction(float time , ActionPackage);
-            std::vector<ActionPackage> GetTimeBattleAction(float& time);
 
-            void InsertTimeBattleAction(float time , ImagePackage ip);
             void InsertBattlePre(UInt16 time, BattleFighter* fgt);
-
-            std::vector<ImagePackage> GetTimeBattleImage(float& time);
 
             std::vector<BattleFighter*> GetBattlePre(UInt16& time);    //BATTLE1
 
