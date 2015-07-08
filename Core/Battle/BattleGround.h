@@ -233,7 +233,9 @@ namespace Battle
             bool  IsInAround(const Ascoord& p , const Ascoord& t);
 
             //下面这些是跟战役结算相关的
-            UInt8 GetWin();   //获得一场战役的结果
+            void  SetCaptureForce();
+            UInt8 GetCaptureId();
+            void  GetAliveForce(std::vector<UInt8> &vecForce);
 
         private:
             UInt32 _id;

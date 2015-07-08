@@ -30,6 +30,7 @@ namespace Battle
             bool IsStop() const { return ground->CheckIsStop();}
             UInt16 GetOneRoundTimeCost() const { return ground->GetOneRoundTimeCost();}
             void EnterBattleGround(GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y);
+            UInt8 GetCaptureForce() { return ground->GetCaptureId();}
         private:
             UInt32 nextStartTime;  //下一次开始战术的时间
             BattleGround* ground;
@@ -39,20 +40,16 @@ namespace Battle
     class RoomBattle  //一个房间 管理一个战役的许多个城市
     {
         public:
-            RoomBattle(UInt32 id) : roomId(id), isPutFighter(false) { singleBattles.clear(); }
+            RoomBattle(UInt32 id) : roomId(id) { singleBattles.clear(); }
             void InsertSingleBattle(SingleBattle* singBt); 
             void StartAllGround();
             std::vector<SingleBattle*> GetSingleBattles() { return singleBattles;}
             void StartAllGroundWithOneRound();
             UInt8 GetStage();
             UInt32 GetRoomId() const { return roomId;}
-            UInt8 GetBattleResult();  //战役结果
-            void BattleSettlement();  //战役结算
-            bool GetIsPutFighter() const { return isPutFighter;}
-            void SetIsPutFighter(bool isPut) { isPutFighter = isPut;}
+            void CollectCaptureInfo(std::map<UInt8,UInt8>& force2captureCityNum);  //战役结束时  统计各个势力的占领城市的情况
         private:
             UInt32 roomId;
-            bool isPutFighter;
             std::vector<SingleBattle*> singleBattles;
     };
 
@@ -66,37 +63,12 @@ namespace Battle
             void StartAllWithOneRound();
             std::vector<RoomBattle*> GetRoomBattleList() { return roomBattleList;}
             RoomBattle* GetRoomBattle(UInt32 roomId);
+            void removeRoomBattle(UInt32 roomId);
         private:
             std::vector<RoomBattle*> roomBattleList;
     };
 
     extern BattleManager battleManager;
-
-    /*
-    class BattleManager
-    {
-        public:
-            //获得战场空闲编号
-            UInt32 GetBattleGroundIndex(); 
-            //进入战场
-            //void EnterBattleGround(UInt32,GObject::Player*,UInt8,UInt8 ); 
-
-            //创建战场
-            UInt32 CreateBattleGround(UInt32 backGround = 1,UInt8 mapId=1,UInt8 limit = 4);
-
-            //战斗开始
-            void StartGround(UInt32 index);
-
-            //所有的城市都开始战斗
-            void StartAllGround();
-              
-            void EnterBattleGround(UInt32 battleId,GObject::Player* player,UInt16 fighterId, UInt8 x,UInt8 y);
-        private:
-            FastMutex _mutex;
-            FastMutex _mutex2;
-            std::map<UInt32,BattleGround*>  _map;
-    };
-    */
 }
 #endif // BATTLEMANAGER_H_
 

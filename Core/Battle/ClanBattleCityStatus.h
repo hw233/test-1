@@ -60,6 +60,7 @@ namespace Battle
             RoomAllCityStatus* GetRoomAllCityStatus(UInt32 roomId);
             void loadCityStatus(UInt32 roomId,UInt8 battleId,UInt8 cityId,UInt8 ownforce);
             std::vector<RoomAllCityStatus*> GetData() { return _vecRoomAllCityStatus;}
+            void SetOwnForce(UInt32 roomId,UInt8 cityId,UInt8 ownForce);
         private:
             std::vector<RoomAllCityStatus*> _vecRoomAllCityStatus;
     };

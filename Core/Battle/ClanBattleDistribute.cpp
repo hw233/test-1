@@ -245,12 +245,16 @@ namespace Battle
             else
             {
                 std::vector<DistributeInfo*> vecDistributeInfo = mapDistribute->GetDistributeInfo();
-                for(auto it = vecDistributeInfo.begin() ; it != vecDistributeInfo.end() ; ++it )
+                for(auto it = vecDistributeInfo.begin() ; it != vecDistributeInfo.end() ;)
                 {
                     if( (*it) == info )
                     {
                         it = vecDistributeInfo.erase(it);
                         break;
+                    }
+                    else
+                    {
+                        ++it;
                     }
                 }
 

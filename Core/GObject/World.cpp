@@ -202,7 +202,6 @@ namespace GObject
             Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
             if( roomBattle == NULL )
             {
-                //TODO
                 std::cout<<"put fighters"<<std::endl;
                 roomBattle = new Battle::RoomBattle(roomId);
                 for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
@@ -226,7 +225,6 @@ namespace GObject
                     roomBattle->InsertSingleBattle(singleBattle);
                 }
                 Battle::battleManager.InsertRoomBattle(roomBattle);
-                roomBattle->SetIsPutFighter(true);
             }
         }
     }
@@ -289,6 +287,15 @@ namespace GObject
                 continue;
             UInt32 now = TimeUtil::Now();
             (*it)->SetStage(now);
+
+            //如果处于准备阶段  把非空的战场删除
+            UInt32 roomId = (*it)->GetRoomId();
+            Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
+            if( (*it)->GetStage() == 0 && roomBattle != NULL )
+            {
+                std::cout<<"处于准备阶段  删掉战场"<<std::endl;
+                Battle::battleManager.removeRoomBattle(roomId);
+            }
         }
     }
 }

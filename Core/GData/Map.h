@@ -46,7 +46,6 @@ namespace GData
     class MapTable
     {
         public:
-            ~MapTable() { delete []_mapInfo;}
             void loadMapInfo(UInt8 mapId,MapInfo* info);
             MapInfo* GetMapInfo(UInt8 mapId);
         private:

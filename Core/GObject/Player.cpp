@@ -25,7 +25,7 @@ namespace GObject
     GlobalNamedClans globalNamedClans;
 
     //GlobalNamedPlayers globalAccountsPlayers;
-    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),clanBattleKillCount(0)
+    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),killSoldiersNum(0) , killFighterNum(0)
     {
         m_pVars = new VarSystem(id);
         m_Package = new Package(this); 

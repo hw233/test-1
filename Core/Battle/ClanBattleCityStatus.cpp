@@ -24,7 +24,7 @@ namespace Battle
 
         UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
         UInt8 newStage = 0;
-        if( t <= sday )
+        if( t > buildTime && t <= sday )
         {
             newStage = 0;
         }
@@ -54,7 +54,7 @@ namespace Battle
         }
         else
         {
-            newStage = 0;
+            newStage = 3;
         }
 
         if( newStage != stage )
@@ -144,6 +144,14 @@ namespace Battle
        }
 
 
+   }
+
+   void RoomAllCityStatusManager::SetOwnForce(UInt32 roomId,UInt8 cityId,UInt8 ownForce)
+   {
+       RoomAllCityStatus* status = GetRoomAllCityStatus(roomId);
+       if( status == NULL )
+           return;
+       status->SetCityOwnForce(cityId,ownForce);
    }
 
 }

@@ -97,4 +97,43 @@ namespace Battle
         }
         return NULL;
     }
+
+    void BattleManager::removeRoomBattle(UInt32 roomId)
+    {
+        if( roomBattleList.empty())
+            return;
+        for( auto it = roomBattleList.begin(); it != roomBattleList.end();)
+        {
+            if( (*it)->GetRoomId() == roomId )
+            {
+                it = roomBattleList.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+    void RoomBattle::CollectCaptureInfo(std::map<UInt8,UInt8>& force2captureCityNum)
+    {
+        if( GetStage() !=  2 )
+            return;
+        for(auto it = singleBattles.begin(); it != singleBattles.end(); ++it )
+        {
+            UInt8 captureId = (*it)->GetCaptureForce();
+            if( captureId != 0 )
+            {
+                if( !force2captureCityNum[captureId] )
+                {
+                    force2captureCityNum[captureId] = 1;
+                }
+                else
+                {
+                    force2captureCityNum[captureId] += 1;
+                }
+            }
+        }
+         
+    }
 }

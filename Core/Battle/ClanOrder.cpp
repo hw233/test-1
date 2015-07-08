@@ -20,11 +20,15 @@ namespace Battle
 
     void RoomOrder::DeleteOrder(Order* order)
     {
-        for(auto it = orders.begin(); it != orders.end();++it)
+        for(auto it = orders.begin(); it != orders.end(); )
         {
             if( *it == order)
             {
                 it = orders.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
     }

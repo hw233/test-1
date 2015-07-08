@@ -44,7 +44,6 @@ namespace GData
     class BattleMapTable
     {
         public:
-            ~BattleMapTable() { delete []battleMapTable;}
             void loadBattleMap(BattleMapInfo * info);
             BattleMapInfo* GetBattleMapInfo(UInt8 battleId);
         private:

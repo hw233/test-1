@@ -9,6 +9,7 @@
 #include "Battle/Report2Id.h"
 #include "Common/URandom.h"
 #include "Battle/ClanBattleDistribute.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
@@ -253,6 +254,7 @@ namespace Battle
             GetMovePosition(move); 
             UInt8 mx = 0;
             UInt8 my = 0;
+            UInt8 dis = 0;
             if( move.x == 0xFF && move.y == 0xFF)
             {
                 mx = x;
@@ -262,6 +264,8 @@ namespace Battle
             {
                 mx = move.x;
                 my = move.y;
+                Ascoord p = Ascoord(x,y);
+                dis = GetDistance(p,move);
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[mx+my*_x] = currentBf;
                 //排布信息同步
@@ -281,7 +285,7 @@ namespace Battle
             _pack << static_cast<UInt8>(my);
             _pack << static_cast<UInt8>( currentBf->GetNowTime2());
             _pack << static_cast<UInt8>(0); //无战斗发生
-            _oneRoundCostTime += ceil((currentBf->GetNowTime()*1.0)/100);
+            _oneRoundCostTime += dis*0.5/*currentBf->GetNowTime()/100*/;
              
         }
         else
@@ -318,7 +322,6 @@ namespace Battle
             _pack << static_cast<UInt8>( currentBf->GetNowTime2());
             _pack << static_cast<UInt8>(1);
 
-            _oneRoundCostTime += ceil((currentBf->GetNowTime()*1.0)/100);
 
             //currentBf->InsertFighterInfo(_pack);
             target.bo->InsertFighterInfo(_pack);
@@ -333,9 +336,10 @@ namespace Battle
             TestCoutBattleS(target.bo);
             std::cout << std::endl;
 
+            _oneRoundCostTime += currentBf->GetNowTime()/100;
             //增加击杀人数
-            currentBf->GetOwner()->AddClanBattleKillCount(currentBf->GetKillCount());
-            (target.bo)->GetOwner()->AddClanBattleKillCount((target.bo)->GetKillCount());
+            currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount());
+            (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount());
 
             //往排布那边同步战将数据
             //自己
@@ -567,7 +571,7 @@ namespace Battle
     {
         UInt8 x = currentBf->GetGroundX();
         UInt8 y = currentBf->GetGroundY();
-        Ascoord pos = Ascoord(x,y);
+        //Ascoord pos = Ascoord(x,y);
         std::vector<Ascoord> vecEnemy;
         GetNearEnemy(x,y,vecEnemy);
         std::vector<AttackInfo> vecFinal;   //最终确立的那个要后退的一系列点
@@ -597,7 +601,7 @@ namespace Battle
     {
         UInt8 x = currentBf->GetGroundX();
         UInt8 y = currentBf->GetGroundY();
-        Ascoord pos = Ascoord(x,y);
+        //Ascoord pos = Ascoord(x,y);
         std::vector<Ascoord> vecEnemy;
         GetNearEnemy(x,y,vecEnemy);
         SetStart(Ascoord(x,y));
@@ -1005,6 +1009,8 @@ namespace Battle
     bool BattleGround::CheckIsStop()
     {
         //检测是不是已经可以结束战斗了  
+        if( camp2fighters.size() <= 1 )
+            return true;
         UInt8 num = 0;
         for(auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
         {
@@ -1069,8 +1075,10 @@ namespace Battle
     //战将进入战场
     void BattleGround::preStart()  //需要玩家手动操作
     { 
+        /*
         if( map2fighter.size() <= 1 )
             return;
+        */
         for( auto it = map2fighter.begin(); it != map2fighter.end(); ++it )
         {
             UInt8 campId = it->first;
@@ -1261,7 +1269,7 @@ namespace Battle
     {
         _openList.clear();
         _closeList.clear();
-        Ascoord start = _start;
+        //Ascoord start = _start;
         Node node(_start);  //起点入openlist
         node.g = 0;
         node.h = GetHValue(_start);
@@ -1607,34 +1615,60 @@ namespace Battle
         return _maxID;
     }
 
-    //返回的是胜利方的势力Id
-    UInt8 BattleGround::GetWin()
+    void BattleGround::GetAliveForce(std::vector<UInt8> &vecForce)
     {
-        //现在就是两个阵营 多个阵营以后修改
-        UInt8 aliveCampNum = 0;
-        std::vector<UInt8> vecAliveCamp; //依然还有人的势力
-        for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it)
+        if( camp2fighters.empty() )
+            return;
+        for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
         {
-            if( ! SomeCampIsAllDie(it->first))
+            bool res = SomeCampIsAllDie(it->first);
+            if( !res )
             {
-                ++aliveCampNum;
-                vecAliveCamp.push_back(it->first);
+                vecForce.push_back(it->first);
             }
         }
 
-        //进行结果处理
-        if( aliveCampNum == 0 )
+    }
+
+    //设置某一城市的占领方
+    UInt8 BattleGround::GetCaptureId()
+    {
+        std::vector<UInt8> vecAliveForce;
+        GetAliveForce(vecAliveForce);
+        if( vecAliveForce.empty() )  //都死光了
         {
-            //全死了
             return 0;
         }
-        else if ( aliveCampNum == 1)
+        else if( vecAliveForce.size() == 1 )
         {
-            return (vecAliveCamp.back());
+            return vecAliveForce.back();
         }
         else
         {
-            return 1;
+            return 0;
+        }
+    }
+
+    void BattleGround::SetCaptureForce()
+    {
+        if( camp2fighters.empty() )
+            return;
+        //先获得城市的原来拥有者
+        UInt32 roomId = _id-_mapId;
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        if( status == NULL )
+            return;
+        UInt8 ownForce = status->GetCityOwnForce(_mapId);
+        UInt8 captureForce = GetCaptureId();
+        if( captureForce!= 0 && ownForce != captureForce  )
+        {
+            std::cout<<"现在这座城属于势力   " <<static_cast<UInt32>(captureForce)<<endl;
+            if( captureForce != 0 )
+            {
+                Battle::roomAllCityStatusManager.SetOwnForce(roomId,_mapId,captureForce);
+                DB7().PushUpdateData("UPDATE  `clan_battle_citystatus`  set ownforce=%u  where roomId = %u and battleId= %u and cityId = %u ", captureForce, roomId,status->GetBattleId(),_mapId);
+
+            }
         }
     }
 }

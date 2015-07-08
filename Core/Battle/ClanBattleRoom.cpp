@@ -34,7 +34,7 @@ namespace Battle
         {
             offset += sprintf(buff+offset,"%d,",(*it));
         }
-        buff[offset-1] = NULL;
+        buff[offset-1] = '\0';
         std::string clans(buff);
         if( vecClan.size() == 1)
         {
@@ -124,22 +124,43 @@ namespace Battle
         else
         {
             ClanBattleRoom *room = _roomList.back();
-            UInt8 i = 1;
-            for(i = 1; i <= forceNum ; ++i)
+            if( room == NULL )
             {
-                UInt8 num = 0;
-                num = room->GetNum(i);
-                //num = force2num[i];
-                if( num < playermax )
-                {
-                    room->InsertClan(i,clanId,memberNum);
-                    break;
-                }
+                return false;
             }
-            //所有的房间都满了
-            if( i > forceNum )
+            UInt32 buildTime = room->GetBuildTime();
+            time_t time = buildTime;
+            tm* tt=localtime(&time);
+            UInt8 hour = tt->tm_hour;
+            UInt8 min = tt->tm_min;
+            UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
+
+            //判断该房间是不是不处于报名阶段
+            //
+            UInt32 now = TimeUtil::Now();
+            if( now > sday )
             {
                 CreateRoom(player);
+            }
+            else
+            {
+                UInt8 i = 1;
+                for(i = 1; i <= forceNum ; ++i)
+                {
+                    UInt8 num = 0;
+                    num = room->GetNum(i);
+                    //num = force2num[i];
+                    if( num < playermax )
+                    {
+                        room->InsertClan(i,clanId,memberNum);
+                        break;
+                    }
+                }
+                //所有的房间都满了
+                if( i > forceNum )
+                {
+                    CreateRoom(player);
+                }
             }
         }
         return true;

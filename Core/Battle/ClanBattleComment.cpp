@@ -18,11 +18,15 @@ namespace Battle
 
     void RoomComment::DeleteSingleComment(SingleComment* sc)
     {
-        for( auto it = comments.begin(); it != comments.end(); ++it )
+        for( auto it = comments.begin(); it != comments.end(); )
         {
             if( (*it) == sc )
             {
                 it = comments.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
 

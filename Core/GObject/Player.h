@@ -628,8 +628,10 @@ namespace GObject
 
             UInt8 UpFighter(UInt16 fighterId);
 
-            UInt32 GetClanBattleKillCount() const { return clanBattleKillCount;}
-            void AddClanBattleKillCount(UInt32 killCount) { clanBattleKillCount += killCount;}
+            UInt32 GetKillFighterNum() const { return killFighterNum;}
+            void AddKillFighterNum(UInt32 killCount) { killFighterNum += killCount;}
+            UInt32 GetKillSoldiersNum() const { return killSoldiersNum;}
+            void AddKillSoldiersNum(UInt32 killCount) { killSoldiersNum+=killCount;}
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -673,7 +675,9 @@ namespace GObject
 
             std::vector<ClanBattleFighter*> _vecClanBattleFighter;
 
-            UInt32 clanBattleKillCount; //军团战杀敌人数
+            UInt32 killSoldiersNum;     //军团战击杀敌军人数(小兵)
+
+            UInt32 killFighterNum; //军团战击杀敌将数量(主将)
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;
