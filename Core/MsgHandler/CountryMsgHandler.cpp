@@ -60,6 +60,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG_2(GameMsgHdr, REQ::CLAN_OPTION, OnClanOption);
 
     //MSG_REG_2(GameMsgHdr, REQ::CLAN_APPLY, OnClanApply);
+    MSG_REG_2(GameMsgHdr, REQ::CLAN_LEAVE, OnClanLeave);
 
     MSG_REG_2(GameMsgHdr, REQ::GMHAND, OnGMHandler);
 

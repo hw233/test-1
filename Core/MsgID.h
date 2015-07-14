@@ -68,6 +68,7 @@ namespace REQ
     const UInt8 CLAN_INFO           = 0x72;
     const UInt8 CLAN_OPTION         = 0x73;
     const UInt8 CLAN_APPLY          = 0x74;
+    const UInt8 CLAN_LEAVE          = 0x75;
 
 
     /*治理换将*/

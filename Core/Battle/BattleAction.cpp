@@ -120,5 +120,9 @@ namespace Battle
         } 
         return false;
     } 
+    UInt8 ImagePackage::Action(Stream& st)
+    {
+            
+    }
 }
 

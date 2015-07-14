@@ -95,6 +95,8 @@ namespace GData
             UInt16 trerapy;  //基础治疗
             float trerapyP;  //治疗百分比
 
+
+            UInt8 avoidhurt ;
             // UInt16 defend;   //附加防御增加
             // float defendP;   //附加防御百分比增加
     };

@@ -56,6 +56,24 @@ void BattleAnalyze::Analyze(Stream br)
                 } 
                 break;
             case 2:
+                {
+                    UInt16 skillId = 0;
+                    UInt8 count = 0;
+                    br >> skillId >> count;
+                    std::cout << "技能Id：" << static_cast<UInt32>(skillId) << " 目标数量: " << static_cast<UInt32>(count) << std::endl;
+                    for(UInt8 i = 0; i < count; ++i)
+                    {
+                        UInt8 type = 0;
+                        UInt8 fgtId = 0;
+                        UInt16 param = 0;
+                        br >> type >> fgtId >> param;
+                        std::cout << "类型：" << static_cast<UInt32>(type);
+                        std::cout << "受影响战将编号：" << static_cast<UInt32>(fgtId);
+                        std::cout << "数值：" << static_cast<UInt32>(param);
+                        std::cout << std::endl;
+                    }
+                    break;
+                }
             case 3:
                 {
                     UInt16 skillId = 0;

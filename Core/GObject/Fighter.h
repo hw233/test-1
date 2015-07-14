@@ -46,9 +46,9 @@ namespace GObject
             void SetColor(UInt8 color) { _color = color;}
             void SetTypeId(UInt8 type) { _typeId = type;}
             UInt8 GetTypeId(){return _typeId;}
-            void SetChildTypeId(UInt8 type) { _childTypeId = type;}
+            void SetChildTypeId(UInt16 type) { _childTypeId = type;}
 
-            UInt8 GetChildTypeId(){return _childTypeId;}
+            UInt16 GetChildTypeId(){return _childTypeId;}
             //Get
             inline UInt32 getId() { return _id; }
             inline Player * GetOwner() { return _owner; }
@@ -159,7 +159,7 @@ namespace GObject
             UInt32 _evade;
 
             UInt8 _typeId;
-            UInt8 _childTypeId;
+            UInt16 _childTypeId;
             UInt8 _color; 
             std::map<UInt8,UInt16> m_skills;  //仅global使用
 };

@@ -7,7 +7,9 @@ namespace Battle
         PreGetObject1() ;
         if(!_target)
             return false;
-        if(!count || getPosX() <= 100 || getPosX() >= (FIELD_WIDTH - 100) )
+        if(count > 3)
+            return false;
+        if(!count || (getPosX() == _battleTargetX && getPosY() == _battleTargetY ))// || getPosX() >= (FIELD_WIDTH - 100) )
         {
             switch(count)
             {

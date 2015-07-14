@@ -127,7 +127,7 @@ namespace GObject
         if(it != _players.end())
         {
             _players.erase(it);
-            DB1().PushUpdateData(" DELETE FROM `clan_player` WHERE `clanId` = %u, `playerId` = %" I64_FMT "u ",_id, pl->getId());   //LIBOUInt64
+            DB1().PushUpdateData(" DELETE FROM `clan_player` WHERE `clanId` = %u AND `playerId` = %" I64_FMT "u ",_id, pl->getId());   //LIBOUInt64
             return 0;
         }
         return 1;
@@ -286,4 +286,10 @@ namespace GObject
         bo->SetClan(NULL);
         bo->SetClanPos(0);
     } 
+    void Clan::OnClanLeave(Player* pl)
+    {
+        DelMember(pl);
+        pl->SetClan(NULL);
+        pl->SetClanPos(0);
+    }
 }

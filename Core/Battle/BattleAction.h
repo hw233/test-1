@@ -84,7 +84,7 @@ namespace Battle
     class ImagePackage : public BattleAction
     {
         public:
-            ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time){}
+            ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time),_special(0),_sIndex(0){}
             ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time2(time){}   // BATTLE2
             UInt32 GetAttack(){return _attack;}
             UInt32 GetHit(){return _hit;}
@@ -96,8 +96,13 @@ namespace Battle
             UInt16 GetHappenTime(){ return _time;}
             float GetHappenTime2(){ return _time2;}
             UInt16 GetObjectSize(){return vec_bo.size();}
-            BattleObject* GetObject(UInt16 index){if(index > vec_bo.size()) return NULL ; return vec_bo[index];}
+            BattleObject* GetObject(UInt16 index = -1){if(index == -1) index = _sIndex++;if(index > vec_bo.size()) return NULL ; return vec_bo[index];}
             void PushObject(BattleObject* bo) { vec_bo.push_back(bo);}
+
+            void SetSpecialType(UInt8 special){ _special = special;}
+            UInt8 GetSpecialType(){return _special;}
+
+            UInt8 Action(Stream& st);
 
         public:
             std::vector<BattleObject *> vec_bo;
@@ -114,6 +119,8 @@ namespace Battle
             UInt16 _time;
             float _time2;
 
+            UInt8 _special;  //特殊技能处理
+            UInt8 _sIndex;
     };
     class ObjectPackage : public BattleAction
     { 

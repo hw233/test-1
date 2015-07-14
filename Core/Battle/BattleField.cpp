@@ -7,7 +7,7 @@
 #include <math.h>
 
 #define SUB(x,y) (x>y)?(x-y):(y-x)
-#define Min(x,y) (x>y)?(y):(x)
+#define Min(x,y) (x)>(y)?(y):(x)
 namespace Battle
 {
 

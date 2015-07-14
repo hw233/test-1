@@ -106,12 +106,12 @@ namespace Battle
             inline UInt8 GetActionLast(){ return _actionLast;}  //获得当前状态
             inline UInt8 GetActionBackLast(){ return _actionBackLast;}  //获得当前状态
 
-            UInt8 GetSide() { if(_fighter) return _fighter->GetSide(); if(m_mainFighter) m_mainFighter->GetSide();return 0;}
+            UInt8 GetSide() { if(!_isChild) return _fighter->GetSide(); if(m_mainFighter) m_mainFighter->GetSide();return 0;}
             void SetGroundX(UInt8 x){_groundX = x;}
             void SetGroundY(UInt8 y){_groundY = y;}
             UInt8 GetGroundX(){ return _groundX;}
             UInt8 GetGroundY(){ return _groundY;}
-            UInt8 GetTypeId() { if(_fighter) return _fighter->GetTypeId(); if(m_mainFighter) m_mainFighter->GetTypeId(); return 0;}
+            UInt8 GetTypeId() { if(_fighter) return _fighter->GetTypeId(); return 0;}
 
             virtual void Action();  //行动
             //移动
@@ -135,10 +135,10 @@ namespace Battle
             BattleField * GetField();
 
             UInt8 GetMovePower();
-            UInt8 GetClass(){ if(_fighter) return _fighter->GetClass(); if(m_mainFighter) return m_mainFighter->GetClass(); return 0; }
+            UInt8 GetClass(){ if(_fighter) return _fighter->GetClass();return 0;}
             UInt8 GetAttackRange();
             UInt8 GetDistance(){ return 1;}   //
-            virtual UInt16 GetId(){ if(!_fighter) return 2; return _fighter->getId();}
+            virtual UInt16 GetId(){ if(_fighter) return _fighter->getId(); return 0;}
 
             void setNumber(UInt8 num){ _number = num;}
             UInt8 getNumber(){ return _number; }
@@ -151,13 +151,15 @@ namespace Battle
                     attrBase[i] = m_mainFighter->GetBattleAttr(i);
                 } 
                 AddSkill();
+
+                _isChild = true;
             }
 
             void PutBattleFighters(BattleSimulator& bsim);
             BattleFighter* getMyFighters(UInt8 index);
 
-            virtual UInt16 GetRad(){ if(m_mainFighter && m_mainFighter != this) return m_mainFighter->GetRad(); if(_fighter) return _fighter->GetRad(); return 0;}
-            void SetEnterPos(UInt8 x1 , UInt8  y1){ if(!_fighter)return ; EnterX = x1; EnterY = y1;}
+            virtual UInt16 GetRad(){if(_fighter) return _fighter->GetRad(); return 0;}
+            void SetEnterPos(UInt8 x1 , UInt8  y1){ if(!_isChild)return ; EnterX = x1; EnterY = y1;}
             inline UInt8 GetEnterPosX(){ return EnterX;}
             inline UInt8 GetEnterPosY(){ return EnterY;}
 
@@ -191,8 +193,6 @@ namespace Battle
             {
                 if(_fighter) 
                     return _fighter->GetSpeed();
-                if(m_mainFighter) 
-                    return m_mainFighter->GetBaseSpeed();
                 return 200; 
             } 
             std::vector<UInt16> GetBaseSkills()
@@ -330,6 +330,8 @@ namespace Battle
             void SetActed(bool v){ _acted = v;}
             bool GetActed(){ return _acted;}
 
+            void SetAvoidHurt(bool v){ _avoidhurt = v;}
+            bool GetAvoidHurt(){ return _avoidhurt;}
 
             bool IsMainFighter(){return _fighter!=NULL;}
         protected:
@@ -396,6 +398,10 @@ namespace Battle
             UInt16 _cachePx;
 
             bool _acted;
+
+            bool _avoidhurt;
+
+            bool _isChild;
 
         public:
             BattleFighter * _target;

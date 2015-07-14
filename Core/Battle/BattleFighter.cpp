@@ -26,9 +26,13 @@ namespace Battle
 
         _acted = false;
 
+        _avoidhurt = false;
+
+        _isChild = false;
+
         m_mainFighter = NULL;
 
-        if(f) //战将属性  小兵属性延后
+        //if(f) //战将属性  小兵属性延后
         { 
             setHP(10000);//f->GetFighterAttr(e_attr_max));
             for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
@@ -39,11 +43,15 @@ namespace Battle
         } 
 
         //属性
-        if( f != NULL)
+        if( f->GetChildTypeId())
         {
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
             {
-                m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,NULL,0,0);
+                UInt16 fighterId = f->GetChildTypeId();
+                GObject::Fighter * f = GObject::globalFighters[fighterId];
+                if(!f)
+                    break;
+                m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,f,0,0);
                 if( m_fighters[i])
                 {
                     m_fighters[i]->setMainFighter(this);
@@ -157,9 +165,18 @@ namespace Battle
         //_st.clear();
         UpdateActionList();
         //硬直
+        
         if(_crick)
         {
             --_crick;
+            return ;
+        }
+
+        if(_target && _target->GetAvoidHurt())
+        {
+            std::cout << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
+            GetField()->InsertBattlePre(GetNowTime(), this);
+            SetMove(true);
             return ;
         }
 
@@ -198,6 +215,16 @@ namespace Battle
                 { 
 
                     std::cout << " 发起魔法攻击 " ;
+                    const GData::Skill * s = GData::skillManager[_ab._skillId];
+                    if(s)
+                    {
+                        const GData::SkillEffect * se = s->GetSkillEffect(); 
+                        if(se)
+                        { 
+                            if(se->avoidhurt)
+                                SetAvoidHurt(true);
+                        } 
+                    }
                     flag = NormolImage();
                 } 
                 break;
@@ -418,8 +445,10 @@ namespace Battle
         std::vector<UInt16> vec = GetBaseSkills();
         for(UInt8 i = 0; i < vec.size(); ++i)
         {
-            if(vec[i] < 1000)
-                preActionList.push_back(ActionBase(vec[i]));
+            UInt16 skillId= vec[i];
+            if(!_fighter && skillId > 1000)
+                continue;
+            preActionList.push_back(ActionBase(skillId));
             //break;
         }
     }
@@ -490,6 +519,8 @@ namespace Battle
         GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
 
         UInt16 cd = s->GetActionCd(); // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
+        if(s->getId() == 11201)
+            cd = s->GetActionCd2()*ip.vec_bo.size() + s->GetActionCd1();
         GetField()->InsertTimeBattleAction(static_cast<UInt16>(GetNowTime()+cd),ip);
         return 1;
     } 

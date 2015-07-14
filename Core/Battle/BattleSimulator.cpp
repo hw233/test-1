@@ -270,6 +270,7 @@ namespace Battle
                 std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber());
                 std::cout << " 攻击 战将编号:" << static_cast<UInt32>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
                 std::cout << "伤害：" << static_cast<UInt32>(param) << std::endl; 
+                std::cout << "敌将血量剩余：" << static_cast<UInt32>(bo->getHP()) << std::endl; 
                 if(bo->getHP() == 0)
                 {
                     if(bo->IsMainFighter())
@@ -319,9 +320,14 @@ namespace Battle
             if(!se)
                 continue ;
 
+
+            UInt8 skillType = se->skillType;
+
             BattleFighter * fgt = bAction.GetBattleFighter();
             if(!fgt)
                 continue;
+            if(se->avoidhurt)
+                fgt->SetAvoidHurt(false);
             _packet << static_cast<UInt16>(bAction.GetHappenTime());
             _packet << fgt->GetBSNumber();
             _packet << static_cast<UInt8>(2);
@@ -345,6 +351,11 @@ namespace Battle
             if(buffId && count && !side)
                 fgt->AddBuff(buffId);
 
+            size_t offset = _packet.size();
+
+            UInt8 infectCnt = 0;
+            
+            _packet << static_cast<UInt8>(infectCnt);
 
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
@@ -355,6 +366,10 @@ namespace Battle
                     bo->AddBuff(buffId);
                 UInt16 param = bo->BeActed(&bAction);
                 //XXX 差法术协议
+                if(skillType == 6)
+                    _packet << static_cast<UInt8>(1);
+                else
+                    _packet << static_cast<UInt8>(0);
                 _packet << bo->GetBSNumber();
                 _packet << static_cast<UInt16>(param);
                 if(!bo->getHP())
@@ -364,11 +379,15 @@ namespace Battle
                     else
                         fgt->AddKillCount2();
                 }
-                ++count;
+                //++count;
+
+                std::cout << "#####战将编号：" << static_cast<UInt32>(bo->GetBSNumber()) << "被法术攻击" << std::endl;
+                ++infectCnt; 
             }
+            
+            _packet.data<UInt8>(offset) = infectCnt;
+
             UInt16 backCd = s->GetActionBackCd();
-            if(backCd < 0.1)
-                backCd = 0.1;
 
             //把行动完成的将领放入准备队列
             InsertBattlePre(backCd + time, fgt);
@@ -579,12 +598,18 @@ namespace Battle
     { 
         for(UInt8 i = 0; i < 2 ; ++i)
         { 
+            bool flag = true;
             for(UInt8 j = 0; j < _fighters[i].size(); ++j)
             { 
                if(!_fighters[i][j]->IsStoped())
-                   return false;
+               {
+                   flag = false;
+                   break;
+               }
             } 
+            if(flag)
+                return true;
         } 
-        return true;
+        return false;
     } 
 }
