@@ -148,7 +148,7 @@ namespace Battle
         }
     }
 
-    void RoomOrderManager::GetAllies(GObject::Player* player,std::set<GObject::Player*>& playerSet)
+    void RoomOrderManager::NoticeOtherAllies(GObject::Player* player,UInt8 mapId,UInt8 order)
     {
         GObject::Clan* clan = player->GetClan();
         if( clan == NULL )
@@ -165,43 +165,12 @@ namespace Battle
         {
             return;
         }
-
         UInt8 forceId = clan->GetBattleForceId();
-        if( forceId == 0 )
-        {
+        std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
+        if( vecPlayer.empty())
             return;
-        }
-        std::vector<UInt32> vecClan = room->GetAllyClans(forceId);
-        if( vecClan.empty())
+        for(auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it)
         {
-            return;
-        }
-        
-        for( auto it = vecClan.begin(); it != vecClan.end(); ++it)
-        {
-            GObject::Clan* Clan = GObject::globalClan[(*it)];
-            if( clan == NULL )
-                continue;
-            std::vector<GObject::Player*> vecPlayer = Clan->GetJoinClanBattlePlayer();
-            if( vecPlayer.empty())
-                continue;
-            for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
-            {
-                playerSet.insert(*it);
-            }
-
-        }
-    }
-
-
-    void RoomOrderManager::NoticeOtherAllies(GObject::Player* player,UInt8 mapId,UInt8 order)
-    {
-         std::set<GObject::Player*> playerSet;
-         GetAllies(player,playerSet);
-         if( playerSet.empty())
-             return;
-         for(auto it = playerSet.begin(); it != playerSet.end(); ++it)
-         {
              if( (*it) == player )
                  continue;
              Stream st(REP::CLAN_BATTLE_ORDERS);
@@ -210,7 +179,7 @@ namespace Battle
              st<<static_cast<UInt8>(order);
              st<<Stream::eos;
              (*it)->send(st);
-         }
+        }
     }
 
 }

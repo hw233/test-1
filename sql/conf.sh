@@ -1,7 +1,7 @@
 #!/bin/bash
 
 H=localhost
-U=jacob
+U=libo
 P=kingxin
 PT=3306
 

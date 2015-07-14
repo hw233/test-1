@@ -540,7 +540,7 @@ namespace GObject
         globalNamedClans.add(clan->GetName(), clan);
         SetClanPos(1);
         clan->LoadPlayer(this,1);
-        DB2().PushUpdateData("INSERT INTO `clan`(`clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax`,`battleRoomId`,`clanFame`,`conquests`,`forceId`) VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,0,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0);
+        DB2().PushUpdateData("INSERT INTO `clan`(`clanId`,`name`,`picIndex`,`announcement`,`announcement2`,`creater`,`leader`,`level`,`contribute`,`personMax`,`battleRoomId`,`clanFame`,`conquests`,`forceId`) VALUES( %u,'%s',%u,'%s','%s',%" I64_FMT "u,%" I64_FMT "u,%u,%u,%u,%u,%u,%u,%u)",clan->GetId(),clan->GetName().c_str(),picIndex,clan->GetAnnouncement().c_str(), clan->GetAnnouncement2().c_str(), getId(),getId(),1,0,clan->GetPersonMax(),0,0,0,0);
 
         //Stream st(REP::CLAN_OPTION);
         //st << static_cast<UInt8>(0x02);
@@ -760,7 +760,7 @@ namespace GObject
     {
         for( auto it = _vecClanBattleFighter.begin(); it != _vecClanBattleFighter.end(); ++it )
         {
-            if( (*it)->GetMapId() == mapId && (*it)->GetFighterId() == fighterId )
+            if( (*it)->GetMapId() == mapId && (*it)->GetFighterId() == fighterId  && (*it)->GetPosX() == posx && (*it)->GetPosY() == posy )
             {
                 delete (*it);
                 it = _vecClanBattleFighter.erase(it);
@@ -783,5 +783,88 @@ namespace GObject
              }
         }
         return NULL;
+    }
+
+    void Player::AddConstantlyKill(UInt16 fighterId,UInt32 killCount)
+    {
+        for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it)
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                (*it).killNum += killCount;
+                return ;
+            }
+        }
+        //没找到的话
+        vecConstantlyKill.push_back(ConstantlyKill(fighterId,killCount));
+    }
+
+    void Player::AddEndConstantlyKill(Player* pl,UInt16 fighterId,UInt32 killCount)
+    {
+         if( pl == NULL  || killCount <= 0 )
+             return;
+         vecEndConstantlyKill.push_back(EndConstantlyKill(pl,fighterId,killCount));
+    }
+
+
+    //获得连续击杀个数
+    UInt32 Player::GetConstantlyKill(UInt16 fighterId)
+    {
+        for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                return (*it).killNum;
+            }
+        }
+        return 0;
+    }
+
+    void Player::GiveEndConstantlyKillAward()
+    {
+        for( auto it = vecEndConstantlyKill.begin(); it != vecEndConstantlyKill.end(); ++it)
+        {
+            UInt32 endKillNum = (*it).endKillNum;
+            if( endKillNum == 0 )
+                continue;
+            std::cout<<" 发终结连杀奖励"<<std::endl;
+            //发奖励(走邮件)
+            char buff[255];
+            UInt16 offset = 0;
+            offset = sprintf(buff,"%u,%u",20001,endKillNum);
+            buff[offset]='\0';
+            Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
+            if(mail)
+            { 
+                globalMails.add(mail->GetId(), mail);
+                AddMail(mail->GetId());
+            }
+        }
+    }
+
+    void Player::GiveConstantlyKillAward()
+    {
+       
+        for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it)
+        {
+            UInt32 killNum = (*it).killNum;
+            if( killNum == 0 )
+                continue;
+            std::cout<<" 发连杀奖励"<<std::endl;
+            for( UInt32 i = 1 ; i <= killNum ; ++i )
+            {
+                //发奖励(走邮件)
+                char buff[255];
+                UInt16 offset = 0;
+                offset = sprintf(buff,"%u,%u",20001,killNum);
+                buff[offset]='\0';
+                Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
+                if(mail)
+                { 
+                    globalMails.add(mail->GetId(), mail);
+                    AddMail(mail->GetId());
+                }
+            }
+        }
     }
 }

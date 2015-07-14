@@ -52,7 +52,7 @@ namespace GData
                 return _BattleAwardTable[mapId];
             }
 
-            ~BattleAwardTable() { delete []_BattleAwardTable;}
+            ~BattleAwardTable() {}
 
         private:
             BattleAward* _BattleAwardTable[AWARD_MAX];

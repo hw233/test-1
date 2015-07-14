@@ -213,6 +213,10 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
     {
         return;
     }
+    if( posx == fighterInfo->GetPosX() && posy == fighterInfo->GetPosY())
+    {
+        return;
+    }
     UInt8 res = false;
     if( curMapId == mapId )
     {

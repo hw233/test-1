@@ -71,7 +71,7 @@ namespace GObject
 
         //GMHandler::Battle(1,2);
 
-        //GMHandler::Battle(2,1007);
+        //GMHandler::Battle(10,1);
         return true; 
     }
 
@@ -294,6 +294,12 @@ namespace GObject
             if( (*it)->GetStage() == 0 && roomBattle != NULL )
             {
                 std::cout<<"处于准备阶段  删掉战场"<<std::endl;
+                Battle::battleManager.removeRoomBattle(roomId);
+            }
+            if( (*it)->GetStage() == 2 && roomBattle != NULL)  //结算阶段
+            {
+                std::cout<<"处于结算阶段  开始发奖励啦"<<std::endl;
+                roomBattle->Settlement();
                 Battle::battleManager.removeRoomBattle(roomId);
             }
         }

@@ -94,7 +94,6 @@ namespace Battle
             bool MoveFighterWithDiffTown(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId, UInt8 destx,UInt8 desty);
             UInt8 GetForceId(UInt64 playerId);
             void  GetBattleInfo(GObject::Player* player,Stream &st);
-            void  GetAllies(GObject::Player* player,std::set<GObject::Player*>& playerSet);
             void  NoticeAlliesAddFighter(GObject::Player* player, UInt16 fighterId);
             void  NoticeAlliesDelFighter(GObject::Player* player,UInt8 mapId,UInt8 posx,UInt8 posy);
             void  NoticeAlliesMoveFighter(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId,UInt8 destx,UInt8 desty);

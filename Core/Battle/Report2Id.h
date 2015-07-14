@@ -80,6 +80,7 @@ namespace Battle
     {
         public:
             void Insert(UInt32 roomId,UInt8 cityId,UInt16 actId, UInt32 reportId,UInt32 actTime);
+            Report2Id* GetReport2Id(UInt32 roomId,UInt8 cityId);
             UInt32 GetRecentReportId(UInt32 roomId, UInt8 mapId);
         private:
             std::vector<Report2Id*> _vecReportId;

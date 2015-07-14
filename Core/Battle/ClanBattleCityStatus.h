@@ -43,6 +43,7 @@ namespace Battle
             void  SetStage(UInt8 s) { stage = s;}
             void  SetStage(UInt32 t);
             std::vector<CityStatus*> GetAllCityStatus() { return vecCityStatus;}
+            bool  IsStop();
 
         private:
             UInt32 roomId;

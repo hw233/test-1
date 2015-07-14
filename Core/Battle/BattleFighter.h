@@ -289,8 +289,10 @@ namespace Battle
 
             virtual bool IsStoped(){return false;}
 
-            void AddKillCount(){ ++_killCount;}
-            UInt16 GetKillCount(){ return _killCount;}
+            void AddKillCount1(){ ++_killCount1;}
+            UInt16 GetKillCount1(){ return _killCount1;}
+            void AddKillCount2(){ ++_killCount2;}
+            UInt16 GetKillCount2(){ return _killCount2;}
 
             GObject::Player* GetOwner() const { return _fighter->GetOwner();}   //by qsj
             //设置某一小兵的血量
@@ -325,11 +327,16 @@ namespace Battle
             virtual bool CanMove() { return true; } // return _canMove;}
             virtual void SetMove(bool v) {}// _canMove = v;}
 
+            void SetActed(bool v){ _acted = v;}
+            bool GetActed(){ return _acted;}
+
+
+            bool IsMainFighter(){return _fighter!=NULL;}
         protected:
 
             UInt8 _crick;  //硬直
-            float _actionLast ;   //动作持续
-            float _actionBackLast ;   //动作收招持续
+            UInt16 _actionLast ;   //动作持续
+            UInt16 _actionBackLast ;   //动作收招持续
             //std::list<BattleObject*>  targetList; //对象列表 (待解)
             UInt8 _actionType;  // 动作类型
 
@@ -383,9 +390,12 @@ namespace Battle
 
             std::list<BattleBuff> bufflst;
             UInt8 _direction;
-            UInt16 _killCount;
+            UInt16 _killCount1;  // 击杀主将
+            UInt16 _killCount2;  // 击杀小兵
 
             UInt16 _cachePx;
+
+            bool _acted;
 
         public:
             BattleFighter * _target;

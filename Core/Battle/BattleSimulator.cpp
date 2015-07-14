@@ -114,7 +114,7 @@ namespace Battle
         _packet.init(0x81);
         InitFightersSide(0);
         InitFightersSide(1);
-        if(_fgt[0]->GetClass() == e_walk && _fgt[1]->GetClass() == e_walk)
+        //if(_fgt[0]->GetClass() == e_walk && _fgt[1]->GetClass() == e_walk)
         {
             RandPosBegin(0);
             RandPosBegin(1);
@@ -257,7 +257,7 @@ namespace Battle
                 continue; 
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
-                BattleObject * bo = bAction.GetObject(j);
+                BattleFighter * bo = static_cast<BattleFighter*>(bAction.GetObject(j));
                 if(bo->getHP() == 0)
                     continue;
                 UInt16 param = bo->BeActed(&bAction);
@@ -271,7 +271,13 @@ namespace Battle
                 std::cout << " 攻击 战将编号:" << static_cast<UInt32>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
                 std::cout << "伤害：" << static_cast<UInt32>(param) << std::endl; 
                 if(bo->getHP() == 0)
-                    fgt->AddKillCount();
+                {
+                    if(bo->IsMainFighter())
+                        fgt->AddKillCount1();
+                    else
+                        fgt->AddKillCount2();
+
+                }
                 ++count;
             }
 #if 0
@@ -342,7 +348,7 @@ namespace Battle
 
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
-                BattleObject* bo = bAction.GetObject(j);
+                BattleFighter* bo = static_cast<BattleFighter* >(bAction.GetObject(j));
                 if(!bo || !bo->getHP())
                     continue;
                 if(buffId && count && side)
@@ -352,7 +358,12 @@ namespace Battle
                 _packet << bo->GetBSNumber();
                 _packet << static_cast<UInt16>(param);
                 if(!bo->getHP())
-                    fgt->AddKillCount();
+                {
+                    if(bo->IsMainFighter())
+                        fgt->AddKillCount1();
+                    else
+                        fgt->AddKillCount2();
+                }
                 ++count;
             }
             UInt16 backCd = s->GetActionBackCd();
@@ -399,7 +410,13 @@ namespace Battle
                         UInt16 param = ft->BeActed(&(*it));
                         it->InsertIntoPackage(time+index*4,ft, param);
                         if(ft->getHP() == 0)
-                            fgt->AddKillCount();
+                        {
+                            if(ft->IsMainFighter())
+                                fgt->AddKillCount1();
+                            else
+                                fgt->AddKillCount2();
+
+                        }
                         std::cout << "时间点：" << static_cast<UInt32>(time) ;
                         std::cout << " 粒子型技能造成伤害 " ;
                         std::cout << " 技能释放者：" << static_cast<UInt32>(fgt->GetBSNumber());

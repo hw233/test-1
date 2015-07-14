@@ -434,6 +434,21 @@ namespace GObject
         UInt8 posy;
     };
 
+    struct ConstantlyKill   //连杀结构体
+    {
+        ConstantlyKill(UInt16 id,UInt32 num ) : fighterId(id), killNum(num){}
+        UInt16 fighterId;
+        UInt32 killNum;   //连杀个数
+    };
+
+    struct EndConstantlyKill //终结连杀结构体
+    {
+        EndConstantlyKill(GObject::Player* pl,UInt16 id,UInt32 num) :player(pl),fighterId(id),endKillNum(num) {}
+        Player* player;      //终结的那个玩家
+        UInt16 fighterId;    //哪个将
+        UInt32 endKillNum;   //终结了对方的几连杀
+    };
+
     class VarSystem;
     class FriendManager ;
     class Fighter;
@@ -632,6 +647,14 @@ namespace GObject
             void AddKillFighterNum(UInt32 killCount) { killFighterNum += killCount;}
             UInt32 GetKillSoldiersNum() const { return killSoldiersNum;}
             void AddKillSoldiersNum(UInt32 killCount) { killSoldiersNum+=killCount;}
+
+            void AddConstantlyKill(UInt16 fighterId,UInt32 killCount);   //增加连续击杀的数量
+            UInt32 GetConstantlyKill(UInt16 fighterId);
+
+            void AddEndConstantlyKill(Player* pl,UInt16 fighterId,UInt32 killCount);
+            void GiveEndConstantlyKillAward();
+
+            void GiveConstantlyKillAward();
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -676,8 +699,10 @@ namespace GObject
             std::vector<ClanBattleFighter*> _vecClanBattleFighter;
 
             UInt32 killSoldiersNum;     //军团战击杀敌军人数(小兵)
-
             UInt32 killFighterNum; //军团战击杀敌将数量(主将)
+
+            std::vector<ConstantlyKill> vecConstantlyKill;
+            std::vector<EndConstantlyKill> vecEndConstantlyKill;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

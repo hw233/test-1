@@ -146,7 +146,8 @@ namespace Battle
 
     }
 
-    void RoomCommentManager::GetAllies(GObject::Player* player,std::set<GObject::Player*>& playerSet)
+
+    void RoomCommentManager::NoticeOtherAllies(GObject::Player* player,UInt8 mapId,std::string message)
     {
         GObject::Clan* clan = player->GetClan();
         if( clan == NULL )
@@ -165,50 +166,22 @@ namespace Battle
         }
 
         UInt8 forceId = clan->GetBattleForceId();
-        if( forceId == 0 )
-        {
+        std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
+        if( vecPlayer.empty())
             return;
-        }
-        std::vector<UInt32> vecClan = room->GetAllyClans(forceId);
-        if( vecClan.empty())
-        {
+        if( vecPlayer.empty())
             return;
-        }
-        
-        for( auto it = vecClan.begin(); it != vecClan.end(); ++it)
+        for(auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it)
         {
-            GObject::Clan* Clan = GObject::globalClan[(*it)];
-            if( clan == NULL )
+            if( (*it) == player )
                 continue;
-            std::vector<GObject::Player*> vecPlayer = Clan->GetJoinClanBattlePlayer();
-            if( vecPlayer.empty())
-                continue;
-            for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
-            {
-                playerSet.insert(*it);
-            }
-
+            Stream st(REP::CLAN_BATTLE_COMMENTS);
+            st<<static_cast<UInt8>(1);
+            st<<static_cast<UInt8>(mapId);
+            st<<message;
+            st<<Stream::eos;
+            (*it)->send(st);
         }
-    }
-
-
-    void RoomCommentManager::NoticeOtherAllies(GObject::Player* player,UInt8 mapId,std::string message)
-    {
-         std::set<GObject::Player*> playerSet;
-         GetAllies(player,playerSet);
-         if( playerSet.empty())
-             return;
-         for(auto it = playerSet.begin(); it != playerSet.end(); ++it)
-         {
-             if( (*it) == player )
-                 continue;
-             Stream st(REP::CLAN_BATTLE_COMMENTS);
-             st<<static_cast<UInt8>(1);
-             st<<static_cast<UInt8>(mapId);
-             st<<message;
-             st<<Stream::eos;
-             (*it)->send(st);
-         }
     }
 
 }

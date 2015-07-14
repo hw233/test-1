@@ -409,44 +409,6 @@ namespace Battle
     } 
 
     //BATTLE@
-   void BattleField::InsertTimeBattleAction(float time , ActionPackage ba)
-    { 
-        //if(FieldAttack.begin() != FieldAttack.end() && time < FieldAttack.begin()->first)
-        //    return ;
-        FieldAttack[time].push_back(ba);
-    } 
-
-    std::vector<ActionPackage> BattleField::GetTimeBattleAction(float& time)
-    { 
-        std::vector<ActionPackage> vec;
-        if(FieldAttack.begin() != FieldAttack.end())
-        {
-            time = FieldAttack.begin()->first;
-            vec = FieldAttack.begin()->second;
-        }
-        return vec;
-    } 
-
-
-    //BATTLE@
-    void BattleField::InsertTimeBattleAction(float time , ImagePackage ip)
-    { 
-        //if(FieldImage.begin() != FieldImage.end() && time < FieldImage.begin()->first)
-        //    return ;
-        FieldImage[time].push_back(ip);
-    } 
-    std::vector<ImagePackage> BattleField::GetTimeBattleImage(float& time)
-    { 
-        std::vector<ImagePackage> vec;
-        if(FieldImage.begin() != FieldImage.end())
-        {
-            time = FieldImage.begin()->first;
-            vec = FieldImage.begin()->second;
-        }
-        return vec;
-    } 
-
-
     void BattleField::InsertObjectPackage(ObjectPackage ba)
     { 
         FieldObject.push_back(ba);
@@ -505,7 +467,9 @@ namespace Battle
     { 
         //if(BattlePre.begin() != BattlePre.end() && time < BattlePre.begin()->first)
         //    return ;
-        BattlePre[time].push_back(fgt);
+
+        std::cout << "-----战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << " 准备于时间点 " <<  static_cast<UInt32>(time+4) << std::endl;
+        BattlePre[time + 4].push_back(fgt);
     } 
 
     void BattleField::FieldPrint()

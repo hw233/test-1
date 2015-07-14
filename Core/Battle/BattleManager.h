@@ -4,16 +4,18 @@
 
 #include "Common/Mutex.h"
 #include "BattleGround.h"
+#include "GObject/Player.h"
 #include <map>
+#include "GObject/Mail.h"
+
 namespace GObject
 {
     class Player;
+    class Mail;
 }
 
 
 #define BATTLEGROUND_MAN 32
-
-#define DAY_MAX 7
 
 namespace Battle
 {
@@ -36,6 +38,31 @@ namespace Battle
             BattleGround* ground;
     };
 
+    struct MoreKillSoldiers
+    {
+        bool operator () ( GObject::Player* player1,GObject::Player* player2)
+        {
+            if( player1->GetKillSoldiersNum() > player2->GetKillSoldiersNum())
+            {
+                return true;
+            }
+            return false;
+        }
+    };
+
+
+    struct MoreKillFighters
+    {
+        bool operator () ( GObject::Player* player1,GObject::Player* player2)
+        {
+            if( player1->GetKillFighterNum() > player2->GetKillFighterNum() )
+            {
+                return true;
+            }
+            return false;
+        }
+    };
+
 
     class RoomBattle  //一个房间 管理一个战役的许多个城市
     {
@@ -48,6 +75,12 @@ namespace Battle
             UInt8 GetStage();
             UInt32 GetRoomId() const { return roomId;}
             void CollectCaptureInfo(std::map<UInt8,UInt8>& force2captureCityNum);  //战役结束时  统计各个势力的占领城市的情况
+            void GivePlayerKillRankAward();         //击杀敌军排行奖励
+            void GivePlayerKillFighterRankAward();  //击杀敌将排行奖励
+            void GivePlayerEndConstantlyKillAward(); //终结连杀奖励
+            void GivePlayerConstantlyKillAward();   //连杀奖励
+            void GiveCaptureCityAward();            //占领城市多少的奖励
+            void Settlement();
         private:
             UInt32 roomId;
             std::vector<SingleBattle*> singleBattles;

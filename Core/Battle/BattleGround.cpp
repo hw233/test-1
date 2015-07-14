@@ -312,6 +312,7 @@ namespace Battle
             {
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
+                Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
             }
             currentBf->SetGroundX(ax);
             currentBf->SetGroundY(ay);
@@ -332,20 +333,42 @@ namespace Battle
             
             _pack << win << reportId;
 
+
+#if 1
+            if( win == 255 )
+            {
+                //两边对死
+                currentBf->setHP(0);
+                (target.bo)->setHP(0);
+                win = 2;
+            }
+#endif
+
             //cout
             TestCoutBattleS(target.bo);
             std::cout << std::endl;
 
+
             _oneRoundCostTime += currentBf->GetNowTime()/100;
             //增加击杀人数
-            currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount());
-            (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount());
+            currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
+            (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
+
+            currentBf->GetOwner()->AddKillSoldiersNum(currentBf->GetKillCount2());
+            (target.bo)->GetOwner()->AddKillSoldiersNum((target.bo)->GetKillCount2());
 
             //往排布那边同步战将数据
             //自己
             if( currentBf->getHP() <= 0 )
             {
-                Battle::battleDistribute.RemoveFighter(_mapId,currentBf->GetOwner(),currentBf->GetId(),x,y);
+                Battle::battleDistribute.RemoveFighter(_mapId,currentBf->GetOwner(),currentBf->GetId(),currentBf->GetGroundX(),currentBf->GetGroundY());
+
+                UInt32 constantKill = (currentBf->GetOwner())->GetConstantlyKill(currentBf->GetId());
+                if( constantKill >= 1 )
+                {
+                    ((target.bo)->GetOwner())->AddEndConstantlyKill(currentBf->GetOwner(),currentBf->GetId(),constantKill);
+                }
+                ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1);
             }
             else
             {
@@ -357,17 +380,19 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,vecHP);
-
-                if( x != ax || y != ay )
-                {
-                    Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
-                }
             }
 
             //对手
             if( target.bo->getHP() <= 0 )
             {
                 Battle::battleDistribute.RemoveFighter(_mapId,(target.bo)->GetOwner(),(target.bo)->GetId(),(target.bo)->GetGroundX(),(target.bo)->GetGroundY());
+                UInt32 constantKill = ((target.bo)->GetOwner())->GetConstantlyKill((target.bo)->GetId());
+                if( constantKill >= 1 )
+                {
+                    (currentBf->GetOwner())->AddEndConstantlyKill((target.bo)->GetOwner(),(target.bo)->GetId(),constantKill);
+                }
+                (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1);
+
             }
             else
             {
@@ -900,7 +925,14 @@ namespace Battle
             _isFirstRound = false;
         }
         if( CheckIsStop() )
+        {
+            if( ! _isSetCapture )
+            {
+                SetCaptureForce();
+                _isSetCapture=true;
+            }
             return;
+        }
         TestCoutBattleS();
         std::map<UInt8,std::vector<BattleFighter*>> camp2fighters_copy = camp2fighters;
         
@@ -990,6 +1022,7 @@ namespace Battle
         {
             (*it)->send(st);
         }
+
     }
 
     //检测某一阵营是不是已经死光了
@@ -1658,17 +1691,15 @@ namespace Battle
         Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
         if( status == NULL )
             return;
-        UInt8 ownForce = status->GetCityOwnForce(_mapId);
+        //UInt8 ownForce = status->GetCityOwnForce(_mapId);
         UInt8 captureForce = GetCaptureId();
-        if( captureForce!= 0 && ownForce != captureForce  )
+        if( captureForce != 0 )
         {
-            std::cout<<"现在这座城属于势力   " <<static_cast<UInt32>(captureForce)<<endl;
-            if( captureForce != 0 )
-            {
-                Battle::roomAllCityStatusManager.SetOwnForce(roomId,_mapId,captureForce);
-                DB7().PushUpdateData("UPDATE  `clan_battle_citystatus`  set ownforce=%u  where roomId = %u and battleId= %u and cityId = %u ", captureForce, roomId,status->GetBattleId(),_mapId);
+            std::cout<<"现在"<<static_cast<UInt32>(_mapId)<<" 这座城属于势力   " <<static_cast<UInt32>(captureForce)<<endl;
+            Battle::roomAllCityStatusManager.SetOwnForce(roomId,_mapId,captureForce);
+            //DB7().PushUpdateData("UPDATE  `clan_battle_citystatus`  set ownforce=%u  where roomId = %u and battleId= %u and cityId = %u ", captureForce, roomId,status->GetBattleId(),_mapId);
+            DB7().PushUpdateData("REPLACE INTO `clan_battle_citystatus`(`roomId`,`battleId`,`cityId`,`ownforce`)  values(%u, %u, %u, %u)",roomId,status->GetBattleId(),_mapId,captureForce);
 
-            }
         }
     }
 }

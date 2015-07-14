@@ -106,6 +106,7 @@ namespace Battle
         {
             if( (*it)->GetRoomId() == roomId )
             {
+                delete (*it);
                 it = roomBattleList.erase(it);
             }
             else
@@ -136,4 +137,177 @@ namespace Battle
         }
          
     }
+
+
+    void RoomBattle::GivePlayerKillRankAward()
+    {
+
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        //按照杀敌人数进行排序
+        MoreKillSoldiers moreKillSoldiers;
+        std::sort(vecPlayer.begin(), vecPlayer.end(),moreKillSoldiers);
+        /*
+        static UInt32 Award[][2][2] ={
+            {{ 20001,0},{20002,20}},
+            {{ 20001,0},{20002,15}},
+            {{ 20001,0},{20002,10}},
+            {{ 20001,0},{20002,5}},
+            {{ 20001,1000},{ 20002,0}},
+        };
+        */
+        std::string items[5] = {
+            "20002,20",
+            "20002,15",
+            "20002,10",
+            "20002,5",
+            "20001,1000"
+        };
+
+        UInt8 pos = 1;
+        UInt8 index = 1;
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            if( (*it)->GetKillSoldiersNum() == 0 )
+                break;
+            if( pos < 9999 )
+            {
+                if( pos >= 1 && pos <= 3 )
+                    index = pos-1;
+                else if( pos >= 4 && pos <= 10 )
+                    index = 3;
+                else 
+                    index = 4;
+                //发排行奖励
+                GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),(*it),1,items[index],0,static_cast<UInt32>(-1));
+                if(mail)
+                { 
+                    GObject::globalMails.add(mail->GetId(), mail);
+                    (*it)->AddMail(mail->GetId());
+                }
+            }
+            ++pos;
+        }
+    }
+
+
+    void RoomBattle::GivePlayerKillFighterRankAward()
+    {
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        MoreKillFighters moreKillFighter;
+        std::sort(vecPlayer.begin(),vecPlayer.end(),moreKillFighter);
+        UInt32 pos=1;
+        UInt32 index=0;
+        /*
+        static UInt32 Award[][2][2] ={
+            {{ 20001,0},{20002,20}},
+            {{ 20001,0},{20002,15}},
+            {{ 20001,0},{20002,10}},
+            {{ 20001,0},{20002,5}},
+            {{ 20001,1000},{ 20002,0}},
+        };
+        */
+
+        std::string items[5] = {
+            "20002,20",
+            "20002,15",
+            "20002,10",
+            "20002,5",
+            "20001,1000"
+        };
+
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            if( (*it)->GetKillFighterNum() == 0 )
+                break;
+            if( pos < 9999 )
+            {
+                if( pos >= 1 && pos <= 3 )
+                    index = pos-1;
+                else if( pos >= 4 && pos <= 10 )
+                    index = 3;
+                else 
+                    index = 4;
+                //发排行奖励
+                //走邮件
+                GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),(*it),1,items[index],0,static_cast<UInt32>(-1));
+                if(mail)
+                { 
+                    GObject::globalMails.add(mail->GetId(), mail);
+                    (*it)->AddMail(mail->GetId());
+                }
+            }
+            ++pos;
+        }
+    }
+
+    void RoomBattle::GivePlayerEndConstantlyKillAward()
+    {
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        for( auto it =  vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            (*it)->GiveEndConstantlyKillAward();
+        }
+
+    }
+
+    void RoomBattle::GivePlayerConstantlyKillAward()
+    {
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL)
+            return;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            (*it)->GiveConstantlyKillAward();
+        }
+    }
+
+
+    void RoomBattle::GiveCaptureCityAward()
+    {
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL)
+            return;
+        std::map<UInt8,UInt8> force2captureCityNum;
+        CollectCaptureInfo(force2captureCityNum);
+        for( auto it = force2captureCityNum.begin(); it != force2captureCityNum.end(); ++it )
+        {
+            UInt8 forceId = it->first;
+            UInt8 captureCityNum = it->second;
+            std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
+            std::cout<<" 势力  "<<static_cast<UInt32>(forceId)<<"占领了   "<<static_cast<UInt32>(captureCityNum)<<"座城市 "<<std::endl;
+            for( auto iter = vecPlayer.begin(); iter != vecPlayer.end(); ++iter )
+            {
+                std::cout<<"给 "<<(*iter)->GetName()<<"发奖励"<<std::endl;
+                GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),(*iter),1,"10002,100",0,static_cast<UInt32>(-1));
+                if(mail)
+                { 
+                    GObject::globalMails.add(mail->GetId(), mail);
+                    (*iter)->AddMail(mail->GetId());
+                }
+                std::cout<<"奖励是  : 10002 2 个呵呵呵呵" <<std::endl;
+            }
+
+        }
+    }
+
+    void RoomBattle::Settlement()
+    {
+        GivePlayerEndConstantlyKillAward();
+        GivePlayerConstantlyKillAward();
+        GivePlayerKillRankAward();
+        GivePlayerKillFighterRankAward();
+        GiveCaptureCityAward();
+    }
+
+
 }

@@ -182,9 +182,9 @@ namespace Battle
         //更新数据库哈
         if( flag )
         {
-            player->InsertClanBattleFighter(mapId,fighterId,x,y);
-            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`mapId`,`playerId`,`fighterId`,`posx`,`posy`) value(%u,%"I64_FMT"u,%u,%u,%u)",mapId,player->GetId(),fighterId,x,y);
+            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`mapId`,`playerId`,`fighterId`,`posx`,`posy`)   value(%u, %"I64_FMT"u, %u, %u, %u)",mapId,player->GetId(),fighterId,x,y);
         }
+        player->InsertClanBattleFighter(mapId,fighterId,x,y);
         return true;
     }
 
@@ -269,7 +269,6 @@ namespace Battle
                 DB7().PushUpdateData("delete from `clan_battle_pos` where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",mapId,info->GetPlayerId(),info->GetFighterId());
                 GObject::Player* player = GObject::globalPlayers[info->GetPlayerId()];
                 player->DelClanBattleFighter(mapId,info->GetFighterId(),info->GetPosX(),info->GetPosY());
-                delete info;
             }
         }
     }
@@ -334,10 +333,13 @@ namespace Battle
             if( campInfo[curx+cury*width] != 0 && campInfo[destx+desty*width] != 0 && campInfo[curx+cury*width] == campInfo[destx+desty*width])
             {
                 RemoveDistributeInfo(roomId,mapId,currentInfo);
-                PutFighter(mapId,player,destInfo->GetFighterId(),curx,cury,true,tag);
-            
                 RemoveDistributeInfo(roomId,mapId,destInfo);
+                PutFighter(mapId,player,destInfo->GetFighterId(),curx,cury,true,tag);
                 PutFighter(mapId,player,currentInfo->GetFighterId(),destx,desty,true,tag);
+                delete destInfo;
+                destInfo = NULL;
+                delete currentInfo;
+                currentInfo = NULL;
             }
         }
         return true;
@@ -388,9 +390,8 @@ namespace Battle
         {
             //交换
             RemoveDistributeInfo(roomId,curMapId,curInfo);
-            PutFighter(destMapId,player,destInfo->GetFighterId(),curx,cury,true);
-            
             RemoveDistributeInfo(roomId,destMapId,destInfo);
+            PutFighter(destMapId,player,destInfo->GetFighterId(),curx,cury,true);
             PutFighter(curMapId,player,curInfo->GetFighterId(),destx,desty,true);
         }
         return true;
@@ -524,6 +525,10 @@ namespace Battle
             }
 
             UInt32 reportId = Battle::report2IdTable.GetRecentReportId(roomId,mapId);
+            if( reportId != 0 )
+            {
+                std::cout<<"最近的一个战报是    "<<static_cast<UInt32>(reportId)<<std::endl;
+            }
             if( status->GetStage() == 1 )
             {
                 st<<static_cast<UInt32>(reportId);
@@ -551,7 +556,8 @@ namespace Battle
     }
 
 
-    void BattleDistribute::GetAllies(GObject::Player* player,std::set<GObject::Player*>& playerSet)
+
+    void BattleDistribute::NoticeAlliesAddFighter(GObject::Player* player, UInt16 fighterId)
     {
         GObject::Clan* clan = player->GetClan();
         if( clan == NULL )
@@ -570,107 +576,110 @@ namespace Battle
         }
 
         UInt8 forceId = clan->GetBattleForceId();
-        if( forceId == 0 )
+        std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
+        if( vecPlayer.empty())
+            return;
+        GObject::ClanBattleFighter* fighterInfo = player->GetClanBattleFighter(fighterId);
+        if( fighterInfo == NULL )
         {
             return;
         }
-        std::vector<UInt32> vecClan = room->GetAllyClans(forceId);
-        if( vecClan.empty())
+
+        UInt8 mapId = fighterInfo->GetMapId();
+        UInt8 posx  = fighterInfo->GetPosX();
+        UInt8 posy  = fighterInfo->GetPosY();
+
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it)
         {
-            return;
-        }
-        
-        for( auto it = vecClan.begin(); it != vecClan.end(); ++it)
-        {
-            GObject::Clan* Clan = GObject::globalClan[(*it)];
-            if( clan == NULL )
-                continue;
-            std::vector<GObject::Player*> vecPlayer = Clan->GetJoinClanBattlePlayer();
-            if( vecPlayer.empty())
-                continue;
-            for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+            if( (*it) == player )
             {
-                playerSet.insert(*it);
-            }
-        }
-    }
-
-
-    void BattleDistribute::NoticeAlliesAddFighter(GObject::Player* player, UInt16 fighterId)
-    {
-         std::set<GObject::Player*> playerSet;
-         GetAllies(player,playerSet);
-         if( playerSet.empty())
-             return;
-         GObject::ClanBattleFighter* fighterInfo = player->GetClanBattleFighter(fighterId);
-         if( fighterInfo == NULL )
-         {
-             return;
-         }
-
-         UInt8 mapId = fighterInfo->GetMapId();
-         UInt8 posx  = fighterInfo->GetPosX();
-         UInt8 posy  = fighterInfo->GetPosY();
-
-         for( auto it = playerSet.begin(); it != playerSet.end(); ++it)
-         {
-             if( (*it) == player )
-             {
                  continue;
-             }
-             Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
-             st<<static_cast<UInt8>(1);
-             st<<static_cast<UInt8>(mapId);
-             st<<static_cast<UInt16>(fighterId);
-             st<<static_cast<UInt8>(posx);
-             st<<static_cast<UInt8>(posy);
-             st<<Stream::eos;
-             (*it)->send(st);
-         }
+            }
+            Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
+            st<<static_cast<UInt8>(1);
+            st<<static_cast<UInt8>(mapId);
+            st<<static_cast<UInt16>(fighterId);
+            st<<static_cast<UInt8>(posx);
+            st<<static_cast<UInt8>(posy);
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
     }
 
     void BattleDistribute::NoticeAlliesDelFighter(GObject::Player* player,UInt8 mapId,UInt8 posx,UInt8 posy)
     {
-         std::set<GObject::Player*> playerSet;
-         GetAllies(player,playerSet);
-         if( playerSet.empty())
+        GObject::Clan* clan = player->GetClan();
+        if( clan == NULL )
+        {
+            return ;
+        }
+        UInt32 roomId = clan->GetClanBattleRoomId();
+        if( roomId == 0 )
+        {
+            return ;
+        }
+        ClanBattleRoom* room  = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+        {
+            return;
+        }
+
+        UInt8 forceId = clan->GetBattleForceId();
+        std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
+        if( vecPlayer.empty())
              return;
 
-         for( auto it = playerSet.begin(); it != playerSet.end(); ++it )
-         {
-             if((*it) == player )
-                 continue;
-             Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);
-             st<<static_cast<UInt8>(mapId);
-             st<<static_cast<UInt8>(posx);
-             st<<static_cast<UInt8>(posy);
-             st<<Stream::eos;
-             (*it)->send(st);
-         }
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            if((*it) == player )
+                continue;
+            Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);
+            st<<static_cast<UInt8>(mapId);
+            st<<static_cast<UInt8>(posx);
+            st<<static_cast<UInt8>(posy);
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
     }
 
     void BattleDistribute::NoticeAlliesMoveFighter(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId,UInt8 destx,UInt8 desty)
     {
-         std::set<GObject::Player*> playerSet;
-         GetAllies(player,playerSet);
-         if( playerSet.empty())
-             return;
+        GObject::Clan* clan = player->GetClan();
+        if( clan == NULL )
+        {
+            return ;
+        }
+        UInt32 roomId = clan->GetClanBattleRoomId();
+        if( roomId == 0 )
+        {
+            return ;
+        }
+        ClanBattleRoom* room  = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+        {
+            return;
+        }
 
-         for( auto it = playerSet.begin(); it != playerSet.end(); ++it )
-         {
-             if( (*it) == player )
-                 continue;
-             Stream st(REP::CLAN_BATTLE_MOVEFIGHTER);
-             st<<static_cast<UInt8>(1);
-             st<<static_cast<UInt8>(curMapId);
-             st<<static_cast<UInt8>(curx);
-             st<<static_cast<UInt8>(cury);
-             st<<static_cast<UInt8>(destMapId);
-             st<<static_cast<UInt8>(destx);
-             st<<static_cast<UInt8>(desty);
-             st<<Stream::eos;
-             (*it)->send(st);
-         }
+        UInt8 forceId = clan->GetBattleForceId();
+        std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
+        if( vecPlayer.empty())
+            return;
+
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            if( (*it) == player )
+                continue;
+            Stream st(REP::CLAN_BATTLE_MOVEFIGHTER);
+            st<<static_cast<UInt8>(1);
+            st<<static_cast<UInt8>(curMapId);
+            st<<static_cast<UInt8>(curx);
+            st<<static_cast<UInt8>(cury);
+            st<<static_cast<UInt8>(destMapId);
+            st<<static_cast<UInt8>(destx);
+            st<<static_cast<UInt8>(desty);
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
 
     }
 
@@ -699,7 +708,7 @@ namespace Battle
         {
             offset += sprintf(buff+offset,"%d,",(*it));
         }
-        buff[offset-1] = NULL;
+        buff[offset-1] = '\0';
         std::string hps(buff);
         DB7().PushUpdateData("update `clan_battle_pos`  set `soldiersHP` = '%s' where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hps.c_str(), mapId,info->GetPlayerId(),info->GetFighterId());
     }

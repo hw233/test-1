@@ -166,7 +166,7 @@ namespace Battle
         return true;
     }
 
-    void ClanBattleRoomManager::loadBattleRoom(UInt32 roomId,UInt8 battleId,UInt8 forceId,std::vector<UInt32> vecClan,UInt8 fighterNum,UInt32 buildTime)
+    void ClanBattleRoomManager::loadBattleRoom(UInt32 roomId,UInt8 forceId,UInt8 battleId,std::vector<UInt32> vecClan,UInt8 fighterNum,UInt32 buildTime)
     {
         ClanBattleRoom* room = GetBattleRoom(roomId);
         if( room == NULL )
@@ -177,6 +177,9 @@ namespace Battle
         room->InsertFighterNum(forceId,fighterNum);
         room->SetBuildTime(buildTime);
         _roomList.push_back(room);
+
+        //每个城的状态
+        Battle::roomAllCityStatusManager.InsertRoomAllCityStatus(roomId,battleId);
     }
 
 
@@ -191,5 +194,48 @@ namespace Battle
             }
         }
         return NULL;
+    }
+
+    std::vector<GObject::Player*> ClanBattleRoom::GetAllJoinPlayer()
+    {
+        std::vector<GObject::Player*> vecPlayer;
+        for( auto it = force2clans.begin() ; it != force2clans.end(); ++it )
+        {
+            std::vector<UInt32> vecClan = it->second;
+            for( auto iter = vecClan.begin(); iter != vecClan.end(); ++iter )
+            {
+                UInt32 clanId = (*iter);
+                GObject::Clan* clan = GObject::globalClan[clanId];
+                if( clan == NULL )
+                    continue;
+                std::vector<GObject::Player*> temp = clan->GetJoinClanBattlePlayer();
+                for( auto iterator = temp.begin(); iterator != temp.end(); ++iterator)
+                {
+                    vecPlayer.push_back(*iterator);
+                }
+            }
+        }
+        return vecPlayer;
+    }
+
+    std::vector<GObject::Player*> ClanBattleRoom::GetSameForceAllies(UInt8 forceId)
+    {
+        std::vector<GObject::Player*> vecPlayer;
+        std::vector<UInt32> vecClan = GetAllyClans(forceId);
+        for( auto it = vecClan.begin(); it != vecClan.end(); ++it)
+        {
+            GObject::Clan* clan = GObject::globalClan[(*it)];
+            if( clan == NULL )
+                continue;
+            std::vector<GObject::Player*> temp = clan->GetJoinClanBattlePlayer();
+            if( temp.empty())
+                continue;
+            for( auto iter = temp.begin(); iter != temp.end(); ++iter )
+            {
+                vecPlayer.push_back(*iter);
+            }
+
+        }
+        return vecPlayer;
     }
 }

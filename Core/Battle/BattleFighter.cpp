@@ -19,9 +19,12 @@ namespace Battle
 
         _beginTime = 0;
 
-        _killCount = 0;
+        _killCount1 = 0;
+        _killCount2 = 0;
 
         _cachePx = 0;
+
+        _acted = false;
 
         m_mainFighter = NULL;
 
@@ -214,7 +217,8 @@ namespace Battle
         if(!flag)
         {
             std::cout << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
-            GetField()->InsertBattlePre(GetNowTime() + 4, this);
+            GetField()->InsertBattlePre(GetNowTime(), this);
+            SetMove(true);
         }
         else
         {
@@ -514,7 +518,7 @@ namespace Battle
             GetField()->InsertObjectPackage(op);
         }
 
-        GetField()->InsertBattlePre(GetNowTime() + s->GetActionBackCd(), this);
+        GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast, this);
         return 1;
     } 
 

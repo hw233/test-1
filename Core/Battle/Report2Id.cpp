@@ -16,11 +16,21 @@ namespace Battle
 
     void Report2IdTable::Insert(UInt32 roomId,UInt8 cityId,UInt16 actId, UInt32 reportId,UInt32 actTime)
     {
-        Report2Id* report = new Report2Id(roomId,cityId);
+        //
+        Report2Id* report = GetReport2Id(roomId,cityId);
+        UInt8 flag = 0;
+        if( report == NULL )
+        {
+            report = new Report2Id(roomId,cityId);
+            flag = 1;
+        }
         ReportOneRound* reportOneRound = new ReportOneRound(actId,reportId);
         reportOneRound->SetTime(actTime);
         report->InsertReportOneRound(reportOneRound);
-        _vecReportId.push_back(report);
+        if( flag == 1 )
+        {
+            _vecReportId.push_back(report);
+        }
     }
 
     UInt32 Report2IdTable::GetRecentReportId(UInt32 roomId, UInt8 cityId)
@@ -33,6 +43,18 @@ namespace Battle
             }
         }
         return 0;
+    }
+
+    Report2Id* Report2IdTable::GetReport2Id(UInt32 roomId,UInt8 cityId)
+    {
+        for( auto it = _vecReportId.begin(); it != _vecReportId.end(); ++it )
+        {
+            if( (*it)->GetRoomId() == roomId && (*it)->GetCityId() == cityId )
+            {
+                return (*it);
+            }
+        }
+        return NULL;
     }
      
 };

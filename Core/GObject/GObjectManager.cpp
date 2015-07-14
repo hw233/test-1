@@ -538,7 +538,6 @@ namespace GObject
                 vecSoldierHP.push_back(::atoi(st[i].c_str()));
             }
             Battle::battleDistribute.SetMainFighterAndSoldiersHP(cbp.mapId,player,cbp.posx,cbp.posy,vecSoldierHP,cbp.mainFighterHP);
-            player->InsertClanBattleFighter(cbp.mapId,cbp.fighterId,cbp.posx,cbp.posy);
             lc.advance();
         }
         lc.finalize();

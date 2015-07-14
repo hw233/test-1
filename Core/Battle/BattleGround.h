@@ -99,7 +99,7 @@ namespace Battle
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID()),_actId(0),_isFirstRound(true),_oneRoundCostTime(0)
+            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID()),_actId(0),_isFirstRound(true),_oneRoundCostTime(0),_isSetCapture(false)
             {
                 //map_player.clear();
                 currentBf = NULL;
@@ -267,6 +267,7 @@ namespace Battle
             UInt16 _actId;
             bool   _isFirstRound;
             UInt16 _oneRoundCostTime; //一回合消耗的时间
+            bool   _isSetCapture;
             std::set<GObject::Player*> setPlayer;
             //一下全是跟A*算法  有关的东西
             Ascoord _start;
