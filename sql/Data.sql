@@ -171,6 +171,8 @@ CREATE TABLE `skill` (
       `actionCostCd` float(10,2) NOT NULL,
       `actionBackCd` float(10,2) NOT NULL,
       `mpCost` int(10) NOT NULL DEFAULT '0',
+      `superSkill` tinyint(3) NOT NULL,  
+      `attackCount` tinyint(3) NOT NULL,  
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;

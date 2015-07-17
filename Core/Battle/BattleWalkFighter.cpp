@@ -10,7 +10,8 @@ namespace Battle
                 _target = GetField()->GetTargetForRide(!GetSideInBS(), getPosX(),getPosY(), 2);
             else
             {
-                std::cout << "战将编号"  << static_cast<UInt32>(_target->GetBSNumber()) << "死亡。 ";
+                if(_target)
+                    std::cout << "战将编号"  << static_cast<UInt32>(_target->GetBSNumber()) << "死亡。 ";
                 _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
                 if(_target)
                     std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
@@ -19,7 +20,8 @@ namespace Battle
             ++_count;
             BuildLocalStream(e_run);
         }
-        SetBattleTargetPos(_target->getPosX(),_target->getPosY());
+        if(_target)
+            SetBattleTargetPos(_target->getPosX(),_target->getPosY());
         return true;
     } 
 

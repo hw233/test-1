@@ -57,7 +57,11 @@ namespace Battle
 
         std::cout << " 技能释放者编号: " << static_cast<UInt32>(GetBattleFighter()->GetBSNumber());
         std::cout << std::endl;
-        std::cout << " 技能编号："  << static_cast<UInt32>(GetSkillId()) << " 前进 " << static_cast<UInt32>(GetPosX()) << " , " << static_cast<UInt32>(GetPosY());
+        for(UInt8 i =0; i < _point.size(); ++i)
+        {
+            std::cout << " 技能编号："  << static_cast<UInt32>(GetSkillId()) << " 前进 " << static_cast<UInt32>(_point[i]._x) << " , " << static_cast<UInt32>(_point[i]._y);
+            std::cout << std::endl;
+        }
         std::cout << std::endl;
         for(UInt8 i = 0; i < vec_struct.size(); ++i)
         { 
@@ -75,11 +79,13 @@ namespace Battle
     } 
     void ObjectPackage::GoForTarget()
     { 
+        if(_point.size()!= 1)
+            return ;
         UInt16 advance = static_cast<UInt16>(sqrt(_xAdd*_xAdd + _yAdd *_yAdd));
         UInt16 targetX = _bo->getPosX();
         UInt16 targetY = _bo->getPosY();
-        UInt16 x = _x;
-        UInt16 y = _y;
+        UInt16 x = _point[0]._x;
+        UInt16 y = _point[0]._y;
         UInt16 distanceX = x > targetX ? x - targetX:targetX -x;
         UInt16 distanceY = y > targetY ? y - targetY:targetY -y;
 
@@ -107,8 +113,8 @@ namespace Battle
                 --distanceY;
             }
         } 
-        _x = x;
-        _y = y;
+        _point[0]._x = x;
+        _point[0]._y = y;
     } 
 
     bool ObjectPackage::CheckFighterAttacked(BattleObject * bo)
@@ -120,9 +126,5 @@ namespace Battle
         } 
         return false;
     } 
-    UInt8 ImagePackage::Action(Stream& st)
-    {
-            
-    }
 }
 

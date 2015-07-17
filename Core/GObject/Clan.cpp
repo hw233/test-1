@@ -175,6 +175,10 @@ namespace GObject
         st << static_cast<UInt8>(_players.size());
         st << static_cast<UInt8>(_personMax);
         st << _announcement;
+        if(_leader)
+            st << _leader->GetName();
+        else
+            st << "";
     } 
     void Clan::GetClanInfo2(Stream& st)
     { 

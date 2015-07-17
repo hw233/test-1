@@ -316,6 +316,8 @@ namespace Battle
             const GData::Skill* s = GData::skillManager[skillId];
             if(!s)
                 continue;
+            if(GetSuperSkill() && s->GetSuperSkill())
+                SetSuperSkill(false);
             const GData::SkillEffect* se = s->GetSkillEffect();
             if(!se)
                 continue ;
@@ -400,7 +402,7 @@ namespace Battle
     //物体型技能
     UInt8 BattleSimulator::doObjectMove(UInt16 time, UInt8 cnt)
     { 
-        std::list<ObjectPackage>& lst = GetObjectpackage();
+        std::list<ObjectPackage>& lst = FieldObject;//GetObjectpackage();
         if(!lst.size())
             return 0;
         std::list<ObjectPackage>::iterator it = lst.begin(); 
@@ -408,12 +410,12 @@ namespace Battle
         for(;it != lst.end();)
         { 
             bool flag = false;
-            for(UInt8 index = 0; index < cnt; ++index,it->GoNext())
+            for(UInt8 index = 0; index < cnt; ++index)
             {
                 BattleFighter * fgt = it->GetBattleFighter();
                 BattleFighter * target = it->GetTargetFighter();
 
-                std::cout << "####### 粒子型技能 移动 : 技能释放者=="  << static_cast<UInt32>(fgt->GetBSNumber()) << " 位置 ：" << static_cast<UInt32>(it->GetPosX()) << " , " << static_cast<UInt32>(it->GetPosY()) << std::endl;
+                //std::cout << "####### 粒子型技能 移动 : 技能释放者=="  << static_cast<UInt32>(fgt->GetBSNumber()) << " 位置 ：" << static_cast<UInt32>(it->GetPosX()) << " , " << static_cast<UInt32>(it->GetPosY()) << std::endl;
 
                 for(UInt8 i = 0; i < _fighters[!fgt->GetSideInBS()].size(); ++i)
                 { 
@@ -449,10 +451,15 @@ namespace Battle
                 if(it->CanExit())
                 { 
                     count += it->BuildStream(_packet);
+                    UInt16 skillId = it->GetSkillId();
                     it = lst.erase(it);
                     flag = true;
+                    const GData::Skill* s = GData::skillManager[skillId];
+                    if(s && GetSuperSkill() && s->GetSuperSkill())
+                        SetSuperSkill(false);
                     break;
                 } 
+                it->GoNext();
             }
             if(!flag)
                 ++it;
@@ -463,7 +470,7 @@ namespace Battle
 
     UInt8 BattleSimulator::ClearObjectPackage()
     { 
-        std::list<ObjectPackage>& lst = GetObjectpackage();
+        std::list<ObjectPackage> lst = GetObjectpackage();
         if(!lst.size())
             return 0;
         std::list<ObjectPackage>::iterator it = lst.begin(); 

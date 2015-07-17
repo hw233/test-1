@@ -137,6 +137,8 @@ namespace GData
         float actionCd;
         float actionBackCd;
         UInt16 mpCost;
+        UInt8 superSkill;
+        UInt8 attackCount;
     };
 
     struct DBMap  
@@ -307,7 +309,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkill)
-        SPECIALDEF(10)
+        SPECIALDEF(12)
         (
          UInt32, id,
          std::string , name,
@@ -318,7 +320,9 @@ namespace DB
          float, actionBeforeCd,
          float, actionCd,
          float, actionBackCd,
-         UInt16, mpCost
+         UInt16, mpCost,
+         UInt8, superSkill,
+         UInt8, attackCount
         )
         SPECIALEND()
 

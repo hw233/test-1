@@ -7,6 +7,7 @@ fi
 function skillCondition()
 {
 # 11,"302,2,3|303,1,0,40,3,4"
+    f=$1
     d=skillCondition
     sed -i /LVL/d $f
     sed -i /^$/d $f
@@ -22,7 +23,7 @@ function skillCondition()
                 printf(",");
             else if (NR >= ENVIRON["lines"])
                 printf(";");
-            printf(\n);
+            printf("\n");
         }
         END {
         }

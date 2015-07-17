@@ -102,8 +102,6 @@ namespace Battle
             void SetSpecialType(UInt8 special){ _special = special;}
             UInt8 GetSpecialType(){return _special;}
 
-            UInt8 Action(Stream& st);
-
         public:
             std::vector<BattleObject *> vec_bo;
 
@@ -122,11 +120,18 @@ namespace Battle
             UInt8 _special;  //特殊技能处理
             UInt8 _sIndex;
     };
+
+    struct PointOb
+    {
+        UInt16 _x;
+        UInt16 _y;
+        PointOb(UInt16 x, UInt16 y):_x(x),_y(y){}
+    };
     class ObjectPackage : public BattleAction
     { 
         public:
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_x(0),_y(0),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1){}
             UInt32 GetAttack(){return _attack;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
@@ -138,22 +143,22 @@ namespace Battle
             UInt16 GetHappenTime(){ return _time;}
             float GetHappenTime2(){ return _time2;}
 
-            UInt16 GetPosX() {return _x;}
-            UInt16 GetPosY() {return _y;}
-
             void GoNext()
             { 
-                 
                 if(_bo != NULL)
                 { 
                     GoForTarget();
                     return ;
                 } 
 
-                if(_xAdd)
-                    _x += _xAdd * _flagX - _xAdd * !_flagX;
-                if(_yAdd)
-                    _y += _yAdd * _flagY - _yAdd * !_flagY;
+                for(UInt8 i = 0; i < _point.size(); ++i)
+                {
+                    if(_xAdd)
+                        _point[i]._x += _xAdd * _flagX - _xAdd * !_flagX;
+                    if(_yAdd)
+                        _point[i]._y += _yAdd * _flagY - _yAdd * !_flagY;
+                    std::cout << " 粒子技能 " << static_cast<UInt32>(i) << " 行动 ：" << static_cast<UInt32>(_point[i]._x) << " , " << static_cast<UInt32>(_point[i]._y) << std::endl;
+                }
             } 
 
             void GoForTarget();
@@ -162,8 +167,11 @@ namespace Battle
             { 
                 if(!_count)
                     return true;
-                if(_x > FIELD_WIDTH || _y > FIELD_HIGH)
-                    return true;
+                for(UInt8 i = 0; i < _point.size(); ++i)
+                {
+                    if(_point[i]._x > FIELD_WIDTH || _point[i]._y > FIELD_HIGH)
+                        return true;
+                }
                 if(!_xAdd && !_yAdd)
                     return true;
                 return false;
@@ -171,25 +179,34 @@ namespace Battle
 
             UInt16 getDistance(UInt16 x, UInt16 y)  //获得飞行轨迹到目标的距离
             { 
-                int x1 =static_cast<int>(_x);
-                int y1 =static_cast<int>(_y);
-                int x2 =static_cast<int>(_x + _xAdd);
-                int y2 =static_cast<int>(_y + _yAdd);
-                int x3 =static_cast<int>(x);
-                int y3 =static_cast<int>(y);
-                int res = (abs((y1-y2)*x3+(x2-x1)*y3-y1*x2+x1*y2)/sqrt(((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2))));
+                UInt16 result = -1;
+                for(UInt8 i = 0; i<_point.size(); ++i) 
+                {
+                    UInt16 result_bak = 0;
+                    UInt16 _x = _point[i]._x;
+                    UInt16 _y = _point[i]._y;
+                    int x1 =static_cast<int>(_x);
+                    int y1 =static_cast<int>(_y);
+                    int x2 =static_cast<int>(_x + _xAdd);
+                    int y2 =static_cast<int>(_y + _yAdd);
+                    int x3 =static_cast<int>(x);
+                    int y3 =static_cast<int>(y);
+                    int res = (abs((y1-y2)*x3+(x2-x1)*y3-y1*x2+x1*y2)/sqrt(((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2))));
 
-                int res1 = sqrt((x1-x3)*(x1-x3) + (y1-y3)*(y1-y3));
-                int res2 = sqrt((x2-x3)*(x2-x3) + (y2-y3)*(y2-y3));
+                    int res1 = sqrt((x1-x3)*(x1-x3) + (y1-y3)*(y1-y3));
+                    int res2 = sqrt((x2-x3)*(x2-x3) + (y2-y3)*(y2-y3));
 
-                if(!CanBeCounted(x,y))
-                    return static_cast<UInt16>(MIN(res1,res2));
-                //return static_cast<UInt16>(MIN_3(res,res1,res2));
-
-                return static_cast<UInt16>(res);
+                    if(!CanBeCounted(x,y,_x,_y))
+                        result_bak =  static_cast<UInt16>(MIN(res1,res2));
+                    else
+                        result_bak = static_cast<UInt16>(res);
+                    if(result_bak < result)
+                        result = result_bak;
+                }
+                return result;
             } 
 
-            bool CanBeCounted(UInt16 x, UInt16 y)  //判断斜率是否相同
+            bool CanBeCounted(UInt16 x, UInt16 y,UInt16 _x, UInt16 _y)  //判断斜率是否相同
             { 
                 //return false;
                 int x1 =static_cast<int>(_x);
@@ -206,20 +223,15 @@ namespace Battle
                     return false;
 
                 return true;
-
-                //if(res == 0)
-                //{ 
-                //    if(x == _x || y == _y)
-                //        return false;
-                //    return true;
-                //} 
-                //return res < 0;
             }
 
-            void setObjectDirection(UInt16 x, UInt16 y, UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleFighter* bo = NULL)  //飞行系
+            void pushObjectPoint(UInt16 x,UInt16 y)
             { 
-                _x = x;
-                _y = y;
+                _point.push_back(PointOb(x,y));
+            } 
+
+            void setObjectDirection(UInt8 flagX,UInt8 flagY, UInt16 xAdd, UInt16 yAdd ,UInt16 rad, BattleFighter* bo = NULL)  //飞行系
+            { 
                 _xAdd = xAdd;
                 _yAdd = yAdd;
                 _flagX = flagX;
@@ -238,7 +250,7 @@ namespace Battle
                     --_count;
                     vec_struct.push_back(BattleActionStream(curtime, bo, param));
                 }
-                return ;
+                //return ;
             } 
             UInt8 BuildStream(Stream& st);
 
@@ -258,9 +270,9 @@ namespace Battle
             BattleFighter * _bo; //受击者
             UInt16 _time;
             float _time2;
+            
+            std::vector<struct PointOb> _point;
 
-            UInt16 _x ;
-            UInt16 _y ;
             UInt16 _xAdd;
             UInt16 _yAdd;
 
