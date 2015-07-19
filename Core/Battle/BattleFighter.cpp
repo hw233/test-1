@@ -45,13 +45,13 @@ namespace Battle
         //属性
         if( f->GetChildTypeId())
         {
+            UInt16 fighterId = f->GetChildTypeId();
             for(UInt8 i = 0; i < MYFIGHTERMAX ; ++i)
             {
-                UInt16 fighterId = f->GetChildTypeId();
-                GObject::Fighter * f = GObject::globalFighters[fighterId];
+                GObject::Fighter * fgt = GObject::globalFighters[fighterId];
                 if(!f)
                     break;
-                m_fighters[i] =  BattleSimulator::CreateFighter(f->GetTypeId(),_formula,f,0,0);
+                m_fighters[i] =  BattleSimulator::CreateFighter(fgt->GetTypeId(),_formula,fgt,0,0);
                 if( m_fighters[i])
                 {
                     m_fighters[i]->setMainFighter(this);
