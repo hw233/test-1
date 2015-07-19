@@ -113,7 +113,7 @@ CREATE TABLE `fighter_base` (
       `name` varchar(255) NOT NULL,
       `color` tinyint(3) NOT NULL DEFAULT '0',
       `typeId` tinyint(3) NOT NULL DEFAULT '0',
-      `childType` tinyint(3) NOT NULL DEFAULT '0',
+      `childType` int(10) NOT NULL DEFAULT '0',
       `speed`  int(10) NOT NULL DEFAULT '0',
       `bodySize`  int(10) NOT NULL DEFAULT '0',
       `skills`  varchar(255) NOT NULL,
