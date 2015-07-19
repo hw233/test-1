@@ -6,8 +6,12 @@
 namespace REQ
 {
     //聊天
+
     const UInt8 CHAT                 = 0x06;
     //强化
+
+    const UInt8 SIGN                 =0x10;
+
     const UInt8 ENCHART              = 0x20;// 0xF0
 
     /*背包信息*/
@@ -568,6 +572,8 @@ namespace REP
 {
     const UInt8 CHAT                = 0x06;
     //强化
+    const UInt8 SIGN                 =0x10;
+
     const UInt8 ENCHART             = 0x20;// 0xF0
 
     /*背包信息*/

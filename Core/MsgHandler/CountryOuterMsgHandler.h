@@ -617,4 +617,20 @@ void OnClanLeave(GameMsgHdr& hdr, const void * data)
     }   
 }
 
+void OnSign(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    UInt8 result = player->Sign(opt);
+
+    Stream st(REP::SIGN);
+    st << static_cast<UInt8>(opt);
+    st << result; 
+    st << Stream::eos;
+    player->send(st);
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_

@@ -630,6 +630,9 @@ namespace GObject
 
             UInt32 GetClanBattleKillCount() const { return clanBattleKillCount;}
             void AddClanBattleKillCount(UInt32 killCount) { clanBattleKillCount += killCount;}
+
+            UInt8 Sign(UInt8 opt);
+
     private:
             //IDTYPE _id;
             std::string _accounts;

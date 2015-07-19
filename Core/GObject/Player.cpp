@@ -784,4 +784,27 @@ namespace GObject
         }
         return NULL;
     }
+
+    UInt8 Player::Sign(UInt8 opt)
+    { 
+        UInt32 val = GetVar(VAR_SIGN_MONTH);
+        UInt8 day = TimeUtil::MonthDay();
+        if(!day)
+            return 0;
+        if(val & (1 << (day-1)))
+            return 0;
+        val |= (1 << (day-1));
+        SetVar(VAR_SIGN_MONTH,val);
+           
+        UInt8 res = 0;
+        while(val)
+        { 
+            if(val%2)
+            {
+                ++res;
+            }
+            val /= 2;
+        } 
+        return res;
+    } 
 }
