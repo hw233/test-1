@@ -95,6 +95,8 @@ namespace GData
             UInt16 trerapy;  //基础治疗
             float trerapyP;  //治疗百分比
 
+
+            UInt8 avoidhurt ;
             // UInt16 defend;   //附加防御增加
             // float defendP;   //附加防御百分比增加
     };
@@ -140,7 +142,7 @@ namespace GData
             const SkillCondition * GetSkillCondition() const {return skillConditionManager[_conditionId];} 
             const SkillScope * GetSkillScope() const {return skillScopeManager[_scopeId];}
             const SkillEffect * GetSkillEffect() const {return skillEffectManager[_effectId];}
-            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, UInt16 cd,UInt16 actionBeforeCd, UInt16 actionCd, UInt16 actionBackCd, UInt16 mpCost)
+            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, UInt16 cd,UInt16 actionBeforeCd, UInt16 actionCd, UInt16 actionBackCd, UInt16 mpCost, UInt8 superSkill, UInt8 attackCount)
             { 
                 _conditionId = conditionId;
                 _scopeId = scopeId;
@@ -150,6 +152,8 @@ namespace GData
                 _actionCd = actionCd;
                 _actionBackCd = actionBackCd;
                 _mpCost = mpCost;
+                _superSkill = superSkill;
+                _attackCount = attackCount;
             } 
 #endif
             UInt16 GetCd() const {return _cd;}  //技能冷却时间
@@ -158,6 +162,8 @@ namespace GData
             UInt16 GetActionCd2() const { return _actionCd;}
             UInt16 GetActionBackCd() const { return _actionBackCd;}
             UInt16 GetMpCost() const { return _mpCost;}
+            UInt8 GetSuperSkill()const { return _superSkill;}
+            UInt8 GetAttackCount()const { return _attackCount;}
         private:
 #ifdef SkillT
             SkillCondition * _sc;
@@ -174,6 +180,8 @@ namespace GData
             UInt16 _actionCd;         //技能动作开始时间
             UInt16 _actionBackCd;     //技能后置
             UInt16 _mpCost;
+            UInt8 _superSkill;
+            UInt8 _attackCount;
     };
 
     typedef ObjectMapT<Skill, UInt16> SkillManager;   

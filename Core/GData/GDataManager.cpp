@@ -215,7 +215,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillEffect dbskeffect;
-        if(execu->Prepare("SELECT `id`,`name`,`skillType`,buffId,`damage`,`damageP`,`trerapy`,`trerapyP` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`skillType`,buffId,`damage`,`damageP`,`trerapy`,`trerapyP`,`avoidhurt` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -228,6 +228,7 @@ namespace GData
             se->damageP = dbskeffect.damageP;
             se->trerapy = dbskeffect.trerapy;
             se->trerapyP = dbskeffect.trerapyP;
+            se->avoidhurt = dbskeffect.avoidhurt;
 
             skillEffectManager.add(se);
         }    
@@ -277,13 +278,13 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkill dbskill;
-        if(execu->Prepare("SELECT `id`,`name`,`skillCondId`,`skillScopeId`,`skillEffectId`,`cd`,`actionBeforeCd`,`actionCostCd`,`actionBackCd`,`mpCost` FROM `skill`", dbskill) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`skillCondId`,`skillScopeId`,`skillEffectId`,`cd`,`actionBeforeCd`,`actionCostCd`,`actionBackCd`,`mpCost`,`superSkill`,`attackCount` FROM `skill`", dbskill) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
             //skill[dbskill].LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId);
             Skill* se = new Skill(dbskill.id, dbskill.name);
-            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd*100, dbskill.actionBeforeCd*100, dbskill.actionCd*100, dbskill.actionBackCd * 100, dbskill.mpCost);
+            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd*100, dbskill.actionBeforeCd*100, dbskill.actionCd*100, dbskill.actionBackCd * 100, dbskill.mpCost, dbskill.superSkill, dbskill.attackCount);
 
             skillManager.add(se);
         }

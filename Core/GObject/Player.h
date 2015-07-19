@@ -655,6 +655,9 @@ namespace GObject
             void GiveEndConstantlyKillAward();
 
             void GiveConstantlyKillAward();
+
+            UInt8 Sign(UInt8 opt);
+
     private:
             //IDTYPE _id;
             std::string _accounts;

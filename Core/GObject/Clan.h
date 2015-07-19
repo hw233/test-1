@@ -79,6 +79,8 @@ namespace GObject
             bool CheckApplicant(Player *pl);
 
             void DelClanMember(Player* opter ,Player* bo);
+
+            void OnClanLeave(Player* pl);
         private:
             std::vector<Player* > _players;
             std::vector<Player* > _applicant;

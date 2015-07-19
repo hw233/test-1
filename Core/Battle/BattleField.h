@@ -101,6 +101,16 @@ namespace Battle
 
             std::vector<BattleFighter*> GetBattlePre(UInt16& time);    //BATTLE1
 
+            void SetSuperSkill(bool super)
+            {
+                _super = super;
+                if(super)
+                    std::cout << "@@@@@@@@@场地大招开始" << std::endl;
+                else
+                    std::cout << "@@@@@@@@@场地大招结束" << std::endl;
+
+            }
+            bool GetSuperSkill(){return _super;}
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -119,6 +129,7 @@ namespace Battle
             void FieldPrint();
 
             void BattleActionPrintf(UInt8 index);
+
         protected:
 
             //BattleObject * _objs[FIELD_WIDTH][FIELD_HIGH];     //战场成员  [x][y] x 表示横坐标 y 表示纵坐标
@@ -145,7 +156,10 @@ namespace Battle
 
             */
             std::map<UInt16,std::vector<BattleFighter*> > BattlePre;
+
+            bool _super;
     };
+
 
 }
 

@@ -80,6 +80,8 @@ namespace GData
 
         UInt16 trerapy;
         float trerapyP;
+
+        UInt8 avoidhurt;
     };
 
     struct DBFighterBase  
@@ -88,7 +90,7 @@ namespace GData
         std::string name;
         UInt8 color;
         UInt8 typeId;
-        UInt8 childType;
+        UInt16 childType;
         UInt16 speed;
         UInt16 bodySize;
         std::string skills;
@@ -135,6 +137,8 @@ namespace GData
         float actionCd;
         float actionBackCd;
         UInt16 mpCost;
+        UInt8 superSkill;
+        UInt8 attackCount;
     };
 
     struct DBMap  
@@ -253,7 +257,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkillEffect)
-        SPECIALDEF(8)
+        SPECIALDEF(9)
         (
          UInt16, id,
          std::string, name,
@@ -265,7 +269,9 @@ namespace DB
          float, damageP,
 
          UInt16, trerapy,
-         float, trerapyP
+         float, trerapyP,
+
+         UInt8, avoidhurt
         )
         SPECIALEND()
 
@@ -276,7 +282,7 @@ namespace DB
          std::string, name,
          UInt8, color,
          UInt8, typeId,
-         UInt8, childType,
+         UInt16, childType,
          UInt16, speed,
          UInt16, bodySize,
          std::string, skills,
@@ -303,7 +309,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkill)
-        SPECIALDEF(10)
+        SPECIALDEF(12)
         (
          UInt32, id,
          std::string , name,
@@ -314,7 +320,9 @@ namespace DB
          float, actionBeforeCd,
          float, actionCd,
          float, actionBackCd,
-         UInt16, mpCost
+         UInt16, mpCost,
+         UInt8, superSkill,
+         UInt8, attackCount
         )
         SPECIALEND()
 

@@ -7,13 +7,14 @@
 #include <math.h>
 
 #define SUB(x,y) (x>y)?(x-y):(y-x)
-#define Min(x,y) (x>y)?(y):(x)
+#define Min(x,y) (x)>(y)?(y):(x)
 namespace Battle
 {
 
     BattleField::BattleField(UInt8 mapId1, UInt8 mapId2, UInt16 fieldDistance, UInt16 timeActionLimit):_mapId1(mapId1),_mapId2(mapId2),_fieldDistance(fieldDistance),_timeActionLimit(timeActionLimit)
     {
         //memset(_objs, 0, sizeof(_objs));
+        _super = false;
     }
 
     BattleField::~BattleField()

@@ -225,36 +225,36 @@ void OnFriendAddReq( GameMsgHdr& hdr,FriendAddReq& far)
 }
 
 /*
-struct FriendListReq
-{
-    UInt8 type;
-    UInt8 index;
-    MESSAGE_DEF2(REQ::FRIEND_LIST,UInt8,type,UInt8,index);
-};
+   struct FriendListReq
+   {
+   UInt8 type;
+   UInt8 index;
+   MESSAGE_DEF2(REQ::FRIEND_LIST,UInt8,type,UInt8,index);
+   };
 
-void OnFriendListReq(GameMsgHdr& hdr,FriendListReq& flr)
-{
-    MSG_QUERY_CONN_PLAYER(conn,player);
-    player->GetFriendManager()->SendFriendList(flr.type,flr.index);
-}
+   void OnFriendListReq(GameMsgHdr& hdr,FriendListReq& flr)
+   {
+   MSG_QUERY_CONN_PLAYER(conn,player);
+   player->GetFriendManager()->SendFriendList(flr.type,flr.index);
+   }
 
-void OnFriendListReq(GameMsgHdr& hdr,const void* data)
-{
-    MSG_QUERY_CONN_PLAYER(conn,player);
-    player->GetFriendManager()->SendFriendList();
-}
-struct FriendBaseInfoReq
-{
-    MESSAGE_DEF(REQ::FRIEND_BASEINFO);
-};
+   void OnFriendListReq(GameMsgHdr& hdr,const void* data)
+   {
+   MSG_QUERY_CONN_PLAYER(conn,player);
+   player->GetFriendManager()->SendFriendList();
+   }
+   struct FriendBaseInfoReq
+   {
+   MESSAGE_DEF(REQ::FRIEND_BASEINFO);
+   };
 
 
-void OnFriendBaseInfoReq( GameMsgHdr& hdr,FriendBaseInfoReq& fbr)
-{
-    MSG_QUERY_CONN_PLAYER(conn,player);
-    player->GetFriendManager()->SendFriendBaseInfo();
-}
-*/
+   void OnFriendBaseInfoReq( GameMsgHdr& hdr,FriendBaseInfoReq& fbr)
+   {
+   MSG_QUERY_CONN_PLAYER(conn,player);
+   player->GetFriendManager()->SendFriendBaseInfo();
+   }
+   */
 
 
 void OnChat(GameMsgHdr& hdr, const void * data)
@@ -604,4 +604,33 @@ void OnFindUp(GameMsgHdr& hdr, const void * data)
     st << Stream::eos;
     player->send(st);
 }
+void OnClanLeave(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    if(player->GetClan())
+    {
+        player->GetClan()->OnClanLeave(player) ;
+        Stream st(REP::CLAN_LIST);
+        player->SendClanListinfo(st);
+        st << Stream::eos;
+        player->send(st);
+    }   
+}
+
+void OnSign(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+
+    UInt8 result = player->Sign(opt);
+
+    Stream st(REP::SIGN);
+    st << static_cast<UInt8>(opt);
+    st << result; 
+    st << Stream::eos;
+    player->send(st);
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_

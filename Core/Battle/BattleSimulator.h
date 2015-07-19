@@ -58,6 +58,7 @@ namespace Battle
             UInt16 GetTime(){return _time;}
 
             bool GetStop();
+
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];

@@ -10,15 +10,18 @@ namespace Battle
                 _target = GetField()->GetTargetForRide(!GetSideInBS(), getPosX(),getPosY(), 2);
             else
             {
-                std::cout << "战将编号"  << static_cast<UInt32>(_target->GetBSNumber()) << "死亡。 ";
+                if(_target)
+                    std::cout << "战将编号"  << static_cast<UInt32>(_target->GetBSNumber()) << "死亡。 ";
                 _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
-                std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
+                if(_target)
+                    std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
             }
             SetMove(true);
             ++_count;
             BuildLocalStream(e_run);
         }
-        SetBattleTargetPos(_target->getPosX(),_target->getPosY());
+        if(_target)
+            SetBattleTargetPos(_target->getPosX(),_target->getPosY());
         return true;
     } 
 
@@ -94,7 +97,8 @@ namespace Battle
 
     UInt16 BattleWalkFighter::GetSpeed()
     { 
-        if(_count < 2 && _fighter == NULL && _target && _target->GetTypeId() == 1)
+        PreGetObject();
+        if(_count < 2 && _isChild && _target && _target->GetTypeId() == 1)
         {
             if((GetSideInBS() == 0 && GetHighSpeed()) || (GetSideInBS() == 1 && !GetHighSpeed()))             
                 return 75;//return GetBaseSpeed()*4/10;

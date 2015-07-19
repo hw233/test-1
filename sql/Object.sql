@@ -220,3 +220,9 @@ CREATE TABLE `clan_battle_citystatus` (
     PRIMARY KEY (`roomId`,`cityId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `account_pwd` (
+      `accounts` varchar(255) NOT NULL DEFAULT '',
+      `password` varchar(255) NOT NULL DEFAULT '',
+      PRIMARY KEY (`accounts`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+

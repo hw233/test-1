@@ -30,7 +30,7 @@ namespace Battle
 //            virtual UInt16 GetSpeed() {return 37;} 
             virtual UInt8 BeForAction();
 
-            virtual bool IsStoped() {return count > 2;}
+            virtual bool IsStoped() {return count > 2 || getHP() == 0;}
         private:
             //BattleFighter * _target ; 
             UInt8 count; //控制来回次数

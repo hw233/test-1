@@ -10,6 +10,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG(GameMsgHdr, OnPlayerInfoReq);
     
+    MSG_REG_2(GameMsgHdr, REQ::SIGN, OnSign);
+
     MSG_REG_2(GameMsgHdr, REQ::ENCHART, OnEnchantReq);
 
     MSG_REG_2(GameMsgHdr, REQ::PACKAGE_INFO, OnPackageInfo);
@@ -60,6 +62,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG_2(GameMsgHdr, REQ::CLAN_OPTION, OnClanOption);
 
     //MSG_REG_2(GameMsgHdr, REQ::CLAN_APPLY, OnClanApply);
+    MSG_REG_2(GameMsgHdr, REQ::CLAN_LEAVE, OnClanLeave);
 
     MSG_REG_2(GameMsgHdr, REQ::GMHAND, OnGMHandler);
 
