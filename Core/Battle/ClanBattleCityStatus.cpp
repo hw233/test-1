@@ -27,8 +27,8 @@ namespace Battle
         UInt8 min = tt->tm_min;
 
 
-        //UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
-        UInt32 sday =buildTime+((24-hour)*60-min)*60+3600*15;   //第二天11点的时间的戳
+        UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
+        //UInt32 sday =buildTime+((24-hour)*60-min)*60+3600*10+1200*2;   //第二天11点的时间的戳
         UInt8 newStage = 0;
         if( t > buildTime && t <= sday )
         {

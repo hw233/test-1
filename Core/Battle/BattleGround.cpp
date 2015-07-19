@@ -331,18 +331,17 @@ namespace Battle
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
             
-            _pack << win << reportId;
 
-
-#if 1
+#if 0
             if( win == 255 )
             {
                 //两边对死
                 currentBf->setHP(0);
                 (target.bo)->setHP(0);
-                win = 2;
+                win = 3;
             }
 #endif
+            _pack << win << reportId;
 
             //cout
             TestCoutBattleS(target.bo);

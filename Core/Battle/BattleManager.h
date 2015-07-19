@@ -75,11 +75,13 @@ namespace Battle
             UInt8 GetStage();
             UInt32 GetRoomId() const { return roomId;}
             void CollectCaptureInfo(std::map<UInt8,UInt8>& force2captureCityNum);  //战役结束时  统计各个势力的占领城市的情况
+            void GetWinForce(std::vector<UInt8> &vecWinForce, std::vector<UInt8> &vecFailForce);
             void GivePlayerKillRankAward();         //击杀敌军排行奖励
             void GivePlayerKillFighterRankAward();  //击杀敌将排行奖励
             void GivePlayerEndConstantlyKillAward(); //终结连杀奖励
             void GivePlayerConstantlyKillAward();   //连杀奖励
             void GiveCaptureCityAward();            //占领城市多少的奖励
+            void GiveClanBattleAward();            //公会战奖励
             void Settlement();
         private:
             UInt32 roomId;

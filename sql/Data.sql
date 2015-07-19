@@ -216,7 +216,7 @@ CREATE TABLE `item_template2` (
       `id` int(11) NOT NULL,
       `name` varchar(255) NOT NULL,
       `subClass` tinyint(3) unsigned NOT NULL COMMENT '物品类型',
-      `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
+      `maxQuantity` int(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
       `coin` int(10) NOT NULL COMMENT '交易价格上限',
       PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

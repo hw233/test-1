@@ -188,7 +188,7 @@ namespace GObject
     void Player::Login()
     { 
         //TODO
-        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,"1,1",0,static_cast<UInt32>(-1));
+        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,"20001,20",0,static_cast<UInt32>(-1));
         if(mail)
         { 
             globalMails.add(mail->GetId(), mail);
@@ -709,7 +709,7 @@ namespace GObject
             if( pos < 2 )
             {
                 SetJoinClanBattle(1);
-                DB7().PushUpdateData( "update clan_player set `isClanBattle`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId()); 
+                DB7().PushUpdateData( "update clan_player set `isClanBattle` = %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId()); 
                 Battle::clanBattleRoomManager.EnterRoom(this);
                 return 0;
             }
@@ -726,7 +726,7 @@ namespace GObject
                 return 3;
             }
             SetJoinClanBattle(1);
-            DB7().PushUpdateData( "update clan_player set `isClanBattle`= %u where (clanId = %u and playerId = %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId());
+            DB7().PushUpdateData( "update clan_player set `isClanBattle` = %u where (clanId = %u and  playerId  =  %"I64_FMT"u)",static_cast<UInt8>(1),clan->GetId(),GetId());
             return 0;
         }
     }
@@ -822,49 +822,60 @@ namespace GObject
 
     void Player::GiveEndConstantlyKillAward()
     {
+        UInt32 totalEndKillNum = 0;
         for( auto it = vecEndConstantlyKill.begin(); it != vecEndConstantlyKill.end(); ++it)
         {
             UInt32 endKillNum = (*it).endKillNum;
             if( endKillNum == 0 )
                 continue;
-            std::cout<<" 发终结连杀奖励"<<std::endl;
-            //发奖励(走邮件)
-            char buff[255];
-            UInt16 offset = 0;
-            offset = sprintf(buff,"%u,%u",20001,endKillNum);
-            buff[offset]='\0';
-            Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
-            if(mail)
-            { 
-                globalMails.add(mail->GetId(), mail);
-                AddMail(mail->GetId());
-            }
+            totalEndKillNum += endKillNum;
+        }
+        if( totalEndKillNum == 0 )
+            return;
+        //发奖励(走邮件)
+        char buff[255];
+        UInt16 offset = 0;
+        offset = sprintf(buff,"%u,%u",20001,totalEndKillNum);
+        std::cout<<"发给"<<GetName()<<" 终结连杀奖励 20001 " <<static_cast<UInt32>(totalEndKillNum)<<"个 "<<std::endl;
+        buff[offset]='\0';
+        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
+        if(mail)
+        { 
+            globalMails.add(mail->GetId(), mail);
+            AddMail(mail->GetId());
         }
     }
 
     void Player::GiveConstantlyKillAward()
     {
+        UInt32 totalKillNum = 0 ;
        
         for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it)
         {
             UInt32 killNum = (*it).killNum;
             if( killNum == 0 )
                 continue;
-            std::cout<<" 发连杀奖励"<<std::endl;
+
+            //把所有连杀的奖励放在一个邮件
             for( UInt32 i = 1 ; i <= killNum ; ++i )
             {
-                //发奖励(走邮件)
-                char buff[255];
-                UInt16 offset = 0;
-                offset = sprintf(buff,"%u,%u",20001,killNum);
-                buff[offset]='\0';
-                Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
-                if(mail)
-                { 
-                    globalMails.add(mail->GetId(), mail);
-                    AddMail(mail->GetId());
-                }
+                totalKillNum += i;
             }
+        }
+
+        if( totalKillNum == 0 )
+            return;
+        //发奖励(走邮件)
+        char buff[255];
+        UInt16 offset = 0;
+        offset = sprintf(buff,"%u,%u",20001,totalKillNum);
+        std::cout<<"发给 "<<GetName()<<" 连杀奖励 20001 "<< static_cast<UInt32>(totalKillNum)<<"个  "<<std::endl;
+        buff[offset]='\0';
+        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
+        if(mail)
+        { 
+            globalMails.add(mail->GetId(), mail);
+            AddMail(mail->GetId());
         }
     }
 }

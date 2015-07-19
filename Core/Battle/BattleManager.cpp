@@ -300,6 +300,73 @@ namespace Battle
         }
     }
 
+    void RoomBattle::GetWinForce(std::vector<UInt8> &vecWinForce, std::vector<UInt8> &vecFailForce)
+    {
+        std::map<UInt8,UInt8> force2captureCityNum;
+        CollectCaptureInfo(force2captureCityNum);
+        UInt8 max = 0;
+
+        //先找到最大的占城个数
+        for( auto it = force2captureCityNum.begin(); it != force2captureCityNum.end(); ++it )
+        {
+            std::cout<<static_cast<UInt32>(it->first)<<endl;
+            if( it->second > max )
+            {
+                max = it->second;
+            }
+        }
+
+        for( auto it = force2captureCityNum.begin(); it != force2captureCityNum.end(); ++it )
+        {
+            if( it->second == max )
+            {
+                vecWinForce.push_back(it->first);
+            }
+            else
+            {
+                vecFailForce.push_back(it->first);
+            }
+        }
+
+
+    }
+
+
+    void RoomBattle::GiveClanBattleAward()
+    {
+        //发公会战结果奖励
+        std::vector<UInt8> vecWinForce;
+        std::vector<UInt8> vecFailForce;
+
+        GetWinForce(vecWinForce,vecFailForce);
+        //胜者发奖励
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL)
+            return;
+        std::map<UInt8,UInt8> force2captureCityNum;
+        for( auto it = vecWinForce.begin(); it != vecWinForce.end(); ++it )
+        {
+            UInt32 forceId = (*it);
+            std::vector<UInt32> vecClans = room->GetAllyClans(forceId);
+            if( vecClans.empty() )
+                continue;
+            for( auto iter = vecClans.begin(); iter != vecClans.end(); ++iter)
+            {
+                UInt32 clanId = (*iter);
+                GObject::Clan* clan = GObject::globalClan[clanId];
+                if( clan == NULL )
+                {
+                    continue;
+                }
+                clan->SetClanFame(clan->GetClanFame()+100);
+                DB1().PushUpdateData(" update `clan` set 'clanFame'=%u WHERE `clanId` = %u",clan->GetClanFame(), clan->GetId());
+            }
+
+        }
+
+
+    }
+
     void RoomBattle::Settlement()
     {
         GivePlayerEndConstantlyKillAward();
@@ -307,6 +374,7 @@ namespace Battle
         GivePlayerKillRankAward();
         GivePlayerKillFighterRankAward();
         GiveCaptureCityAward();
+        GiveClanBattleAward();
     }
 
 

@@ -106,8 +106,14 @@ namespace GObject
 
     ItemBase * Package::AddItem(UInt32 typeId, UInt32 num, bool bind , bool silence , UInt16 fromWhere )
     { 
+        if( num == 0 )
+            return NULL;
+        if( typeId >= 20001 &&  typeId <= 20002 )
+        {
+            m_Owner->AddMoney(typeId-20000,num);
+            return NULL;
+        }
         ItemBase* item = m_Items[ItemKey(typeId, bind)];
-        UInt8 flag = 0;
         if(!item)
         {
             const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
@@ -118,18 +124,9 @@ namespace GObject
             m_Items[ItemKey(typeId, bind)] = item;
         }
 
-        auto it = m_Items.find(ItemKey(typeId, bind));
-        if(item->Count())
-            flag = 1;
+        //auto it = m_Items.find(ItemKey(typeId, bind));
         item->IncItem(num);
-        if(!flag)
-        {
-          DB7().PushUpdateData( "update item set `count`= %u where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",(it->second)->Count()+num,typeId,m_Owner->getId());
-        }
-        else
-        {
-            DB7().PushUpdateData("insert into item(itemId,playerId,count) value(%u, %" I64_FMT "u, %u )", typeId, m_Owner->getId(),num);
-        }
+        DB7().PushUpdateData("  REPLACE INTO `item`(`itemId`,`playerId`,`count`) values(%u, %"I64_FMT"u, %u) ",typeId,m_Owner->GetId(),item->Count());
         return item;
     } 
 

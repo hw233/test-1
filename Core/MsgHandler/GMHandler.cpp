@@ -134,7 +134,7 @@ bool GMHandler::Handle( const std::string& txt, GObject::Player * player, bool i
 }
 void GMHandler::OnSendMail( GObject::Player * player, std::vector<std::string>& args )
 { 
-    GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),player,1,"1,1",0,static_cast<UInt32>(-1));
+    GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),player,1,"20001,20",0,static_cast<UInt32>(-1));
     if(mail)
     { 
         globalMails.add(mail->GetId(), mail);
