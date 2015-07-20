@@ -69,7 +69,7 @@ namespace Battle
     
 
     //放将
-    //特殊说明一下这个tag  在放将初期需要检查阵营和位置是否一致   但在打的阶段开打以后就不需要这个检测了
+    //特殊说明一下这个tag  在放将初期需要检查阵营和位置是否一致(tag == 0 )    但在打的阶段开打以后就不需要这个检测了( tag == 1 )
     bool BattleDistribute::PutFighter(UInt8 mapId,GObject::Player* player,UInt16 fighterId, UInt8 x, UInt8 y,bool flag,UInt8 tag)
     {
         bool status = Check(player);
@@ -138,9 +138,11 @@ namespace Battle
               {
                     //更新数据
                     DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
-                    //info->SetSoldierNum(INIT_SOLDIER_NUM);
-                    info->SetMainFighterHP(1000);
-                    info->SetSoldiersHP();
+                    if( flag == true && tag == 0 )
+                    {
+                      info->SetMainFighterHP(1000);
+                      info->SetSoldiersHP();
+                    }
                     if( info == NULL )
                         return false;
                     std::vector<DistributeInfo*> vecDistributeInfo;
@@ -163,8 +165,11 @@ namespace Battle
                     else
                     {
                         DistributeInfo* info = new DistributeInfo(player->GetId(),fighterId,x,y);
-                        info->SetMainFighterHP(1000);
-                        info->SetSoldiersHP();
+                        if( flag == true && tag == 0 )
+                        {
+                            info->SetMainFighterHP(1000);
+                            info->SetSoldiersHP();
+                        }
                         //info->SetSoldierNum(INIT_SOLDIER_NUM);
                         vecInfo.push_back(info);
                         for( auto it = vecMapDistributeInfo.begin() ; it != vecMapDistributeInfo.end() ; ++it )

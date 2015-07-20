@@ -491,7 +491,7 @@ namespace Battle
 
         if(!bf || !bf->GetField() || !bf->getHP())
             return 0;
-        if(_distance > bf->GetDistance())
+        if(_distance > bf->GetAttackRange())
             return 0;
 
         bf->CheckBuff();

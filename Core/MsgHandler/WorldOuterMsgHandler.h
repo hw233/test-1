@@ -172,21 +172,44 @@ void OnClanBattleAddFighter(GameMsgHdr& hdr, const void * data)
     brd >> fighterId;
     brd >> posx;
     brd >> posy;
-    bool res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
-    if( res == false )
+    
+    GObject::Clan* clan = player->GetClan();
+    if( clan == NULL )
+        return;
+    UInt32 roomId = clan->GetClanBattleRoomId();
+    Battle::DistributeInfo* info = Battle::battleDistribute.GetDistributeInfo(roomId, mapId, posx, posy);
+    if( info == NULL )
     {
-       Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
-       st << static_cast<UInt8>(res);
-       st<<static_cast<UInt8>(mapId);
-       st<<static_cast<UInt16>(fighterId);
-       st<<static_cast<UInt8>(posx);
-       st<<static_cast<UInt8>(posy);
-       st<<Stream::eos;
-       player->send(st);
+        bool res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
+        if( res == false )
+        {
+            Stream st(REP::CLAN_BATTLE_ADDFIGHTER);
+            st << static_cast<UInt8>(res);
+            st<<static_cast<UInt8>(mapId);
+            st<<static_cast<UInt16>(fighterId);
+            st<<static_cast<UInt8>(posx);
+            st<<static_cast<UInt8>(posy);
+            st<<Stream::eos;
+            player->send(st);
+        }
+        else
+        {
+            Battle::battleDistribute.NoticeAlliesAddFighter(player,fighterId);
+        }
     }
-    else
+    else  //相当于换将
     {
-        Battle::battleDistribute.NoticeAlliesAddFighter(player,fighterId);
+        /*
+        bool result = true;
+        bool res = true;
+        bool res =  Battle::battleDistribute.RemoveFighter(mapId,player,info->GetFighterId(),Info->GetPosX(),Info->GetPosY());
+        bool res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
+        if( res == false )
+        {
+            result = false;
+        }
+        */
+       
     }
 }
 

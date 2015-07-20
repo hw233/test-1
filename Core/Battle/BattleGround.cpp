@@ -283,7 +283,7 @@ namespace Battle
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>( currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100);
             _pack << static_cast<UInt8>(0); //无战斗发生
             _oneRoundCostTime += dis*0.5/*currentBf->GetNowTime()/100*/;
              
@@ -320,7 +320,7 @@ namespace Battle
             //UInt8 rand = uRand(255);
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(ax) << static_cast<UInt8>(ay);
-            _pack << static_cast<UInt8>( currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100);
             _pack << static_cast<UInt8>(1);
 
 
@@ -348,7 +348,7 @@ namespace Battle
             std::cout << std::endl;
 
 
-            _oneRoundCostTime += currentBf->GetNowTime()/100;
+            _oneRoundCostTime += currentBf->GetNowTime()/100+1;
             //增加击杀人数
             currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
             (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
@@ -739,8 +739,12 @@ namespace Battle
             begin++;
             for( auto it = begin; it != path.end();++it )
             {
-                    Ascoord p = *it;
-                    cost+=GetRideSub(p.x,p.y);
+                Ascoord p = *it;
+                cost+=GetRideSub(p.x,p.y);
+                if( IsNearbyHaveEnemy(p))
+                {
+                    cost+=1;
+                }
             }
         }
         if( cost > currentBf->GetMovePower())
@@ -752,6 +756,24 @@ namespace Battle
             UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
             _vecTarget.push_back(TargetInfo(static_cast<BattleFighter*>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
         }
+    }
+
+
+    bool BattleGround::IsNearbyHaveEnemy(Ascoord& p)
+    {
+        std::vector<Ascoord> vecAscoord;
+        GetAround(p,vecAscoord);
+        CheckUp(vecAscoord);
+        for( auto it = vecAscoord.begin(); it != vecAscoord.end(); ++it )
+        {
+           UInt8 x = (*it).x;  
+           UInt8 y = (*it).y;
+           if( _mapGround[x+y*_x] != 0  && _mapFighters[x+y*_x] != NULL && _mapFighters[x+y*_x] != currentBf  && _mapFighters[x+y*_x]->GetSide() != currentBf->GetSide() && _mapFighters[x+y*_x]->getHP() > 0)
+           {
+               return true;
+           }
+        }
+        return false;
     }
 
     //按照这个路径走一下  获得总的一个行动力消耗 走到可攻击点就行了
@@ -782,6 +804,11 @@ namespace Battle
                     ++it;
                     Ascoord p = *it;
                     cost+=GetRideSub(p.x,p.y);
+                    //周围有敌人消耗行动力加一
+                    if( IsNearbyHaveEnemy(p))
+                    {
+                        cost+=1;
+                    }
                 }
 
             }
@@ -790,7 +817,7 @@ namespace Battle
         UInt8 movePower = currentBf->GetMovePower();
         if( cost > movePower )
         {
-            if(IsInAround(attack,target) && (cost-movePower) <= (ride-1) )    //如果攻击点在目标点的附近
+            if(IsInAround(attack,target) && (cost-movePower) <=  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
             {
                 UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
                 _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
