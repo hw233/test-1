@@ -199,17 +199,31 @@ void OnClanBattleAddFighter(GameMsgHdr& hdr, const void * data)
     }
     else  //相当于换将
     {
-        /*
-        bool result = true;
-        bool res = true;
-        bool res =  Battle::battleDistribute.RemoveFighter(mapId,player,info->GetFighterId(),Info->GetPosX(),Info->GetPosY());
-        bool res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
-        if( res == false )
+        UInt16 fighterId = info->GetFighterId();
+        GObject::ClanBattleFighter* fighterInfo = player->GetClanBattleFighter(fighterId);
+        if( fighterInfo == NULL )
         {
-            result = false;
+            return;
         }
-        */
-       
+        else
+        {
+            /*
+            bool  res =  Battle::battleDistribute.RemoveFighter(mapId,player,info->GetFighterId(),Info->GetPosX(),Info->GetPosY());
+            if( res == false )
+            {
+            }
+            else
+            {
+            }
+            bool  res = Battle::battleDistribute.PutFighter(mapId,player,fighterId,posx,posy,1);
+            if( res == false )
+            {
+            }
+            else
+            {
+            }
+            */
+        }
     }
 }
 

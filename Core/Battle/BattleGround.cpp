@@ -333,12 +333,12 @@ namespace Battle
             
 
 #if 0
-            if( win == 255 )
+            if( win == 1 || win == 0 )
             {
                 //两边对死
-                currentBf->setHP(0);
-                (target.bo)->setHP(0);
-                win = 3;
+                currentBf->setHP(100);
+                (target.bo)->setHP(100);
+                win = 2 ;
             }
 #endif
             _pack << win << reportId;
@@ -1048,7 +1048,6 @@ namespace Battle
         {
             (*it)->send(st);
         }
-
     }
 
     //检测某一阵营是不是已经死光了
