@@ -177,7 +177,7 @@ namespace Battle
 
             void SetBattleTargetPos(UInt16 x,UInt16 y){ _battleTargetX = x; _battleTargetY = y;}
 
-            virtual UInt8 GetBSNumber() { return _number + GetSideInBS()*GetField()->GetFirstSize();}
+            virtual UInt8 GetBSNumber() { return _number + GetSideInBS()* (MYFIGHTERMAX +1);}//GetField()->GetFirstSize();}
 
             void SetNowTime(UInt16 time ){ /*if(_nowTime != time ) SetGone(false);*/ _nowTime = time;}
             UInt16  GetNowTime() { return _nowTime;}
