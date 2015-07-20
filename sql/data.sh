@@ -13,7 +13,7 @@ function update_data()
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillCondition; source skillCondition;";
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillScope; source skillScope;";
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skillEffect; source skillEffect;";
-#   mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from fighter_base; source fighter_base;";
+   mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from fighter_base; source fighter_base;";
    #mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from fighter_base_skill; source fighter_base_skill;";
    mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from skill; source skill;";
   # mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map; source map;";
