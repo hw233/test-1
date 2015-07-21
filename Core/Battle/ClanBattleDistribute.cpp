@@ -113,8 +113,9 @@ namespace Battle
                 return false;
             }
         }
-
         //下面判断该点上是不是有人
+        //
+        DistributeInfo* pInfo = NULL;
         std::vector<MapDistributeInfo*> vecMapDistributeInfo = _room2Distribute[roomId];
         if( vecMapDistributeInfo.empty() )
         {
@@ -130,6 +131,7 @@ namespace Battle
             mapdistribute->SetDistributeInfo(vecDistributeInfo);
             vecMapDistributeInfo.push_back(mapdistribute);
             _room2Distribute[roomId] = vecMapDistributeInfo;
+            pInfo = info;
         }
         else
         {
@@ -138,11 +140,6 @@ namespace Battle
               {
                     //更新数据
                     DistributeInfo* info = new(std::nothrow) DistributeInfo(player->GetId(),fighterId,x,y);
-                    if( flag == true && tag == 0 )
-                    {
-                      info->SetMainFighterHP(1000);
-                      info->SetSoldiersHP();
-                    }
                     if( info == NULL )
                         return false;
                     std::vector<DistributeInfo*> vecDistributeInfo;
@@ -153,6 +150,7 @@ namespace Battle
                     mapdistribute->SetDistributeInfo(vecDistributeInfo);
                     vecMapDistributeInfo.push_back(mapdistribute);
                     _room2Distribute[roomId] = vecMapDistributeInfo;
+                    pInfo = info;
               }
               else
               {
@@ -165,11 +163,6 @@ namespace Battle
                     else
                     {
                         DistributeInfo* info = new DistributeInfo(player->GetId(),fighterId,x,y);
-                        if( flag == true && tag == 0 )
-                        {
-                            info->SetMainFighterHP(1000);
-                            info->SetSoldiersHP();
-                        }
                         //info->SetSoldierNum(INIT_SOLDIER_NUM);
                         vecInfo.push_back(info);
                         for( auto it = vecMapDistributeInfo.begin() ; it != vecMapDistributeInfo.end() ; ++it )
@@ -180,6 +173,7 @@ namespace Battle
                             }
                         }
                         _room2Distribute[roomId] = vecMapDistributeInfo;
+                        pInfo = info;
                     }
                 }
         }
@@ -188,6 +182,12 @@ namespace Battle
         if( flag )
         {
             DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`mapId`,`playerId`,`fighterId`,`posx`,`posy`)   value(%u, %"I64_FMT"u, %u, %u, %u)",mapId,player->GetId(),fighterId,x,y);
+            if( flag == true && tag == 0 )
+            {
+                pInfo->SetSoldiersHP();
+                UpdateSoldiersHP(mapId,player,x,y,pInfo->GetSoldiersHP());
+                UpdateMainFighterHP(mapId,player,x,y,1000);
+            }
         }
         player->InsertClanBattleFighter(mapId,fighterId,x,y);
         return true;

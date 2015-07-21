@@ -1096,14 +1096,18 @@ namespace Battle
         {
             UInt8 campId = it->first;
             _pack<<static_cast<UInt8>(campId);
-            _pack<<static_cast<UInt8>((it->second).size());
+            size_t offset = _pack.size();
+            UInt8 count = 0;
+            _pack<<static_cast<UInt8>(count);
             for(auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
             {
                 if( (*iter) != NULL && (*iter)->getHP() > 0 )
                 {
+                    ++count;
                     (*iter)->InsertFighterInfo(_pack,1);
                 }
             }
+            _pack.data<UInt8>(offset) = count;
 
         }
 
