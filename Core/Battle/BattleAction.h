@@ -255,6 +255,9 @@ namespace Battle
             UInt8 BuildStream(Stream& st);
 
             bool CheckFighterAttacked(BattleObject * bo);
+            
+            void SetEffectType(UInt8 effect){ _effectType = effect;}
+            UInt8 GetEffectType() { return _effectType;}
         public:
             std::vector< BattleActionStream >  vec_struct;
         private:
@@ -281,6 +284,8 @@ namespace Battle
             UInt16 _rad;   //物体距离
 
             UInt8 _count;
+
+            UInt8 _effectType;
 
     };
 }

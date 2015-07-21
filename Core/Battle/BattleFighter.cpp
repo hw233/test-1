@@ -234,6 +234,7 @@ namespace Battle
             case e_attack_counter:
                 break;
             case e_object_image:
+            case e_object_attack:
                 { 
                     std::cout << " 发起粒子攻击 " ;
                     const GData::Skill * s = GData::skillManager[_ab._skillId];
@@ -575,6 +576,7 @@ namespace Battle
         ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         op.setObjectDirection(/*getPosX(),minY + (ss->rady+1)*i*width,*/GetBattleDirection(),0,40, 0, 50);
         op.setObjectCount(s->GetAttackCount());
+        op.SetEffectType(_actionType);
         for(UInt8 i = 0 ; i < ss->radx ; ++i)
         {
             op.pushObjectPoint(getPosX(), minY + (ss->rady+1)*i*width);

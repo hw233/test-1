@@ -58,6 +58,7 @@ namespace Battle
             op.setObjectDirection(/*getPosX(),getPosY(),*/targetX>getPosX(),targetY>getPosY(),80*SUB(targetX,getPosX())/targetZ, 80*SUB(targetY,getPosY())/targetZ, 50 , _target);
             op.setObjectCount(1); //设置穿透数量
             op.pushObjectPoint(getPosX(),getPosY());
+            op.SetEffectType(_actionType);
             GetField()->InsertObjectPackage(op);
 
             GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast, this);
