@@ -37,7 +37,7 @@ namespace Battle
             return 0;
         //st << static_cast<UInt8>(GetHappenTime()); 
     
-        if(GetSkillId() == 6)
+        if(GetEffectType() == e_object_attack)
         { 
             if(vec_struct.size() != 1)
                 return 0;
