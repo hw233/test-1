@@ -149,8 +149,8 @@ CREATE TABLE `player_apply_clan` (
 
 DROP TABLE IF EXISTS `reportid`; 
 CREATE TABLE `reportid` (
-    `maxid` int(10) unsigned NOT NULL DEFAULT '0',
     `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `maxid` int(10) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -313,6 +313,14 @@ namespace Battle
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
+                Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),ax,ay,currentBf->getHP());
+                std::vector<UInt32> vecHP;
+                for( UInt8 i = 0 ; i < 10 ; ++i )
+                {
+                   UInt32 hp = currentBf->GetSoldierHp(i);
+                   vecHP.push_back(hp);
+                }
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),ax,ay,vecHP);
             }
             currentBf->SetGroundX(ax);
             currentBf->SetGroundY(ay);

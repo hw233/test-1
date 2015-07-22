@@ -73,7 +73,7 @@ namespace GObject
 
         //GMHandler::Battle(10,1);
         //GMHandler::Battle(2,1);
-        //GMHandler::Battle(1001,1004);
+        //GMHandler::Battle(1002,1006);
         return true; 
     }
 
