@@ -72,8 +72,12 @@ namespace GObject
         //GMHandler::Battle(1,2);
 
         //GMHandler::Battle(10,1);
+<<<<<<< HEAD
         //GMHandler::Battle(2,1);
         //GMHandler::Battle(1002,1006);
+=======
+        GMHandler::Battle(1003,1002);
+>>>>>>> 192fc373ab7134dd629ab38e018559f634f7be08
         return true; 
     }
 
