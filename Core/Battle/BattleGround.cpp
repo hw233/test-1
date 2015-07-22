@@ -230,6 +230,7 @@ namespace Battle
     }
 
     static UInt8 priority [4][4] = {
+
         {1,2,3,4},
         {1,2,3,4},
         {1,2,3,4},
@@ -861,18 +862,49 @@ namespace Battle
     }
 
 
+    //地形和战斗背景的关系   依次为 草地 树林 城镇 山地
+    static UInt8 land2FightGround[4]  = {1,2,4,3};
+
     void BattleGround::Fight(BattleFighter *bf , BattleFighter * bo, UInt8& result, UInt32& BattleReport)
     { 
         //TODO   连接BattleSimulator
         //添加一个实际的攻击距离
         UInt8 distance = GetFactAttackDis();
+        
+        UInt8 x = bf->GetGroundX();
+        UInt8 y = bf->GetGroundY();
 
-        BattleSimulator bsim(bf,bo,distance);
-        bsim.start(); 
-        result = bsim.GetWin();
-        BattleReport = bsim.getId();
+        UInt8 landform1 = _mapGround[x+y*_x];
+        if( landform1 <= 0 )
+            return ;
+        UInt8 fightgroud1 = land2FightGround[landform1-1];
 
-        std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        UInt8 bx = bo->GetGroundX();
+        UInt8 by = bo->GetGroundY();
+        
+
+        UInt8 landform2 = _mapGround[bx+by*_x];
+        if( landform2 <= 0 )
+            return ;
+        UInt8 fightgroud2 = land2FightGround[landform2-1];
+        if( IsInAround(Ascoord(x,y),Ascoord(bx,by)))
+        {
+            BattleSimulator bsim(bf,bo,distance);
+            bsim.start(); 
+            result = bsim.GetWin();
+            BattleReport = bsim.getId();
+            std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        }
+        else
+        {
+            BattleSimulator bsim(bf,bo,distance,fightgroud1,fightgroud2);
+            bsim.start(); 
+            result = bsim.GetWin();
+            BattleReport = bsim.getId();
+            std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        }
+
+
         //result = 0;
         //BattleReport = 111;
         //bo->setHP(0);

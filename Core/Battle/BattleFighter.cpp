@@ -550,7 +550,7 @@ namespace Battle
         GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
 
         UInt16 cd = _actionLast; // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
-        if(s->getId() == 11201)
+        if(s->GetSkillEffect()->skillType == e_image_attack_time_special)
             cd = s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
         GetField()->InsertTimeBattleAction(static_cast<UInt16>(GetNowTime()+cd),ip);
         return 1;

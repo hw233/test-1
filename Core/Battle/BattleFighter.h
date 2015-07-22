@@ -49,7 +49,9 @@ namespace Battle
         e_be_attacked = 8 , //被攻击
         e_run_attack = 9 ,   //跑攻 (骑兵专用)
         e_object_image = 10,
-        e_object_attack = 11
+        e_object_attack = 11,
+        e_image_attack_time_special = 12
+
     };
 
     enum
