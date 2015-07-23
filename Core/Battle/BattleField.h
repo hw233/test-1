@@ -101,7 +101,7 @@ namespace Battle
 
             std::vector<BattleFighter*> GetBattlePre(UInt16& time);    //BATTLE1
 
-            void SetSuperSkill(bool super)
+            void SetSuperSkill(BattleFighter* super)
             {
                 _super = super;
                 if(super)
@@ -110,7 +110,7 @@ namespace Battle
                     std::cout << "@@@@@@@@@场地大招结束" << std::endl;
 
             }
-            bool GetSuperSkill(){return _super;}
+            BattleFighter* GetSuperSkill(){return _super;}
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -157,7 +157,7 @@ namespace Battle
             */
             std::map<UInt16,std::vector<BattleFighter*> > BattlePre;
 
-            bool _super;
+            BattleFighter* _super;
     };
 
 

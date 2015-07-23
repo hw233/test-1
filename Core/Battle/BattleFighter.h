@@ -140,7 +140,7 @@ namespace Battle
             UInt8 GetMovePower();
             UInt8 GetClass(){ if(_fighter) return _fighter->GetClass();return 0;}
             UInt8 GetAttackRange();
-            UInt8 GetDistance(){ return 1;}   //
+            virtual UInt8 GetDistance(){ return 1;}   //
             virtual UInt16 GetId(){ if(_fighter) return _fighter->getId(); return 0;}
 
             void setNumber(UInt8 num){ _number = num;}

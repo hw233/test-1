@@ -227,7 +227,7 @@ namespace Battle
                     }
                     UInt8 super = s->GetSuperSkill();
                     if(super)
-                        GetField()->SetSuperSkill(true);
+                        GetField()->SetSuperSkill(this);
                     flag = NormolImage();
                 } 
                 break;
@@ -249,7 +249,7 @@ namespace Battle
                     }
                     UInt8 super = s->GetSuperSkill();
                     if(super)
-                        GetField()->SetSuperSkill(true);
+                        GetField()->SetSuperSkill(this);
                     flag = NormolObject();
                 } 
                 break;
@@ -266,6 +266,8 @@ namespace Battle
         }
         else
         {
+            if(this == GetField()->GetSuperSkill())
+                GetField()->SetSuperSkill(NULL);
             SetMove(false);
         }
         std::cout << std::endl;

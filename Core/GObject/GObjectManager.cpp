@@ -561,6 +561,7 @@ namespace GObject
             {
                 vecClan.push_back(::atoi(st[i].c_str()));
             }
+            //roo.buildTime = 
             Battle::clanBattleRoomManager.loadBattleRoom(room.roomId,room.forceId,room.battleId,vecClan,room.fighterNum,room.buildTime);
             lc.advance();
         }

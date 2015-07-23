@@ -28,6 +28,7 @@ namespace Battle
 
             virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 6;}
+            virtual UInt8 GetDistance(){ return 2;}   //
 
             //virtual UInt8 NormolAttack();
             //virtual UInt8 NormolImage();

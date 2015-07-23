@@ -230,6 +230,7 @@ namespace Battle
     }
 
     static UInt8 priority [4][4] = {
+
         {1,2,3,4},
         {1,2,3,4},
         {1,2,3,4},
@@ -283,7 +284,7 @@ namespace Battle
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>( currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100);
             _pack << static_cast<UInt8>(0); //无战斗发生
             _oneRoundCostTime += dis*0.5/*currentBf->GetNowTime()/100*/;
              
@@ -313,6 +314,14 @@ namespace Battle
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
+                Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),ax,ay,currentBf->getHP());
+                std::vector<UInt32> vecHP;
+                for( UInt8 i = 0 ; i < 10 ; ++i )
+                {
+                   UInt32 hp = currentBf->GetSoldierHp(i);
+                   vecHP.push_back(hp);
+                }
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),ax,ay,vecHP);
             }
             currentBf->SetGroundX(ax);
             currentBf->SetGroundY(ay);
@@ -320,7 +329,7 @@ namespace Battle
             //UInt8 rand = uRand(255);
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(ax) << static_cast<UInt8>(ay);
-            _pack << static_cast<UInt8>( currentBf->GetNowTime2());
+            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100);
             _pack << static_cast<UInt8>(1);
 
 
@@ -333,12 +342,12 @@ namespace Battle
             
 
 #if 0
-            if( win == 255 )
+            if( win == 1 || win == 0 )
             {
                 //两边对死
-                currentBf->setHP(0);
-                (target.bo)->setHP(0);
-                win = 3;
+                currentBf->setHP(100);
+                (target.bo)->setHP(100);
+                win = 2 ;
             }
 #endif
             _pack << win << reportId;
@@ -348,7 +357,7 @@ namespace Battle
             std::cout << std::endl;
 
 
-            _oneRoundCostTime += currentBf->GetNowTime()/100;
+            _oneRoundCostTime += currentBf->GetNowTime()/100+1;
             //增加击杀人数
             currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
             (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
@@ -739,8 +748,12 @@ namespace Battle
             begin++;
             for( auto it = begin; it != path.end();++it )
             {
-                    Ascoord p = *it;
-                    cost+=GetRideSub(p.x,p.y);
+                Ascoord p = *it;
+                cost+=GetRideSub(p.x,p.y);
+                if( IsNearbyHaveEnemy(p))
+                {
+                    cost+=1;
+                }
             }
         }
         if( cost > currentBf->GetMovePower())
@@ -752,6 +765,24 @@ namespace Battle
             UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
             _vecTarget.push_back(TargetInfo(static_cast<BattleFighter*>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
         }
+    }
+
+
+    bool BattleGround::IsNearbyHaveEnemy(Ascoord& p)
+    {
+        std::vector<Ascoord> vecAscoord;
+        GetAround(p,vecAscoord);
+        CheckUp(vecAscoord);
+        for( auto it = vecAscoord.begin(); it != vecAscoord.end(); ++it )
+        {
+           UInt8 x = (*it).x;  
+           UInt8 y = (*it).y;
+           if( _mapGround[x+y*_x] != 0  && _mapFighters[x+y*_x] != NULL && _mapFighters[x+y*_x] != currentBf  && _mapFighters[x+y*_x]->GetSide() != currentBf->GetSide() && _mapFighters[x+y*_x]->getHP() > 0)
+           {
+               return true;
+           }
+        }
+        return false;
     }
 
     //按照这个路径走一下  获得总的一个行动力消耗 走到可攻击点就行了
@@ -782,6 +813,11 @@ namespace Battle
                     ++it;
                     Ascoord p = *it;
                     cost+=GetRideSub(p.x,p.y);
+                    //周围有敌人消耗行动力加一
+                    if( IsNearbyHaveEnemy(p))
+                    {
+                        cost+=1;
+                    }
                 }
 
             }
@@ -790,7 +826,7 @@ namespace Battle
         UInt8 movePower = currentBf->GetMovePower();
         if( cost > movePower )
         {
-            if(IsInAround(attack,target) && (cost-movePower) <= (ride-1) )    //如果攻击点在目标点的附近
+            if(IsInAround(attack,target) && (cost-movePower) <=  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
             {
                 UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
                 _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
@@ -826,18 +862,49 @@ namespace Battle
     }
 
 
+    //地形和战斗背景的关系   依次为 草地 树林 城镇 山地
+    static UInt8 land2FightGround[4]  = {1,2,4,3};
+
     void BattleGround::Fight(BattleFighter *bf , BattleFighter * bo, UInt8& result, UInt32& BattleReport)
     { 
         //TODO   连接BattleSimulator
         //添加一个实际的攻击距离
         UInt8 distance = GetFactAttackDis();
+        
+        UInt8 x = bf->GetGroundX();
+        UInt8 y = bf->GetGroundY();
 
-        BattleSimulator bsim(bf,bo,distance);
-        bsim.start(); 
-        result = bsim.GetWin();
-        BattleReport = bsim.getId();
+        UInt8 landform1 = _mapGround[x+y*_x];
+        if( landform1 <= 0 )
+            return ;
+        UInt8 fightgroud1 = land2FightGround[landform1-1];
 
-        std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        UInt8 bx = bo->GetGroundX();
+        UInt8 by = bo->GetGroundY();
+        
+
+        UInt8 landform2 = _mapGround[bx+by*_x];
+        if( landform2 <= 0 )
+            return ;
+        UInt8 fightgroud2 = land2FightGround[landform2-1];
+        if( IsInAround(Ascoord(x,y),Ascoord(bx,by)))
+        {
+            BattleSimulator bsim(bf,bo,distance);
+            bsim.start(); 
+            result = bsim.GetWin();
+            BattleReport = bsim.getId();
+            std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        }
+        else
+        {
+            BattleSimulator bsim(bf,bo,distance,fightgroud1,fightgroud2);
+            bsim.start(); 
+            result = bsim.GetWin();
+            BattleReport = bsim.getId();
+            std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        }
+
+
         //result = 0;
         //BattleReport = 111;
         //bo->setHP(0);
@@ -1021,7 +1088,6 @@ namespace Battle
         {
             (*it)->send(st);
         }
-
     }
 
     //检测某一阵营是不是已经死光了
@@ -1070,14 +1136,18 @@ namespace Battle
         {
             UInt8 campId = it->first;
             _pack<<static_cast<UInt8>(campId);
-            _pack<<static_cast<UInt8>((it->second).size());
+            size_t offset = _pack.size();
+            UInt8 count = 0;
+            _pack<<static_cast<UInt8>(count);
             for(auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
             {
                 if( (*iter) != NULL && (*iter)->getHP() > 0 )
                 {
+                    ++count;
                     (*iter)->InsertFighterInfo(_pack,1);
                 }
             }
+            _pack.data<UInt8>(offset) = count;
 
         }
 

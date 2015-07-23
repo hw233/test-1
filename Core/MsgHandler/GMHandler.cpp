@@ -34,6 +34,7 @@ GMHandler::GMHandler()
     Reg(3, "addfighter", &GMHandler::OnAddFighter);
     Reg(3, "addmoney",&GMHandler::OnAddMoney);
     Reg(3, "battle",&GMHandler::OnBattle);
+    Reg(3, "setgvar",&GMHandler::OnSetGVar);
     _printMsgPlayer = NULL;
 }
 

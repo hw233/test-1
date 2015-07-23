@@ -233,7 +233,6 @@ function GetAllDirect2Force()
     return directionAll
 end
 
-
 --[[
 local table = GetTileSetsWithGid(1)
 for k,v in pairs(table) do

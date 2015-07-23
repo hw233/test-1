@@ -214,6 +214,7 @@ namespace Battle
             void  MoveGetEnemy(std::vector<Ascoord>& vecAscoord);
             void  GetMovePosition(Ascoord& move);
             UInt8 GetDistance(Ascoord & lp , Ascoord& rp );
+            bool  IsNearbyHaveEnemy(Ascoord& p);
             ////////一下这些家伙全是A*相关东西
 
             UInt8 GetGValue(const Ascoord& p);

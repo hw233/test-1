@@ -454,9 +454,6 @@ namespace Battle
                     UInt16 skillId = it->GetSkillId();
                     it = lst.erase(it);
                     flag = true;
-                    const GData::Skill* s = GData::skillManager[skillId];
-                    if(s && GetSuperSkill() && s->GetSuperSkill())
-                        SetSuperSkill(false);
                     break;
                 } 
                 it->GoNext();
@@ -491,7 +488,7 @@ namespace Battle
 
         if(!bf || !bf->GetField() || !bf->getHP())
             return 0;
-        if(_distance > bf->GetDistance())
+        if(_distance > bf->GetAttackRange())
             return 0;
 
         bf->CheckBuff();

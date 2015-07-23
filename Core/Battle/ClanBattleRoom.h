@@ -4,6 +4,7 @@
 #include"Config.h"
 #include"GObject/Player.h"
 #include"GObject/Clan.h"
+#include "GObject/GVar.h"
 
 namespace GObject
 {
@@ -38,7 +39,13 @@ namespace Battle
             }
             std::vector<UInt32> GetAllyClans(UInt8 forceId) { return force2clans[forceId];}
             void SetBuildTime(UInt32 time) { buildTime = time;}
-            UInt32 GetBuildTime() const { return buildTime;}
+            UInt32 GetBuildTime() const
+            { 
+                UInt32 value = GObject::GVAR.GetVar(GObject::GVAR_CLAN_CREATE);
+                if(value)
+                    return value;
+                return buildTime;
+            }
             std::vector<GObject::Player*> GetAllJoinPlayer();
             std::vector<GObject::Player*> GetSameForceAllies(UInt8 forceId);
         private:
