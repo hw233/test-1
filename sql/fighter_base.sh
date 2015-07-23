@@ -34,6 +34,7 @@ function fighter_base()
         }
     ' $f > $d
     sed -i s/\\r//g $d
+
     if [ $? -eq 0 ]
     then
         iconv2utf8 $d
