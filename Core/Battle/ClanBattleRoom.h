@@ -41,9 +41,9 @@ namespace Battle
             void SetBuildTime(UInt32 time) { buildTime = time;}
             UInt32 GetBuildTime() const
             { 
-                UInt32 value = GObject::GVAR.GetVar(GObject::GVAR_CLAN_CREATE);
-                if(value)
-                    return value;
+                //UInt32 value = GObject::GVAR.GetVar(GObject::GVAR_CLAN_CREATE);
+                //if(value)
+                //    return value;
                 return buildTime;
             }
             std::vector<GObject::Player*> GetAllJoinPlayer();
