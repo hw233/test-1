@@ -52,7 +52,7 @@ void BattleAnalyze::Analyze(Stream br)
                     UInt8 fgtId = 0;
                     UInt16 param = 0;
                     br >> fgtId >> param;
-                    std::cout << "攻击战将：" << static_cast<UInt32>(fgtId) << "伤害:" << static_cast<UInt32>(param) << std::endl;
+                    std::cout << "普通AT战将：" << static_cast<UInt32>(fgtId) << "伤害:" << static_cast<UInt32>(param) << std::endl;
                 } 
                 break;
             case 2:

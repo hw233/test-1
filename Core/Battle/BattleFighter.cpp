@@ -261,13 +261,13 @@ namespace Battle
         if(!flag)
         {
             std::cout << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
+            if(GetField()->GetSuperSkill() && this == GetField()->GetSuperSkill())
+                GetField()->SetSuperSkill(NULL);
             GetField()->InsertBattlePre(GetNowTime(), this);
             SetMove(true);
         }
         else
         {
-            if(this == GetField()->GetSuperSkill())
-                GetField()->SetSuperSkill(NULL);
             SetMove(false);
         }
         std::cout << std::endl;
