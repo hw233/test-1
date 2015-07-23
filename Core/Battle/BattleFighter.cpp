@@ -34,7 +34,7 @@ namespace Battle
 
         //if(f) //战将属性  小兵属性延后
         { 
-            setHP(10000);//f->GetFighterAttr(e_attr_max));
+            setHP(1000);//f->GetFighterAttr(e_attr_max));
             for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
             { 
                 attrBase[i] = f->GetFighterAttr(i);

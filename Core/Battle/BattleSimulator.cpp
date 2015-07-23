@@ -80,6 +80,7 @@ namespace Battle
     void BattleSimulator::InitFightersSide(UInt8 index)
     { 
         //XXX
+        //输入会+100
         static UInt16 XPos[][11] = {
             {420,280,160,280,160,280,160,280,160,280,160},
             {1100,1240,1360,1240,1360,1240,1360,1240,1360,1240,1360},
@@ -123,29 +124,27 @@ namespace Battle
 
         GetBSEnterInfo(_packet);
 
-        BattleFighter * bf[2] = {NULL,NULL};
+        BattleFighter * bf = NULL;//[2] = {NULL,NULL};
         UInt8 index = 1;
         UInt16 actCount = 0;
         size_t offset = _packet.size();
         _packet << actCount; 
-        //for(UInt8 i = 0; i < _limitTime ; ++i)
+        for(UInt8 i = 0; i < 2 ; ++i)
         {
-            for(UInt8 j = 0; j < 22; ++j)
+            for(UInt8 j = 0; j < _fighters[i].size(); ++j)
             {
-                index = !index;
-                bf[index] = getMyFighters(index,j/2);
+                //index = !index;
+                bf = _fighters[i][j];// getMyFighters(index,j/2);
 
-                if(!bf[0] && !bf[1])          
-                    break;
-
-                if(!bf[index] || !bf[index]->GetField() || !bf[index]->getHP())
+                if(!bf || !bf->GetField() || !bf->getHP())
                     continue;
 
                 UInt16 rand = (uRand(25)+1)*4;
-                InsertBattlePre(rand , bf[index]);
-                bf[index]->SetBeginTime(rand);
+                InsertBattlePre(rand , bf);
+                bf->SetBeginTime(rand);
             }
-
+        }
+        {
             //UInt8 count = 0;
             UInt16 lastTime = 0;
             UInt16 time = 0;
@@ -356,7 +355,7 @@ namespace Battle
             size_t offset = _packet.size();
 
             UInt8 infectCnt = 0;
-            
+
             _packet << static_cast<UInt8>(infectCnt);
 
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
@@ -386,7 +385,7 @@ namespace Battle
                 std::cout << "#####战将编号：" << static_cast<UInt32>(bo->GetBSNumber()) << "被法术攻击" << std::endl;
                 ++infectCnt; 
             }
-            
+
             _packet.data<UInt8>(offset) = infectCnt;
 
             UInt16 backCd = s->GetActionBackCd();
@@ -605,11 +604,11 @@ namespace Battle
             bool flag = true;
             for(UInt8 j = 0; j < _fighters[i].size(); ++j)
             { 
-               if(!_fighters[i][j]->IsStoped())
-               {
-                   flag = false;
-                   break;
-               }
+                if(!_fighters[i][j]->IsStoped())
+                {
+                    flag = false;
+                    break;
+                }
             } 
             if(flag)
                 return true;
