@@ -148,7 +148,7 @@ namespace Battle
 
             void setMainFighter(BattleFighter * bf){
                 m_mainFighter = bf;
-                setHP(1000);//m_mainFighter->getHP());
+                setHP(100);//m_mainFighter->getHP());
                 for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
                 { 
                     attrBase[i] = m_mainFighter->GetBattleAttr(i);
