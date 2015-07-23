@@ -173,6 +173,7 @@ namespace Battle
 
         actCount += ClearObjectPackage();
         std::cout << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
+        std::cout << "战斗结果" << static_cast<UInt32>(GetWin()) <<std::endl;
 
         _packet.data<UInt16>(offset) = actCount;
         _packet << Stream::eos;
@@ -185,9 +186,9 @@ namespace Battle
     { 
         if( _fgt[0] && _fgt[0]->getHP() == 0 && _fgt[1] && _fgt[1]->getHP()==0 )
             return 3;
-        if( !_fgt[0] || _fgt[0]->getHP() <= 0 )
+        if( !_fgt[0] || !_fgt[0]->getHP())
             return 1;
-        if( !_fgt[1] || _fgt[1]->getHP() <= 0 )
+        if( !_fgt[1] || !_fgt[1]->getHP())
             return 0;
         if(GetStop())
             return 2;
