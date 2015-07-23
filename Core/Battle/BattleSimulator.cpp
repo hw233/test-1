@@ -173,6 +173,7 @@ namespace Battle
 
         actCount += ClearObjectPackage();
         std::cout << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
+        FieldPrint();
         std::cout << "战斗结果" << static_cast<UInt32>(GetWin()) <<std::endl;
 
         _packet.data<UInt16>(offset) = actCount;
