@@ -479,7 +479,7 @@ namespace Battle
         { 
             std::cout << "Side" << static_cast<UInt32>(i) << std::endl;
             for(UInt8 j = 0; j < _fighters[i].size(); ++j)
-                std::cout << "战将编号:" << static_cast<UInt32>(_fighters[i][j]->GetBSNumber()) << std::endl;
+                std::cout << "战将编号:" << static_cast<UInt32>(_fighters[i][j]->GetBSNumber()) << "血量：" << static_cast<UInt32>(_fighters[i][j]->getHP()) << std::endl;
         } 
     } 
 
