@@ -212,6 +212,7 @@ namespace Battle
                 break;
             case e_image_attack:
             case e_image_therapy:
+            case e_image_attack_time_special:
                 { 
 
                     std::cout << " 发起魔法攻击 " ;
