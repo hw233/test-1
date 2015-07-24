@@ -587,6 +587,8 @@ namespace Battle
         for(UInt8 i = 0; i < _fighters[index].size(); ++i)
         { 
             BattleFighter * fgt = _fighters[index][i];
+            if(!fgt->getHP())
+                continue;
             if(fgt && fgt->CanMove())
             {
                 if(fgt->GetBeginTime() > time)
