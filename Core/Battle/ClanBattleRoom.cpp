@@ -136,7 +136,6 @@ namespace Battle
             UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
 
             //判断该房间是不是不处于报名阶段
-            //
             UInt32 now = TimeUtil::Now();
             if( now > sday )
             {
@@ -144,7 +143,29 @@ namespace Battle
             }
             else
             {
+                //获得房间中人数最少的势力
                 UInt8 i = 1;
+                UInt8 theMinNum = 0xFF;  //人数最少的势力
+                UInt8 minForce = 1 ;    
+                for( i = 1; i <= forceNum; ++i)
+                {
+                    if( room->GetNum(i) < theMinNum )
+                    {
+                        theMinNum = room->GetNum(i);
+                        minForce = i;
+                    }
+                }
+                if( theMinNum >= playermax )
+                {
+                    CreateRoom(player);
+                }
+                else
+                {
+
+                    room->InsertClan(minForce,clanId,memberNum);
+                }
+
+                /*
                 for(i = 1; i <= forceNum ; ++i)
                 {
                     UInt8 num = 0;
@@ -161,6 +182,7 @@ namespace Battle
                 {
                     CreateRoom(player);
                 }
+                */
             }
         }
         return true;

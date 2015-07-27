@@ -27,7 +27,7 @@ namespace GObject
         GVAR_INVALID = 0,
         GVAR_TCPASS = 1, // 组队副本最高通过等级
         GVAR_TIMEADD = 2,
-        GVAR_CLAN_CREATE = 3,
+        GVAR_BATTLE_STATUS = 3,   //军团战状态
         GVAR_MAX,
     };
 
@@ -51,6 +51,7 @@ namespace GObject
         {
             GREGISTER_VAR(GVAR_TCPASS, GCYCLE_NONE);
             GREGISTER_VAR(GVAR_TIMEADD, GCYCLE_DAY);
+            GREGISTER_VAR(GVAR_BATTLE_STATUS, GCYCLE_NONE);
         }
 
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

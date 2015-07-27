@@ -71,7 +71,7 @@ namespace GObject
 
         AddTimer(5*1000,World_clanBattle_OneRound,this,30*1000);
 
-
+        GVAR.SetVar(GVAR_BATTLE_STATUS,3);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //GMHandler::Battle(10,1);
         //GMHandler::Battle(1001,1014);

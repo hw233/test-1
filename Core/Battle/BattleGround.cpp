@@ -282,19 +282,21 @@ namespace Battle
             }
             currentBf->SetGroundX(mx);
             currentBf->SetGroundY(my);
-
+            std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
             std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
             std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
             std::cout <<" 无方案" << " 从" << static_cast<UInt32>( x ) <<" , " << static_cast<UInt32>(y);
             std::cout <<" 移动到 "<<  static_cast<UInt32>(mx)<< " , " << static_cast<UInt32>(my) <<std::endl;
+            std::cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
             currentBf->InsertFighterInfo(_pack);  //Stream
 
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100);
+            _pack << static_cast<UInt8>(  dis*0.5+1/*currentBf->GetNowTime()/100+1 */);
+            std::cout<<"移动用时  " <<static_cast<UInt32>(dis*0.5+1)<<std::endl;
             _pack << static_cast<UInt8>(0); //无战斗发生
-            _oneRoundCostTime += dis*0.5/*currentBf->GetNowTime()/100*/;
+            _oneRoundCostTime += dis*0.5+1/*currentBf->GetNowTime()/100*/;
              
         }
         else
@@ -306,9 +308,12 @@ namespace Battle
 
 
             //战斗
+            
+            std::cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
             std::cout <<"从     "<<static_cast<UInt32>(currentBf->GetGroundX())<<" , "<< static_cast<UInt32>(currentBf->GetGroundY())<<std::endl;
             std::cout <<"移动到  "<<static_cast<UInt32>(target.attack.x)<< "," << static_cast<UInt32>(target.attack.y) <<std::endl;
             std::cout << "攻击目标  " <<static_cast<UInt32>((target.bo)->GetGroundX())<<","<<static_cast<UInt32>((target.bo)->GetGroundY())<<std::endl;
+            std::cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 
             //Stream
             //
@@ -337,16 +342,17 @@ namespace Battle
             //UInt8 rand = uRand(255);
             currentBf->InsertFighterInfo(_pack);  //Stream
             _pack << static_cast<UInt8>(ax) << static_cast<UInt8>(ay);
-            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100);
-            _pack << static_cast<UInt8>(1);
-
-
-            //currentBf->InsertFighterInfo(_pack);
-            target.bo->InsertFighterInfo(_pack);
 
             UInt8 win = 0;
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
+
+            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100+1);
+            _pack << static_cast<UInt8>(1);
+            std::cout<<" 此次战斗用时  "<< static_cast<UInt32>(currentBf->GetNowTime()/100+1)<<"秒"<<endl; 
+
+            //currentBf->InsertFighterInfo(_pack);
+            target.bo->InsertFighterInfo(_pack);
             
 
 #if 0
@@ -832,6 +838,10 @@ namespace Battle
         }
         UInt8 ride = GetRideSub(attack.x,attack.y);
         UInt8 movePower = currentBf->GetMovePower();
+        if( _mapFighters[attack.x+attack.y*_x] != NULL && _mapFighters[attack.x+attack.y*_x]->getHP() > 0 )
+        {
+            return;
+        }
         if( cost > movePower )
         {
             if(IsInAround(attack,target) && (cost-movePower) <=  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
