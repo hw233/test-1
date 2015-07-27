@@ -229,6 +229,7 @@ namespace Battle
                     UInt8 super = s->GetSuperSkill();
                     if(super)
                         GetField()->SetSuperSkill(this);
+                    GetField()->AddTimeExtra(s->GetFrozrTime());
                     flag = NormolImage();
                 } 
                 break;
@@ -251,6 +252,7 @@ namespace Battle
                     UInt8 super = s->GetSuperSkill();
                     if(super)
                         GetField()->SetSuperSkill(this);
+                    GetField()->AddTimeExtra(s->GetFrozrTime());
                     flag = NormolObject();
                 } 
                 break;

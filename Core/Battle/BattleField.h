@@ -111,6 +111,8 @@ namespace Battle
 
             }
             BattleFighter* GetSuperSkill(){return _super;}
+            void AddTimeExtra(UInt32 v){ _timeExtra += v;}
+            UInt32 GetTimeExtra() {return _timeExtra;}
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);
@@ -158,6 +160,7 @@ namespace Battle
             std::map<UInt16,std::vector<BattleFighter*> > BattlePre;
 
             BattleFighter* _super;
+            UInt32 _timeExtra;
     };
 
 

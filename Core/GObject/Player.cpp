@@ -902,4 +902,21 @@ namespace GObject
         } 
         return res;
     } 
+
+    void Player::GetSignInfo(UInt16 index)
+    { 
+        Stream st(REP::SIGN_INFO);
+        st << static_cast<UInt16>(index);
+        UInt32 value = 0;
+        switch(index)
+        { 
+            case 0:
+                {
+                    value = GetVar(VAR_SIGN_MONTH);
+                    st << value;
+                }
+        } 
+        st << Stream::eos;
+        send(st);
+    } 
 }

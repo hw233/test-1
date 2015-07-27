@@ -11,6 +11,7 @@ namespace REQ
     //强化
 
     const UInt8 SIGN                 =0x10;
+    const UInt8 SIGN_INFO            =0x11;
 
     const UInt8 ENCHART              = 0x20;// 0xF0
 
@@ -573,6 +574,7 @@ namespace REP
     const UInt8 CHAT                = 0x06;
     //强化
     const UInt8 SIGN                 =0x10;
+    const UInt8 SIGN_INFO                 =0x11;
 
     const UInt8 ENCHART             = 0x20;// 0xF0
 

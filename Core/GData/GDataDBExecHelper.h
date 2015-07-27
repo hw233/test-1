@@ -136,6 +136,7 @@ namespace GData
         float actionBeforeCd;
         float actionCd;
         float actionBackCd;
+        float frozeTime;;
         UInt16 mpCost;
         UInt8 superSkill;
         UInt8 attackCount;
@@ -319,7 +320,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkill)
-        SPECIALDEF(12)
+        SPECIALDEF(13)
         (
          UInt32, id,
          std::string , name,
@@ -330,6 +331,7 @@ namespace DB
          float, actionBeforeCd,
          float, actionCd,
          float, actionBackCd,
+         float, frozeTime,
          UInt16, mpCost,
          UInt8, superSkill,
          UInt8, attackCount

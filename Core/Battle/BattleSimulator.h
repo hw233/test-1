@@ -55,7 +55,7 @@ namespace Battle
 
             UInt8 FighterMove(UInt8 index, UInt16 lastTime, UInt16 cutTime);
 
-            UInt16 GetTime(){return _time;}
+            UInt16 GetTime(){return _time + GetTimeExtra();}
 
             bool GetStop();
 

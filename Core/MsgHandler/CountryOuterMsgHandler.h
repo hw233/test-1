@@ -633,4 +633,13 @@ void OnSign(GameMsgHdr& hdr, const void * data)
     player->send(st);
 }
 
+void OnSignInfo(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 number = 0;
+    br >> number;
+    player->GetSignInfo(number);
+} 
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
