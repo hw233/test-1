@@ -15,6 +15,7 @@ namespace Battle
     {
         //memset(_objs, 0, sizeof(_objs));
         _super = NULL;
+        _timeExtra = 0;
     }
 
     BattleField::~BattleField()

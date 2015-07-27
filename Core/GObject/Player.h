@@ -658,6 +658,8 @@ namespace GObject
 
             UInt8 Sign(UInt8 opt);
 
+            void GetSignInfo(UInt16 number);
+
     private:
             //IDTYPE _id;
             std::string _accounts;

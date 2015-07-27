@@ -170,6 +170,7 @@ CREATE TABLE `skill` (
       `actionBeforeCd` float(10,2) NOT NULL,
       `actionCostCd` float(10,2) NOT NULL,
       `actionBackCd` float(10,2) NOT NULL,
+      `frozeTime` float(10,2) NOT NULL,
       `mpCost` int(10) NOT NULL DEFAULT '0',
       `superSkill` tinyint(3) NOT NULL,  
       `attackCount` tinyint(3) NOT NULL,  
