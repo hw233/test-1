@@ -13,7 +13,7 @@
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
-
+#include<math.h>
 namespace Battle
 {
     void BattleGround::InitMapFight(UInt8 mapId)   
@@ -293,10 +293,10 @@ namespace Battle
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>(  dis*0.5+1/*currentBf->GetNowTime()/100+1 */);
-            std::cout<<"移动用时  " <<static_cast<UInt32>(dis*0.5+1)<<std::endl;
+            _pack << static_cast<UInt8>(  ceil(dis*0.5)/*currentBf->GetNowTime()/100+1 */);
+            std::cout<<"移动用时  " <<static_cast<UInt32>(ceil(dis*0.5))<<std::endl;
             _pack << static_cast<UInt8>(0); //无战斗发生
-            _oneRoundCostTime += dis*0.5+1/*currentBf->GetNowTime()/100*/;
+            _oneRoundCostTime += ceil(dis*0.5)/*currentBf->GetNowTime()/100*/;
              
         }
         else
@@ -318,12 +318,15 @@ namespace Battle
             //Stream
             //
             //同步_mapFighters的坐标
+            UInt32 timeCost = 0;
             UInt8 x = currentBf->GetGroundX();
             UInt8 y = currentBf->GetGroundY();
             UInt8 ax = target.attack.x;
             UInt8 ay = target.attack.y;
             if( target.attack.x != x ||  target.attack.y != y )
             {
+                Ascoord p = Ascoord(x,y);
+                UInt8 dis = GetDistance(p,target.attack);
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
@@ -335,6 +338,8 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),ax,ay,vecHP);
+                _oneRoundCostTime += ceil(dis*0.5);
+                timeCost += ceil(dis*0.5);
             }
             currentBf->SetGroundX(ax);
             currentBf->SetGroundY(ay);
@@ -346,10 +351,11 @@ namespace Battle
             UInt8 win = 0;
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
-
-            _pack << static_cast<UInt8>( currentBf->GetNowTime()/100+1);
+            
+            timeCost += ceil(static_cast<float>(currentBf->GetNowTime()/100.0));
+            _pack << static_cast<UInt8>(timeCost);
             _pack << static_cast<UInt8>(1);
-            std::cout<<" 此次战斗用时  "<< static_cast<UInt32>(currentBf->GetNowTime()/100+1)<<"秒"<<endl; 
+            std::cout<<" 此次战斗用时  "<< static_cast<UInt32>(timeCost)<<"秒"<<endl; 
 
             //currentBf->InsertFighterInfo(_pack);
             target.bo->InsertFighterInfo(_pack);
@@ -817,7 +823,7 @@ namespace Battle
         {
             for( auto it = path.begin(); it != path.end(); )
             {
-                if( IsInAttackZone(*it,target))
+                if( IsInAttackZone(*it,target) && !(_mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] > 0 ) )
                 {
                     attack = *it;
                     break;
@@ -838,10 +844,6 @@ namespace Battle
         }
         UInt8 ride = GetRideSub(attack.x,attack.y);
         UInt8 movePower = currentBf->GetMovePower();
-        if( _mapFighters[attack.x+attack.y*_x] != NULL && _mapFighters[attack.x+attack.y*_x]->getHP() > 0 )
-        {
-            return;
-        }
         if( cost > movePower )
         {
             if(IsInAround(attack,target) && (cost-movePower) <=  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
