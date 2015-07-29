@@ -290,7 +290,7 @@ namespace GData
         {
             //skill[dbskill].LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId);
             Skill* se = new Skill(dbskill.id, dbskill.name);
-            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd*100, dbskill.actionBeforeCd*100, dbskill.actionCd*100, dbskill.actionBackCd * 100,dbskill.frozeTime, dbskill.mpCost, dbskill.superSkill, dbskill.attackCount);
+            se->LoadSkill(dbskill.skillCondId, dbskill.skillScopeId, dbskill.skillEffectId, dbskill.cd*100, dbskill.actionBeforeCd*100, dbskill.actionCd*100, dbskill.actionBackCd * 100,dbskill.frozeTime * 100, dbskill.mpCost, dbskill.superSkill, dbskill.attackCount);
 
             skillManager.add(se);
         }

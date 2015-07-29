@@ -293,8 +293,8 @@ namespace Battle
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>(  ceil(dis*0.5)/*currentBf->GetNowTime()/100+1 */);
-            std::cout<<"移动用时  " <<static_cast<UInt32>(ceil(dis*0.5))<<std::endl;
+            _pack << static_cast<UInt8>(  ceil((dis+1)*0.5)/*currentBf->GetNowTime()/100+1 */);
+            std::cout<<"移动用时  " <<static_cast<UInt32>(ceil((dis+1)*0.5))<<std::endl;
             _pack << static_cast<UInt8>(0); //无战斗发生
             _oneRoundCostTime += ceil(dis*0.5)/*currentBf->GetNowTime()/100*/;
              
@@ -318,15 +318,16 @@ namespace Battle
             //Stream
             //
             //同步_mapFighters的坐标
-            UInt32 timeCost = 0;
+            UInt32 timeCost = 1;
             UInt8 x = currentBf->GetGroundX();
             UInt8 y = currentBf->GetGroundY();
             UInt8 ax = target.attack.x;
             UInt8 ay = target.attack.y;
+            UInt8 dis = 1;
             if( target.attack.x != x ||  target.attack.y != y )
             {
                 Ascoord p = Ascoord(x,y);
-                UInt8 dis = GetDistance(p,target.attack);
+                dis = GetDistance(p,target.attack);
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
@@ -338,9 +339,8 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),ax,ay,vecHP);
-                _oneRoundCostTime += ceil(dis*0.5);
-                timeCost += ceil(dis*0.5);
             }
+            timeCost += ceil(dis*0.5);
             currentBf->SetGroundX(ax);
             currentBf->SetGroundY(ay);
             
@@ -351,7 +351,10 @@ namespace Battle
             UInt8 win = 0;
             UInt32 reportId = 0;
             Fight(currentBf, target.bo, win, reportId);
-            
+
+            std::cout<<"--------------------------------------------------------------------------------------------------------------------------------"<<endl;
+            std::cout<<" the time from fight is " << static_cast<UInt32>(currentBf->GetNowTime())<<endl;
+            std::cout<<"--------------------------------------------------------------------------------------------------------------------------------"<<endl;
             timeCost += ceil(static_cast<float>(currentBf->GetNowTime()/100.0));
             _pack << static_cast<UInt8>(timeCost);
             _pack << static_cast<UInt8>(1);
@@ -377,7 +380,7 @@ namespace Battle
             std::cout << std::endl;
 
 
-            _oneRoundCostTime += currentBf->GetNowTime()/100+1;
+            _oneRoundCostTime += timeCost;
             //增加击杀人数
             currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
             (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
@@ -834,7 +837,7 @@ namespace Battle
                     Ascoord p = *it;
                     cost+=GetRideSub(p.x,p.y);
                     //周围有敌人消耗行动力加一
-                    if( IsNearbyHaveEnemy(p))
+                    if( IsNearbyHaveEnemy(p) && p != target)
                     {
                         cost+=1;
                     }
@@ -1093,6 +1096,7 @@ namespace Battle
         _pack << static_cast<UInt32>(now);
         _pack<<Stream::eos;
         UInt32 battleId = IDGenerator::gBattleOidGenerator0.ID();
+        std::cout<<" ****************************************************************该战术战报Id为  "<<static_cast<UInt32>(battleId)<<endl;
         battleReport0.addReport(/*_battleNum*/ battleId,_pack);
         report2IdTable.Insert(_id-_mapId,_mapId,_actId,/*_battleNum*/ battleId,now);
         DB7().PushUpdateData("REPLACE INTO `report2id` value(%u,%u,%u,%u,%u)",_id-_mapId,_mapId,_actId, /*_battleNum*/battleId,now);
