@@ -262,7 +262,11 @@ namespace Battle
         {
             std::cout << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
             if(GetField()->GetSuperSkill() && this == GetField()->GetSuperSkill())
+            {
                 GetField()->SetSuperSkill(NULL);
+            }
+            if(GetAvoidHurt())
+                SetAvoidHurt(false);
             GetField()->InsertBattlePre(GetNowTime(), this);
             SetMove(true);
         }

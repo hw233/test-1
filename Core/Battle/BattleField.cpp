@@ -35,7 +35,7 @@ namespace Battle
         UInt8 res = -1;
         for(UInt8 i = 0; i < _fighters[side].size(); ++i)
         { 
-            if(!_fighters[side][i])
+            if(!_fighters[side][i] || !_fighters[side][i]->getHP())
                 continue;
             if(_fighters[side][i]->getClass() > eFighter)
                 return NULL;
