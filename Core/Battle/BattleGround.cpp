@@ -134,6 +134,10 @@ namespace Battle
             {
                 flag = *it;
                 ride -=GetRideSub(flag.x,flag.y);
+                if( IsNearbyHaveEnemy(*it) && (*it) != target)
+                {
+                    ride = ride -1;
+                }
                 if( InMyAttackHasEnemy(*it) )
                     break;
                 if( ride <= 0 )
@@ -773,7 +777,7 @@ namespace Battle
             {
                 Ascoord p = *it;
                 cost+=GetRideSub(p.x,p.y);
-                if( IsNearbyHaveEnemy(p))
+                if( IsNearbyHaveEnemy(p) && p != target)
                 {
                     cost+=1;
                 }
