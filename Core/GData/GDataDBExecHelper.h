@@ -178,6 +178,16 @@ namespace GData
         UInt8 playermin;
         UInt8 playermax;
     };
+
+    struct DBExploitPointInfo
+    {
+        UInt8 id;
+        UInt8 type;
+        UInt8 openLevel;
+        float transform;
+        UInt8 perMin;
+        UInt8 perMax;
+    };
 }
 namespace DB
 {
@@ -382,6 +392,18 @@ namespace DB
           UInt8, forcenum,
           UInt8, playermin,
           UInt8, playermax
+       )
+       SPECIALEND()
+
+       SPECIALBEGIN(GData::DBExploitPointInfo)
+       SPECIALDEF(6)
+       (
+          UInt8,  id,
+          UInt8, type,
+          UInt8, openLevel,
+          float, transform,
+          UInt8, perMin,
+          UInt8, perMax
        )
        SPECIALEND()
 }

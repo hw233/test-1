@@ -28,6 +28,7 @@ namespace GData
             static bool LoadBattleAwardData();
             static bool LoadClanBattleBase();
             static bool LoadBattleMap();
+            static bool LoadExploitPointInfo();
 
         private:
 

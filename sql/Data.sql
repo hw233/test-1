@@ -247,3 +247,15 @@ CREATE TABLE `corps_campaign_base` (
       `playermax`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '玩家的个数上限',
       PRIMARY KEY (`battleId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `exploit_point`;
+CREATE TABLE `exploit_point` (
+      `id` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '采集点编号',
+      `type`   int(3) unsigned NOT NULL DEFAULT '0' COMMENT '资源类型',
+      `openLevel`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '开放的等级',
+      `transform`  float(10,2) unsigned NOT NULL DEFAULT '0' COMMENT '转化率',
+      `perMin`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '转化率',
+      `perMax`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '转化率',
+      PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
