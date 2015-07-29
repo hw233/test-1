@@ -1,7 +1,7 @@
 #!/bin/sh
 #export LD_LIBRARY_PATH=/opt/app/mysql/lib/mysql/:/opt/app/libevent/lib
 #echo "1" > /proc/sys/kernel/core_uses_pid
-#ulimit -n 16384 -c unlimited
+ulimit -n 16384 -c unlimited
 ulimit -S -c unlimited
 ID=00001
 PORT=8833
