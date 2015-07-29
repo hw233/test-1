@@ -337,6 +337,9 @@ namespace Battle
             bool GetAvoidHurt(){ return _avoidhurt;}
 
             bool IsMainFighter(){return _fighter!=NULL;}
+            
+            void ResetSkill();//{}
+
         protected:
 
             UInt8 _crick;  //硬直
