@@ -69,7 +69,7 @@ namespace GObject
 
         AddTimer(1* 1000, world_clanBattle_putFighters, this, 10*1000);
 
-        AddTimer(5*1000,World_clanBattle_OneRound,this,30*1000);
+        AddTimer(1*1000,World_clanBattle_OneRound,this,30*1000);
 
         GVAR.SetVar(GVAR_BATTLE_STATUS,3);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
@@ -274,7 +274,7 @@ namespace GObject
                     else
                     {
                         UInt32 now = TimeUtil::Now();
-                        if( fabs( now - (*iter)->GetNextStartTime() ) <= 5  )
+                        if( fabs( now - (*iter)->GetNextStartTime() ) <= 1  )
                         {
 
                             (*iter)->StartOneRound();
