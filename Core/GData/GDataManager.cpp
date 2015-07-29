@@ -21,6 +21,7 @@
 #include "GData/BattleAward.h"
 #include "GData/ClanBattleBase.h"
 #include "GData/BattleMap.h"
+#include "GData/ExploitTable.h"
 namespace GData
 {
     //静态成员申明区
@@ -107,6 +108,11 @@ namespace GData
         if( !LoadBattleMap() )
         {
             fprintf(stderr, "Load BattleMap Error !\n");
+            std::abort();
+        }
+        if( !LoadExploitPointInfo())
+        {
+            fprintf(stderr, "Load ExploitPointInfo Error !\n");
             std::abort();
         }
 
@@ -560,6 +566,27 @@ namespace GData
             }
         }
         lua_close(L);
+        return true;
+    }
+
+    bool GDataManager::LoadExploitPointInfo()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading ExploitPointInfo");
+        lc.reset(1000);
+        DBExploitPointInfo info;
+        if(execu->Prepare("SELECT `id`,`type`,`openLevel`,`transform`,`perMin`,`perMax` FROM `exploit_point`", info) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::ExploitPoint* exploitInfo = new GData::ExploitPoint(info.id,info.type,info.openLevel,info.transform,info.perMin,info.perMax);
+            if( exploitInfo == NULL )
+                return false;
+            GData::exploitTable.LoadExpoit(exploitInfo);
+            lc.advance();
+        }
+        lc.finalize();
         return true;
     }
 }

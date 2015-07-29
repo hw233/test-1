@@ -1,5 +1,6 @@
 #include"ClanBattleCityStatus.h"
 #include"Battle/ClanBattleRoom.h"
+#include "GObject/GVar.h"
 
 
 namespace Battle
@@ -10,6 +11,11 @@ namespace Battle
     {
         //报名之后的第二天10点为战术推演阶段 
         //由报名时间得到
+        if( GObject::GVAR.GetVar(3/*GVAR_BATTLE_STATUS*/) < 3 )
+        {
+            stage = GObject::GVAR.GetVar(3/*GVAR_BATTLE_STATUS*/);
+            return;
+        }
         if( IsStop() )
         {
             stage = 2;

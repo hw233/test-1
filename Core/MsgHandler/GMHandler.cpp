@@ -201,5 +201,5 @@ void GMHandler::Battle(UInt16 id1, UInt16 id2)
     bsim.start();
     UInt32 BattleReport = bsim.getId();
     cout << "GM命令 战斗ID " << BattleReport << std::endl;
-} 
+}
 

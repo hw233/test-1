@@ -43,7 +43,11 @@ namespace GObject
         VAR_GOVERN_FIGHTERID = 13, //治理的将领id
         VAR_SEARCH_FIGHTER = 14 ,  //探索次数
         VAR_CLANBATTLE_COMMENT_TIME = 15,//军团战留言时间
-        VAR_SIGN_MONTH,  //按月签到
+        VAR_SIGN_MONTH = 16,  //按月签到
+        VAR_EXPLOIT_WOOD = 17, //采集 木材
+        VAR_EXPLOIT_LEATHER = 18, //皮革
+        VAR_EXPLOIT_IRON = 19,    //铁
+        VAR_EXPLOIT_COPPER = 20,  //铜
         VAR_MAX
     };
 
@@ -90,6 +94,10 @@ namespace GObject
                 REGISTER_VAR(VAR_SEARCH_FIGHTER,CYCLE_DAY_4);
                 REGISTER_VAR(VAR_CLANBATTLE_COMMENT_TIME,CYCLE_NONE);
                 REGISTER_VAR(VAR_SIGN_MONTH,CYCLE_MONTH);
+                REGISTER_VAR(VAR_EXPLOIT_WOOD,CYCLE_NONE);
+                REGISTER_VAR(VAR_EXPLOIT_LEATHER,CYCLE_NONE);
+                REGISTER_VAR(VAR_EXPLOIT_IRON,CYCLE_NONE);
+                REGISTER_VAR(VAR_EXPLOIT_COPPER,CYCLE_NONE);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

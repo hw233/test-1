@@ -359,7 +359,7 @@ namespace Battle
                     continue;
                 }
                 clan->SetClanFame(clan->GetClanFame()+100);
-                DB1().PushUpdateData(" update `clan` set 'clanFame'=%u WHERE `clanId` = %u",clan->GetClanFame(), clan->GetId());
+                DB1().PushUpdateData(" update `clan` set 'clanFame' = %u where `clanId` = %u",clan->GetClanFame(),clanId);
             }
 
         }
@@ -374,7 +374,7 @@ namespace Battle
         GivePlayerKillRankAward();
         GivePlayerKillFighterRankAward();
         GiveCaptureCityAward();
-        GiveClanBattleAward();
+        //GiveClanBattleAward();
     }
 
 
