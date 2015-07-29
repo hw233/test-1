@@ -259,7 +259,7 @@ namespace Battle
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
                 BattleFighter * bo = static_cast<BattleFighter*>(bAction.GetObject(j));
-                if(bo->getHP() == 0)
+                if(bo->getHP() == 0 || bo->GetAvoidHurt())
                     continue;
                 UInt16 param = bo->BeActed(&bAction);
                 _packet << static_cast<UInt16>(bAction.GetHappenTime());
@@ -329,8 +329,9 @@ namespace Battle
             BattleFighter * fgt = bAction.GetBattleFighter();
             if(!fgt)
                 continue;
-            if(se->avoidhurt)
-                fgt->SetAvoidHurt(false);
+            //技能无敌持续到下一个动作
+            //if(se->avoidhurt)
+            //    fgt->SetAvoidHurt(false);
             _packet << static_cast<UInt16>(bAction.GetHappenTime());
             _packet << fgt->GetBSNumber();
             _packet << static_cast<UInt8>(2);
@@ -363,7 +364,7 @@ namespace Battle
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
                 BattleFighter* bo = static_cast<BattleFighter* >(bAction.GetObject(j));
-                if(!bo || !bo->getHP())
+                if(!bo || !bo->getHP() || bo->GetAvoidHurt())
                     continue;
                 if(buffId && count && side)
                     bo->AddBuff(buffId);
@@ -492,8 +493,8 @@ namespace Battle
         if(_distance > bf->GetAttackRange())
             return 0;
 
-        bf->CheckBuff();
         bf->SetNowTime(curTime);
+        bf->CheckBuff();
         bf->Action();
         return bf->AppendFighterStream(_packet);
     } 
@@ -590,8 +591,8 @@ namespace Battle
             {
                 if(fgt->GetBeginTime() > time)
                     continue;
-                UInt16 advance = ((time-lastTime)*fgt->GetSpeed()) + fgt->GetCachePx() ;
                 fgt->SetNowTime(time);
+                UInt16 advance = ((time-lastTime)*fgt->GetSpeed()) + fgt->GetCachePx() ;
                 fgt->GoForward(2 - cls, advance/100);
                 fgt->SetCachePx(advance % 100);
                 num += fgt->AppendFighterStream(_packet);

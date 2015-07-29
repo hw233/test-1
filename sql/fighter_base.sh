@@ -35,9 +35,11 @@ function fighter_base()
     ' $f > $d
     sed -i s/\\r//g $d
 
+    echo $?
+
     if [ $? -eq 0 ]
     then
-        iconv2utf8 $d
+#        iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
