@@ -102,6 +102,7 @@ namespace Battle
             BattleFighter * fgt = _fgt[index]->getMyFighters(i);
             if(!fgt || fgt->getHP() == 0)
                 return ;
+            fgt->ResetSkill();
             setObjectXY(XPos[index][i] + 100, YPos[index][i], fgt);
             fgt->resetBattleStatue();
             _fighters[index].push_back(fgt);

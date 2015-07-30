@@ -630,4 +630,19 @@ namespace Battle
        m_mainFighter->setHP(hp);
        }
        */
+    void BattleFighter::ResetSkill()
+    { 
+        ActionSort::iterator it = preActionCD.begin();  
+        if(it != preActionCD.end())
+        { 
+            for(;it != preActionCD.end(); ++it)
+                preActionList.push_back(*it);
+            preActionCD.clear();
+        } 
+        //it = preActionList.begin();
+        //for(;it!=preActionList.end();++it)
+        //{ 
+        //    it->_cd = 0;
+        //} 
+    } 
 }
