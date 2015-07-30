@@ -174,7 +174,7 @@ namespace Battle
             //对象移动
             void Move();
             //产生战报信息
-            void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport);
+            void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport,UInt16& fightTimeCost);
             void FighterMove(BattleFighter *, UInt8 x ,UInt8 y);
             //void GetTargetBo(UInt8 x ,UInt8 y ,UInt8 step = 0);
             UInt8 GetRideSub(const UInt8& posx ,const UInt8& posy);
