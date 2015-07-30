@@ -271,6 +271,14 @@ namespace Battle
                 _mapFighters[mx+my*_x] = currentBf;
                 //排布信息同步
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my,1);
+                Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),mx,my,currentBf->getHP());
+                std::vector<UInt32> vecHP;
+                for( UInt8 i = 0 ; i < 10 ; ++i )
+                {
+                   UInt32 hp = currentBf->GetSoldierHp(i);
+                   vecHP.push_back(hp);
+                }
+                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),mx,my,vecHP);
             }
             currentBf->SetGroundX(mx);
             currentBf->SetGroundY(my);
