@@ -36,7 +36,7 @@ function skillEffect()
     sed -i s/\\r//g $d
     if [ $? -eq 0 ]
     then
-        iconv2utf8 $d
+#        iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
