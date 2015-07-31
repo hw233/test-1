@@ -297,7 +297,7 @@ namespace Battle
             //UInt8 rand = uRand(255);
             _pack << static_cast<UInt8>(mx);
             _pack << static_cast<UInt8>(my);
-            _pack << static_cast<UInt8>(  ceil((dis+1)*0.5)/*currentBf->GetNowTime()/100+1 */);
+            _pack << static_cast<UInt8>(ceil((dis+1)*0.5));
             std::cout<<"移动用时  " <<static_cast<UInt32>(ceil((dis+1)*0.5))<<std::endl;
             _pack << static_cast<UInt8>(0); //无战斗发生
             _oneRoundCostTime += ceil(dis*0.5)/*currentBf->GetNowTime()/100*/;
@@ -354,12 +354,13 @@ namespace Battle
 
             UInt8 win = 0;
             UInt32 reportId = 0;
-            Fight(currentBf, target.bo, win, reportId);
+            UInt16 fightCostTime = 0 ;
+            Fight(currentBf, target.bo, win, reportId,fightCostTime);
 
             std::cout<<"--------------------------------------------------------------------------------------------------------------------------------"<<endl;
-            std::cout<<" the time from fight is " << static_cast<UInt32>(currentBf->GetNowTime())<<endl;
+            std::cout<<" the time from fight is " << static_cast<UInt32>(fightCostTime)<<endl;
             std::cout<<"--------------------------------------------------------------------------------------------------------------------------------"<<endl;
-            timeCost += ceil(static_cast<float>(currentBf->GetNowTime()/100.0));
+            timeCost += ceil(static_cast<float>(fightCostTime/100.0));
             _pack << static_cast<UInt8>(timeCost);
             _pack << static_cast<UInt8>(1);
             std::cout<<" 此次战斗用时  "<< static_cast<UInt32>(timeCost)<<"秒"<<endl; 
@@ -892,7 +893,7 @@ namespace Battle
     //地形和战斗背景的关系   依次为 草地 树林 城镇 山地
     static UInt8 land2FightGround[4]  = {1,2,4,3};
 
-    void BattleGround::Fight(BattleFighter *bf , BattleFighter * bo, UInt8& result, UInt32& BattleReport)
+    void BattleGround::Fight(BattleFighter *bf , BattleFighter * bo, UInt8& result, UInt32& BattleReport,UInt16& fightTimeCost)
     { 
         //TODO   连接BattleSimulator
         //添加一个实际的攻击距离
@@ -921,6 +922,7 @@ namespace Battle
             result = bsim.GetWin();
             BattleReport = bsim.getId();
             std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+            fightTimeCost = bsim.GetTime();
         }
         else
         {
@@ -929,6 +931,7 @@ namespace Battle
             result = bsim.GetWin();
             BattleReport = bsim.getId();
             std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+            fightTimeCost = bsim.GetTime();
         }
 
 
