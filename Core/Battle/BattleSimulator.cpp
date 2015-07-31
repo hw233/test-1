@@ -412,7 +412,14 @@ namespace Battle
         UInt8 count = 0;
         for(;it != lst.end();)
         { 
-            if(!it->GetBeing() && (!it->GetBattleFighter() || !it->GetBattleFighter()->getHP()))
+            BattleFighter * fgt = it->GetBattleFighter();
+            if(!fgt)
+            { 
+                it = lst.erase(it);
+                continue;
+            } 
+
+            if(!it->GetBeing() && !fgt->getHP())
             {
                 it = lst.erase(it);
                 continue;
@@ -423,7 +430,6 @@ namespace Battle
             bool flag = false;
             for(UInt8 index = 0; index < cnt; ++index)
             {
-                BattleFighter * fgt = it->GetBattleFighter();
                 BattleFighter * target = it->GetTargetFighter();
 
                 //std::cout << "####### 粒子型技能 移动 : 技能释放者=="  << static_cast<UInt32>(fgt->GetBSNumber()) << " 位置 ：" << static_cast<UInt32>(it->GetPosX()) << " , " << static_cast<UInt32>(it->GetPosY()) << std::endl;
