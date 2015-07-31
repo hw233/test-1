@@ -75,7 +75,7 @@ namespace GObject
         //GMHandler::Battle(10,1);
         //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(2,1);
-        //GMHandler::Battle(1002,1006);
+        GMHandler::Battle(1006,1006);
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //std::vector<UInt8> *r = Battle::battleReport0[414];

@@ -855,14 +855,21 @@ namespace Battle
         if( cost > movePower )
         {
             //cost-movePower 为额外需要的行动力
-            if(IsInAround(attack,target) && (cost-movePower) <  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
+            if( cost-movePower >= ride )
             {
-                UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
-                _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
+                return ;
             }
             else
             {
-                return;
+                if(IsInAround(attack,target))    //如果攻击点在目标点的附近
+                {
+                    UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+                    _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
+                }
+                else
+                {
+                    return;
+                }
             }
         }
         else
