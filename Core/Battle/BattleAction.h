@@ -130,8 +130,8 @@ namespace Battle
     class ObjectPackage : public BattleAction
     { 
         public:
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(false){}
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(false){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(0){}
             UInt32 GetAttack(){return _attack;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
@@ -142,8 +142,8 @@ namespace Battle
             UInt16 GetSkillId(){ return _skillId;}
             UInt16 GetHappenTime(){ return _time;}
             float GetHappenTime2(){ return _time2;}
-            void SetBeing(bool v) { _being = v;}
-            bool GetBeing() {return _being;}
+            void SetBeing(UInt16 v) { _being = v;}
+            UInt16 GetBeing() {return _being;}
 
             void GoNext()
             { 
@@ -288,7 +288,7 @@ namespace Battle
             UInt8 _count;
 
             UInt8 _effectType;
-            bool _being;
+            UInt16 _being; // 发射时间
 
     };
 }

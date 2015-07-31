@@ -59,6 +59,7 @@ namespace Battle
             op.setObjectCount(1); //设置穿透数量
             op.pushObjectPoint(getPosX(),getPosY());
             op.SetEffectType(_actionType);
+            op.SetBeing(GetNowTime() + _actionLast);
             GetField()->InsertObjectPackage(op);
 
             GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast, this);

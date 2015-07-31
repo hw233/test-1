@@ -419,13 +419,14 @@ namespace Battle
                 continue;
             } 
 
-            if(!it->GetBeing() && !fgt->getHP())
+            if(it->GetBeing() < time)
             {
-                it = lst.erase(it);
+                if(!fgt->getHP())
+                    it = lst.erase(it);
+                else
+                    ++it;
                 continue;
             }
-            else
-                it->SetBeing(true);
 
             bool flag = false;
             for(UInt8 index = 0; index < cnt; ++index)

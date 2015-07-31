@@ -590,6 +590,7 @@ namespace Battle
         {
             op.pushObjectPoint(getPosX(), minY + (ss->rady+1)*i*width);
         }
+        op.SetBeing(GetNowTime() + _actionLast);
         GetField()->InsertObjectPackage(op);
 
         GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast, this);
