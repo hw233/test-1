@@ -361,7 +361,7 @@ namespace Battle
             std::cout<<"--------------------------------------------------------------------------------------------------------------------------------"<<endl;
             std::cout<<" the time from fight is " << static_cast<UInt32>(fightCostTime)<<endl;
             std::cout<<"--------------------------------------------------------------------------------------------------------------------------------"<<endl;
-            timeCost += ceil(static_cast<float>(fightCostTime/100.0));
+            timeCost += ceil(static_cast<float>(fightCostTime/100.0))+3;
             _pack << static_cast<UInt8>(timeCost);
             _pack << static_cast<UInt8>(1);
             std::cout<<" 此次战斗用时  "<< static_cast<UInt32>(timeCost)<<"秒"<<endl; 
@@ -854,6 +854,7 @@ namespace Battle
         UInt8 movePower = currentBf->GetMovePower();
         if( cost > movePower )
         {
+            //cost-movePower 为额外需要的行动力
             if(IsInAround(attack,target) && (cost-movePower) <  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
             {
                 UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];

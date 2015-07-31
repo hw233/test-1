@@ -15,8 +15,7 @@
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/BattleAnalyze.h"
 #include "Battle/BattleReport.h"
-
-
+#include "Battle/BattleReportAnalyse.h"
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -80,8 +79,10 @@ namespace GObject
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //std::vector<UInt8> *r = Battle::battleReport0[414];
-        std::vector<UInt8>* r = Battle::battleReport1[903];
-        BattleAnalyze::Analyze(Stream(*r));
+        //std::vector<UInt8>* r = Battle::battleReport1[903];
+        //BattleAnalyze::Analyze(Stream(*r));
+        std::vector<UInt8> *r = Battle::battleReport0[415];
+        ReportAnalyse::AnalyseReport(Stream(*r));
 
         return true; 
     }
