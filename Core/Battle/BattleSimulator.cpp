@@ -412,7 +412,7 @@ namespace Battle
         UInt8 count = 0;
         for(;it != lst.end();)
         { 
-            if(it->GetBattleFighter() && !it->GetBattleFighter()->getHP() && !it->GetBeing())
+            if((it->GetBattleFighter() || !it->GetBattleFighter()->getHP()) && !it->GetBeing())
             {
                 it = lst.erase(it);
                 continue;
