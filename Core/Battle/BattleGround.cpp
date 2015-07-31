@@ -134,7 +134,8 @@ namespace Battle
             {
                 flag = *it;
                 ride -=GetRideSub(flag.x,flag.y);
-                if( IsNearbyHaveEnemy(*it) && (*it) != target)
+                //UInt8 dis = GetDistance(flag,target);
+                if( IsNearbyHaveEnemy(*it) )
                 {
                     ride = ride -1;
                 }
@@ -221,15 +222,15 @@ namespace Battle
         UInt8 upI = lh.x + j;
         if( rh.x >= downI && rh.x <= upI )
         {
-            return j;
+            return j-1;
         }
         else if( rh.x < downI )
         {
-            return j+(downI-rh.x)/2;
+            return j+(downI-rh.x)/2-1;
         }
         else
         {
-            return j+(rh.x-upI)/2;
+            return j+(rh.x-upI)/2-1;
         }
     }
 
@@ -778,9 +779,9 @@ namespace Battle
             {
                 Ascoord p = *it;
                 cost+=GetRideSub(p.x,p.y);
-                if( IsNearbyHaveEnemy(p) && p != target)
+                if( IsNearbyHaveEnemy(p) )
                 {
-                    cost+=1;
+                    cost +=1;
                 }
             }
         }
@@ -831,7 +832,7 @@ namespace Battle
         {
             for( auto it = path.begin(); it != path.end(); )
             {
-                if( IsInAttackZone(*it,target) && !(_mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] > 0 ) )
+                if( IsInAttackZone(*it,target) && (_mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] <= 0 ) ))
                 {
                     attack = *it;
                     break;
@@ -841,20 +842,19 @@ namespace Battle
                     ++it;
                     Ascoord p = *it;
                     cost+=GetRideSub(p.x,p.y);
-                    //周围有敌人消耗行动力加一
-                    if( IsNearbyHaveEnemy(p) && p != target)
+                    UInt8 dis = GetDistance(p,target);
+                    if( IsNearbyHaveEnemy(p) && dis > 0  )
                     {
                         cost+=1;
                     }
                 }
-
             }
         }
         UInt8 ride = GetRideSub(attack.x,attack.y);
         UInt8 movePower = currentBf->GetMovePower();
         if( cost > movePower )
         {
-            if(IsInAround(attack,target) && (cost-movePower) <=  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
+            if(IsInAround(attack,target) && (cost-movePower) <  ride /*(ride-1)*/ )    //如果攻击点在目标点的附近
             {
                 UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
                 _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
