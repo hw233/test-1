@@ -371,7 +371,7 @@ namespace Battle
                     bo->AddBuff(buffId);
                 UInt16 param = bo->BeActed(&bAction);
                 //XXX 差法术协议
-                if(skillType == 6)
+                if(skillType == e_image_therapy)
                     _packet << static_cast<UInt8>(1);
                 else
                     _packet << static_cast<UInt8>(0);
@@ -419,7 +419,7 @@ namespace Battle
                 continue;
             } 
 
-            if(it->GetBeing() < time)
+            if(it->GetBeing() > time)
             {
                 if(!fgt->getHP())
                     it = lst.erase(it);
