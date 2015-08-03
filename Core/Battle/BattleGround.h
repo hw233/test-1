@@ -196,7 +196,7 @@ namespace Battle
             void GetTarget(UInt8 x,UInt8 y ,UInt8 ride);
             void GetNeighbourEnemy(UInt8 x,UInt8 y,std::vector<Ascoord>& vecAscoord);//相邻的敌人
             void BowAnalyse(std::list<Ascoord> path,Ascoord target);
-            void GetBackPosition(std::vector<Ascoord>& vecNearEnemy, std::vector<AttackInfo> vecFinal);
+            void GetBackPosition(std::vector<Ascoord>& vecNearEnemy, std::vector<AttackInfo>& vecFinal);
             void GetRideZone(std::vector<Ascoord>& vecAscoord);
             bool EnemyCanAttack(Ascoord stand, Ascoord target);
             UInt8 GetDirection(UInt8 x,UInt8 y , UInt8 cx, UInt8 cy);
