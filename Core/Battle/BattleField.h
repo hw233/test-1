@@ -31,9 +31,9 @@ namespace Battle
     {
         filed_none = 0,
         filed_flat = 1,
-        filed_glass = 2,
-        filed_desert = 3,
-        filed_water = 4,
+        filed_forest = 2,
+        filed_city = 3,
+        filed_hill = 4,
     };
 
     class BattleField
@@ -113,6 +113,7 @@ namespace Battle
             BattleFighter* GetSuperSkill(){return _super;}
             void AddTimeExtra(UInt32 v){ _timeExtra += v;}
             UInt32 GetTimeExtra() {return _timeExtra;}
+            virtual UInt8 GetAttackUp(UInt8) { return 0;}
         protected:
             bool anyObjectInRow(UInt16, UInt16);
             void updateStats(UInt16);

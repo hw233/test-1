@@ -15,7 +15,7 @@
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/BattleAnalyze.h"
 #include "Battle/BattleReport.h"
-#include "Battle/BattleReportAnalyse.h"
+//#include "Battle/BattleReportAnalyse.h"
 #define W_CHAT_MAX 20
 
 namespace GObject

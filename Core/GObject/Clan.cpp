@@ -320,4 +320,9 @@ namespace GObject
         }
 
     }
+
+    void Clan::OnClanDestroy()
+    { 
+
+    } 
 }

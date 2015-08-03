@@ -32,7 +32,8 @@ namespace Battle
         e_walk = 1,
         e_ride = 2,
         e_shoot = 3,
-        e_advice = 4,
+        e_lance = 4,
+        e_advice = 5,
         e_fighter_max
     };
 
@@ -218,7 +219,7 @@ namespace Battle
 
             virtual UInt16 GetBaseActionNum() = 0 ;
             
-            UInt32 GetAttack() { return GetTotalAttr(e_attr_attack);}
+            UInt32 GetAttack() { return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS())/100);}
 
             UInt32 GetDefend(){ return GetTotalAttr(e_attr_defend);}
             UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magatk);}

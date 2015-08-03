@@ -15,6 +15,8 @@ namespace GObject
 }
 namespace Battle
 {
+
+
     struct Point
     {
         UInt8 x;
@@ -59,6 +61,9 @@ namespace Battle
 
             bool GetStop();
 
+            void SetAttackUp();
+
+            UInt8 GetAttackUp(UInt8 side){if(side >1) return 0; return _attackUp[side];} 
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];
@@ -67,7 +72,8 @@ namespace Battle
             UInt32 _limitTime;
             UInt8 _distance;
             UInt16 _time;
-            UInt16 _complate[2];
+            //UInt16 _complate[2];
+            UInt8 _attackUp[2];
     };
 }
 #endif // BATTLESIMULATOR_H_
