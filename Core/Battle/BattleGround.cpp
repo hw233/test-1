@@ -157,6 +157,8 @@ namespace Battle
     void BattleGround::MoveGetEnemy(std::vector<Ascoord>& vecAscoord)
     {
         UInt8 y = currentBf->GetGroundY();
+        if( y > _y )
+            return;
         //先检查和他一条直线上
         for(UInt8 i = 0 ; i < _x ; ++i )
         {
@@ -564,7 +566,7 @@ namespace Battle
     }
 
 
-    //获得一个行动力所能走到的范围
+    //获得行动力所能走到的范围
     void BattleGround::GetRideZone(std::vector<Ascoord>& vecAscoord)
     {
         UInt8 ride = currentBf->GetMovePower();
@@ -591,7 +593,7 @@ namespace Battle
 
 
 
-    void BattleGround::GetBackPosition(std::vector<Ascoord>& vecNearEnemy, std::vector<AttackInfo> vecFinal)
+    void BattleGround::GetBackPosition(std::vector<Ascoord>& vecNearEnemy, std::vector<AttackInfo>& vecFinal)
     {
         //后退的那个点 不能有人 不能是障碍 
         std::vector<Ascoord> vecAscoord;
@@ -645,7 +647,7 @@ namespace Battle
         else
         {
             SetStart(Ascoord(x,y));
-            for( auto it = vecFinal.begin() ; it != vecFinal.begin(); ++it)
+            for( auto it = vecFinal.begin() ; it != vecFinal.end(); ++it)
             {
                 SetEnd((*it).attack);
                 ComputeRoute();
@@ -779,9 +781,14 @@ namespace Battle
             {
                 Ascoord p = *it;
                 cost+=GetRideSub(p.x,p.y);
-                if( IsNearbyHaveEnemy(p) )
+                if( IsInAttackZone(*it,target) && (_mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] <= 0 ) ))
                 {
                     cost +=1;
+                }
+                if( IsInAttackZone(p,target) )
+                {
+                    attack = p;
+                    break;
                 }
             }
         }
@@ -806,10 +813,17 @@ namespace Battle
         {
            UInt8 x = (*it).x;  
            UInt8 y = (*it).y;
-           if( _mapGround[x+y*_x] != 0  && _mapFighters[x+y*_x] != NULL && _mapFighters[x+y*_x] != currentBf  && _mapFighters[x+y*_x]->GetSide() != currentBf->GetSide() && _mapFighters[x+y*_x]->getHP() > 0)
-           {
-               return true;
-           }
+           if( _mapGround[x+y*_x] == 0 )
+               continue;
+           if( _mapFighters[x+y*_x] == NULL )
+               continue;
+           if( _mapFighters[x+y*_x]->GetSide() == currentBf->GetSide() )
+               continue;
+           if( _mapFighters[x+y*_x]->getHP() <= 0 )
+               continue;
+           if( _mapFighters[x+y*_x] == currentBf )
+               continue;
+           return true;
         }
         return false;
     }
@@ -830,9 +844,10 @@ namespace Battle
         }
         else
         {
+            std::cout<<" ||||||||||||||||||||||||||||||目标点  " << static_cast<UInt32>( target.x ) << "     " << static_cast<UInt32>( target.y) <<std::endl;
             for( auto it = path.begin(); it != path.end(); )
             {
-                if( IsInAttackZone(*it,target) && (_mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] <= 0 ) ))
+                if( IsInAttackZone(*it,target)  /*&& (_mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] <= 0 )) */)
                 {
                     attack = *it;
                     break;
@@ -842,9 +857,12 @@ namespace Battle
                     ++it;
                     Ascoord p = *it;
                     cost+=GetRideSub(p.x,p.y);
+                    std::cout<<" 在  "<<static_cast<UInt32>(p.x)<<"    " << static_cast<UInt32>( p.y ) << " 消耗行动力 " << static_cast<UInt32>(GetRideSub(p.x,p.y))<<std::endl;
+
                     UInt8 dis = GetDistance(p,target);
                     if( IsNearbyHaveEnemy(p) && dis > 0  )
                     {
+                        std::cout<<" 由于周围有敌人的干扰  行动力消耗+1 "<<std::endl;
                         cost+=1;
                     }
                 }
@@ -854,8 +872,12 @@ namespace Battle
         UInt8 movePower = currentBf->GetMovePower();
         if( cost > movePower )
         {
-            //cost-movePower 为额外需要的行动力
-            if( cost-movePower >= ride )
+            //cost-movePower 为额外需要的行动力   
+            //
+            //自身行动虽然不够但是  还是有剩余的
+            UInt8 toReverseSecondCost = cost - ride ;   //  从起始点到倒数第二个点的行动力消耗
+            //然后再跟自己本身就有的行动力做比较
+            if( toReverseSecondCost >= movePower ) //到倒数第一个点的时候已经没有行动力剩余  直接return
             {
                 return ;
             }

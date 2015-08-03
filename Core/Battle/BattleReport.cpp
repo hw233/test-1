@@ -16,7 +16,8 @@ namespace Battle
 BattleReport battleReport0(0);
 BattleReport battleReport1(1);
 
-int lastMaxId = 0;
+int lastMaxId0 = 0;  //战术上一个战报
+int lastMaxId1 = 1;  //战斗上一个战报
 void BattleReport::init()
 {
 	try
@@ -43,11 +44,16 @@ void BattleReport::init()
             }
             if (maxid > 0)
             {
-                lastMaxId = maxid;
                 if(!_type)
+                {
+                    lastMaxId0 = maxid;
                     IDGenerator::gBattleOidGenerator0.Init(maxid);
+                }
                 else
+                {
+                    lastMaxId1 = maxid;
                     IDGenerator::gBattleOidGenerator1.Init(maxid);
+                }
                 return;
             }
         }
@@ -129,9 +135,18 @@ void BattleReport::addReport( UInt32 id, std::vector<UInt8>& v )
 		return;
 	fwrite(&v[0], 1, v.size(), f);
 	fclose(f);
-    if(id >static_cast<UInt32>(lastMaxId))
-        DB1().PushUpdateData("update reportid set maxid = %d where type = %d", id,_type);
-    lastMaxId = id;
+    if( _type == 0 )
+    {
+        if(id >static_cast<UInt32>(lastMaxId0))
+            DB1().PushUpdateData("update reportid set maxid = %d where type = %d", id,_type);
+        lastMaxId0 = id;
+    }
+    else
+    {
+        if(id >static_cast<UInt32>(lastMaxId1))
+            DB1().PushUpdateData("update reportid set maxid = %d where type = %d", id,_type);
+        lastMaxId1 = id;
+    }
 
     RptLife rptLife = {id, TimeUtil::Now()};
     _rptLife.insert(rptLife);
