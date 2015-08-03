@@ -23,6 +23,9 @@ namespace Battle
         _fgt[1] = bo;
         bo->SetSideInBS(1); 
         bo->SetField(this);
+
+        _attackUp[0] = 0;
+        _attackUp[1] = 0;
     } 
     void BattleSimulator::InitFighters(UInt8 index ,UInt8 flag)
     { 
@@ -122,6 +125,8 @@ namespace Battle
             RandPosBegin(1);
         }
         //UInt32 time  = 0;
+        //战力提升
+        SetAttackUp();
 
         GetBSEnterInfo(_packet);
 
@@ -208,12 +213,13 @@ namespace Battle
                 fgt = new BattleRideFighter(bf,f,pointX,pointY);
                 break;
             case 1:
+            case 4:
                 fgt = new BattleWalkFighter(bf,f,pointX,pointY);
                 break;
             case 3:
                 fgt =  new BattleShootFighter(bf,f,pointX,pointY);
                 break;
-            case 4:
+            case 5:
                 fgt =  new BattleAdviceFighter(bf,f,pointX,pointY);
                 break;
             default:
@@ -637,5 +643,40 @@ namespace Battle
                 return true;
         } 
         return false;
+    } 
+    void BattleSimulator::SetAttackUp()
+    { 
+        static UInt8 groundUp[][5] = {
+        {0,25,0,0,0},
+        {25,0,0,10,25},
+        {10,0,25,25,25},
+        {10,0,25,10,0},
+        };
+
+        static UInt8 armyUp[e_fighter_max][e_fighter_max] = {0};
+
+        armyUp[e_walk][e_lance] = 50;
+        armyUp[e_ride][e_walk] = 50;
+        armyUp[e_lance][e_ride] = 50;
+
+        if(!_fgt[0] || !_fgt[1])
+            return ;
+
+        UInt8 type1 = _fgt[0]->GetTypeId();
+        UInt8 type2 = _fgt[1]->GetTypeId();
+
+        if((_mapId1 < 4 && _mapId1 != 0) && (type1 < e_fighter_max && type1 != e_fighter))
+        {
+            _attackUp[0] = groundUp[_mapId1-1][type1-1];
+        }
+
+        if((_mapId2 < 4 && _mapId2 != 0) && (type2 < e_fighter_max && _fgt[1]->GetTypeId() != e_fighter))
+        {
+            _attackUp[1] = groundUp[_mapId1-1][_fgt[0]->GetTypeId()-1];
+        }
+
+        _attackUp[0] += armyUp[type1][type2];
+        _attackUp[1] += armyUp[type2][type1];
+
     } 
 }

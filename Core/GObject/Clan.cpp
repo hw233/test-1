@@ -296,4 +296,9 @@ namespace GObject
         pl->SetClan(NULL);
         pl->SetClanPos(0);
     }
+
+    void Clan::OnClanDestroy()
+    { 
+
+    } 
 }

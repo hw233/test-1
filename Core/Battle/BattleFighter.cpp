@@ -139,9 +139,17 @@ namespace Battle
         //TODO
         UInt32 attack = bAction->GetAttack();
         UInt32 defend = GetDefend();
-        UInt32 hpSub = attack - defend;
+        UInt32 hpSub = 0;
+
+        if(attack <= defend)
+        { 
+            hpSub = attack * 25 / 100;
+        } 
+        else
+        {
+            hpSub = attack - attack * (defend / attack * 75 /100);
+        }
         //TEST
-        hpSub = 200;
         makeDamage(hpSub);
 
         if(GetClass() == e_shoot || GetClass() == e_advice)
