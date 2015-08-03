@@ -266,7 +266,7 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
     {
         return;
     }
-    if( posx == fighterInfo->GetPosX() && posy == fighterInfo->GetPosY())
+    if( mapId == fighterInfo->GetMapId() && posx == fighterInfo->GetPosX() && posy == fighterInfo->GetPosY())
     {
         return;
     }

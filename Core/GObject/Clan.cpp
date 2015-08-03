@@ -292,8 +292,32 @@ namespace GObject
     } 
     void Clan::OnClanLeave(Player* pl)
     {
-        DelMember(pl);
-        pl->SetClan(NULL);
-        pl->SetClanPos(0);
+        if( pl->GetClanPos() == 1 )   //如果是军团长
+        {
+            if(GetClanBattleRoomId() == 0 ) //没有参加军团战的话  删掉
+            {
+                //删掉
+                DB2().PushUpdateData("delete from `clan` where `clanId`=%u", GetId());
+                //globalclans 更新  这次先不写了 
+                //TODO
+                GObject::globalClan.remove(GetId());
+                GObject::globalNamedClans.remove(GetName());
+
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+           if( pl->GetJoinClanBattle() == 0 )
+           {
+               DelMember(pl);
+               pl->SetClan(NULL);
+               pl->SetClanPos(0);
+           }
+        }
+
     }
 }

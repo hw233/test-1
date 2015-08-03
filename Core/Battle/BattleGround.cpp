@@ -920,6 +920,15 @@ namespace Battle
     }
 
 
+     //1  草地
+
+     //2  森林
+
+     //3  城镇
+
+     //4  山地  
+
+
     //地形和战斗背景的关系   依次为 草地 树林 城镇 山地
     static UInt8 land2FightGround[4]  = {1,2,4,3};
 

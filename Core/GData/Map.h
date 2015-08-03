@@ -11,8 +11,8 @@ namespace GData
     {
         eUnCross = 0 , //不可通过的障碍
         eGrass   = 1 , //草地
-        eTown    = 2 , //城镇
-        eForest  = 3 , //森林
+        eForest  = 2 , //森林
+        eTown    = 3 , //城镇
         eHill    = 4 , //山地
         eMax
     };
