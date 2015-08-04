@@ -847,10 +847,17 @@ namespace Battle
             std::cout<<" ||||||||||||||||||||||||||||||目标点  " << static_cast<UInt32>( target.x ) << "     " << static_cast<UInt32>( target.y) <<std::endl;
             for( auto it = path.begin(); it != path.end(); )
             {
-                if( IsInAttackZone(*it,target)  /*&& (_mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] <= 0 )) */)
+                if( IsInAttackZone(*it,target))
                 {
-                    attack = *it;
-                    break;
+                    if( _mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x]->getHP() <= 0 ))
+                    {
+                        attack = *it;
+                        break;
+                    }
+                    else  //在可攻击的点还是有人 就return
+                    {
+                        return;
+                    }
                 }
                 else
                 {

@@ -321,7 +321,7 @@ void OnClanBattleDelFighter(GameMsgHdr& hdr,const void * data)
     UInt8 y = fighterInfo->GetPosY();
     if( fighterInfo->GetMapId() != mapId)
         return;
-    bool res =  Battle::battleDistribute.RemoveFighter(mapId,player,fighterId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
+    bool res =  Battle::battleDistribute.RemoveFighter(mapId,player,fighterId,x,y);
     if( res == false )
     {
         Stream st(REP::CLAN_BATTLE_CANCELFIGHTER);
