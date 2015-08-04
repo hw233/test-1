@@ -271,13 +271,15 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
         return;
     }
     UInt8 res = false;
+    UInt8 curx = fighterInfo->GetPosX();
+    UInt8 cury = fighterInfo->GetPosY();
     if( curMapId == mapId )
     {
-        res = Battle::battleDistribute.MoveFighter(mapId,player,fighterInfo->GetPosX(),fighterInfo->GetPosY(),posx,posy,0);
+        res = Battle::battleDistribute.MoveFighter(mapId,player,curx,cury,posx,posy,0);
     }
     else
     {
-        res = Battle::battleDistribute.MoveFighterWithDiffTown(player,curMapId,fighterInfo->GetPosX(),fighterInfo->GetPosY(),mapId,posx,posy);
+        res = Battle::battleDistribute.MoveFighterWithDiffTown(player,curMapId,curx,cury,mapId,posx,posy);
 
     }
     if( res == false )
@@ -285,8 +287,8 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
         Stream st(REP::CLAN_BATTLE_MOVEFIGHTER);
         st<<static_cast<UInt8>(res);
         st<< static_cast<UInt8>(curMapId);
-        st<< static_cast<UInt8>(fighterInfo->GetPosX());
-        st<< static_cast<UInt8>(fighterInfo->GetPosY());
+        st<< static_cast<UInt8>(curx);
+        st<< static_cast<UInt8>(cury);
         st<< static_cast<UInt8>(mapId);
         st<< static_cast<UInt8>(posx);
         st<< static_cast<UInt8>(posy);
@@ -295,7 +297,7 @@ void OnClanBattleMoveFighter(GameMsgHdr& hdr,const void * data)
     }
     else
     {
-        Battle::battleDistribute.NoticeAlliesMoveFighter(player,curMapId,fighterInfo->GetPosX(),fighterInfo->GetPosY(),mapId,posx,posy);
+        Battle::battleDistribute.NoticeAlliesMoveFighter(player,curMapId,curx,cury,mapId,posx,posy);
     }
 
 }
@@ -315,7 +317,8 @@ void OnClanBattleDelFighter(GameMsgHdr& hdr,const void * data)
 
     if( fighterInfo == NULL )
         return;
-
+    UInt8 x = fighterInfo->GetPosX();
+    UInt8 y = fighterInfo->GetPosY();
     if( fighterInfo->GetMapId() != mapId)
         return;
     bool res =  Battle::battleDistribute.RemoveFighter(mapId,player,fighterId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
@@ -328,7 +331,7 @@ void OnClanBattleDelFighter(GameMsgHdr& hdr,const void * data)
     }
     else
     {
-        Battle::battleDistribute.NoticeAlliesDelFighter(player,mapId,fighterInfo->GetPosX(),fighterInfo->GetPosY());
+        Battle::battleDistribute.NoticeAlliesDelFighter(player,mapId,x,y);
     }
 
 }
