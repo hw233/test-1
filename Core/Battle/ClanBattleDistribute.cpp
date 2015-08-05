@@ -470,6 +470,13 @@ namespace Battle
                     st<<static_cast<UInt16>((*iter)->GetFighterId());
                     st<<static_cast<UInt8>((*iter)->GetPosX());
                     st<<static_cast<UInt8>((*iter)->GetPosY());
+                    GObject::Player* pl = GObject::globalPlayers[(*iter)->GetPlayerId()];
+                    if( pl == NULL )
+                        continue;
+                    GObject::Fighter* fgt = pl->findFighter((*iter)->GetFighterId());
+                    if( fgt == NULL )
+                        continue;
+                    st<<static_cast<UInt16>(fgt->GetTotalPower());
                     ++allies;
                 }
                 if( forceid != forceId )

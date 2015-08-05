@@ -255,6 +255,7 @@ CREATE TABLE `exploit_point` (
       `id` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '采集点编号',
       `type`   int(3) unsigned NOT NULL DEFAULT '0' COMMENT '资源类型',
       `openLevel`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '开放的等级',
+      `ability` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '所需能力',
       `transform`  float(10,2) unsigned NOT NULL DEFAULT '0' COMMENT '转化率',
       `perMin`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '转化率',
       `perMax`  int(3) unsigned NOT NULL DEFAULT '0' COMMENT '转化率',

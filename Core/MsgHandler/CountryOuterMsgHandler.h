@@ -640,6 +640,29 @@ void OnSignInfo(GameMsgHdr& hdr, const void * data)
     UInt8 number = 0;
     br >> number;
     player->GetSignInfo(number);
-} 
+}
+
+void OnExploitReplaceFighter(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 id = 0;
+    br >> id;
+    UInt16 fighterId = 0;
+    br >> fighterId;
+    GObject::Fighter* fgt = player->findFighter(fighterId);
+    if( fgt == NULL )
+        return ;
+    player->GetExploitManager()->ReplaceFighter(id,fgt);
+}
+
+void OnExploitCollect(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    //UInt8 id = 0;
+    //br >> id;
+    player->GetExploitManager()->CollectAllSource();
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

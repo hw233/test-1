@@ -185,6 +185,7 @@ namespace GData
         UInt8 id;
         UInt8 type;
         UInt8 openLevel;
+        UInt8 ability;
         float transform;
         UInt8 perMin;
         UInt8 perMax;
@@ -398,11 +399,12 @@ namespace DB
        SPECIALEND()
 
        SPECIALBEGIN(GData::DBExploitPointInfo)
-       SPECIALDEF(6)
+       SPECIALDEF(7)
        (
           UInt8,  id,
           UInt8, type,
           UInt8, openLevel,
+          UInt8, ability,
           float, transform,
           UInt8, perMin,
           UInt8, perMax

@@ -12,7 +12,7 @@ namespace Battle
     {
         //更新数据库
         std::vector<UInt32> vecClan = force2clans[forceId];
-
+        UInt16 totalNum = 0;
         if( !vecClan.empty() )
         {
             for( auto it = vecClan.begin(); it != vecClan.end(); ++it )
@@ -21,14 +21,17 @@ namespace Battle
                 {
                     return;
                 }
+                GObject::Clan* clan = GObject::globalClan[clanId];
+                if( clan == NULL )
+                    return;
+                totalNum += clan->GetMemberNum();
             }
-
         }
         char buff[1024]={0};
         vecClan.push_back(clanId);
         force2clans[forceId] = vecClan;
-        UInt32 totalNum = force2num[forceId]+num;
-        force2num[forceId] += num;
+        totalNum += num;
+        force2num[forceId] = totalNum;
         UInt8 offset = 0 ;
         for(auto it = vecClan.begin(); it != vecClan.end() ; ++it )
         {

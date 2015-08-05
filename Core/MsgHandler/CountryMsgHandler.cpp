@@ -74,4 +74,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     //推图战役奖励
     MSG_REG_2(GameMsgHdr,REQ::BATTLE_AWARD,OnFarWardAward);
 
+    MSG_REG_2(GameMsgHdr,REQ::EXPLOIT_REPLACE_FIGHTER,OnExploitReplaceFighter);
+
+    MSG_REG_2(GameMsgHdr,REQ::EXPLOIT_COLLECT,OnExploitCollect);
+
 MSG_HANDLER_END()

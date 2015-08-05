@@ -33,6 +33,7 @@ namespace GObject
         chatHold = NULL;
         clan = NULL;
         m_governManager = new GovernManager(this);
+        m_exploitManager = new ExploitManager(this);
     }
 
     bool enum_send_chat(Player *pl , void * ptr)

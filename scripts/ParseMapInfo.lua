@@ -1,7 +1,7 @@
 forest = require("MapInfo/forest")
 campaign_1 = require("MapInfo/campaign_1")
 template9  = require("MapInfo/template_9x9")
-
+template_10x9_2p_lr = require("MapInfo/template_10x9_2p_lr")
 
 name2table= {
     [1] = forest,
@@ -15,7 +15,7 @@ name2table= {
     [9] = forest,
     [10] = forest,
     [11] = campaign_1,
-    [12] = campaign_1,
+    [12] = template_10x9_2p_lr,
     [13] = campaign_1,
     [14] = campaign_1,
     [15] = campaign_1,
@@ -245,7 +245,7 @@ for i=1,#b do
     print("the value is"..b[i])
 end
 
-local c = GetMap(1)
+local c = GetMap(12)
 print(#c)
 for i=1,#c do
     print("the tile is"..c[i])

@@ -417,6 +417,7 @@ namespace Battle
         st << static_cast<UInt8>(GetGroundX());
         st << static_cast<UInt8>(GetGroundY());
         st << static_cast<UInt8>(GetFighterNum());
+        st << static_cast<UInt16>(GetTotalPower());
     }
 
 

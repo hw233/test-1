@@ -110,6 +110,14 @@ namespace REQ
     const UInt8 CLAN_BATTLE_INFO          = 0xA7;
 
 
+    /*开采换将*/
+    const UInt8 EXPLOIT_REPLACE_FIGHTER   = 0xB0;
+    /*资源采集*/
+    const UInt8 EXPLOIT_COLLECT           = 0xB1;
+    /*开采加速*/
+    const UInt8 EXPLOIT_SPEEDUP           = 0xB2;
+
+
 
 
 
@@ -646,7 +654,7 @@ namespace REP
     /*取消放置战将*/
     const UInt8 CLAN_BATTLE_CANCELFIGHTER = 0xA3;
     /*军团令*/
-    const UInt8 CLAN_BATTLE_ORDERS      = 0xA4;
+    const UInt8 CLAN_BATTLE_ORDERS        = 0xA4;
     /*留言*/
     const UInt8 CLAN_BATTLE_COMMENTS      = 0xA5;
     /*请求战报*/
@@ -654,8 +662,15 @@ namespace REP
     /*战场信息*/
     const UInt8 CLAN_BATTLE_INFO          = 0xA7;
 
-    const UInt8 CLAN_APPLY         = 0x74;
+    const UInt8 CLAN_APPLY                = 0x74;
 
+
+    /*开采换将*/
+    const UInt8 EXPLOIT_REPLACE_FIGHTER   = 0xB0;
+    /*资源采集返回*/
+    const UInt8 EXPLOIT_COLLECT           = 0xB1;
+    /*开采加速*/
+    const UInt8 EXPLOIT_SPEEDUP           = 0xB2;
 
 
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00
