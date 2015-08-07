@@ -57,6 +57,7 @@ namespace GObject
         e_chat_friend,
         e_chat_clan
     };
+
     class Fighter;
     struct lineup
     {
@@ -656,7 +657,7 @@ namespace GObject
 
             void GiveConstantlyKillAward();
 
-            UInt8 Sign(UInt8 opt);
+            UInt8 SignForMouth(UInt8 opt);
 
             void GetSignInfo(UInt16 number);
 

@@ -27,7 +27,7 @@ private:
 public:
     GObject::Player* _printMsgPlayer;
 
-    static void Battle(UInt16 fighterId1, UInt16 fighterId2) ;
+    static void Battle(UInt16 fighterId1, UInt16 fighterId2, UInt8 advance = 0);
 private:
 
 	void OnAddExp(GObject::Player *, std::vector<std::string>&);

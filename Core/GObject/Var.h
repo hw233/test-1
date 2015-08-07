@@ -48,6 +48,8 @@ namespace GObject
         VAR_EXPLOIT_LEATHER = 18, //皮革
         VAR_EXPLOIT_IRON = 19,    //铁
         VAR_EXPLOIT_COPPER = 20,  //铜
+        VAR_SIGN_MONTH_ADD = 21,  //按月签到
+        VAR_DAY_CHANGE = 22,  //按月签到
         VAR_MAX
     };
 
@@ -98,6 +100,8 @@ namespace GObject
                 REGISTER_VAR(VAR_EXPLOIT_LEATHER,CYCLE_NONE);
                 REGISTER_VAR(VAR_EXPLOIT_IRON,CYCLE_NONE);
                 REGISTER_VAR(VAR_EXPLOIT_COPPER,CYCLE_NONE);
+                REGISTER_VAR(VAR_SIGN_MONTH_ADD,CYCLE_MONTH);
+                REGISTER_VAR(VAR_DAY_CHANGE,CYCLE_DAY);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

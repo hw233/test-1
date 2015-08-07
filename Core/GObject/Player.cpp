@@ -15,6 +15,11 @@
 #define P_CHAT_MAX 10
 namespace GObject
 {
+    enum 
+    {
+        e_sign_mouth = 0,
+    };
+
     //GlobalNamedPlayers globalPlayers;
     GlobalPlayers globalPlayers;
     GlobalPlayers globalOnlinePlayers;
@@ -880,40 +885,68 @@ namespace GObject
     }
 
 
-    UInt8 Player::Sign(UInt8 opt)
+    UInt8 Player::SignForMouth(UInt8 opt)
     { 
-        UInt32 val = GetVar(VAR_SIGN_MONTH);
-        UInt8 day = TimeUtil::MonthDay();
-        if(!day)
-            return 0;
-        if(val & (1 << (day-1)))
-            return 0;
-        val |= (1 << (day-1));
-        SetVar(VAR_SIGN_MONTH,val);
-           
-        UInt8 res = 0;
-        while(val)
+        UInt32 val = GetVar(VAR_SIGN_MONTH); //签到次数
+        UInt32 valAdd = GetVar(VAR_SIGN_MONTH_ADD);
+        //UInt8 day = TimeUtil::MonthDay();
+        UInt32 dayVal = GetVar(VAR_DAY_CHANGE);
+        UInt8 vipLevel = getVipLevel();
+        if(!opt) //普通签到
+        {
+            //验证当天是否签到过
+            if(dayVal & (1 << e_sign_mouth)) 
+                return 1;
+        }
+        else  //补签
+        {
+            if(!val || opt > val)
+                return 1;
+
+            if((valAdd & (1 << (opt - 1))))
+                return 1;
+            val = opt - 1;
+        }
+
+        UInt8 res = GameAction()->GetSignForMouth(this, val + 1, vipLevel, !opt);
+        if(!res)
+            return 1;
+
+        if(!opt)  //自然签到
         { 
-            if(val%2)
-            {
-                ++res;
-            }
-            val /= 2;
+            val += 1;  //签到次数增加
+            SetVar(VAR_SIGN_MONTH,val);
+            
+            dayVal |= (1 << e_sign_mouth);  //当天签到
+            SetVar(VAR_DAY_CHANGE, dayVal);
+
+            if(res == 2)
+            { 
+                valAdd |= (1 << (val-1));
+                SetVar(VAR_SIGN_MONTH_ADD,valAdd);
+            } 
         } 
-        return res;
+        else  //补签
+        { 
+            valAdd |= (1 << (opt-1));
+            SetVar(VAR_SIGN_MONTH_ADD,valAdd);
+        } 
+        return 0;
     } 
 
     void Player::GetSignInfo(UInt16 index)
     { 
         Stream st(REP::SIGN_INFO);
         st << static_cast<UInt16>(index);
-        UInt32 value = 0;
         switch(index)
         { 
             case 0:
                 {
-                    value = GetVar(VAR_SIGN_MONTH);
-                    st << value;
+                    UInt32 value = GetVar(VAR_SIGN_MONTH);
+                    UInt32 value2 = GetVar(VAR_SIGN_MONTH_ADD);
+                    st << static_cast<UInt8>(value);
+                    st << value2;
+                    st << static_cast<UInt8>(GetVar(VAR_DAY_CHANGE) & (1 << e_sign_mouth));
                 }
         } 
         st << Stream::eos;

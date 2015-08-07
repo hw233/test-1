@@ -101,6 +101,10 @@ namespace Script
         CLASS_DEF(Player, SetVar);
         CLASS_DEF(Player, AddVar);
         CLASS_DEF(Player, AddVarS);
+        CLASS_DEF(Player, GetPackage);
+
+        CLASS_ADD(Package);
+        CLASS_DEF(Package, AddItem);
 
     }
     /*
@@ -266,6 +270,11 @@ namespace Script
     UInt16 GameActionLua::GetRandFighter()
     {
         return Run<UInt16>(NULL, "GetRandFighter");
+    }
+
+    UInt8 GameActionLua::GetSignForMouth(Player* player ,UInt8 index, UInt8 vip, UInt8 flag)
+    {
+        return Run<UInt8>(player, "GetSignForMouth",index,vip,flag);
     }
 
     UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息

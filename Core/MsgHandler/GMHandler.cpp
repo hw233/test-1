@@ -185,7 +185,7 @@ void GMHandler::OnBattle( GObject::Player * player, std::vector<std::string>& ar
     cout << "GM命令 战斗ID " << BattleReport << std::endl;
 }
 
-void GMHandler::Battle(UInt16 id1, UInt16 id2)
+void GMHandler::Battle(UInt16 id1, UInt16 id2, UInt8 advance)
 { 
 
     GObject::Fighter* fgt1 = GObject::globalFighters[id1];
@@ -197,7 +197,7 @@ void GMHandler::Battle(UInt16 id1, UInt16 id2)
     Battle::BattleFighter * bf1 = Battle::BattleSimulator::CreateFighter(fgt1->GetClass(),NULL,fgt1, 0, 0);
     Battle::BattleFighter * bf2 = Battle::BattleSimulator::CreateFighter(fgt2->GetClass(),NULL,fgt2, 0, 0);
     
-    Battle::BattleSimulator bsim(bf1,bf2,1);
+    Battle::BattleSimulator bsim(bf1,bf2,advance);
     bsim.start();
     UInt32 BattleReport = bsim.getId();
     cout << "GM命令 战斗ID " << BattleReport << std::endl;

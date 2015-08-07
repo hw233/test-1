@@ -192,4 +192,11 @@ namespace GObject
         st << Stream::eos;
         m_Owner->send(st);
     } 
+    UInt32 Package::GetLeftSize()
+    {
+        UInt32 size = m_Owner->GetVar(VAR_PACKAGE_SIZE);
+        if(size > m_Items.size())
+            return size - m_Items.size();
+        return 0;
+    } 
 }

@@ -32,3 +32,56 @@ function GetRandFighter()
     return ColorFighter[index][r%(#ColorFighter[index])+1]
 end
 
+local AwardForMouth = {
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+    {1,1,1},
+}
+
+function GetSignForMouth(player, index , vip ,flag)  --flag == 0 表示补签
+    if index > #AwardForMouth then
+        return 0
+    end
+    local count = 1; 
+
+    if flag == 0 and vip < AwardForMouth[index][0] then
+        return 0
+    end
+
+    if flag == 1 and vip >= AwardForMouth[index][0] then
+        count = 2
+    end
+
+    local package = player:GetPackage()
+
+    package:AddItem(AwardForMouth[index][1], AwardForMouth[index][2] * count)
+    return count
+end
+

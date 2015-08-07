@@ -55,6 +55,7 @@ namespace Battle
 
     };
 
+    /*
     enum
     {
         e_attr_attack = 0,
@@ -65,8 +66,10 @@ namespace Battle
         e_attr_criticalDef = 5,
         e_attr_hit = 6,
         e_attr_evade = 7,
+        e_attr_hp = 8,
         e_attr_max
     };
+    */
 
     struct BattleBuff
     {
@@ -149,12 +152,12 @@ namespace Battle
 
             void setMainFighter(BattleFighter * bf){
                 m_mainFighter = bf;
-                setHP(100);//m_mainFighter->getHP());
-                for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
-                { 
-                    attrBase[i] = m_mainFighter->GetBattleAttr(i);
-                } 
-                AddSkill();
+                //setHP(100);//m_mainFighter->getHP());
+                //for(UInt8 i = e_attr_attack ; i < e_attr_max; ++i)
+                //{ 
+                //    attrBase[i] = m_mainFighter->GetBattleAttr(i);
+                //} 
+                //AddSkill();
 
                 _isChild = true;
             }
@@ -219,7 +222,7 @@ namespace Battle
 
             virtual UInt16 GetBaseActionNum() = 0 ;
             
-            UInt32 GetAttack() { return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS())/100);}
+            UInt32 GetAttack() { return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS()))/100;}
 
             UInt32 GetDefend(){ return GetTotalAttr(e_attr_defend);}
             UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magatk);}

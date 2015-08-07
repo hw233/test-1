@@ -145,6 +145,8 @@ namespace Battle
                 if(!bf || !bf->GetField() || !bf->getHP())
                     continue;
 
+                if(_distance > bf->GetAttackRange())
+                    continue ;
                 UInt16 rand = (uRand(25)+1)*4;
                 InsertBattlePre(rand , bf);
                 bf->SetBeginTime(rand);
@@ -204,6 +206,8 @@ namespace Battle
 
     BattleFighter* BattleSimulator::CreateFighter(UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY)
     { 
+        if(!f)
+            return NULL;
         if(!bf)
             bf = Script::BattleFormula::getCurrent();
         BattleFighter * fgt = NULL;

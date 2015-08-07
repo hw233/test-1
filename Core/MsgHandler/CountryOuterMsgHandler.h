@@ -624,7 +624,19 @@ void OnSign(GameMsgHdr& hdr, const void * data)
     UInt8 opt = 0;
     br >> opt;
 
-    UInt8 result = player->Sign(opt);
+    UInt8 result = 0;
+
+    switch(opt)
+    { 
+        case 0:
+            {
+                UInt8 type = 0;
+                br >> type;
+                result = player->SignForMouth(type);
+            }
+            break;
+    } 
+
 
     Stream st(REP::SIGN);
     st << static_cast<UInt8>(opt);

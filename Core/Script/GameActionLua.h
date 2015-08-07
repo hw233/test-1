@@ -40,6 +40,7 @@ namespace Script
             UInt8  GetRideSub(UInt8 stype, UInt8 landform);
             UInt8  GetAttackRange(UInt8 stype);
             UInt8  GetMovePower(UInt8 stype);
+            UInt8  GetSignForMouth(Player* player, UInt8 index, UInt8 vip, UInt8 flag);
 
 
         public:
