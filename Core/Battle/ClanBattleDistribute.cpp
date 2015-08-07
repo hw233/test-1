@@ -97,8 +97,9 @@ namespace Battle
         {
             return false;
         }
+        
 
-        if( tileInfo[x+y*width] == 0 )     //改点是不可放置的点
+        if( tileInfo[x+y*width] == 0 )     //该点是不可放置的点
         {
             return false;
         }

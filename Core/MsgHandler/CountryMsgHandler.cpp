@@ -78,4 +78,6 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr,REQ::EXPLOIT_COLLECT,OnExploitCollect);
 
+    MSG_REG_2(GameMsgHdr,REQ::EXPLOIT_SPEEDUP,OnExploitSpeedUp);
+
 MSG_HANDLER_END()

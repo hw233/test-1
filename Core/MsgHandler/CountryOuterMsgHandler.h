@@ -665,4 +665,14 @@ void OnExploitCollect(GameMsgHdr& hdr,const void * data)
     player->GetExploitManager()->CollectAllSource();
 }
 
+void OnExploitSpeedUp(GameMsgHdr& hdr,const void * data)
+{
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    //UInt8 id = 0;
+    //br >> id;
+    player->GetExploitManager()->SpeedUp();
+}
+
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
