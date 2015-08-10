@@ -128,12 +128,14 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         conn->pendClose();
         return;
     }                 
-
+    
+    /*
     if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
     {
         conn->pendClose();
         return;
     }
+    */
 
     //checkKey(0, ul._hashval, ul._userid);  //LIBO
 
