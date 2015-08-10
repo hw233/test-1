@@ -349,7 +349,7 @@ namespace Battle
 
             UInt32 GetTotalPower() { return _fighter->GetTotalPower();}
 
-            void AddEnergy(UInt32 energy){ _energy += energy;}
+            void AddEnergy(UInt32 energy){ if(!_isChild) _energy += energy;}
             UInt32 GetEnergy(){ return _energy;}
 
         protected:
