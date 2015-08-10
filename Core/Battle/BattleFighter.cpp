@@ -32,6 +32,8 @@ namespace Battle
 
         m_mainFighter = NULL;
 
+        _energy = 0; //主将集气
+
         //if(f) //战将属性  小兵属性延后
         if(f)
         { 
@@ -163,7 +165,7 @@ namespace Battle
             }
         } 
 
-
+        AddEnergy(5);
         return hpSub;
         //BuildLocalStream(e_be_attacked , hpSub);
     } 
@@ -340,7 +342,7 @@ namespace Battle
         UInt8 priority = 0;
         ActionSort::iterator result ;
         ActionBase res(0);//,0,0);
-        bool flag = false;
+        UInt8 flag = 0;
         if(advance == static_cast<UInt16>(-1))
             return res;
         for(ActionSort::iterator it = preActionList.begin(); it != preActionList.end(); ++it)
@@ -348,12 +350,15 @@ namespace Battle
             const GData::Skill * s = GData::skillManager[it->_skillId];
             if(!s)
                 continue;
-            if(GetField()->GetSuperSkill() && s->GetSuperSkill())
+            if(s->GetSuperSkill() && (GetField()->GetSuperSkill() || _energy < 100 ))
                 continue;
+
             if(s->GetSkillCondition()->MeetCondition(advance,priority)) //XXX
             {
-                flag = true;
+                flag = 1;
                 result = it;
+                if(s->GetSuperSkill())
+                    flag = 2;
             }
         }   
         if(/*priority != 0*/ flag && GData::skillManager[result->_skillId])
@@ -362,6 +367,9 @@ namespace Battle
             res._cd = GData::skillManager[res._skillId]->GetCd() + GetNowTime(); //BATTLE2
             preActionList.erase(result);
             preActionCD.push_back(res);
+            if(flag == 2)
+               _energy = _energy > 100 ? _energy - 100:0; 
+            AddEnergy(5);
         } 
         return res;
     } 

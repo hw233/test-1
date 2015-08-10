@@ -64,14 +64,16 @@ namespace Battle
             void SetAttackUp();
 
             UInt8 GetAttackUp(UInt8 side){if(side >1) return 0; return _attackUp[side];} 
+
+            void EnergyUp(UInt32 time);
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];
             Script::BattleFormula * _formula; 
             Stream _packet;
             UInt32 _limitTime;
-            UInt8 _distance;
             UInt16 _time;
+            UInt8 _distance;
             //UInt16 _complate[2];
             UInt8 _attackUp[2];
     };

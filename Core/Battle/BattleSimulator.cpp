@@ -15,6 +15,7 @@
 namespace Battle
 {
     BattleSimulator::BattleSimulator(BattleFighter * bf , BattleFighter* bo ,UInt8 distance,UInt8 mapId1, UInt8 mapId2, bool rpt,UInt32 limitTime):BattleField(mapId1, mapId2),_id(IDGenerator::gBattleOidGenerator1.ID()),_formula(NULL/*Script::BattleFormula::getCurrent()*/),_limitTime(limitTime),_distance(distance)
+
     { 
         _fgt[0] = bf;
         bf->SetSideInBS(0); 
@@ -128,6 +129,7 @@ namespace Battle
         //战力提升
         SetAttackUp();
 
+        _packet << static_cast<UInt8>(_distance);
         GetBSEnterInfo(_packet);
 
         BattleFighter * bf = NULL;//[2] = {NULL,NULL};
@@ -166,6 +168,7 @@ namespace Battle
                 {
                     break; 
                 }
+                EnergyUp(time-lastTime);
                 actCount += doAction(time);
                 actCount += doObjectMove(time, (time - lastTime)/4);  //每回合
                 actCount += doImage(time);   
@@ -682,5 +685,10 @@ namespace Battle
         _attackUp[0] += armyUp[type1][type2];
         _attackUp[1] += armyUp[type2][type1];
 
+    } 
+    void BattleSimulator::EnergyUp(UInt32 time)
+    { 
+       _fgt[0]->AddEnergy(time/4);
+       _fgt[1]->AddEnergy(time/4);
     } 
 }
