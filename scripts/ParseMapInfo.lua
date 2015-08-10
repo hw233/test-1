@@ -1,7 +1,7 @@
 forest = require("MapInfo/forest")
 campaign_1 = require("MapInfo/campaign_1")
 template9  = require("MapInfo/template_9x9")
-
+template_10x9_2p_lr = require("MapInfo/template_10x9_2p_lr")
 
 name2table= {
     [1] = forest,
@@ -15,7 +15,7 @@ name2table= {
     [9] = forest,
     [10] = forest,
     [11] = campaign_1,
-    [12] = campaign_1,
+    [12] = template_10x9_2p_lr,
     [13] = campaign_1,
     [14] = campaign_1,
     [15] = campaign_1,
@@ -42,7 +42,6 @@ end
 function GetTileSetsWithGid(mapId)
     local tileset = {}
     local tilesets = GetTileSets(mapId)
-    print(#tilesets)
     for i = 1, #tilesets do
         local gid = tilesets[i].firstgid
         local name = tilesets[i].name
@@ -128,9 +127,9 @@ function GetMap(mapId)
     for i=1,#map do
         if map[i] == 0 and force[i] == 0 then
             table.insert(Map,0)
-        else if map[i] == 0 then
+        elseif map[i] == 0 then
             table.insert(Map,1)
-        end
+        else
             table.insert(Map,formWithId[map[i]])
         end
     end
@@ -142,9 +141,8 @@ end
 function GetForce(mapId)
     local Force = {}
     local force = GetForceInfo(mapId)
-    local map   = GetMapInfo(mapId)
     local forceWithId = GetForce2Id(mapId)
-    for i=1,#map do
+    for i=1,#force do
         if force[i] == 0 then
             table.insert(Force,0)
         else
@@ -232,22 +230,3 @@ function GetAllDirect2Force()
     end
     return directionAll
 end
-
---[[
-local table = GetTileSetsWithGid(1)
-for k,v in pairs(table) do
-    print(k..":"..v)
-end
-
-local b = GetForce(1)
-print(#b)
-for i=1,#b do
-    print("the value is"..b[i])
-end
-
-local c = GetMap(1)
-print(#c)
-for i=1,#c do
-    print("the tile is"..c[i])
-end
---]]

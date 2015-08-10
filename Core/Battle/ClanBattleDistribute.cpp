@@ -97,8 +97,9 @@ namespace Battle
         {
             return false;
         }
+        
 
-        if( tileInfo[x+y*width] == 0 )     //改点是不可放置的点
+        if( tileInfo[x+y*width] == 0 )     //该点是不可放置的点
         {
             return false;
         }
@@ -470,6 +471,13 @@ namespace Battle
                     st<<static_cast<UInt16>((*iter)->GetFighterId());
                     st<<static_cast<UInt8>((*iter)->GetPosX());
                     st<<static_cast<UInt8>((*iter)->GetPosY());
+                    GObject::Player* pl = GObject::globalPlayers[(*iter)->GetPlayerId()];
+                    if( pl == NULL )
+                        continue;
+                    GObject::Fighter* fgt = pl->findFighter((*iter)->GetFighterId());
+                    if( fgt == NULL )
+                        continue;
+                    st<<static_cast<UInt16>(fgt->GetTotalPower());
                     ++allies;
                 }
                 if( forceid != forceId )

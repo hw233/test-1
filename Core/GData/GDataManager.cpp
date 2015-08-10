@@ -576,11 +576,11 @@ namespace GData
         LoadingCounter lc("Loading ExploitPointInfo");
         lc.reset(1000);
         DBExploitPointInfo info;
-        if(execu->Prepare("SELECT `id`,`type`,`openLevel`,`transform`,`perMin`,`perMax` FROM `exploit_point`", info) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`type`,`openLevel`,`ability`,`transform`,`perMin`,`perMax` FROM `exploit_point`", info) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            GData::ExploitPoint* exploitInfo = new GData::ExploitPoint(info.id,info.type,info.openLevel,info.transform,info.perMin,info.perMax);
+            GData::ExploitPoint* exploitInfo = new GData::ExploitPoint(info.id,info.type,info.openLevel,info.ability,info.transform,info.perMin,info.perMax);
             if( exploitInfo == NULL )
                 return false;
             GData::exploitTable.LoadExpoit(exploitInfo);

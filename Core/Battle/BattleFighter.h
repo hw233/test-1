@@ -344,6 +344,8 @@ namespace Battle
             
             void ResetSkill();//{}
 
+            UInt32 GetTotalPower() { return _fighter->GetTotalPower();}
+
         protected:
 
             UInt8 _crick;  //硬直
