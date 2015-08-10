@@ -171,6 +171,7 @@ namespace Battle
             bool CheckIsStop();
             void MakePreStartInfo();
             UInt16 GetOneRoundTimeCost() const { return _oneRoundCostTime;}
+            void SyncHp(BattleFighter* bft,UInt8 x, UInt8 y);
             //对象移动
             void Move();
             //产生战报信息

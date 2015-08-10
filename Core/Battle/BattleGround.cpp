@@ -245,6 +245,21 @@ namespace Battle
     };
 
 
+    void BattleGround::SyncHp(Battle::BattleFighter* bft,UInt8 x,UInt8 y)
+    {
+        if( bft == NULL )
+            return;
+        Battle::battleDistribute.UpdateMainFighterHP(_mapId,bft->GetOwner(),x,y,currentBf->getHP());
+        std::vector<UInt32> vecHP;
+        for( UInt8 i = 0 ; i < 10 ; ++i )
+        {
+            UInt32 hp = bft->GetSoldierHp(i);
+            vecHP.push_back(hp);
+        }
+        Battle::battleDistribute.UpdateSoldiersHP(_mapId,bft->GetOwner(),x,y,vecHP);
+    }
+
+
     void BattleGround::Move()
     {
         //选择对象
@@ -276,8 +291,10 @@ namespace Battle
                 dis = GetDistance(p,move);
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[mx+my*_x] = currentBf;
-                //排布信息同步
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my,1);
+                SyncHp(currentBf,mx,my);
+                //排布信息同步
+                /*
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),mx,my,currentBf->getHP());
                 std::vector<UInt32> vecHP;
                 for( UInt8 i = 0 ; i < 10 ; ++i )
@@ -286,6 +303,7 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),mx,my,vecHP);
+                */
             }
             currentBf->SetGroundX(mx);
             currentBf->SetGroundY(my);
@@ -338,6 +356,8 @@ namespace Battle
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
                 Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
+                SyncHp(currentBf,ax,ay);
+                /*
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),ax,ay,currentBf->getHP());
                 std::vector<UInt32> vecHP;
                 for( UInt8 i = 0 ; i < 10 ; ++i )
@@ -346,6 +366,7 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),ax,ay,vecHP);
+                */
             }
             timeCost += ceil(dis*0.5);
             currentBf->SetGroundX(ax);
@@ -411,6 +432,8 @@ namespace Battle
             }
             else
             {
+                SyncHp(currentBf,currentBf->GetGroundX(),currentBf->GetGroundY());
+                /*
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),x,y,currentBf->getHP());
                 std::vector<UInt32> vecHP;
                 for( UInt8 i = 0 ; i < 10 ; ++i )
@@ -419,6 +442,7 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,vecHP);
+                */
             }
 
             //对手
@@ -435,9 +459,9 @@ namespace Battle
             }
             else
             {
-                //更新主将的血量
+                SyncHp((target.bo),(target.bo)->GetGroundX(),(target.bo)->GetGroundY());
+                /*
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,(target.bo)->GetOwner(),x,y,(target.bo)->getHP());
-                //更新小兵们的血量
                 std::vector<UInt32> vecHP;
                 for( UInt8 i = 0 ; i < 10 ; ++i )
                 {
@@ -445,6 +469,7 @@ namespace Battle
                    vecHP.push_back(hp);
                 }
                 Battle::battleDistribute.UpdateSoldiersHP(_mapId,(target.bo)->GetOwner(),x,y,vecHP);
+                */
             }
         }
         _vecTarget.clear();
@@ -943,7 +968,7 @@ namespace Battle
     { 
         //TODO   连接BattleSimulator
         //添加一个实际的攻击距离
-        UInt8 distance = GetFactAttackDis();
+        //UInt8 distance = GetFactAttackDis();
         
         UInt8 x = bf->GetGroundX();
         UInt8 y = bf->GetGroundY();
@@ -961,6 +986,7 @@ namespace Battle
         if( landform2 <= 0 )
             return ;
         UInt8 fightgroud2 = land2FightGround[landform2-1];
+        UInt8 distance = 0;
         if( IsInAround(Ascoord(x,y),Ascoord(bx,by)))
         {
             BattleSimulator bsim(bf,bo,distance);
@@ -972,6 +998,9 @@ namespace Battle
         }
         else
         {
+            Ascoord curPos = Ascoord(x,y);
+            Ascoord bPos =  Ascoord(bx,by);
+            distance = GetDistance(curPos,bPos);
             BattleSimulator bsim(bf,bo,distance,fightgroud1,fightgroud2);
             bsim.start(); 
             result = bsim.GetWin();
