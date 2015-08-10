@@ -148,7 +148,7 @@ namespace Battle
         } 
         else
         {
-            hpSub = attack - attack * (defend / attack * 75 /100);
+            hpSub = attack - (defend  * 75 /100);
         }
         //TEST
         makeDamage(hpSub);

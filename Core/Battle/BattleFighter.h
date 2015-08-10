@@ -222,7 +222,10 @@ namespace Battle
 
             virtual UInt16 GetBaseActionNum() = 0 ;
             
-            UInt32 GetAttack() { return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS()))/100;}
+            UInt32 GetAttack()
+            { 
+                return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS()))/100; 
+            }
 
             UInt32 GetDefend(){ return GetTotalAttr(e_attr_defend);}
             UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magatk);}
