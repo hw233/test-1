@@ -349,6 +349,9 @@ namespace Battle
 
             UInt32 GetTotalPower() { return _fighter->GetTotalPower();}
 
+            void AddEnergy(UInt32 energy){ _energy += energy;}
+            UInt32 GetEnergy(){ return _energy;}
+
         protected:
 
             UInt8 _crick;  //硬直
@@ -417,6 +420,8 @@ namespace Battle
             bool _avoidhurt;
 
             bool _isChild;
+
+            UInt32 _energy;
 
         public:
             BattleFighter * _target;
