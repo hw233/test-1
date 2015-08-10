@@ -213,7 +213,7 @@ namespace Battle
             }
             virtual UInt16 GetSpeed() { return GetBaseSpeed();}
 
-            virtual void resetBattleStatue() = 0;
+            virtual void resetBattleStatue();
 
             virtual void SetGone(bool v){ }
             virtual bool GetGone(){return true;}
@@ -415,7 +415,7 @@ namespace Battle
 
             UInt16 _cachePx;
 
-            bool _acted;
+            bool _acted;  //XXX
 
             bool _avoidhurt;
 

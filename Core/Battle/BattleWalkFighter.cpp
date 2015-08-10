@@ -78,23 +78,6 @@ namespace Battle
         }
     }
 
-    void BattleWalkFighter::resetBattleStatue()
-    { 
-        _target = NULL;
-
-        _battleTargetY = 0;
-        _battleTargetX = 0;
-        _nowTime = 0;
-        EnterX = 0;
-        EnterY = 0;
-        _crickSum = 0;
-        //_sideInBS = 0;
-        _count = 0;
-        _isHighSpeed = false;
-        _canMove = true;
-        return ;
-    } 
-
     UInt16 BattleWalkFighter::GetSpeed()
     { 
         PreGetObject();
@@ -106,6 +89,14 @@ namespace Battle
                 return 225;// GetBaseSpeed()*12/10;
         }
         return GetBaseSpeed();
+    } 
+
+    void BattleWalkFighter::resetBattleStatue()
+    { 
+        _canMove = true;
+        _isHighSpeed = false;
+        _count = 0;
+        BattleFighter::resetBattleStatue();
     } 
 } 
 

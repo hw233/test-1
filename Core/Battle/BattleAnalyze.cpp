@@ -6,9 +6,10 @@ void BattleAnalyze::Analyze(Stream br)
 
     UInt32 cmd = 0;
     br >> cmd;
+    UInt8 distance = 0;
     UInt8 mapId1 = 0, mapId2 = 0;
-    br >> mapId1 >> mapId2;
-    std::cout << "地图ID :" << static_cast<UInt32>(mapId1) << " VS " << static_cast<UInt32>(mapId2) << std::endl;
+    br >> distance >> mapId1 >> mapId2;
+    std::cout << "攻击距离"<< static_cast<UInt32>(distance) << "地图ID :" << static_cast<UInt32>(mapId1) << " VS " << static_cast<UInt32>(mapId2) << std::endl;
 
     for(UInt8 index = 0; index < 2; ++index)
     {
