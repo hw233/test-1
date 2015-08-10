@@ -46,7 +46,7 @@ namespace Battle
             UInt8  GetPosY() const { return posy;}
             void   SetPosX(UInt8 px)  { posx = px ; }
             void   SetPosY(UInt8 py)  { posy = py ; }
-            void   SetSoldiersHP();
+            void   SetSoldiersHP(UInt32 childTypeId);
             void   SetMainFighterHP( UInt32 hp ) { mainFighterHP = hp;}
             UInt32   GetMainFighterHP() { return mainFighterHP;}
             void   SetSoldiersHP(std::vector<UInt32> vecHP ) { SoldiersHP = vecHP;}

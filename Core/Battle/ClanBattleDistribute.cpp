@@ -11,11 +11,15 @@ namespace Battle
 {
     BattleDistribute battleDistribute;
 
-    void DistributeInfo::SetSoldiersHP()
+    void DistributeInfo::SetSoldiersHP(UInt32 childTypeId)
     {
+        GObject::Fighter* fgt = GObject::globalFighters[childTypeId];
+        if( fgt == NULL )
+            return;
+        UInt32 hp = fgt->GetHP();
         for( UInt8 i = 0 ; i < INIT_SOLDIER_NUM ; ++i )
         {
-             SoldiersHP.push_back(100);//小兵的血量暂时定为100
+             SoldiersHP.push_back(hp);//小兵的血量暂时定为100
         }
     }
 
@@ -185,9 +189,13 @@ namespace Battle
             DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`mapId`,`playerId`,`fighterId`,`posx`,`posy`)   value(%u, %"I64_FMT"u, %u, %u, %u)",mapId,player->GetId(),fighterId,x,y);
             if( flag == true && tag == 0 )
             {
-                pInfo->SetSoldiersHP();
+                GObject::Fighter* fgt = player->findFighter(fighterId);
+                UInt32 childTypeId = fgt->GetChildTypeId();
+                pInfo->SetSoldiersHP(childTypeId);
                 UpdateSoldiersHP(mapId,player,x,y,pInfo->GetSoldiersHP());
-                UpdateMainFighterHP(mapId,player,x,y,1000);
+                if( fgt == NULL )
+                    return false;
+                UpdateMainFighterHP(mapId,player,x,y,fgt->GetHP());
             }
         }
         player->InsertClanBattleFighter(mapId,fighterId,x,y);
@@ -734,22 +742,8 @@ namespace Battle
         DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
         if( info == NULL )
             return;
-        if( vecSoldiersHP.empty() || vecSoldiersHP.size() == 1 )
-        {
-            info->SetSoldiersHP();
-        }
-        else
-        {
-            info->SetSoldiersHP(vecSoldiersHP);
-        }
-        if( mainFighterHP == 0 )
-        {
-            info->SetMainFighterHP(1000);
-        }
-        else
-        {
-            info->SetMainFighterHP(mainFighterHP);
-        }
+        info->SetSoldiersHP(vecSoldiersHP);
+        info->SetMainFighterHP(mainFighterHP);
     }
 
 }

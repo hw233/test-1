@@ -129,6 +129,7 @@ namespace GObject
             UInt32 GetEquipmentUpgradeLoad(UInt8 index);
             UInt32 GetTotalPower() ;  //获得总战力
             std::string GetName() const { return _name;}
+            UInt32 GetHP() const { return _hp;}
 
             std::vector<UInt16> GetBaseSkills(){return m_baseSkills;}
 

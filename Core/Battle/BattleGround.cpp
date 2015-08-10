@@ -249,7 +249,7 @@ namespace Battle
     {
         if( bft == NULL )
             return;
-        Battle::battleDistribute.UpdateMainFighterHP(_mapId,bft->GetOwner(),x,y,currentBf->getHP());
+        Battle::battleDistribute.UpdateMainFighterHP(_mapId,bft->GetOwner(),x,y,bft->getHP());
         std::vector<UInt32> vecHP;
         for( UInt8 i = 0 ; i < 10 ; ++i )
         {
@@ -986,10 +986,10 @@ namespace Battle
         if( landform2 <= 0 )
             return ;
         UInt8 fightgroud2 = land2FightGround[landform2-1];
-        UInt8 distance = 0;
+        /*
         if( IsInAround(Ascoord(x,y),Ascoord(bx,by)))
         {
-            BattleSimulator bsim(bf,bo,distance);
+            BattleSimulator bsim(bf,bo,distance,);
             bsim.start(); 
             result = bsim.GetWin();
             BattleReport = bsim.getId();
@@ -1001,14 +1001,24 @@ namespace Battle
             Ascoord curPos = Ascoord(x,y);
             Ascoord bPos =  Ascoord(bx,by);
             distance = GetDistance(curPos,bPos);
-            BattleSimulator bsim(bf,bo,distance,fightgroud1,fightgroud2);
+            BattleSimulator bsim(bf,bo,distance+1,fightgroud1,fightgroud2);
             bsim.start(); 
             result = bsim.GetWin();
             BattleReport = bsim.getId();
             std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
             fightTimeCost = bsim.GetTime();
         }
+        */
 
+        Ascoord curPos = Ascoord(x,y);
+        Ascoord bPos =  Ascoord(bx,by);
+        UInt8 distance = GetDistance(curPos,bPos);
+        BattleSimulator bsim(bf,bo,distance+1,fightgroud1,fightgroud2);
+        bsim.start(); 
+        result = bsim.GetWin();
+        BattleReport = bsim.getId();
+        std::cout << "发生战斗  " << static_cast<UInt32>(bf->GetBattleIndex()) << " VS " << static_cast<UInt32>(bo->GetBattleIndex()) << "  战斗结果: " << static_cast<UInt32>(result) <<" 战报ID:" << BattleReport << std::endl;
+        fightTimeCost = bsim.GetTime();
 
         //result = 0;
         //BattleReport = 111;
