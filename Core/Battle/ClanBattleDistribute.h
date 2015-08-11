@@ -72,6 +72,7 @@ namespace Battle
             UInt8 GetMapId() const { return mapId;}
             std::vector<DistributeInfo*> GetDistributeInfo() const { return vecDistributeInfo;}
             void SetDistributeInfo(std::vector<DistributeInfo*> vecInfo ) { vecDistributeInfo = vecInfo;}
+            bool HasBody() { return !vecDistributeInfo.empty();}
         private:
             UInt8 mapId; //地图id
             std::vector<DistributeInfo*> vecDistributeInfo;

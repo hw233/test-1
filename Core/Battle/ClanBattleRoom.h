@@ -41,13 +41,11 @@ namespace Battle
             void SetBuildTime(UInt32 time) { buildTime = time;}
             UInt32 GetBuildTime() const
             { 
-                //UInt32 value = GObject::GVAR.GetVar(GObject::GVAR_CLAN_CREATE);
-                //if(value)
-                //    return value;
                 return buildTime;
             }
             std::vector<GObject::Player*> GetAllJoinPlayer();
             std::vector<GObject::Player*> GetSameForceAllies(UInt8 forceId);
+            bool IsFirstDay();
         private:
             UInt32 roomId;    //以创建者的军团id作为roomId
             UInt8  battleId;  //战役Id

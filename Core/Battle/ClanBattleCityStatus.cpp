@@ -131,6 +131,27 @@ namespace Battle
    }
 
 
+   std::vector<UInt32> RoomAllCityStatus::GetCanConfigure(UInt8 forceId)
+   {
+       std::vector<UInt32> vecConfigure;
+       ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+       if( room == NULL )
+       {
+           return vecConfigure; 
+       }
+       /*------------------------------------
+        *
+        * 如果是 
+        ------------------------------------*/
+       if( room->IsFirstDay )
+       {
+
+       }
+       return vecConfigure;
+
+   }
+
+
    UInt8 RoomAllCityStatus::GetCityOwnForce(UInt8 cityId)
    {
        for( auto it = vecCityStatus.begin(); it != vecCityStatus.end(); ++it )

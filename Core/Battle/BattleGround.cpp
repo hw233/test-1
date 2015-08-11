@@ -66,6 +66,16 @@ namespace Battle
             return false;
 
     }
+    
+    bool BowMoreFit(TargetInfo info1,TargetInfo info2)
+    {
+        if( info1.cost < info2.cost)
+            return true;
+        else if( info1.pri > info2.pri )
+            return true;
+        else
+            return false;
+    }
 
     bool BattleGround::InMyAttackHasEnemy(const Ascoord& p )
     {
@@ -326,7 +336,14 @@ namespace Battle
         }
         else
         {
-            std::sort(_vecTarget.begin(),_vecTarget.end(),MoreFit);
+            if( currentBf->GetTypeId() == 3 )
+            {
+                std::sort(_vecTarget.begin(),_vecTarget.end(),BowMoreFit);
+            }
+            else
+            {
+                std::sort(_vecTarget.begin(),_vecTarget.end(),MoreFit);
+            }
             TargetInfo target = _vecTarget.front();
             std::cout << std::endl;
             TestCoutBattleS(currentBf);
@@ -787,7 +804,8 @@ namespace Battle
         }
     }
     
-
+     
+    //弓箭兵呢  肯定选的是离敌人最远的点( 后退攻击 )
     void BattleGround::BowAnalyse(std::list<Ascoord> path,Ascoord target)
     {
         std::reverse(path.begin(),path.end());
@@ -811,6 +829,7 @@ namespace Battle
                     if( _mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x]->getHP() <= 0 ))
                     {
                         attack = p;
+                        break;
                     }
                     else
                     {

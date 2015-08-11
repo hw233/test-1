@@ -61,6 +61,27 @@ namespace Battle
         DB7().PushUpdateData("update clan set battleRoomId = %u , forceId = %u where clanId=%u",roomId,forceId,clanId);
 
     }
+
+
+    bool ClanBattleRoom::IsFirstDay()
+    {
+        time_t time = buildTime;
+        tm* tt=localtime(&time);
+        UInt8 hour = tt->tm_hour;
+        UInt8 min = tt->tm_min;
+        UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
+
+        //判断该房间是不是不处于报名阶段
+        UInt32 now = TimeUtil::Now();
+        if( now > sday )
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
     
     bool ClanBattleRoomManager::CreateRoom(GObject::Player* player)
     {
@@ -131,16 +152,7 @@ namespace Battle
             {
                 return false;
             }
-            UInt32 buildTime = room->GetBuildTime();
-            time_t time = buildTime;
-            tm* tt=localtime(&time);
-            UInt8 hour = tt->tm_hour;
-            UInt8 min = tt->tm_min;
-            UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
-
-            //判断该房间是不是不处于报名阶段
-            UInt32 now = TimeUtil::Now();
-            if( now > sday )
+            if( !room->IsFirstDay() )
             {
                 CreateRoom(player);
             }
