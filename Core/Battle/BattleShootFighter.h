@@ -26,7 +26,7 @@ namespace Battle
             //virtual void BuildLocalStream(UInt8 wait = 0 , UInt8 param = 0);
             virtual UInt16 GetTargetDistance() {if(_target) return GetField()->getDistance(this,_target); return -1;};
 
-            virtual void resetBattleStatue();
+            //virtual void resetBattleStatue();
             virtual UInt16 GetBaseActionNum(){return 6;}
             virtual UInt8 GetDistance(){ return 2;}   //
 

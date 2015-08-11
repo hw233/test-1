@@ -154,11 +154,9 @@ namespace Battle
     void BattleRideFighter::resetBattleStatue()
     { 
         isRunSend = false;
-        _target = NULL;
-        _battleTargetY = 0;
-        _battleTargetX = 0;
         count = 0;
-        _crickSum = 0;
+        isGone = false;
+        BattleFighter::resetBattleStatue();
     } 
 
     UInt8 BattleRideFighter::CheckTarget()

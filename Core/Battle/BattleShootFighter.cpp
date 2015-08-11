@@ -24,20 +24,6 @@ namespace Battle
         return 0;
     } 
 
-    void BattleShootFighter::resetBattleStatue()
-    { 
-        _target = NULL;
-
-        _battleTargetY = 0;
-        _battleTargetX = 0;
-        _nowTime = 0;
-        EnterX = 0;
-        EnterY = 0;
-        _crickSum = 0;
-        //_sideInBS = 0;
-        return ;
-    } 
-
     UInt8 BattleShootFighter::NormolObject()
     { 
         //BattleFighter::NormolAttack();

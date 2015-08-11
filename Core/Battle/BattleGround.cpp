@@ -806,14 +806,22 @@ namespace Battle
             {
                 Ascoord p = *it;
                 cost+=GetRideSub(p.x,p.y);
-                if( IsInAttackZone(*it,target) && (_mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x] <= 0 ) ))
+                if( IsInAttackZone(p,target))
                 {
-                    cost +=1;
+                    if( _mapFighters[(*it).x+(*it).y*_x] == NULL || ( _mapFighters[(*it).x+(*it).y*_x] != NULL && _mapFighters[(*it).x+(*it).y*_x]->getHP() <= 0 ))
+                    {
+                        attack = p;
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
-                if( IsInAttackZone(p,target) )
+                UInt8 dis = GetDistance(p,target);
+                if( IsNearbyHaveEnemy(p) && dis > 0  )
                 {
-                    attack = p;
-                    break;
+                    std::cout<<" 由于周围有敌人的干扰  行动力消耗+1 "<<std::endl;
+                    cost+=1;
                 }
             }
         }
@@ -905,7 +913,6 @@ namespace Battle
         if( cost > movePower )
         {
             //cost-movePower 为额外需要的行动力   
-            //
             //自身行动虽然不够但是  还是有剩余的
             UInt8 toReverseSecondCost = cost - ride ;   //  从起始点到倒数第二个点的行动力消耗
             //然后再跟自己本身就有的行动力做比较
