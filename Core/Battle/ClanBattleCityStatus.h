@@ -44,7 +44,7 @@ namespace Battle
             void  SetStage(UInt32 t);
             std::vector<CityStatus*> GetAllCityStatus() { return vecCityStatus;}
             bool  IsStop();
-            std::vector<UInt32> GetCanConfigure(UInt8 forceId);
+            std::vector<UInt8> GetCanConfigure(UInt8 forceId);
         private:
             UInt32 roomId;
             UInt8 battleId;   //战役Id

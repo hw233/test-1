@@ -279,8 +279,6 @@ namespace Battle
             {
                 GetField()->SetSuperSkill(NULL);
             }
-            if(GetAvoidHurt())
-                SetAvoidHurt(false);
             GetField()->InsertBattlePre(GetNowTime(), this);
             SetMove(true);
         }
@@ -288,6 +286,8 @@ namespace Battle
         {
             SetMove(false);
         }
+        if(GetAvoidHurt())
+            SetAvoidHurt(false);
         std::cout << std::endl;
         return ;
     } 

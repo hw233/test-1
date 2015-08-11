@@ -16,6 +16,7 @@ namespace GData
             UInt8 GetMapId() const { return mapId;}
             UInt8 GetForce() const { return force;}
             bool IsLink(UInt8 mapId);
+            std::vector<UInt8> GetLinks() const { return links;}
         private:
             UInt8 mapId;  
             UInt8 force;  //which capacity the town

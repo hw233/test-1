@@ -131,22 +131,15 @@ namespace Battle
    }
 
 
-   std::vector<UInt32> RoomAllCityStatus::GetCanConfigure(UInt8 forceId)
+   std::vector<UInt8> RoomAllCityStatus::GetCanConfigure(UInt8 forceId)
    {
-       std::vector<UInt32> vecConfigure;
-       ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
-       if( room == NULL )
-       {
-           return vecConfigure; 
-       }
-       /*------------------------------------
-        *
-        * 如果是 
-        ------------------------------------*/
-       if( room->IsFirstDay )
-       {
-
-       }
+       std::vector<UInt8> vecConfigure;
+       UInt8 cityId = GetCityOwnForce(forceId);
+       GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
+       GData::SingleMapInfo* cityInfo = info->GetSingleMapInfo(cityId);
+       std::vector<UInt8> vecCity = cityInfo->GetLinks();
+       vecConfigure.assign(vecCity.begin(),vecCity.end());
+       vecConfigure.push_back(cityId);
        return vecConfigure;
 
    }
@@ -163,6 +156,13 @@ namespace Battle
        }
        return 0;
    }
+   
+   /*
+   std::vector<UInt8> RoomAllCityStatus::GetCaptureCitys()
+   {
+       for( auto it =
+   }
+   */
 
    void RoomAllCityStatusManager::InsertRoomAllCityStatus(UInt32 roomId,UInt8 battleId)
    {
