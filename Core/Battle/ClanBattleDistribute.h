@@ -102,6 +102,7 @@ namespace Battle
             void UpdateMainFighterHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt32 hp);
             void UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecHP);
             void SetMainFighterAndSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP);
+            MapDistributeInfo* GetMapDistributionInfo(UInt32 roomId,UInt8 mapId);
         private:
             map<UInt32,std::vector<MapDistributeInfo*>> _room2Distribute;
     };

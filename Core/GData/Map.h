@@ -17,6 +17,14 @@ namespace GData
         eMax
     };
 
+    struct NpcInfo
+    {
+        NpcInfo(UInt16 id,UInt8 px,UInt8 py) : fighterId(id),x(px),y(py) {}
+        UInt16 fighterId;
+        UInt8 x;
+        UInt8 y;
+    };
+
     typedef std::vector<UInt8> vecInfo;
 
     class MapInfo
@@ -35,6 +43,8 @@ namespace GData
             void SetTileInfo(vecInfo info) { tileInfo = info;}
             void InsertCampDir(UInt8 campId,UInt8 dir) { camp2direction[campId] = dir ;}
             UInt8 GetAttackDirect(UInt8 side) { return camp2direction[side];}
+            void SetNpcInfo(std::vector<NpcInfo> vecInfo ) { vecNpcInfo = vecInfo;}
+            std::vector<NpcInfo> GetNpcInfo() const { return vecNpcInfo;}
         private:
             UInt8 width;
             UInt8 height;
@@ -42,6 +52,7 @@ namespace GData
             vecInfo tileInfo;  //地形信息
             vecInfo campInfo;  //地图信息
             std::map<UInt8,UInt8> camp2direction;
+            std::vector<NpcInfo> vecNpcInfo;
     };
     class MapTable
     {

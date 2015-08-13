@@ -242,6 +242,18 @@ namespace Battle
         return true;
     }
 
+
+    MapDistributeInfo* BattleDistribute::GetMapDistributionInfo(UInt32 roomId,UInt8 mapId)
+    {
+        std::vector<MapDistributeInfo*>  vecMapDistribute = _room2Distribute[roomId];
+        if( vecMapDistribute.empty() )
+        {
+            return NULL;
+        }
+        MapDistributeInfo* mapDistribute = GetMapDistributionInfo(vecMapDistribute,mapId);
+        return mapDistribute;
+    }
+
     void BattleDistribute::RemoveDistributeInfo(UInt32 roomId,UInt8 mapId,DistributeInfo* info)
     {
         std::vector<MapDistributeInfo*>  vecMapDistribute = _room2Distribute[roomId];

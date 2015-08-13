@@ -142,26 +142,24 @@ namespace Battle
             begin++;
             for( auto it = begin; it != path.end() ;++it )
             {
+                if( InMyAttackHasEnemy(*it) || ride <= 0 )
+                    break;
                 flag = *it;
                 ride -=GetRideSub(flag.x,flag.y);
                 //UInt8 dis = GetDistance(flag,target);
                 if( IsNearbyHaveEnemy(*it) )
                 {
-                    ride = ride -1;
+                    ride -= 1;
                 }
-                if( InMyAttackHasEnemy(*it) )
-                    break;
-                if( ride <= 0 )
-                    break;
             }
-            for(auto it = path.begin();it != path.end(); ++it )
-            {
-                movePath.push_back(*it);
-                if( *it == flag )
-                    break;
-            }
-            GetMovePos(movePath,move);  //倒着走  找到第一个没有人的位置即可
         }
+        for(auto it = path.begin();it != path.end(); ++it )
+        {
+            movePath.push_back(*it);
+            if( *it == flag )
+                break;
+        }
+        GetMovePos(movePath,move);  //倒着走  找到第一个没有人的位置即可
     }
 
     void BattleGround::MoveGetEnemy(std::vector<Ascoord>& vecAscoord)
@@ -301,8 +299,11 @@ namespace Battle
                 dis = GetDistance(p,move);
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[mx+my*_x] = currentBf;
-                Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my,1);
-                SyncHp(currentBf,mx,my);
+                if( currentBf->GetOwner() != NULL )  //NPC的血量和位置不需要同步到数据库
+                {
+                    Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,mx,my,1);
+                    SyncHp(currentBf,mx,my);
+                }
                 //排布信息同步
                 /*
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),mx,my,currentBf->getHP());
@@ -318,7 +319,6 @@ namespace Battle
             currentBf->SetGroundX(mx);
             currentBf->SetGroundY(my);
             std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
-            std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
             std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
             std::cout <<" 无方案" << " 从" << static_cast<UInt32>( x ) <<" , " << static_cast<UInt32>(y);
             std::cout <<" 移动到 "<<  static_cast<UInt32>(mx)<< " , " << static_cast<UInt32>(my) <<std::endl;
@@ -336,14 +336,14 @@ namespace Battle
         }
         else
         {
-            if( currentBf->GetTypeId() == 3 )
-            {
-                std::sort(_vecTarget.begin(),_vecTarget.end(),BowMoreFit);
-            }
-            else
-            {
+            //if( currentBf->GetTypeId() == 3 )
+            //{
+            //    std::sort(_vecTarget.begin(),_vecTarget.end(),BowMoreFit);
+            //}
+            //else
+            //{
                 std::sort(_vecTarget.begin(),_vecTarget.end(),MoreFit);
-            }
+            //}
             TargetInfo target = _vecTarget.front();
             std::cout << std::endl;
             TestCoutBattleS(currentBf);
@@ -372,8 +372,11 @@ namespace Battle
                 dis = GetDistance(p,target.attack);
                 _mapFighters[x+y*_x] = NULL;
                 _mapFighters[ax+ay*_x] = currentBf;
-                Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
-                SyncHp(currentBf,ax,ay);
+                if( currentBf->GetOwner() != NULL )
+                {
+                    Battle::battleDistribute.MoveFighter(_mapId,currentBf->GetOwner(),x,y,ax,ay,1);
+                    SyncHp(currentBf,ax,ay);
+                }
                 /*
                 Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),ax,ay,currentBf->getHP());
                 std::vector<UInt32> vecHP;
@@ -428,65 +431,73 @@ namespace Battle
 
             _oneRoundCostTime += timeCost;
             //增加击杀人数
-            currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
-            (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
-
-            currentBf->GetOwner()->AddKillSoldiersNum(currentBf->GetKillCount2());
-            (target.bo)->GetOwner()->AddKillSoldiersNum((target.bo)->GetKillCount2());
+            if( currentBf->GetOwner() != NULL && (target.bo)->GetOwner() != NULL )
+            {
+                currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
+                (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
+                currentBf->GetOwner()->AddKillSoldiersNum(currentBf->GetKillCount2());
+                (target.bo)->GetOwner()->AddKillSoldiersNum((target.bo)->GetKillCount2());
+            }
 
             //往排布那边同步战将数据
             //自己
-            if( currentBf->getHP() <= 0 )
+            if( currentBf->GetOwner() != NULL )
             {
-                Battle::battleDistribute.RemoveFighter(_mapId,currentBf->GetOwner(),currentBf->GetId(),currentBf->GetGroundX(),currentBf->GetGroundY());
+                if( currentBf->getHP() <= 0 )
+                {
+                    Battle::battleDistribute.RemoveFighter(_mapId,currentBf->GetOwner(),currentBf->GetId(),currentBf->GetGroundX(),currentBf->GetGroundY());
 
-                UInt32 constantKill = (currentBf->GetOwner())->GetConstantlyKill(currentBf->GetId());
-                if( constantKill >= 1 )
-                {
-                    ((target.bo)->GetOwner())->AddEndConstantlyKill(currentBf->GetOwner(),currentBf->GetId(),constantKill);
+                    UInt32 constantKill = (currentBf->GetOwner())->GetConstantlyKill(currentBf->GetId());
+                    if( constantKill >= 1 )
+                    {
+                        ((target.bo)->GetOwner())->AddEndConstantlyKill(currentBf->GetOwner(),currentBf->GetId(),constantKill);
+                    }
+                    ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1);
                 }
-                ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1);
-            }
-            else
-            {
-                SyncHp(currentBf,currentBf->GetGroundX(),currentBf->GetGroundY());
-                /*
-                Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),x,y,currentBf->getHP());
-                std::vector<UInt32> vecHP;
-                for( UInt8 i = 0 ; i < 10 ; ++i )
+                else
                 {
-                   UInt32 hp = currentBf->GetSoldierHp(i);
-                   vecHP.push_back(hp);
+                    SyncHp(currentBf,currentBf->GetGroundX(),currentBf->GetGroundY());
+                    /*
+                       Battle::battleDistribute.UpdateMainFighterHP(_mapId,currentBf->GetOwner(),x,y,currentBf->getHP());
+                       std::vector<UInt32> vecHP;
+                       for( UInt8 i = 0 ; i < 10 ; ++i )
+                       {
+                       UInt32 hp = currentBf->GetSoldierHp(i);
+                       vecHP.push_back(hp);
+                       }
+                       Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,vecHP);
+                       */
                 }
-                Battle::battleDistribute.UpdateSoldiersHP(_mapId,currentBf->GetOwner(),x,y,vecHP);
-                */
             }
 
             //对手
-            if( target.bo->getHP() <= 0 )
+            if( target.bo->GetOwner() != NULL )
             {
-                Battle::battleDistribute.RemoveFighter(_mapId,(target.bo)->GetOwner(),(target.bo)->GetId(),(target.bo)->GetGroundX(),(target.bo)->GetGroundY());
-                UInt32 constantKill = ((target.bo)->GetOwner())->GetConstantlyKill((target.bo)->GetId());
-                if( constantKill >= 1 )
+                if( target.bo->getHP() <= 0 )
                 {
-                    (currentBf->GetOwner())->AddEndConstantlyKill((target.bo)->GetOwner(),(target.bo)->GetId(),constantKill);
-                }
-                (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1);
+                    Battle::battleDistribute.RemoveFighter(_mapId,(target.bo)->GetOwner(),(target.bo)->GetId(),(target.bo)->GetGroundX(),(target.bo)->GetGroundY());
+                    UInt32 constantKill = ((target.bo)->GetOwner())->GetConstantlyKill((target.bo)->GetId());
+                    if( constantKill >= 1 )
+                    {
+                        (currentBf->GetOwner())->AddEndConstantlyKill((target.bo)->GetOwner(),(target.bo)->GetId(),constantKill);
+                    }
+                    (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1);
 
-            }
-            else
-            {
-                SyncHp((target.bo),(target.bo)->GetGroundX(),(target.bo)->GetGroundY());
-                /*
-                Battle::battleDistribute.UpdateMainFighterHP(_mapId,(target.bo)->GetOwner(),x,y,(target.bo)->getHP());
-                std::vector<UInt32> vecHP;
-                for( UInt8 i = 0 ; i < 10 ; ++i )
-                {
-                   UInt32 hp = (target.bo)->GetSoldierHp(i);
-                   vecHP.push_back(hp);
                 }
-                Battle::battleDistribute.UpdateSoldiersHP(_mapId,(target.bo)->GetOwner(),x,y,vecHP);
-                */
+                else
+                {
+                    SyncHp((target.bo),(target.bo)->GetGroundX(),(target.bo)->GetGroundY());
+                    /*
+                       Battle::battleDistribute.UpdateMainFighterHP(_mapId,(target.bo)->GetOwner(),x,y,(target.bo)->getHP());
+                       std::vector<UInt32> vecHP;
+                       for( UInt8 i = 0 ; i < 10 ; ++i )
+                       {
+                       UInt32 hp = (target.bo)->GetSoldierHp(i);
+                       vecHP.push_back(hp);
+                       }
+                       Battle::battleDistribute.UpdateSoldiersHP(_mapId,(target.bo)->GetOwner(),x,y,vecHP);
+                       */
+                }
             }
         }
         _vecTarget.clear();
@@ -1073,17 +1084,20 @@ namespace Battle
         //bf->InsertFighterInfo(_pack,1);
         std::cout << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
 
-        //设置主将及小兵的血量
-        UInt32 roomId = _id-_mapId;
-        Battle::DistributeInfo* info =Battle::battleDistribute.GetDistributeInfo(roomId,_mapId,x,y);
-        UInt32 mainFighterHP = info->GetMainFighterHP();
-        bf->setHP(mainFighterHP);
-        std::vector<UInt32> vecHP = info->GetSoldiersHP();
-        UInt8 index = 0;
-        for( auto it = vecHP.begin(); it != vecHP.end(); ++it )
+        //设置主将及小兵的血量( 非npc )
+        if( fgt->GetOwner() != NULL )
         {
-           bf->SetSoldierHp(index,(*it));
-           ++index;
+            UInt32 roomId = _id-_mapId;
+            Battle::DistributeInfo* info =Battle::battleDistribute.GetDistributeInfo(roomId,_mapId,x,y);
+            UInt32 mainFighterHP = info->GetMainFighterHP();
+            bf->setHP(mainFighterHP);
+            std::vector<UInt32> vecHP = info->GetSoldiersHP();
+            UInt8 index = 0;
+            for( auto it = vecHP.begin(); it != vecHP.end(); ++it )
+            {
+                bf->SetSoldierHp(index,(*it));
+                ++index;
+            }
         }
         return bf;
     } 
@@ -1336,7 +1350,15 @@ namespace Battle
                 UInt16 fighterId = (*iter)->fighterId;
                 UInt8  x = (*iter)->posx;
                 UInt8  y = (*iter)->posy;
-                GObject::Fighter* fgt = owner->findFighter(fighterId);
+                GObject::Fighter* fgt = NULL;
+                if( owner == NULL )
+                {
+                    fgt = GObject::globalFighters[fighterId];
+                }
+                else
+                {
+                    GObject::Fighter* fgt = owner->findFighter(fighterId);
+                }
                 if( fgt == NULL )
                     continue;
                 if( camp2fighters[campId].empty() )
@@ -1636,6 +1658,11 @@ namespace Battle
         player->SetBattleSide(forceId);
 
         setPlayer.insert(player);
+    }
+
+    void BattleGround::PushNpc(UInt8 forceId,UInt16 fighterId,UInt8 x,UInt8 y)
+    {
+        map2fighter[forceId].push_back(new FighterInfo(NULL,fighterId,x,y));
     }
 
 
