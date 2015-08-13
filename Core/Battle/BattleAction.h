@@ -22,13 +22,13 @@ namespace Battle
         UInt16 _curtime;
         float _curtime2;
         BattleObject* _bo;
-        UInt16 _prarm ;
-        BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
-        BattleActionStream(float curtime, BattleObject*  bo, UInt16 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
+        UInt32 _prarm ;
+        BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt32 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
+        BattleActionStream(float curtime, BattleObject*  bo, UInt32 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
         UInt16 GetCurTime(){return _curtime;}
         float GetCurTime2(){return _curtime2;}
         BattleObject* GetBattleObject(){ return _bo;}
-        UInt16 GetParam(){ return _prarm;}
+        UInt32 GetParam(){ return _prarm;}
     };
 
     class BattleAction
@@ -245,7 +245,7 @@ namespace Battle
             void setObjectCount(UInt8 count ) { _count = count;}
 
             bool CheckFighterInSCope(BattleObject* bo);  //非指向性
-            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt16 param)
+            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt32 param)
             { 
                 if(_count)
                 { 

@@ -274,7 +274,7 @@ namespace Script
 
     UInt8 GameActionLua::GetSignForMouth(Player* player ,UInt8 index, UInt8 vip, UInt8 flag)
     {
-        return Run<UInt8>(player, "GetSignForMouth",index,vip,flag);
+        return Call<UInt8>("GetSignForMouth",player,index,vip,flag);
     }
 
     UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息

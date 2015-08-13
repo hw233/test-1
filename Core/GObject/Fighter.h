@@ -3,6 +3,7 @@
 #define FIGHTER_H_
 #include "Config.h"
 #include "GGlobalObjectManager.h"
+#include "FVar.h"
 
 namespace GObject
 {
@@ -11,6 +12,7 @@ namespace GObject
     class Player;
     class FVarSystem;
 
+#define ENCHANT_MAX 9
     enum
     {
         e_attr_attack = 0,
@@ -23,6 +25,17 @@ namespace GObject
         e_attr_evade = 7,
         e_attr_hp = 8,
         e_attr_max
+    };
+
+    enum
+    {
+        e_fighter = 0,
+        e_walk = 1,
+        e_ride = 2,
+        e_shoot = 3,
+        e_lance = 4,
+        e_advice = 5,
+        e_fighter_max
     };
 
     class Fighter
@@ -98,6 +111,8 @@ namespace GObject
                     return 0;
                 if(index >= e_attr_max)
                     return 0;
+                
+                // 缺少了装备的属性加成
                 switch(index)
                 { 
                     case e_attr_attack:
@@ -120,6 +135,75 @@ namespace GObject
                         return _hp * (baseUp[up] + 100)/100;
                 } 
                 return 0;
+            } 
+
+            UInt32 GetFighterEquipUpAttr(UInt8 index)
+            { 
+               static UInt32 EquipentBase[e_fighter_max][e_attr_max] = {
+                 //攻击 , 魔法攻击，防御，魔法防御，暴击，抗暴，命中 ，躲避
+                   {100}, //步兵
+                   {}, //骑兵
+                   {}, //弓兵
+                   {}, //长枪兵
+                   {}  //谋士
+               };
+               UInt8 cls = GetTypeId();
+               switch(index)
+               { 
+                   case e_attr_attack:
+                       {
+                            UInt32 value = GetVar(FVAR_WEAPON_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                   case e_attr_magatk:
+                       {
+                            UInt32 value = GetVar(FVAR_WEAPON_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_defend:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR1_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_magdef:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR1_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_critical:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR2_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_criticalDef:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR3_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_hit:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR4_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_evade:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR5_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+                   case e_attr_hp:
+                       {
+                            UInt32 value = GetVar(FVAR_ARMOR1_ENCHANT);
+                            return EquipentBase[cls][index] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                       }
+                       break;
+               } 
             } 
 
             void MakeFighterInfo(Stream& st);

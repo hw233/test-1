@@ -194,7 +194,10 @@ namespace GObject
                 continue;
             st << pl->GetName();
             st << pl->GetClanPos();
-            st << static_cast<UInt8>(pl->isOnline());
+            if(pl->isOnline())
+                st << static_cast<UInt32>(0);
+            else
+                st << static_cast<UInt32>(pl->GetVar(VAR_OFF_LINE));
             st << static_cast<UInt8>(pl->GetLevel());
         } 
         st << _announcement2;

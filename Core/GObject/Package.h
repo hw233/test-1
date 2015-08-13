@@ -13,6 +13,7 @@ namespace GObject
 
 #define ARENA_BET_ITEM1    9081  
 #define ARENA_BET_ITEM2    9082
+
     class Player;
     struct ItemKey
     {   

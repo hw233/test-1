@@ -28,8 +28,8 @@ namespace GObject
         if(!fgt)
             return 1;
         UInt32 val = fgt->GetVar(part + FVAR_WEAPON_ENCHANT );
-        UInt8 enchant = val % 10;
-        if(enchant >= 9)
+        UInt8 enchant = val % (ENCHANT_MAX +1);
+        if(enchant >= ENCHANT_MAX )
             return 3;
 
         //XXX 扣除道具
@@ -39,7 +39,7 @@ namespace GObject
             UInt32 value = fgt->GetEquipmentUpgradeLoad(part);
             //UInt8 rand = (value >> (enchant - 1)*3) & 7;
             //while(value & (1 << (enchant+(++AddLevel))) && (enchant+AddLevel) < 9);
-            for(; AddLevel < 9 - enchant ; ++AddLevel)
+            for(; AddLevel < ENCHANT_MAX - enchant ; ++AddLevel)
             {
                if(value &(1 << (enchant+AddLevel)) ) 
                    break;
@@ -47,8 +47,8 @@ namespace GObject
         }
 
         {
-           if(enchant + AddLevel > 9) 
-               val += (9 - enchant);
+           if(enchant + AddLevel > ENCHANT_MAX) 
+               val += (ENCHANT_MAX - enchant);
            else
                val += AddLevel;
         }
@@ -63,9 +63,9 @@ namespace GObject
         if(!fgt)
             return 1;
         UInt32 val = fgt->GetVar(part + FVAR_WEAPON_ENCHANT );
-        UInt8 enchant = val % 10;
-        UInt8 grade = val / 10;
-        if(enchant != 9) 
+        UInt8 enchant = val % (ENCHANT_MAX+1);
+        UInt8 grade = val / (ENCHANT_MAX+1);
+        if(enchant != ENCHANT_MAX) 
             return 3;
         if( grade >= 20)
             return 3;

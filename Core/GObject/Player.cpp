@@ -672,6 +672,7 @@ namespace GObject
         st<<Stream::eos;
         send(st);
     }
+
     /*
     UInt8 Player::OpenClanBattle()
     {

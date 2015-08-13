@@ -137,12 +137,13 @@ namespace Battle
 
     } 
 
-    UInt16 BattleFighter::BeActed(BattleAction *  bAction)
+    UInt32 BattleFighter::BeActed(BattleAction *  bAction)
     { 
         //TODO
         UInt32 attack = bAction->GetAttack();
         UInt32 defend = GetDefend();
         UInt32 hpSub = 0;
+        UInt8 flag = 0;
 
         if(attack <= defend)
         { 
@@ -153,6 +154,44 @@ namespace Battle
             hpSub = attack - (defend  * 75 /100);
         }
         //TEST
+
+        UInt32 hit = bAction->GetHit();
+        UInt32 evade = GetEvade(); 
+        UInt32 rand = uRand(10000);
+        if(rand > (hit*10000/evade))
+        {
+            flag = 1;
+        }
+
+        UInt32 critical = bAction->GetCritical();
+        UInt32 criticalDef = GetCriticalDef(); 
+        rand = uRand(10000);
+        if(rand > (critical * 10000/criticalDef))
+        {
+            flag = 2;
+        }
+        
+        GetAttackedSkill(flag);
+
+        switch(flag)
+        { 
+            case 1: //闪避
+                {
+                    hpSub = 0;
+                }
+                break;
+            case 2: //暴击
+                {
+                    hpSub *= 2;
+                }
+                break;
+            case 3:  //格挡
+                {
+                    hpSub = 0;
+                }
+                break;
+        } 
+            
         makeDamage(hpSub);
 
         if(GetClass() == e_shoot || GetClass() == e_advice)
@@ -166,7 +205,7 @@ namespace Battle
         } 
 
         AddEnergy(5);
-        return hpSub;
+        return hpSub | (flag << 16);
         //BuildLocalStream(e_be_attacked , hpSub);
     } 
     void BattleFighter::Action()
@@ -179,7 +218,8 @@ namespace Battle
         
         if(_crick)
         {
-            --_crick;
+            GetField()->InsertBattlePre(GetNowTime()+_crick, this);
+            _crick = 0;
             return ;
         }
 
@@ -337,7 +377,7 @@ namespace Battle
         } 
     } 
 
-    ActionBase BattleFighter::GetActionCurrent(UInt16 advance)
+    ActionBase BattleFighter::GetActionCurrent(UInt16 advance, UInt8 type) //type == 0 主动  1 被动
     { 
         UInt8 priority = 0;
         ActionSort::iterator result ;
@@ -350,6 +390,9 @@ namespace Battle
             const GData::Skill * s = GData::skillManager[it->_skillId];
             if(!s)
                 continue;
+            if(s->GetSkillCondition()->cond != type)
+                continue;
+
             if(s->GetSuperSkill() && (GetField()->GetSuperSkill() || _energy < 100 ))
                 continue;
 
@@ -678,4 +721,23 @@ namespace Battle
         _avoidhurt = false;
         return ;
     } 
+    bool BattleFighter::GetAttackedSkill(UInt8& flag)
+    { 
+        ActionBase ab = GetActionCurrent(0,1);
+        if(ab._skillId)
+        {
+            const GData::Skill * s = GData::skillManager[ab._skillId];
+            UInt8 type = s->GetSkillEffect()->skillType;
+            switch(type)
+            { 
+                case e_parry:
+                    { 
+                        if(_ab._skillId)
+                            _crick += s->GetActionBackCd();
+                        flag = 3;
+                    } 
+            } 
+        }
+        return true;
+    }
 }

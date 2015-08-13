@@ -280,7 +280,10 @@ namespace Battle
                 _packet << static_cast<UInt8>(fgt->GetBSNumber());
                 _packet << static_cast<UInt8>(1);
                 _packet << static_cast<UInt8>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
+                //param改
+                _packet << static_cast<UInt8>(param >> 16);
                 _packet << static_cast<UInt16>(param);
+
                 std::cout << "时间：" << bAction.GetHappenTime();
                 std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber());
                 std::cout << " 攻击 战将编号:" << static_cast<UInt32>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
@@ -382,13 +385,14 @@ namespace Battle
                     continue;
                 if(buffId && count && side)
                     bo->AddBuff(buffId);
-                UInt16 param = bo->BeActed(&bAction);
+                UInt32 param = bo->BeActed(&bAction);
                 //XXX 差法术协议
                 if(skillType == e_image_therapy)
                     _packet << static_cast<UInt8>(1);
                 else
                     _packet << static_cast<UInt8>(0);
                 _packet << bo->GetBSNumber();
+                _packet << static_cast<UInt8>(param >> 16);
                 _packet << static_cast<UInt16>(param);
                 if(!bo->getHP())
                 {
@@ -459,7 +463,7 @@ namespace Battle
                     { 
                         if(ft->getHP() == 0)
                             continue;
-                        UInt16 param = ft->BeActed(&(*it));
+                        UInt32 param = ft->BeActed(&(*it));
                         it->InsertIntoPackage(time+index*4,ft, param);
                         if(ft->getHP() == 0)
                         {
