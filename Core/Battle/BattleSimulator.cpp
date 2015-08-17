@@ -281,7 +281,7 @@ namespace Battle
                 _packet << static_cast<UInt8>(1);
                 _packet << static_cast<UInt8>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
                 //param改
-                _packet << static_cast<UInt8>(param >> 16);
+                //_packet << static_cast<UInt8>(param >> 16);
                 _packet << static_cast<UInt16>(param);
 
                 std::cout << "时间：" << bAction.GetHappenTime();
@@ -392,7 +392,7 @@ namespace Battle
                 else
                     _packet << static_cast<UInt8>(0);
                 _packet << bo->GetBSNumber();
-                _packet << static_cast<UInt8>(param >> 16);
+                //_packet << static_cast<UInt8>(param >> 16);
                 _packet << static_cast<UInt16>(param);
                 if(!bo->getHP())
                 {

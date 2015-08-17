@@ -75,7 +75,7 @@ namespace Battle
 
             st << static_cast<UInt16>(vec_struct[i].GetCurTime());
             st << static_cast<UInt8>(vec_struct[i].GetBattleObject()->GetBSNumber());
-            st << static_cast<UInt8>(vec_struct[i].GetParam() >> 16);
+            //st << static_cast<UInt8>(vec_struct[i].GetParam() >> 16);
             st << static_cast<UInt16>(vec_struct[i].GetParam());
         } 
         return 1;
