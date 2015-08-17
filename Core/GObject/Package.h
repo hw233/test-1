@@ -62,6 +62,7 @@ namespace GObject
 
             void  SendPackageInfo();
 
+            UInt32 GetItemCount(UInt32 id);
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;
             typedef ItemCont::iterator item_elem_iter;

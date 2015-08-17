@@ -220,13 +220,13 @@ namespace Battle
                 fgt = new BattleRideFighter(bf,f,pointX,pointY);
                 break;
             case 1:
-            case 4:
+            case 5:
                 fgt = new BattleWalkFighter(bf,f,pointX,pointY);
                 break;
             case 3:
                 fgt =  new BattleShootFighter(bf,f,pointX,pointY);
                 break;
-            case 5:
+            case 4:
                 fgt =  new BattleAdviceFighter(bf,f,pointX,pointY);
                 break;
             default:

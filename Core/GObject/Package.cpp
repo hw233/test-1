@@ -4,6 +4,8 @@
 #include "FVar.h"
 #include "Common/URandom.h"
 #include "MsgID.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 namespace GObject
 {
     ItemBase* Package::AddItemFromDB(UInt32 id, UInt32 num, bool bind)
@@ -71,6 +73,9 @@ namespace GObject
             return 3;
 
         //XXX 扣除道具
+        UInt8 res = GameAction()->UpgradeCost(m_Owner, fgt->GetTypeId(), part+1, grade + 1);
+        if(!res)
+            return 4;
 
         UInt32 load  = 0;
 
@@ -167,6 +172,17 @@ namespace GObject
         }
         return 0;
     }
+    UInt32 Package::GetItemCount(UInt32 id)
+    { 
+        ItemBase* itemFalse = m_Items[ItemKey(id, false)];
+        ItemBase* itemTrue = m_Items[ItemKey(id, true)];
+        UInt32 count = 0;
+        if(itemFalse)
+            count += itemFalse->Count();
+        if(itemTrue)
+            count += itemTrue->Count();
+        return count;
+    } 
 
     UInt32 Package::GetPackageSize()
     { 

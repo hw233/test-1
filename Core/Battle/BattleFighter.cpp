@@ -137,6 +137,7 @@ namespace Battle
 
     } 
 
+    //被攻击
     UInt32 BattleFighter::BeActed(BattleAction *  bAction)
     { 
         //TODO
@@ -147,12 +148,25 @@ namespace Battle
 
         if(attack <= defend)
         { 
-            hpSub = attack * 25 / 100;
+            hpSub += attack * 25 / 100;
         } 
         else
         {
-            hpSub = attack - (defend  * 75 /100);
+            hpSub += attack - (defend  * 75 /100);
         }
+
+        UInt32 attackImage = bAction->GetAttackImage();
+        UInt32 defendImage = GetImageDefend();
+
+        if(attackImage <= defendImage)
+        { 
+            hpSub += attackImage * 25 / 100;
+        } 
+        else
+        {
+            hpSub += attackImage - (defendImage * 75 /100);
+        }
+
         //TEST
 
         UInt32 hit = bAction->GetHit();
@@ -173,6 +187,7 @@ namespace Battle
         
         GetAttackedSkill(flag);
 
+        //伤害变化
         switch(flag)
         { 
             case 1: //闪避
@@ -426,7 +441,7 @@ namespace Battle
 
     ImagePackage BattleFighter::MakeImageEffect()
     { 
-        return ImagePackage(2,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+        return ImagePackage(2,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
     } 
     BattleFighter * BattleFighter::getMyFighters(UInt8 index)   //找第几个活着的 (0开始)
     { 
@@ -616,7 +631,7 @@ namespace Battle
         if(!s)
             return 0;
         //BATTLE2
-        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
+        ImagePackage ip(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
 
         UInt16 cd = _actionLast; // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
@@ -643,7 +658,7 @@ namespace Battle
         if(myY > ((width * ss->rady + width)*minNumber + ss->y))
             minY = myY - ((width * ss->rady + width)*minNumber);
 
-        ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
+        ObjectPackage op(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         op.setObjectDirection(/*getPosX(),minY + (ss->rady+1)*i*width,*/GetBattleDirection(),0,40, 0, 50);
         op.setObjectCount(s->GetAttackCount());
         op.SetEffectType(_actionType);
@@ -736,6 +751,7 @@ namespace Battle
                             _crick += s->GetActionBackCd();
                         flag = 3;
                     } 
+                    break;
             } 
         }
         return true;

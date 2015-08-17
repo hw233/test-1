@@ -105,6 +105,8 @@ namespace Script
 
         CLASS_ADD(Package);
         CLASS_DEF(Package, AddItem);
+        CLASS_DEF(Package, DelItem);
+        CLASS_DEF(Package, GetItemCount);
 
     }
     /*
@@ -275,6 +277,10 @@ namespace Script
     UInt8 GameActionLua::GetSignForMouth(Player* player ,UInt8 index, UInt8 vip, UInt8 flag)
     {
         return Call<UInt8>("GetSignForMouth",player,index,vip,flag);
+    }
+    UInt8 GameActionLua::UpgradeCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev)
+    {
+        return Call<bool>("UpgradeCost",player,cls,index,lev);
     }
 
     UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息

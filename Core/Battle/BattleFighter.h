@@ -216,9 +216,10 @@ namespace Battle
             { 
                 return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS()))/100; 
             }
+            UInt32 GetAttackImage(){ return GetTotalAttr(e_attr_magatk);}
 
             UInt32 GetDefend(){ return GetTotalAttr(e_attr_defend);}
-            UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magatk);}
+            UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magdef);}
             UInt32 GetHit() { return GetTotalAttr(e_attr_hit);}
             UInt32 GetEvade() {return GetTotalAttr(e_attr_evade);}
             UInt32 GetCritical() { return GetTotalAttr(e_attr_critical);}

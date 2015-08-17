@@ -3,6 +3,7 @@
 namespace Battle
 {
     UInt32 ActionPackage::GetAttack(){if(!_bf) return 0; return _bf->GetAttack();}
+    UInt32 ActionPackage::GetAttackImage(){if(!_bf) return 0; return _bf->GetAttackImage();}
     UInt32 ActionPackage::GetHit(){ if(!_bf) return 0; return _bf->GetHit();}
     UInt32 ActionPackage::GetWreck(){ if(!_bf) return 0; return _bf->GetWreck();}
     UInt32 ActionPackage::GetCritical(){ if(!_bf) return 0; return _bf->GetCritical();}
