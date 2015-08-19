@@ -64,7 +64,7 @@ namespace Battle
             //inline bool isHide() { return _hide; }
             //inline void setHide(bool hide) { _hide = hide; }
 
-            virtual UInt16 BeActed(BattleAction * battleAction){ makeDamage(battleAction->GetAttack()); return 0;}   //用于非战斗对象
+            virtual UInt32 BeActed(BattleAction * battleAction){ makeDamage(battleAction->GetAttack()); return 0;}   //用于非战斗对象
             //virtual BattleField * GetField(){ return _field;}
             virtual UInt32 GetDefend() {return defend_near;}
             UInt8 AppendFighterStream(Stream & st){if(!_st.size()) return 0; st << _st; _st.clear(); return 1;}

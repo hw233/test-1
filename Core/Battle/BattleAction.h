@@ -22,13 +22,13 @@ namespace Battle
         UInt16 _curtime;
         float _curtime2;
         BattleObject* _bo;
-        UInt16 _prarm ;
-        BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt16 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
-        BattleActionStream(float curtime, BattleObject*  bo, UInt16 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
+        UInt32 _prarm ;
+        BattleActionStream(UInt16 curtime, BattleObject*  bo, UInt32 prarm):_curtime(curtime),_bo(bo),_prarm(prarm){ }
+        BattleActionStream(float curtime, BattleObject*  bo, UInt32 prarm):_curtime2(curtime),_bo(bo),_prarm(prarm){ }
         UInt16 GetCurTime(){return _curtime;}
         float GetCurTime2(){return _curtime2;}
         BattleObject* GetBattleObject(){ return _bo;}
-        UInt16 GetParam(){ return _prarm;}
+        UInt32 GetParam(){ return _prarm;}
     };
 
     class BattleAction
@@ -36,6 +36,7 @@ namespace Battle
         public:
             BattleAction(){};
             virtual  UInt32 GetAttack(){return 0;}
+            virtual  UInt32 GetAttackImage(){return 0;}
             virtual  UInt32 GetHit(){return 0;}
             virtual  UInt32 GetWreck() {return 0;}
             virtual  UInt32 GetCritical() {return 0;}
@@ -61,6 +62,7 @@ namespace Battle
             ActionPackage(){}
             ~ActionPackage(){}
             UInt32 GetAttack(); //{if(!_bf) return 0; return _bf->GetAttack();}
+            UInt32 GetAttackImage(); //{if(!_bf) return 0; return _bf->GetAttack();}
             UInt32 GetHit(); //{ if(!_bf) return 0; return _bf->GetHit();}
             UInt32 GetWreck(); //{ if(!_bf) return 0; return _bf->GetWreck();}
             UInt32 GetCritical(); //{ if(!_bf) return 0; return _bf->GetCritical();}
@@ -84,9 +86,10 @@ namespace Battle
     class ImagePackage : public BattleAction
     {
         public:
-            ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time),_special(0),_sIndex(0){}
-            ImagePackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time2(time){}   // BATTLE2
+            ImagePackage(UInt16 skillId,UInt32 attack, UInt32 attackImage, UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_attackImage(attackImage),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time(time),_special(0),_sIndex(0){}
+            ImagePackage(UInt16 skillId,UInt32 attack, UInt32 attackImage, UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_attackImage(attackImage),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_time2(time){}   // BATTLE2
             UInt32 GetAttack(){return _attack;}
+            UInt32 GetAttackImage(){return _attackImage;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
             UInt32 GetCritical() {return _critical;}
@@ -108,6 +111,7 @@ namespace Battle
         private:
             UInt16 _skillId;
             UInt32 _attack ;
+            UInt32 _attackImage ;
             UInt32 _critical ;
             UInt32 _wreck ;
             UInt32 _hit;
@@ -130,9 +134,10 @@ namespace Battle
     class ObjectPackage : public BattleAction
     { 
         public:
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(0){}
-            ObjectPackage(UInt16 skillId,UInt32 attack , UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack,UInt32 attackImage, UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , UInt16 time):_skillId(skillId),_attack(attack),_attackImage(attackImage),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(0){}
+            ObjectPackage(UInt16 skillId,UInt32 attack, UInt32 attackImage, UInt32 critical, UInt32 wreck, UInt32 hit , BattleFighter * bf , float time):_skillId(skillId),_attack(attack),_attackImage(attackImage),_critical(critical),_wreck(wreck),_hit(hit),_bf(bf),_bo(NULL),_time2(time),_xAdd(0),_yAdd(0),_flagX(0),_flagY(0),_count(1),_being(0){}
             UInt32 GetAttack(){return _attack;}
+            UInt32 GetAttackImage(){return _attackImage;}
             UInt32 GetHit(){return _hit;}
             UInt32 GetWreck() {return _wreck;}
             UInt32 GetCritical() {return _critical;}
@@ -245,7 +250,7 @@ namespace Battle
             void setObjectCount(UInt8 count ) { _count = count;}
 
             bool CheckFighterInSCope(BattleObject* bo);  //非指向性
-            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt16 param)
+            void InsertIntoPackage(UInt16 curtime , BattleObject* bo , UInt32 param)
             { 
                 if(_count)
                 { 
@@ -266,6 +271,7 @@ namespace Battle
 
             UInt16 _skillId;
             UInt32 _attack ;
+            UInt32 _attackImage ;
             UInt32 _critical ;
             UInt32 _wreck ;
             UInt32 _hit;

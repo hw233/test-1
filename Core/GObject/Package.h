@@ -13,6 +13,7 @@ namespace GObject
 
 #define ARENA_BET_ITEM1    9081  
 #define ARENA_BET_ITEM2    9082
+
     class Player;
     struct ItemKey
     {   
@@ -61,6 +62,7 @@ namespace GObject
 
             void  SendPackageInfo();
 
+            UInt32 GetItemCount(UInt32 id);
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;
             typedef ItemCont::iterator item_elem_iter;

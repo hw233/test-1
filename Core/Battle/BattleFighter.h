@@ -26,16 +26,6 @@ namespace Battle
 #define  MYFIGHTERMAX 10
 #define  A_SUB_B(x,y) (x)>(y)?(x)-(y):0
 
-    enum
-    {
-        e_fighter = 0,
-        e_walk = 1,
-        e_ride = 2,
-        e_shoot = 3,
-        e_lance = 4,
-        e_advice = 5,
-        e_fighter_max
-    };
 
     enum 
     {
@@ -50,9 +40,9 @@ namespace Battle
         e_be_attacked = 8 , //被攻击
         e_run_attack = 9 ,   //跑攻 (骑兵专用)
         e_object_image = 10,
-        e_object_attack = 11,
-        e_image_attack_time_special = 12
-
+        e_object_attack = 11, //弓箭（追击型）
+        e_image_attack_time_special = 12, // 根据目标数量决定施法时间
+        e_parry // 格挡
     };
 
     /*
@@ -126,7 +116,7 @@ namespace Battle
              ActionPackage MakeActionEffect();   //实现动作效果  伤害 法术等
 
             //被击
-            UInt16 BeActed(BattleAction *  bAction ); //是否延迟
+            UInt32 BeActed(BattleAction *  bAction ); //是否延迟
 
             //添加本身数据包
 
@@ -136,7 +126,7 @@ namespace Battle
             //updateAction
             void UpdateActionList();
 
-            ActionBase GetActionCurrent(UInt16 advance);
+            ActionBase GetActionCurrent(UInt16 advance, UInt8 flag = 0);
             void SetField(BattleField* bfield){ _field = bfield;}
 
             BattleField * GetField();
@@ -226,9 +216,10 @@ namespace Battle
             { 
                 return GetTotalAttr(e_attr_attack)*(100 + GetField()->GetAttackUp(GetSideInBS()))/100; 
             }
+            UInt32 GetAttackImage(){ return GetTotalAttr(e_attr_magatk);}
 
             UInt32 GetDefend(){ return GetTotalAttr(e_attr_defend);}
-            UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magatk);}
+            UInt32 GetImageDefend(){ return GetTotalAttr(e_attr_magdef);}
             UInt32 GetHit() { return GetTotalAttr(e_attr_hit);}
             UInt32 GetEvade() {return GetTotalAttr(e_attr_evade);}
             UInt32 GetCritical() { return GetTotalAttr(e_attr_critical);}
@@ -351,6 +342,8 @@ namespace Battle
 
             void AddEnergy(UInt32 energy){ if(!_isChild) _energy += energy;}
             UInt32 GetEnergy(){ return _energy;}
+
+            bool GetAttackedSkill(UInt8& flag);
 
         protected:
 

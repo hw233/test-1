@@ -26,10 +26,10 @@ namespace GObject
     {
         FVAR_INVALID = 0,    //无效变量
         FVAR_WEAPON_ENCHANT = 1,    //武器强化值
-        FVAR_ARMOR1_ENCHANT = 2,    //胸甲强化值
-        FVAR_ARMOR2_ENCHANT = 3,    //护头强化值
-        FVAR_ARMOR3_ENCHANT = 4,    //绑腿强化值
-        FVAR_ARMOR4_ENCHANT = 5,    //戒指强化值
+        FVAR_ARMOR1_ENCHANT = 2,    //盾牌强化值
+        FVAR_ARMOR2_ENCHANT = 3,    //帽子强化值
+        FVAR_ARMOR3_ENCHANT = 4,    //胸甲强化值
+        FVAR_ARMOR4_ENCHANT = 5,    //鞋子强化值
         FVAR_ARMOR5_ENCHANT = 6,    //项链强化值
 
         FVAR_WEAPON_ROAD = 7,    //武器强化之路

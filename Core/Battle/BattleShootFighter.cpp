@@ -40,7 +40,7 @@ namespace Battle
             UInt16 targetZ = TRIANGLE_Z(SUB(targetX , getPosX()), SUB(targetY, getPosY())) ;
             if(targetZ == 0)
                 targetZ = 1;
-            ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+            ObjectPackage op(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
             op.setObjectDirection(/*getPosX(),getPosY(),*/targetX>getPosX(),targetY>getPosY(),80*SUB(targetX,getPosX())/targetZ, 80*SUB(targetY,getPosY())/targetZ, 50 , _target);
             op.setObjectCount(1); //设置穿透数量
             op.pushObjectPoint(getPosX(),getPosY());

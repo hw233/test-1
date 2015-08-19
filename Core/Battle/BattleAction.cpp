@@ -3,6 +3,7 @@
 namespace Battle
 {
     UInt32 ActionPackage::GetAttack(){if(!_bf) return 0; return _bf->GetAttack();}
+    UInt32 ActionPackage::GetAttackImage(){if(!_bf) return 0; return _bf->GetAttackImage();}
     UInt32 ActionPackage::GetHit(){ if(!_bf) return 0; return _bf->GetHit();}
     UInt32 ActionPackage::GetWreck(){ if(!_bf) return 0; return _bf->GetWreck();}
     UInt32 ActionPackage::GetCritical(){ if(!_bf) return 0; return _bf->GetCritical();}
@@ -45,6 +46,7 @@ namespace Battle
             st << static_cast<UInt8>(GetBattleFighter()->GetBSNumber());
             st << static_cast<UInt8>(5);
             st << static_cast<UInt8>(vec_struct[0].GetBattleObject()->GetBSNumber());
+            st << static_cast<UInt8>(vec_struct[0].GetParam() >> 16);
             st << static_cast<UInt16>(vec_struct[0].GetParam());
             return 1;
         } 
@@ -73,6 +75,7 @@ namespace Battle
 
             st << static_cast<UInt16>(vec_struct[i].GetCurTime());
             st << static_cast<UInt8>(vec_struct[i].GetBattleObject()->GetBSNumber());
+            st << static_cast<UInt8>(vec_struct[i].GetParam() >> 16);
             st << static_cast<UInt16>(vec_struct[i].GetParam());
         } 
         return 1;

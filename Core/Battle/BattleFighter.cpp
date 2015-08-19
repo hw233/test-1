@@ -137,22 +137,76 @@ namespace Battle
 
     } 
 
-    UInt16 BattleFighter::BeActed(BattleAction *  bAction)
+    //被攻击
+    UInt32 BattleFighter::BeActed(BattleAction *  bAction)
     { 
         //TODO
         UInt32 attack = bAction->GetAttack();
         UInt32 defend = GetDefend();
         UInt32 hpSub = 0;
+        UInt8 flag = 0;
 
         if(attack <= defend)
         { 
-            hpSub = attack * 25 / 100;
+            hpSub += attack * 25 / 100;
         } 
         else
         {
-            hpSub = attack - (defend  * 75 /100);
+            hpSub += attack - (defend  * 75 /100);
         }
+
+        UInt32 attackImage = bAction->GetAttackImage();
+        UInt32 defendImage = GetImageDefend();
+
+        if(attackImage <= defendImage)
+        { 
+            hpSub += attackImage * 25 / 100;
+        } 
+        else
+        {
+            hpSub += attackImage - (defendImage * 75 /100);
+        }
+
         //TEST
+
+        UInt32 hit = bAction->GetHit();
+        UInt32 evade = GetEvade(); 
+        UInt32 rand = uRand(10000);
+        if(rand > (hit*10000/evade))
+        {
+            flag = 1;
+        }
+
+        UInt32 critical = bAction->GetCritical();
+        UInt32 criticalDef = GetCriticalDef(); 
+        rand = uRand(10000);
+        if(rand > (critical * 10000/criticalDef))
+        {
+            flag = 2;
+        }
+        
+        GetAttackedSkill(flag);
+
+        //伤害变化
+        switch(flag)
+        { 
+            case 1: //闪避
+                {
+                    hpSub = 0;
+                }
+                break;
+            case 2: //暴击
+                {
+                    hpSub *= 2;
+                }
+                break;
+            case 3:  //格挡
+                {
+                    hpSub = 0;
+                }
+                break;
+        } 
+            
         makeDamage(hpSub);
 
         if(GetClass() == e_shoot || GetClass() == e_advice)
@@ -166,7 +220,7 @@ namespace Battle
         } 
 
         AddEnergy(5);
-        return hpSub;
+        return hpSub | (flag << 16);
         //BuildLocalStream(e_be_attacked , hpSub);
     } 
     void BattleFighter::Action()
@@ -179,7 +233,8 @@ namespace Battle
         
         if(_crick)
         {
-            --_crick;
+            GetField()->InsertBattlePre(GetNowTime()+_crick, this);
+            _crick = 0;
             return ;
         }
 
@@ -337,7 +392,7 @@ namespace Battle
         } 
     } 
 
-    ActionBase BattleFighter::GetActionCurrent(UInt16 advance)
+    ActionBase BattleFighter::GetActionCurrent(UInt16 advance, UInt8 type) //type == 0 主动  1 被动
     { 
         UInt8 priority = 0;
         ActionSort::iterator result ;
@@ -350,6 +405,9 @@ namespace Battle
             const GData::Skill * s = GData::skillManager[it->_skillId];
             if(!s)
                 continue;
+            if(s->GetSkillCondition()->cond != type)
+                continue;
+
             if(s->GetSuperSkill() && (GetField()->GetSuperSkill() || _energy < 100 ))
                 continue;
 
@@ -383,7 +441,7 @@ namespace Battle
 
     ImagePackage BattleFighter::MakeImageEffect()
     { 
-        return ImagePackage(2,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
+        return ImagePackage(2,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,_nowTime);
     } 
     BattleFighter * BattleFighter::getMyFighters(UInt8 index)   //找第几个活着的 (0开始)
     { 
@@ -573,7 +631,7 @@ namespace Battle
         if(!s)
             return 0;
         //BATTLE2
-        ImagePackage ip(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
+        ImagePackage ip(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
 
         UInt16 cd = _actionLast; // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
@@ -600,7 +658,7 @@ namespace Battle
         if(myY > ((width * ss->rady + width)*minNumber + ss->y))
             minY = myY - ((width * ss->rady + width)*minNumber);
 
-        ObjectPackage op(_ab._skillId,GetAttack(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
+        ObjectPackage op(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         op.setObjectDirection(/*getPosX(),minY + (ss->rady+1)*i*width,*/GetBattleDirection(),0,40, 0, 50);
         op.setObjectCount(s->GetAttackCount());
         op.SetEffectType(_actionType);
@@ -678,4 +736,24 @@ namespace Battle
         _avoidhurt = false;
         return ;
     } 
+    bool BattleFighter::GetAttackedSkill(UInt8& flag)
+    { 
+        ActionBase ab = GetActionCurrent(0,1);
+        if(ab._skillId)
+        {
+            const GData::Skill * s = GData::skillManager[ab._skillId];
+            UInt8 type = s->GetSkillEffect()->skillType;
+            switch(type)
+            { 
+                case e_parry:
+                    { 
+                        if(_ab._skillId)
+                            _crick += s->GetActionBackCd();
+                        flag = 3;
+                    } 
+                    break;
+            } 
+        }
+        return true;
+    }
 }

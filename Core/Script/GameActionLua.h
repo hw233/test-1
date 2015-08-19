@@ -41,6 +41,7 @@ namespace Script
             UInt8  GetAttackRange(UInt8 stype);
             UInt8  GetMovePower(UInt8 stype);
             UInt8  GetSignForMouth(Player* player, UInt8 index, UInt8 vip, UInt8 flag);
+            UInt8  UpgradeCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
 
 
         public:

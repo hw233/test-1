@@ -4,6 +4,8 @@
 #include "FVar.h"
 #include "Common/URandom.h"
 #include "MsgID.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 namespace GObject
 {
     ItemBase* Package::AddItemFromDB(UInt32 id, UInt32 num, bool bind)
@@ -28,8 +30,8 @@ namespace GObject
         if(!fgt)
             return 1;
         UInt32 val = fgt->GetVar(part + FVAR_WEAPON_ENCHANT );
-        UInt8 enchant = val % 10;
-        if(enchant >= 9)
+        UInt8 enchant = val % (ENCHANT_MAX +1);
+        if(enchant >= ENCHANT_MAX )
             return 3;
 
         //XXX 扣除道具
@@ -39,7 +41,7 @@ namespace GObject
             UInt32 value = fgt->GetEquipmentUpgradeLoad(part);
             //UInt8 rand = (value >> (enchant - 1)*3) & 7;
             //while(value & (1 << (enchant+(++AddLevel))) && (enchant+AddLevel) < 9);
-            for(; AddLevel < 9 - enchant ; ++AddLevel)
+            for(; AddLevel < ENCHANT_MAX - enchant ; ++AddLevel)
             {
                if(value &(1 << (enchant+AddLevel)) ) 
                    break;
@@ -47,8 +49,8 @@ namespace GObject
         }
 
         {
-           if(enchant + AddLevel > 9) 
-               val += (9 - enchant);
+           if(enchant + AddLevel > ENCHANT_MAX) 
+               val += (ENCHANT_MAX - enchant);
            else
                val += AddLevel;
         }
@@ -63,14 +65,17 @@ namespace GObject
         if(!fgt)
             return 1;
         UInt32 val = fgt->GetVar(part + FVAR_WEAPON_ENCHANT );
-        UInt8 enchant = val % 10;
-        UInt8 grade = val / 10;
-        if(enchant != 9) 
+        UInt8 enchant = val % (ENCHANT_MAX+1);
+        UInt8 grade = val / (ENCHANT_MAX+1);
+        if(enchant != ENCHANT_MAX) 
             return 3;
         if( grade >= 20)
             return 3;
 
         //XXX 扣除道具
+        UInt8 res = GameAction()->UpgradeCost(m_Owner, fgt->GetTypeId(), part+1, grade + 1);
+        if(!res)
+            return 4;
 
         UInt32 load  = 0;
 
@@ -167,6 +172,17 @@ namespace GObject
         }
         return 0;
     }
+    UInt32 Package::GetItemCount(UInt32 id)
+    { 
+        ItemBase* itemFalse = m_Items[ItemKey(id, false)];
+        ItemBase* itemTrue = m_Items[ItemKey(id, true)];
+        UInt32 count = 0;
+        if(itemFalse)
+            count += itemFalse->Count();
+        if(itemTrue)
+            count += itemTrue->Count();
+        return count;
+    } 
 
     UInt32 Package::GetPackageSize()
     { 
