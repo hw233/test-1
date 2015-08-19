@@ -32,6 +32,7 @@ namespace Battle
             bool IsStop() const { return ground->CheckIsStop();}
             UInt16 GetOneRoundTimeCost() const { return ground->GetOneRoundTimeCost();}
             void EnterBattleGround(GObject::Player* player,UInt16 fighterId,UInt8 x,UInt8 y);
+            void NpcEnterBattleGround(UInt8 forceId,UInt16 fighterId,UInt8 x,UInt8 y);
             UInt8 GetCaptureForce() { return ground->GetCaptureId();}
         private:
             UInt32 nextStartTime;  //下一次开始战术的时间

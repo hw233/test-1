@@ -14,6 +14,27 @@ namespace Battle
         return (vecReportOneRound.back())->GetReportId();
     }
 
+    
+    ReportOneRound* Report2Id::GetEarliestReport()
+    {
+        if( vecReportOneRound.empty())
+            return NULL;
+        LessActTime<ReportOneRound*> lessActTime;
+        std::sort(vecReportOneRound.begin(), vecReportOneRound.end(), lessActTime);
+        return (vecReportOneRound.front());
+    }
+
+    UInt32 Report2Id::GetEarliestTime()
+    {
+        UInt32 time = TimeUtil::Now();
+        ReportOneRound* roundReport = GetEarliestReport();
+        if( roundReport != NULL )
+        {
+            time = roundReport->GetTime();
+        }
+        return time;
+    }
+
     void Report2IdTable::Insert(UInt32 roomId,UInt8 cityId,UInt16 actId, UInt32 reportId,UInt32 actTime)
     {
         //
@@ -56,5 +77,18 @@ namespace Battle
         }
         return NULL;
     }
-     
+
+    std::vector<Battle::Report2Id*> Report2IdTable::GetReport2Ids(UInt32 roomId)
+    {
+        std::vector<Report2Id*> vecReport;
+        for(auto it = _vecReportId.begin(); it != _vecReportId.end(); ++it )
+        {
+            if( (*it)->GetRoomId() == roomId )
+            {
+                vecReport.push_back((*it));
+            }
+        }
+        return vecReport;
+    }
+
 };

@@ -15,8 +15,9 @@
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/BattleAnalyze.h"
 #include "Battle/BattleReport.h"
-//#include "Battle/BattleReportAnalyse.h"
+#include "Battle/BattleReportAnalyse.h"
 #include "GObject/Exploit.h"
+#include "GData/Map.h"
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -78,10 +79,11 @@ namespace GObject
         //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1004,1005,2);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        //std::vector<UInt8> *r = Battle::battleReport0[414];
+        //std::vector<UInt8> *r = Battle::battleReport0[142];
         //std::vector<UInt8>* r = Battle::battleReport1[903];
         //BattleAnalyze::Analyze(Stream(*r));
         //BattleAnalyze::Analyze(Stream(*r));
+        //ReportAnalyse::AnalyseReport(Stream(*r));
 
         return true; 
     }
@@ -220,6 +222,8 @@ namespace GObject
                     UInt8 mapId = (*iter)->GetMapId();
                     Battle::SingleBattle* singleBattle = new Battle::SingleBattle(roomId,mapId,4);
                     singleBattle->SetNextStartTime(0);
+
+                    /*玩家的战将入场*/
                     std::vector<Battle::DistributeInfo*> vecInfo = (*iter)->GetDistributeInfo();
                     for( auto iterator = vecInfo.begin(); iterator != vecInfo.end(); ++iterator )
                     {
@@ -232,6 +236,29 @@ namespace GObject
                         if( player == NULL )
                             continue;
                         singleBattle->EnterBattleGround(player,fighterId,posx,posy);
+                    }
+                    /*策划所谓的野怪入场 从配置中读取该地图上的野怪信息*/
+                    /* 如果该处有玩家布置的战将  则不放入野怪*/
+                    GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
+                    std::vector<GData::NpcInfo> vecNpcInfo = mapInfo->GetNpcInfo();
+                    for( auto iterator = vecNpcInfo.begin(); iterator != vecNpcInfo.end(); ++iterator)
+                    {
+                        UInt16 fighterId = (*iterator).fighterId;
+                        UInt8  x = (*iterator).x;
+                        UInt8  y = (*iterator).y;
+                        bool flag = true;
+                        for( auto p = vecInfo.begin(); p != vecInfo.end(); ++p )
+                        {
+                            if( (*p)->GetPosX() == x && (*p)->GetPosY() == y )
+                            {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if( flag )
+                        {
+                            singleBattle->NpcEnterBattleGround(0,fighterId,x,y);
+                        }
                     }
                     roomBattle->InsertSingleBattle(singleBattle);
                 }

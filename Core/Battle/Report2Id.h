@@ -2,6 +2,7 @@
 #ifndef __REPORT2ID_H__
 #define __REPORT2ID_H__
 #include"Config.h"
+#include"Common/TimeUtil.h"
 
 namespace Battle
 {
@@ -47,6 +48,8 @@ namespace Battle
             std::vector<ReportOneRound*> GetReportOneRounds() const { return vecReportOneRound;}
             void SetVecRepoortOneRound(std::vector<ReportOneRound*> vecReports) { vecReportOneRound = vecReports;}
             void InsertReportOneRound(ReportOneRound* reportRound) { vecReportOneRound.push_back(reportRound);}
+            ReportOneRound* GetEarliestReport();
+            UInt32 GetEarliestTime();
         private:
             UInt32 roomId;
             UInt8  cityId;
@@ -82,6 +85,7 @@ namespace Battle
             void Insert(UInt32 roomId,UInt8 cityId,UInt16 actId, UInt32 reportId,UInt32 actTime);
             Report2Id* GetReport2Id(UInt32 roomId,UInt8 cityId);
             UInt32 GetRecentReportId(UInt32 roomId, UInt8 mapId);
+            std::vector<Battle::Report2Id*> GetReport2Ids(UInt32 roomId);
         private:
             std::vector<Report2Id*> _vecReportId;
 

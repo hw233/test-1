@@ -1,5 +1,6 @@
 #include"ClanBattleCityStatus.h"
 #include"Battle/ClanBattleRoom.h"
+#include"Battle/ClanBattleDistribute.h"
 #include "GObject/GVar.h"
 
 
@@ -91,17 +92,17 @@ namespace Battle
    //判断是不是到结束了
    bool RoomAllCityStatus::IsStop()
    {
-      std::vector<UInt8> vecCaptureForce;
+      std::set<UInt8> CaptureForceSet;
       for( auto it = vecCityStatus.begin(); it != vecCityStatus.end(); ++it )
       {
           UInt8 ownForce = (*it)->GetOwnForce();
           //并且该地图有
           if( (*it)->GetOwnForce() != 0 )
           {
-              vecCaptureForce.push_back(ownForce);
+              CaptureForceSet.insert(ownForce);
           }
       }
-      if( vecCaptureForce.size() == 1 )
+      if( CaptureForceSet.size() == 1 )
       {
           return true;
       }
@@ -131,17 +132,33 @@ namespace Battle
    }
 
 
-   std::vector<UInt8> RoomAllCityStatus::GetCanConfigure(UInt8 forceId)
+   std::set<UInt8> RoomAllCityStatus::GetCanConfigure(UInt8 forceId)
    {
-       std::vector<UInt8> vecConfigure;
-       UInt8 cityId = GetCityOwnForce(forceId);
-       GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
-       GData::SingleMapInfo* cityInfo = info->GetSingleMapInfo(cityId);
-       std::vector<UInt8> vecCity = cityInfo->GetLinks();
-       vecConfigure.assign(vecCity.begin(),vecCity.end());
-       vecConfigure.push_back(cityId);
-       return vecConfigure;
+       std::vector<UInt8> vecCitys;
+       for( auto it = vecCityStatus.begin(); it != vecCityStatus.end(); ++it)
+       {
+           UInt8 cityId = (*it)->GetCityId();
+           UInt8 ownforce = (*it)->GetOwnForce();
+           Battle::MapDistributeInfo* info = Battle::battleDistribute.GetMapDistributionInfo(roomId,cityId);
+           if( (ownforce == 0 && info != NULL && info->HasBody()) || (!ownforce  && forceId == ownforce))
+           {
+               vecCitys.push_back(cityId);
+           }
+       }
 
+       std::set<UInt8> ConfigureSet;
+       GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
+       for( auto it = vecCitys.begin(); it != vecCitys.end(); ++it )
+       {
+            GData::SingleMapInfo* singleInfo = info->GetSingleMapInfo((*it));
+            std::vector<UInt8> linkCitys = singleInfo->GetLinks();
+            for( auto iter = linkCitys.begin(); iter != linkCitys.end(); ++iter)
+            {
+                ConfigureSet.insert((*iter));
+            }
+            ConfigureSet.insert(*it);
+       }
+       return ConfigureSet;
    }
 
 
@@ -157,12 +174,18 @@ namespace Battle
        return 0;
    }
    
-   /*
-   std::vector<UInt8> RoomAllCityStatus::GetCaptureCitys()
+   std::vector<UInt8> RoomAllCityStatus::GetCaptureCitys(UInt8 forceId)
    {
-       for( auto it =
+       std::vector<UInt8> vecCitys;
+       for( auto it = vecCityStatus.begin(); it != vecCityStatus.end(); ++it )
+       {
+           if( (*it)->GetOwnForce() == forceId )
+           {
+               vecCitys.push_back((*it)->GetCityId());
+           }
+       }
+       return vecCitys;
    }
-   */
 
    void RoomAllCityStatusManager::InsertRoomAllCityStatus(UInt32 roomId,UInt8 battleId)
    {

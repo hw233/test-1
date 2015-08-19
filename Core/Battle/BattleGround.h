@@ -155,6 +155,7 @@ namespace Battle
             void InitMapFight(UInt8 mapId);
             void PushBattleInfo(const BattleInfo& bi);
             void PushFighter(GObject::Player*, UInt16 ,UInt8,UInt8);
+            void PushNpc(UInt8 forceId,UInt16 fighterId,UInt8 x,UInt8 y);
             void SetCampActId();
             void GetCampAttackOrder(UInt8 campId,UInt8 dir);
             void SearchFromDownToUp(UInt8 campId);

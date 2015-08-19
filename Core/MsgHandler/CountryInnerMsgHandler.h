@@ -16,6 +16,7 @@
 #endif
 #include "Common/StringTokenizer.h"
 #include "GObject/Player.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 //Login thread -> Country thread
 void PlayerLogin( GameMsgHdr& hdr, const void * data )

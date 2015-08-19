@@ -99,9 +99,13 @@ namespace Battle
             void  NoticeAlliesDelFighter(GObject::Player* player,UInt8 mapId,UInt8 posx,UInt8 posy);
             void  NoticeAlliesMoveFighter(GObject::Player* player,UInt8 curMapId,UInt8 curx,UInt8 cury,UInt8 destMapId,UInt8 destx,UInt8 desty);
             map<UInt32,std::vector<MapDistributeInfo*>> GetData() const { return _room2Distribute;}
-            void UpdateMainFighterHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt32 hp);
-            void UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecHP);
-            void SetMainFighterAndSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP);
+            void UpdateMainFighterHP(UInt32 roomId,UInt8 mapId,UInt8 x,UInt8 y, UInt32 hp);
+            void UpdateSoldiersHP(UInt32 roomId,UInt8 mapId,UInt8 x,UInt8 y,std::vector<UInt32> vecHP);
+            void SetMainFighterAndSoldiersHP(UInt32 roomId,UInt8 mapId,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP);
+            MapDistributeInfo* GetMapDistributionInfo(UInt32 roomId,UInt8 mapId);
+            void MoveNpc(UInt32 roomId,UInt8 mapId,UInt16 fighterId,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty);
+            void PutNpc(UInt32 roomId,UInt8 mapId,UInt16 fighterId,UInt8 x,UInt8 y,bool flag = true);
+            void RemoveNpc(UInt32 roomId,UInt8 mapId,UInt8 curx,UInt8 cury);
         private:
             map<UInt32,std::vector<MapDistributeInfo*>> _room2Distribute;
     };

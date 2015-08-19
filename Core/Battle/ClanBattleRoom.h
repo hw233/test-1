@@ -46,6 +46,8 @@ namespace Battle
             std::vector<GObject::Player*> GetAllJoinPlayer();
             std::vector<GObject::Player*> GetSameForceAllies(UInt8 forceId);
             bool IsFirstDay();
+            std::vector<UInt32> GetJoinClan();
+            std::vector<UInt8> GetJoinForce();
         private:
             UInt32 roomId;    //以创建者的军团id作为roomId
             UInt8  battleId;  //战役Id

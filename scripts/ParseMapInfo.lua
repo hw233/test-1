@@ -14,15 +14,15 @@ name2table= {
     [8] = forest,
     [9] = forest,
     [10] = forest,
-    [11] = campaign_1,
+    [11] = template_10x9_2p_lr,
     [12] = template_10x9_2p_lr,
-    [13] = campaign_1,
-    [14] = campaign_1,
-    [15] = campaign_1,
-    [16] = campaign_1,
-    [17] = campaign_1,
-    [18] = campaign_1,
-    [19] = template9
+    [13] = template_10x9_2p_lr,
+    [14] = template_10x9_2p_lr,
+    [15] = template_10x9_2p_lr,
+    [16] = template_10x9_2p_lr,
+    [17] = template_10x9_2p_lr,
+    [18] = template_10x9_2p_lr,
+    [19] = template_10x9_2p_lr 
 }
 
 function GetMapWidth(mapId)
@@ -57,7 +57,6 @@ function GetTileSets(mapId)
 end
 
 
-
 function GetForceInfo(mapId)   --get force info from map
     local layers = GetLayers(mapId)
     for i=1,#layers do
@@ -88,6 +87,9 @@ function GetForce2Id(mapId)
                local id = tiles[j].id
                local forceId = firstgid+id
                local force = tiles[j].properties["force"]
+               if force == "auto" then
+                   force = 0
+               end
                forceWithId[forceId] = tonumber(force)
             end
         end
@@ -161,6 +163,32 @@ function GetForceNum(mapId)
     end
 end
 
+function GetActForceIds(mapId)
+    local force = GetForce(mapId)
+    local forceWithId = GetForce2Id(mapId)
+    local forceId = {}
+    for i=1,#force do
+        if force[i] ~= 0 then 
+            if #forceId == 0 then
+                table.insert(forceId,force[i])
+            else
+                local flag = 0
+                for j=1,#forceId do
+                    if forceId[j] == force[i] then
+                        flag = 1
+                    end
+                end
+                if flag == 0 then
+                    table.insert(forceId,force[i])
+                end
+            end
+        end
+    end
+    return forceId
+end
+
+
+
 function GetTiles(mapId)
     local tilesets = GetTileSets(mapId)
     for i=1,#tilesets do
@@ -177,6 +205,98 @@ direction2num={
     ["down"] = 4,
     ["auto"] = 5
 }
+
+
+function GetSoldierObject(mapId)
+    local layers = GetLayers(mapId);
+    for i=1,#layers do
+        if layers[i].type=="objectgroup" and layers[i].name=="soldier" then
+            return layers[i]
+        end
+    end
+end
+
+--获得hero这个图块的
+function GetHeroTile(mapId)
+    local tilesets = GetTileSets(mapId)
+    for i=1,#tilesets do
+        if tilesets[i].name == "hero" then
+            return tilesets[i]
+        end
+    end
+end
+
+--获得hero图块的宽度
+function GetHeroTileWidth(mapId)
+    local heroTile = GetHeroTile(mapId)
+    return heroTile.tilewidth
+end
+
+
+--获得hero图块的高度
+function GetHeroTileHeight(mapId)
+    local heroTile = GetHeroTile(mapId)
+    return heroTile.tileheight
+end
+
+
+--把图块id和fighterId对应起来
+function GetSoldier2Id(mapId)
+    local heroTile = GetHeroTile(mapId)
+    local soldier2id = {}
+    local firstgid = heroTile.firstgid
+    local tiles = heroTile.tiles
+    for j=1,#tiles do
+        local id = tiles[j].id
+        local properties = tiles[j].properties
+        local fighterId = properties["heroId"]
+        soldier2id[firstgid+id] = fighterId
+    end
+    return soldier2id
+end
+
+function GetTileHeight(mapId)
+    return name2table[mapId].tileheight
+end
+
+function GetTileWidth(mapId)
+    return name2table[mapId].tilewidth
+end
+
+--获得野怪(npc)信息
+function ParseSoldier(mapId)
+    local soldierobjects = GetSoldierObject(mapId)
+    local soldiers = {}
+    if soldierobjects == nil then 
+        return soldiers
+    end
+    local objects = soldierobjects.objects
+    if objects == nil then 
+        return soldiers
+    end
+
+    local soldier2id = GetSoldier2Id(mapId)
+    local tilewidth = GetTileWidth(mapId)
+    local tileheight = GetTileHeight(mapId)
+    local height = GetMapHeight(mapId)
+    for i=1,#objects do
+        local x = objects[i].x
+        local y = objects[i].y
+        local gid = objects[i].gid
+        --把世界坐标转换为地图坐标
+        local fighterId = soldier2id[gid]
+        local posx = 0
+        local posy = (y-tileheight)/(0.5*tileheight)
+        if posy%2 == 0 then
+            posx = x/tilewidth
+        else
+            posx = (x-0.5*tilewidth)/tilewidth
+        end
+        table.insert(soldiers,{fighterId,posx,posy})
+    end
+    return soldiers
+end
+
 
 function GetForceDirection(mapId)
     local direction = {}
@@ -229,4 +349,23 @@ function GetAllDirect2Force()
         table.insert(directionAll,direct)
     end
     return directionAll
+end
+
+function GetAllSoldiers()
+    local soldierAll = {}
+    for i=1,#name2table do
+        local soldiers = ParseSoldier(i)
+        table.insert(soldierAll,soldiers)
+    end
+    return soldierAll
+end
+
+
+function GetAllActForceIds()
+    local forceIdAll = {}
+    for i=1,#name2table do
+        local forceIds = GetActForceIds(i)
+        table.insert(forceIdAll,forceIds)
+    end
+    return forceIdAll
 end

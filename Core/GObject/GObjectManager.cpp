@@ -523,21 +523,28 @@ namespace GObject
         LoadingCounter lc("Loading ClanApply");
         lc.reset(1000);
         DBClanBattlePos cbp;
-        if(execu->Prepare("SELECT `mapId`,`playerId`,`fighterId`,`posx`,`posy` , `mainFighterHP`,`soldiersHP` FROM `clan_battle_pos`", cbp) != DB::DB_OK)
+        if(execu->Prepare("SELECT `roomId`,`mapId`,`playerId`,`fighterId`,`posx`,`posy` , `mainFighterHP`,`soldiersHP` FROM `clan_battle_pos`", cbp) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            Player* player = globalPlayers[cbp.playerId];
-            if(!player)
-                continue;
-            Battle::battleDistribute.PutFighter(cbp.mapId,player,cbp.fighterId,cbp.posx,cbp.posy,0,1);
+            if( cbp.playerId != 0 )
+            {
+                Player* player = globalPlayers[cbp.playerId];
+                if(!player)
+                    continue;
+                Battle::battleDistribute.PutFighter(cbp.mapId,player,cbp.fighterId,cbp.posx,cbp.posy,0,1);
+            }
+            else
+            {
+                Battle::battleDistribute.PutNpc(cbp.roomId,cbp.mapId,cbp.fighterId,cbp.posx,cbp.posy,0);
+            }
             std::vector<UInt32> vecSoldierHP;
             StringTokenizer st(cbp.soldiersHP,",");
             for( UInt8 i =0 ; i < st.count() ; ++i )
             {
                 vecSoldierHP.push_back(::atoi(st[i].c_str()));
             }
-            Battle::battleDistribute.SetMainFighterAndSoldiersHP(cbp.mapId,player,cbp.posx,cbp.posy,vecSoldierHP,cbp.mainFighterHP);
+            Battle::battleDistribute.SetMainFighterAndSoldiersHP(cbp.roomId,cbp.mapId,cbp.posx,cbp.posy,vecSoldierHP,cbp.mainFighterHP);
             lc.advance();
         }
         lc.finalize();

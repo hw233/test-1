@@ -109,6 +109,8 @@ namespace REQ
     const UInt8 CLAN_BATTLE_REPORT        = 0xA6;
     /*战场信息*/
     const UInt8 CLAN_BATTLE_INFO          = 0xA7;
+    /*战报回放*/
+    const UInt8 CLAN_BATTLE_REPORTList    = 0xA8;
 
 
     /*开采换将*/
@@ -663,6 +665,8 @@ namespace REP
     const UInt8 CLAN_BATTLE_REPORT        = 0xA6;
     /*战场信息*/
     const UInt8 CLAN_BATTLE_INFO          = 0xA7;
+
+    const UInt8 CLAN_BATTLE_REPORTList    = 0xA8;
 
     const UInt8 CLAN_APPLY                = 0x74;
 

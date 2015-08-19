@@ -17,12 +17,20 @@ namespace GData
         eMax
     };
 
+    struct NpcInfo
+    {
+        NpcInfo(UInt16 id,UInt8 px,UInt8 py) : fighterId(id),x(px),y(py) {}
+        UInt16 fighterId;
+        UInt8 x;
+        UInt8 y;
+    };
+
     typedef std::vector<UInt8> vecInfo;
 
     class MapInfo
     {
         public:
-            MapInfo(UInt8 w,UInt8 h,UInt8 cn) : width(w),height(h),campNum(cn)
+            MapInfo(UInt8 w,UInt8 h) : width(w),height(h)
             {
                 camp2direction.clear();
             }
@@ -30,18 +38,22 @@ namespace GData
             UInt8 GetHeight() const { return height;}
             vecInfo GetTileInfo() const { return tileInfo;}
             vecInfo GetCampInfo() const { return campInfo;}
-            UInt8 GetCampNum() const { return campNum;}
             void SetCampInfo(vecInfo info) { campInfo = info;}
             void SetTileInfo(vecInfo info) { tileInfo = info;}
             void InsertCampDir(UInt8 campId,UInt8 dir) { camp2direction[campId] = dir ;}
             UInt8 GetAttackDirect(UInt8 side) { return camp2direction[side];}
+            void SetNpcInfo(std::vector<NpcInfo> vecInfo ) { vecNpcInfo = vecInfo;}
+            std::vector<NpcInfo> GetNpcInfo() const { return vecNpcInfo;}
+            std::vector<UInt8> GetActCamp() const { return vecCamp;}
+            void SetActCamp(std::vector<UInt8> vecForce) { vecCamp = vecForce;}
         private:
             UInt8 width;
             UInt8 height;
-            UInt8 campNum;
             vecInfo tileInfo;  //地形信息
-            vecInfo campInfo;  //地图信息
+            vecInfo campInfo;  //阵营信息
             std::map<UInt8,UInt8> camp2direction;
+            std::vector<NpcInfo> vecNpcInfo;
+            std::vector<UInt8> vecCamp;  //实际有哪些阵营
     };
     class MapTable
     {

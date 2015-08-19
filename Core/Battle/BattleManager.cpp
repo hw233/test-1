@@ -29,6 +29,11 @@ namespace Battle
     {
         ground->PushFighter(player,fighterId,x,y);
     }
+
+    void SingleBattle::NpcEnterBattleGround(UInt8 forceId,UInt16 fighterId,UInt8 x,UInt8 y)
+    {
+        ground->PushNpc(forceId,fighterId,x,y);
+    }
     
     void RoomBattle::InsertSingleBattle(SingleBattle* singBt)
     {
