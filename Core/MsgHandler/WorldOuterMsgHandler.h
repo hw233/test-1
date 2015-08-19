@@ -19,6 +19,7 @@
 #include "Battle/ClanBattleComment.h"
 #include "Battle/ClanOrder.h"
 #include "Battle/Report2Id.h"
+#include "Battle/ClanBattleRoom.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -413,5 +414,44 @@ void OnClanBattleReport(GameMsgHdr& hdr, const void * data)
     */
 }
 
+void OnClanBattleReportList(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( !player )
+        return;
+    GObject::Clan* clan = player->GetClan();
+    UInt32 roomId = clan->GetClanBattleRoomId();
+    std::vector<Battle::Report2Id*> vecReport = Battle::report2IdTable.GetReport2Ids(roomId);
+    Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+    std::vector<UInt8> vecforce = room->GetJoinForce();
+    Stream st(REP::CLAN_BATTLE_REPORTList);
+    if( vecReport.empty())
+    {
+        st<<static_cast<UInt8>(0);
+    }
+    else
+    {
+        st<<static_cast<UInt8>(vecReport.size());
+        for( auto it = vecReport.begin(); it != vecReport.end();++it )
+        {
+            st<<static_cast<UInt8>((*it)->GetCityId());
+            st<<static_cast<UInt8>(vecforce.size());
+            for( auto iter = vecforce.begin(); iter != vecforce.end(); ++iter )
+            {
+                st<<static_cast<UInt8>(*iter);
+            }
+            st<<static_cast<UInt8>(0);
+            st<<static_cast<UInt32>((*it)->GetEarliestTime());
+            std::vector<Battle::ReportOneRound*> vecRoundRepot = (*it)->GetReportOneRounds();
+            st<<static_cast<UInt8>(vecRoundRepot.size());
+            for( auto iter = vecRoundRepot.begin(); iter != vecRoundRepot.end(); ++iter )
+            {
+                st<<static_cast<UInt32>((*iter)->GetReportId());
+            }
+        }
+    }
+    st<<Stream::eos;
+    player->send(st);
+}
 
 #endif // _WORLDOUTERMSGHANDLER_H_

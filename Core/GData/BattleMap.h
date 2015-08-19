@@ -37,6 +37,7 @@ namespace GData
             SingleMapInfo* GetSingleMapInfo(UInt8 mapId);
             UInt8 GetMapNum() const { return battleMapInfo.size();}
             UInt8 GetBornCity(UInt8 forceId);
+            std::vector<UInt8> GetForces();
         private:
             UInt8 battleId;
             std::vector<SingleMapInfo*> battleMapInfo;

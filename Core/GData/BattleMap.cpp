@@ -63,4 +63,17 @@ namespace GData
             return NULL;
         return battleMapTable[battleId];
     }
+
+    std::vector<UInt8> BattleMapInfo::GetForces()
+    {
+        std::vector<UInt8> vecForce;
+        for( auto it = battleMapInfo.begin(); it != battleMapInfo.end();++it )
+        {
+            if( (*it)->GetForce() != 0 )
+            {
+                vecForce.push_back((*it)->GetForce());
+            }
+        }
+        return vecForce;
+    }
 }

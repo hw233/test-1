@@ -157,6 +157,7 @@ CREATE TABLE `reportid` (
 
 DROP TABLE IF EXISTS `clan_battle_pos`; 
 CREATE TABLE `clan_battle_pos` (
+    `roomId`   int(10) unsigned NOT NULL DEFAULT '0' COMMENT '房间id',
     `mapId`    tinyint(3)  unsigned NOT NULL DEFAULT '0' COMMENT '地图id',
     `playerId` bigint(20) unsigned NOT NULL COMMENT '玩家Id',
     `fighterId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '战将id',

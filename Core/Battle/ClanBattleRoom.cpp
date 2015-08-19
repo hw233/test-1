@@ -7,6 +7,30 @@ namespace Battle
 
     ClanBattleRoomManager clanBattleRoomManager;
 
+    std::vector<UInt32> ClanBattleRoom::GetJoinClan()
+    {
+       std::vector<UInt32> vecClans;
+       for( auto it = force2clans.begin(); it != force2clans.end(); ++it )
+       {
+           std::vector<UInt32> clans = it->second;
+           for( auto iter = clans.begin(); iter != clans.end(); ++iter )
+           {
+               vecClans.push_back(*iter);
+           }
+       }
+       return vecClans;
+    }
+
+    std::vector<UInt8> ClanBattleRoom::GetJoinForce()
+    {
+       std::vector<UInt8> vecForce;
+       for( auto it = force2clans.begin(); it != force2clans.end(); ++it )
+       {
+           vecForce.push_back(it->first);
+       }
+       return vecForce;
+    }
+
 
     void ClanBattleRoom::InsertClan(UInt8 forceId,UInt32 clanId,UInt32 num )
     {
@@ -130,8 +154,12 @@ namespace Battle
         //UInt8 battleId = base->GetBattleId();
         UInt32 clanId = clan->GetId();
         UInt8 memberNum = clan->GetMemberNum();
-        UInt8 forceNum = base->GetForceNum();
+        //UInt8 forceNum = base->GetForceNum();
         UInt8 playermax = base->GetPlayerMax();
+        UInt8 battleId = base->GetBattleId();
+
+        GData::BattleMapInfo* info = GData::battleMapTable.GetBattleMapInfo(battleId);
+        std::vector<UInt8> vecForce = info->GetForces();
         
         
         //检查是不是军团长
@@ -162,11 +190,12 @@ namespace Battle
                 UInt8 i = 1;
                 UInt8 theMinNum = 0xFF;  //人数最少的势力
                 UInt8 minForce = 1 ;    
-                for( i = 1; i <= forceNum; ++i)
+                for( auto it = vecForce.begin(); it != vecForce.end(); ++it)
                 {
-                    if( room->GetNum(i) < theMinNum )
+                    UInt8 forceId = (*it);
+                    if( room->GetNum(forceId) < theMinNum )
                     {
-                        theMinNum = room->GetNum(i);
+                        theMinNum = room->GetNum(forceId);
                         minForce = i;
                     }
                 }
@@ -179,25 +208,6 @@ namespace Battle
 
                     room->InsertClan(minForce,clanId,memberNum);
                 }
-
-                /*
-                for(i = 1; i <= forceNum ; ++i)
-                {
-                    UInt8 num = 0;
-                    num = room->GetNum(i);
-                    //num = force2num[i];
-                    if( num < playermax )
-                    {
-                        room->InsertClan(i,clanId,memberNum);
-                        break;
-                    }
-                }
-                //所有的房间都满了
-                if( i > forceNum )
-                {
-                    CreateRoom(player);
-                }
-                */
             }
         }
         return true;

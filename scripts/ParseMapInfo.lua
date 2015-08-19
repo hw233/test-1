@@ -14,15 +14,15 @@ name2table= {
     [8] = forest,
     [9] = forest,
     [10] = forest,
-    [11] = campaign_1,
+    [11] = template_10x9_2p_lr,
     [12] = template_10x9_2p_lr,
-    [13] = campaign_1,
-    [14] = campaign_1,
-    [15] = campaign_1,
-    [16] = campaign_1,
-    [17] = campaign_1,
-    [18] = campaign_1,
-    [19] = template9
+    [13] = template_10x9_2p_lr,
+    [14] = template_10x9_2p_lr,
+    [15] = template_10x9_2p_lr,
+    [16] = template_10x9_2p_lr,
+    [17] = template_10x9_2p_lr,
+    [18] = template_10x9_2p_lr,
+    [19] = template_10x9_2p_lr 
 }
 
 function GetMapWidth(mapId)
@@ -57,7 +57,6 @@ function GetTileSets(mapId)
 end
 
 
-
 function GetForceInfo(mapId)   --get force info from map
     local layers = GetLayers(mapId)
     for i=1,#layers do
@@ -88,6 +87,9 @@ function GetForce2Id(mapId)
                local id = tiles[j].id
                local forceId = firstgid+id
                local force = tiles[j].properties["force"]
+               if force == "auto" then
+                   force = 0
+               end
                forceWithId[forceId] = tonumber(force)
             end
         end
@@ -160,6 +162,32 @@ function GetForceNum(mapId)
         end
     end
 end
+
+function GetActForceIds(mapId)
+    local force = GetForce(mapId)
+    local forceWithId = GetForce2Id(mapId)
+    local forceId = {}
+    for i=1,#force do
+        if force[i] ~= 0 then 
+            if #forceId == 0 then
+                table.insert(forceId,force[i])
+            else
+                local flag = 0
+                for j=1,#forceId do
+                    if forceId[j] == force[i] then
+                        flag = 1
+                    end
+                end
+                if flag == 0 then
+                    table.insert(forceId,force[i])
+                end
+            end
+        end
+    end
+    return forceId
+end
+
+
 
 function GetTiles(mapId)
     local tilesets = GetTileSets(mapId)
@@ -330,4 +358,14 @@ function GetAllSoldiers()
         table.insert(soldierAll,soldiers)
     end
     return soldierAll
+end
+
+
+function GetAllActForceIds()
+    local forceIdAll = {}
+    for i=1,#name2table do
+        local forceIds = GetActForceIds(i)
+        table.insert(forceIdAll,forceIds)
+    end
+    return forceIdAll
 end

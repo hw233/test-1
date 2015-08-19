@@ -186,16 +186,16 @@ namespace Battle
         //更新数据库哈
         if( flag )
         {
-            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`mapId`,`playerId`,`fighterId`,`posx`,`posy`)   value(%u, %"I64_FMT"u, %u, %u, %u)",mapId,player->GetId(),fighterId,x,y);
+            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`roomId`,`mapId`,`playerId`,`fighterId`,`posx`,`posy`) value(%u,%u,%"I64_FMT"u,%u,%u,%u)",roomId,mapId,player->GetId(),fighterId,x,y);
             if( flag == true && tag == 0 )
             {
                 GObject::Fighter* fgt = player->findFighter(fighterId);
                 UInt32 childTypeId = fgt->GetChildTypeId();
                 pInfo->SetSoldiersHP(childTypeId);
-                UpdateSoldiersHP(mapId,player,x,y,pInfo->GetSoldiersHP());
+                UpdateSoldiersHP(roomId,mapId,x,y,pInfo->GetSoldiersHP());
                 if( fgt == NULL )
                     return false;
-                UpdateMainFighterHP(mapId,player,x,y,fgt->GetHP());
+                UpdateMainFighterHP(roomId,mapId,x,y,fgt->GetHP());
             }
         }
         player->InsertClanBattleFighter(mapId,fighterId,x,y);
@@ -292,9 +292,12 @@ namespace Battle
                     }
                 }
                 _room2Distribute[roomId] = vecMapDistribute;
-                DB7().PushUpdateData("delete from `clan_battle_pos` where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",mapId,info->GetPlayerId(),info->GetFighterId());
-                GObject::Player* player = GObject::globalPlayers[info->GetPlayerId()];
-                player->DelClanBattleFighter(mapId,info->GetFighterId(),info->GetPosX(),info->GetPosY());
+                DB7().PushUpdateData("delete from `clan_battle_pos` where `roomId` = %u AND `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",roomId,mapId,info->GetPlayerId(),info->GetFighterId());
+                if( info->GetPlayerId() != 0 )   //非npc
+                {
+                    GObject::Player* player = GObject::globalPlayers[info->GetPlayerId()];
+                    player->DelClanBattleFighter(mapId,info->GetFighterId(),info->GetPosX(),info->GetPosY());
+                }
             }
         }
     }
@@ -463,6 +466,8 @@ namespace Battle
         {
             UInt8 mapId = (*it)->GetMapId();
             st<<static_cast<UInt8>(mapId);
+            UInt8 ownforce = status->GetCityOwnForce(mapId);
+            st<<static_cast<UInt8>(ownforce);
             UInt8 count = 0;
             size_t offset = st.size();
             st<<static_cast<UInt8>(count);
@@ -716,21 +721,19 @@ namespace Battle
 
     }
 
-    void BattleDistribute::UpdateMainFighterHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y, UInt32 hp)
+    void BattleDistribute::UpdateMainFighterHP(UInt32 roomId,UInt8 mapId,UInt8 x,UInt8 y, UInt32 hp)
     {
-        UInt32 roomId = GetBattleRoomId(player);
         DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
         if( info == NULL)
             return;
         info->SetMainFighterHP(hp);
         //更新数据库
-        DB7().PushUpdateData("update `clan_battle_pos`  set `mainFighterHP` = %u where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hp, mapId,info->GetPlayerId(),info->GetFighterId());
+        DB7().PushUpdateData("update `clan_battle_pos`  set `mainFighterHP` = %u where `roomId`=%u AND`mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hp, roomId,mapId,info->GetPlayerId(),info->GetFighterId());
 
     }
 
-    void BattleDistribute::UpdateSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32>vecHP)
+    void BattleDistribute::UpdateSoldiersHP(UInt32 roomId , UInt8 mapId,UInt8 x,UInt8 y,std::vector<UInt32>vecHP)
     {
-        UInt32 roomId = GetBattleRoomId(player);
         DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
         if( info == NULL)
             return;
@@ -743,14 +746,13 @@ namespace Battle
         }
         buff[offset-1] = '\0';
         std::string hps(buff);
-        DB7().PushUpdateData("update `clan_battle_pos`  set `soldiersHP` = '%s' where `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hps.c_str(), mapId,info->GetPlayerId(),info->GetFighterId());
+        DB7().PushUpdateData("update `clan_battle_pos`  set `soldiersHP` = '%s' where `roomId`=%u AND `mapId`= %u AND `playerId` = %" I64_FMT "u  AND `fighterId` = %u",hps.c_str(), roomId,mapId,info->GetPlayerId(),info->GetFighterId());
     }
 
 
    
-    void BattleDistribute::SetMainFighterAndSoldiersHP(UInt8 mapId,GObject::Player* player,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP)
+    void BattleDistribute::SetMainFighterAndSoldiersHP(UInt32 roomId,UInt8 mapId,UInt8 x,UInt8 y,std::vector<UInt32> vecSoldiersHP,UInt32 mainFighterHP)
     {
-        UInt32 roomId = GetBattleRoomId(player);
         DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
         if( info == NULL )
             return;
@@ -758,4 +760,102 @@ namespace Battle
         info->SetMainFighterHP(mainFighterHP);
     }
 
+
+    void BattleDistribute::PutNpc(UInt32 roomId,UInt8 mapId,UInt16 fighterId,UInt8 x,UInt8 y,bool flag)
+    {
+        DistributeInfo* info = GetDistributeInfo(roomId,mapId,x,y);
+        if( info != NULL )
+            return ;
+        GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
+        UInt8 width = mapInfo->GetWidth();
+        UInt8 height = mapInfo->GetHeight();
+        vecInfo tileInfo = mapInfo->GetTileInfo();
+        vecInfo campInfo = mapInfo->GetCampInfo();
+
+        if( x >= width || y >= height )    //坐标超出了地图的边界
+        {
+            return ;
+        }
+        
+        if( tileInfo[x+y*width] == 0 )     //该点是不可放置的点
+        {
+            return ;
+        }
+        UInt64 playerId=0;
+        DistributeInfo* newInfo = new DistributeInfo(0,fighterId,x,y);
+        if( _room2Distribute[roomId].empty())
+        {
+            std::vector<MapDistributeInfo*> vecMapDistributeInfo;
+            std::vector<DistributeInfo*> vecDistributeInfo;
+            vecDistributeInfo.push_back(newInfo);
+            MapDistributeInfo* mapdistribute  = new(std::nothrow) MapDistributeInfo(mapId);
+            if( mapdistribute == NULL )
+                return ;
+            mapdistribute->SetDistributeInfo(vecDistributeInfo);
+            vecMapDistributeInfo.push_back(mapdistribute);
+            _room2Distribute[roomId] = vecMapDistributeInfo;
+        }
+        else
+        {
+            std::vector<MapDistributeInfo*> vecMapDistributeInfo = _room2Distribute[roomId];
+            MapDistributeInfo* mapDistributeInfo = GetMapDistributionInfo(roomId,mapId);
+            if( mapDistributeInfo != NULL )
+            {
+                std::vector<DistributeInfo*> vecInfo = mapDistributeInfo->GetDistributeInfo();
+                vecInfo.push_back(newInfo);
+                for( auto it = vecMapDistributeInfo.begin() ; it != vecMapDistributeInfo.end() ; ++it )
+                {
+                    if( (*it)->GetMapId() == mapId )
+                    {
+                        (*it)->SetDistributeInfo(vecInfo);
+                    }
+                }
+            }
+            else
+            {
+                MapDistributeInfo* mapdistribute  = new(std::nothrow) MapDistributeInfo(mapId);
+                std::vector<DistributeInfo*> vecDistributeInfo;
+                vecDistributeInfo.push_back(newInfo);
+                mapdistribute->SetDistributeInfo(vecDistributeInfo);
+                vecMapDistributeInfo.push_back(mapdistribute);
+            }
+            _room2Distribute[roomId] = vecMapDistributeInfo;
+        }
+        if( flag == true )
+        {
+            DB7().PushUpdateData("REPLACE INTO `clan_battle_pos`(`roomId`,`mapId`,`playerId`,`fighterId`,`posx`,`posy`) value(%u, %u, %"I64_FMT"u, %u, %u, %u)",roomId,mapId,playerId,fighterId,x,y);
+        }
+
+
+    }
+
+    void BattleDistribute::RemoveNpc(UInt32 roomId,UInt8 mapId,UInt8 curx,UInt8 cury)
+    {
+        DistributeInfo* info = GetDistributeInfo(roomId,mapId,curx,cury);
+        if( info == NULL)
+             return ;
+        RemoveDistributeInfo(roomId,mapId,info);
+    }
+
+    
+    //野怪的逻辑比较特殊
+    void BattleDistribute::MoveNpc(UInt32 roomId,UInt8 mapId,UInt16 fighterId,UInt8 curx ,UInt8 cury,UInt8 destx,UInt8 desty)
+    {
+        //先按照位置获得排布信息
+        DistributeInfo* curInfo = GetDistributeInfo(roomId,mapId,curx,cury);
+        DistributeInfo* destInfo = GetDistributeInfo(roomId,mapId,destx,desty);
+        if( destInfo != NULL )
+        {
+            return;
+        }
+        if( curInfo == NULL )
+        {
+            PutNpc(roomId,mapId,fighterId,destx,desty);
+        }
+        else
+        {
+            RemoveDistributeInfo(roomId,mapId,curInfo);
+            PutNpc(roomId,mapId,fighterId,destx,desty);
+        }
+    }
 }

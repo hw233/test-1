@@ -386,7 +386,7 @@ namespace GData
             lua_tinker::dofile(L,path.c_str());
             lua_tinker::table AllTile = lua_tinker::call<lua_tinker::table>(L,"GetAllMap"); 
             lua_tinker::table AllForce = lua_tinker::call<lua_tinker::table>(L,"GetAllForce"); 
-            lua_tinker::table AllForceNum = lua_tinker::call<lua_tinker::table>(L,"GetAllForceNum");
+            lua_tinker::table AllForceIds = lua_tinker::call<lua_tinker::table>(L,"GetAllActForceIds");
             lua_tinker::table AllDirection = lua_tinker::call<lua_tinker::table>(L,"GetAllDirect2Force");
             lua_tinker::table AllSoldiers = lua_tinker::call<lua_tinker::table>(L,"GetAllSoldiers");
 
@@ -402,7 +402,6 @@ namespace GData
                 lua_tinker::table map = AllTile.get<lua_tinker::table>(i+1);
                 UInt8 width = static_cast<UInt8>(map.get<UInt8>(1));
                 UInt8 height = static_cast<UInt8>(map.get<UInt8>(2));
-                UInt8 forceNum = static_cast<UInt8>(AllForceNum.get<UInt8>(i+1));  //势力的数量
                 for( UInt8 j = 2 ; j < map.size() ; ++j )
                 {
                    tileInfo.push_back(static_cast<UInt8>(map.get<UInt8>(j+1)));
@@ -412,7 +411,7 @@ namespace GData
                 {
                     campInfo.push_back(static_cast<UInt8>(force.get<UInt8>(j+1)));
                 }
-                MapInfo* info = new(std::nothrow) MapInfo(width,height,forceNum);
+                MapInfo* info = new(std::nothrow) MapInfo(width,height);
                 if( info == NULL )
                 {
                     lua_close(L);
@@ -449,14 +448,23 @@ namespace GData
                     UInt16 npcId = npcInfo.get<UInt16>(1);
                     UInt8  x     = npcInfo.get<UInt8>(2);
                     UInt8  y     = npcInfo.get<UInt8>(3);
-                    std::cout<<" npcId  "<<static_cast<UInt32>(npcId)<<"  x " <<static_cast<UInt32>(x)<<" y  "<<static_cast<UInt32>(y)<<std::endl;
                     vecNpcInfo.push_back(NpcInfo(npcId,x,y));
                 }
+
+                lua_tinker::table forceIds = AllForceIds.get<lua_tinker::table>(i+1);
+                std::vector<UInt8> vecCamp;
+                for( UInt8 j = 0 ; j < forceIds.size(); ++j)
+                {
+                    vecCamp.push_back(static_cast<UInt8>(forceIds.get<UInt8>(j+1)));
+
+                }
                 info->SetNpcInfo(vecNpcInfo);
+                info->SetActCamp(vecCamp);
                 GData::mapTable.loadMapInfo(i+1,info);  //第0位不存数据
                 tileInfo.clear();
                 campInfo.clear();
                 vecNpcInfo.clear();
+                vecCamp.clear();
 
             }
         }

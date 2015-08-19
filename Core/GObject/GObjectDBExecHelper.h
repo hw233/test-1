@@ -147,6 +147,7 @@ namespace GObject
 
     struct DBClanBattlePos
     {
+        UInt32 roomId;
         UInt8 mapId;
         UInt64 playerId;
         UInt16 fighterId;
@@ -367,8 +368,9 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBClanBattlePos)
-    SPECIALDEF(7)
+    SPECIALDEF(8)
     (
+        UInt32,roomId,
         UInt8 , mapId,
         UInt64, playerId,
         UInt16, fighterId,

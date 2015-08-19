@@ -22,5 +22,6 @@ MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_CANCELFIGHTER,OnClanBattleDelFighter);
 MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_COMMENTS,OnClanBattleComment);
 MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_ORDERS,OnClanBattleOrder);
 MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_REPORT,OnClanBattleReport);
+MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_REPORTList,OnClanBattleReportList);
 
 MSG_HANDLER_END()

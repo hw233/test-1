@@ -140,7 +140,7 @@ namespace Battle
            UInt8 cityId = (*it)->GetCityId();
            UInt8 ownforce = (*it)->GetOwnForce();
            Battle::MapDistributeInfo* info = Battle::battleDistribute.GetMapDistributionInfo(roomId,cityId);
-           if( (ownforce == 0 && info->HasBody()) || (!ownforce  && forceId == ownforce))
+           if( (ownforce == 0 && info != NULL && info->HasBody()) || (!ownforce  && forceId == ownforce))
            {
                vecCitys.push_back(cityId);
            }
