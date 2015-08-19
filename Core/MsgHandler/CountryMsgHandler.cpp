@@ -14,6 +14,7 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
     MSG_REG_2(GameMsgHdr, REQ::SIGN_INFO, OnSignInfo);
 
     MSG_REG_2(GameMsgHdr, REQ::ENCHART, OnEnchantReq);
+    MSG_REG_2(GameMsgHdr, REQ::ENCHARTSOLDIER, OnEnchantSoldierReq);
 
     MSG_REG_2(GameMsgHdr, REQ::PACKAGE_INFO, OnPackageInfo);
 

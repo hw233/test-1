@@ -33,7 +33,8 @@ namespace GObject
         VAR_GOLD    = 3,            //金子
         VAR_EXP    = 4,             //经验
         VAR_TOTAL_GOLD = 5,         //总充值量
-        VAR_ENCHANT_CD = 6,         //强化cd
+        VAR_ENCHANT_CD = 6,         //装备强化cd
+        VAR_ENCHANT_CD2 = 6,         //士兵强化cd
         VAR_CLAN_CONT = 7,          //帮派贡献
         VAR_CLAN_ENTER = 8,         //进入帮派的时间
         VAR_PACKAGE_SIZE = 9,
@@ -51,6 +52,79 @@ namespace GObject
         VAR_SIGN_MONTH_ADD = 21,  //按月签到
         VAR_DAY_CHANGE = 22,  //按月签到
         VAR_EXPLOIT_TIME   = 23,  //上一次采集的时间
+
+        //武装
+        VAR_0_WALK_ENCHANT = 30,    //步兵强化值
+        VAR_0_RIDE_ENCHANT = 31,    //骑兵强化值
+        VAR_0_SHOOT_ENCHANT = 32,    //弓兵强化值
+        VAR_0_ADVICE_ENCHANT = 33,    //谋士强化值
+        VAR_0_LANCE_ENCHANT = 34,    //枪兵强化值
+        VAR_0_WALK_ROAD = 35,    //步兵强化之路
+        VAR_0_RIDE_ROAD = 36,    //骑兵强化之路
+        VAR_0_SHOOt_ROAD = 37,    //弓兵强化之路
+        VAR_0_ADVICE_ROAD = 38,   //谋士强化之路
+        VAR_0_LANCE_ROAD = 39,   //枪兵强化之路
+
+        //士气
+        VAR_1_WALK_ENCHANT   =  40,    //步兵强化值
+        VAR_1_RIDE_ENCHANT   =  41,    //骑兵强化值
+        VAR_1_SHOOT_ENCHANT  =  42,    //弓兵强化值
+        VAR_1_ADVICE_ENCHANT =  43,    //谋士强化值
+        VAR_1_LANCE_ENCHANT  =  44,    //枪兵强化值
+        VAR_1_WALK_ROAD      =  45,    //步兵强化之路
+        VAR_1_RIDE_ROAD      =  46,    //骑兵强化之路
+        VAR_1_SHOOt_ROAD     =  47,    //弓兵强化之路
+        VAR_1_ADVICE_ROAD    =  48,   //谋士强化之路
+        VAR_1_LANCE_ROAD     =  49,   //枪兵强化之路
+
+        //体能
+        VAR_2_WALK_ENCHANT   =  50,    //步兵强化值
+        VAR_2_RIDE_ENCHANT   =  51,    //骑兵强化值
+        VAR_2_SHOOT_ENCHANT  =  52,    //弓兵强化值
+        VAR_2_ADVICE_ENCHANT =  53,    //谋士强化值
+        VAR_2_LANCE_ENCHANT  =  54,    //枪兵强化值
+        VAR_2_WALK_ROAD      =  55,    //步兵强化之路
+        VAR_2_RIDE_ROAD      =  56,    //骑兵强化之路
+        VAR_2_SHOOt_ROAD     =  57,    //弓兵强化之路
+        VAR_2_ADVICE_ROAD    =  58,   //谋士强化之路
+        VAR_2_LANCE_ROAD     =  59,   //枪兵强化之路
+
+        //身手
+        VAR_3_WALK_ENCHANT   =  60,    //步兵强化值
+        VAR_3_RIDE_ENCHANT   =  61,    //骑兵强化值
+        VAR_3_SHOOT_ENCHANT  =  62,    //弓兵强化值
+        VAR_3_ADVICE_ENCHANT =  63,    //谋士强化值
+        VAR_3_LANCE_ENCHANT  =  64,    //枪兵强化值
+        VAR_3_WALK_ROAD      =  65,    //步兵强化之路
+        VAR_3_RIDE_ROAD      =  66,    //骑兵强化之路
+        VAR_3_SHOOt_ROAD     =  67,    //弓兵强化之路
+        VAR_3_ADVICE_ROAD    =  68,   //谋士强化之路
+        VAR_3_LANCE_ROAD     =  69,   //枪兵强化之路
+
+        //纪律
+        VAR_4_WALK_ENCHANT   =  70,    //步兵强化值
+        VAR_4_RIDE_ENCHANT   =  71,    //骑兵强化值
+        VAR_4_SHOOT_ENCHANT  =  72,    //弓兵强化值
+        VAR_4_ADVICE_ENCHANT =  73,    //谋士强化值
+        VAR_4_LANCE_ENCHANT  =  74,    //枪兵强化值
+        VAR_4_WALK_ROAD      =  75,    //步兵强化之路
+        VAR_4_RIDE_ROAD      =  76,    //骑兵强化之路
+        VAR_4_SHOOt_ROAD     =  77,    //弓兵强化之路
+        VAR_4_ADVICE_ROAD    =  78,   //谋士强化之路
+        VAR_4_LANCE_ROAD     =  79,   //枪兵强化之路
+
+        //操练
+        VAR_5_WALK_ENCHANT   =  80,    //步兵强化值
+        VAR_5_RIDE_ENCHANT   =  81,    //骑兵强化值
+        VAR_5_SHOOT_ENCHANT  =  82,    //弓兵强化值
+        VAR_5_ADVICE_ENCHANT =  83,    //谋士强化值
+        VAR_5_LANCE_ENCHANT  =  84,    //枪兵强化值
+        VAR_5_WALK_ROAD      =  85,    //步兵强化之路
+        VAR_5_RIDE_ROAD      =  86,    //骑兵强化之路
+        VAR_5_SHOOt_ROAD     =  87,    //弓兵强化之路
+        VAR_5_ADVICE_ROAD    =  88,   //谋士强化之路
+        VAR_5_LANCE_ROAD     =  89,   //枪兵强化之路
+
         VAR_MAX
     };
 

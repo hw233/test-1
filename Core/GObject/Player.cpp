@@ -39,6 +39,8 @@ namespace GObject
         clan = NULL;
         m_governManager = new GovernManager(this);
         m_exploitManager = new ExploitManager(this);
+        _ArenaLayout.clear();
+        _ArenaDefendLayout.clear();
     }
 
     bool enum_send_chat(Player *pl , void * ptr)
@@ -953,5 +955,27 @@ namespace GObject
         } 
         st << Stream::eos;
         send(st);
+    } 
+
+    void Player::LoadArenaLayout(UInt8 index , UInt16 fighterId)
+    { 
+       _ArenaDefendLayout[index] = fighterId;
+    } 
+
+    std::map<UInt8,fighterId> Player::GetArenaLayout()
+    { 
+        return _ArenaDefendLayout;
+    } 
+    
+    void SetArenaLayout(UInt8 index, UInt16 fighterId)
+    { 
+        //XXX
+        if(index >= 7)
+            return ;
+        _ArenaDefendLayout[index] = fighterId;
+        return ;
+        DB1().PushUpdateData("delete `arenaLayout` where `playerId` = %" I64_FMT "u and `fighterId` = %u"  , getId(), fighterId());   //LIBOUInt64
+        DB1().PushUpdateData(" `arenaLayout` where `playerId` = %" I64_FMT "u and `fighterId` = %u"  , getId(), fighterId());   //LIBOUInt64
+        
     } 
 }

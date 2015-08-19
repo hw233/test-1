@@ -140,6 +140,7 @@ namespace GData
         UInt16 mpCost;
         UInt8 superSkill;
         UInt8 attackCount;
+        UInt16 lstTime;
     };
 
     struct DBMap  
@@ -321,7 +322,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkill)
-        SPECIALDEF(13)
+        SPECIALDEF(14)
         (
          UInt32, id,
          std::string , name,
@@ -335,7 +336,8 @@ namespace DB
          float, frozeTime,
          UInt16, mpCost,
          UInt8, superSkill,
-         UInt8, attackCount
+         UInt8, attackCount,
+         UInt16, lstTime
         )
         SPECIALEND()
 

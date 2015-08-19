@@ -101,6 +101,26 @@ void OnEnchantReq(GameMsgHdr& hdr, const void * data)
     player->send(st);
 }
 
+void OnEnchantSoldierReq(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player) ;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt8 opt = 0;
+    br >> opt;
+    UInt16 fighterId;
+    br >> fighterId;
+    UInt8 part = 0;
+    br >> part;
+    UInt32 result = player->GetPackage()->EnchantSoldierFromClient(fighterId,part,opt);
+    Stream st(REP::ENCHARTSOLDIER);
+    st << static_cast<UInt8>(opt);
+    if(opt)
+        st << static_cast<UInt8>(part);
+    st << result; 
+    st << Stream::eos;
+    player->send(st);
+}
+
 void OnPackageInfo(GameMsgHdr& hdr, const void * data)
 { 
     MSG_QUERY_PLAYER(player) ;

@@ -14,6 +14,7 @@ namespace REQ
     const UInt8 SIGN_INFO            =0x11;
 
     const UInt8 ENCHART              = 0x20;// 0xF0
+    const UInt8 ENCHARTSOLDIER       = 0x21;// 0xF0
 
     /*背包信息*/
     const UInt8 PACKAGE_INFO         = 0x30;// 0xE0
@@ -585,6 +586,7 @@ namespace REP
     const UInt8 SIGN_INFO                 =0x11;
 
     const UInt8 ENCHART             = 0x20;// 0xF0
+    const UInt8 ENCHARTSOLDIER      = 0x21;// 0xF0
 
     /*背包信息*/
     const UInt8 PACKAGE_INFO        = 0x30;// 0xE0

@@ -239,6 +239,7 @@ namespace Battle
             UInt8 GetCaptureId();
             void  GetAliveForce(std::vector<UInt8> &vecForce);
 
+            void AutoEnterFighters(UInt8 index, Player *pl);
         private:
             UInt32 _id;
             UInt8 _x;
