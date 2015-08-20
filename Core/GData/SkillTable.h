@@ -42,7 +42,7 @@ namespace GData
             ~SkillCondition(){}
             bool MeetCondition(UInt16 advance ,UInt8& pri) const 
             {
-                if(uRand(100) < prob)                
+                if(uRand(100) > prob)                
                     return false;
                 if(distance >= advance && pri <= priority)  //XXX 等号添加
                 { 
@@ -145,7 +145,7 @@ namespace GData
             const SkillCondition * GetSkillCondition() const {return skillConditionManager[_conditionId];} 
             const SkillScope * GetSkillScope() const {return skillScopeManager[_scopeId];}
             const SkillEffect * GetSkillEffect() const {return skillEffectManager[_effectId];}
-            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, UInt16 cd,UInt16 actionBeforeCd, UInt16 actionCd, UInt16 actionBackCd, UInt16 frozeTime, UInt16 mpCost, UInt8 superSkill, UInt8 attackCount)
+            void LoadSkill(UInt16 conditionId, UInt16 scopeId,UInt16 effectId, UInt16 cd,UInt16 actionBeforeCd, UInt16 actionCd, UInt16 actionBackCd, UInt16 frozeTime, UInt16 mpCost, UInt8 superSkill, UInt8 attackCount, UInt16 lstTime)
             { 
                 _conditionId = conditionId;
                 _scopeId = scopeId;
@@ -158,6 +158,7 @@ namespace GData
                 _mpCost = mpCost;
                 _superSkill = superSkill;
                 _attackCount = attackCount;
+                _lstTime = lstTime;
             } 
 #endif
             UInt16 GetCd() const {return _cd;}  //技能冷却时间
@@ -169,6 +170,7 @@ namespace GData
             UInt16 GetMpCost() const { return _mpCost;}
             UInt8 GetSuperSkill()const { return _superSkill;}
             UInt8 GetAttackCount()const { return _attackCount;}
+            UInt16 GetLstTime()const { return _lstTime;}
         private:
 #ifdef SkillT
             SkillCondition * _sc;
@@ -188,6 +190,7 @@ namespace GData
             UInt16 _mpCost;
             UInt8 _superSkill;
             UInt8 _attackCount;
+            UInt16 _lstTime;   //持续时间
     };
 
     typedef ObjectMapT<Skill, UInt16> SkillManager;   

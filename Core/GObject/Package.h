@@ -63,6 +63,14 @@ namespace GObject
             void  SendPackageInfo();
 
             UInt32 GetItemCount(UInt32 id);
+
+            //小兵强化
+            UInt32 EnchantSoldier(UInt8 index, UInt8 part);
+            UInt32 UpGradeSoldier(UInt8 index, UInt8 part);
+
+            UInt32 GetSoldierUpgradeLoad(UInt8 offect) ;
+            void updateSoldierLoad(UInt8 index); //兵种，部位
+            UInt32 EnchantSoldierFromClient(UInt8 index, UInt8 part, UInt8 type);
         protected:
             typedef std::map<ItemKey, ItemBase *> ItemCont;
             typedef ItemCont::iterator item_elem_iter;

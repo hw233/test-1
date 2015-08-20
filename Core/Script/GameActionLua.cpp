@@ -282,6 +282,14 @@ namespace Script
     {
         return Call<bool>("UpgradeCost",player,cls,index,lev);
     }
+    UInt8 GameActionLua::EnchantSoldierCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev)
+    {
+        return Call<bool>("EnchantSoldierCost",player,cls,index,lev);
+    }
+    UInt8 GameActionLua::UpgradeSoldierCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev)
+    {
+        return Call<bool>("UpgradeSoldierCost",player,cls,index,lev);
+    }
 
     UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息
     {
