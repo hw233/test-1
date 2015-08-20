@@ -42,7 +42,7 @@ namespace GData
             ~SkillCondition(){}
             bool MeetCondition(UInt16 advance ,UInt8& pri) const 
             {
-                if(uRand(100) < prob)                
+                if(uRand(100) > prob)                
                     return false;
                 if(distance >= advance && pri <= priority)  //XXX 等号添加
                 { 

@@ -317,9 +317,12 @@ namespace GObject
             ExploitManager* GetExploitManager() const { return m_exploitManager;}
 
             //Arena 竞技场排布
-            void LoadArenaLayout(UInt8 index , UInt16 fighterId);
+            void LoadArenaDefendLayout(UInt8 index , UInt16 fighterId);
             std::map<UInt8,UInt16> GetArenaLayout();
             void SetArenaLayout(UInt8 index, UInt16 fighterId);
+
+            std::map<UInt8,UInt16> GetArenaDefendLayout();
+            void SetArenaDefendLayout(UInt8 index, UInt16 fighterId);
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -371,6 +374,7 @@ namespace GObject
 
             ExploitManager* m_exploitManager;
 
+            std::map<UInt8 , UInt16> _ArenaLayout;
             std::map<UInt8 , UInt16> _ArenaDefendLayout;
 };
 

@@ -165,7 +165,7 @@ CREATE TABLE `clan_battle_pos` (
     `posy`     int(3) unsigned NOT NULL DEFAULT '0' COMMENT '地图上的坐标y',
     `mainFighterHP` int(3) unsigned NOT NULL DEFAULT '0' COMMENT '主将血量',
     `soldiersHP` varchar(1024) NOT NULL DEFAULT '' COMMENT '小兵们的血量',
-    PRIMARY KEY (`mapId`,`playerId`,`fighterId`)
+    PRIMARY KEY (`roomId`,`mapId`,`playerId`,`fighterId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `clan_battle_room`; 

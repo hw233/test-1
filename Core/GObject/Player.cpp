@@ -957,25 +957,39 @@ namespace GObject
         send(st);
     } 
 
-    void Player::LoadArenaLayout(UInt8 index , UInt16 fighterId)
+    void Player::LoadArenaDefendLayout(UInt8 index , UInt16 fighterId)
     { 
        _ArenaDefendLayout[index] = fighterId;
     } 
 
-    std::map<UInt8,fighterId> Player::GetArenaLayout()
+    std::map<UInt8,UInt16> Player::GetArenaDefendLayout()
     { 
         return _ArenaDefendLayout;
     } 
     
-    void SetArenaLayout(UInt8 index, UInt16 fighterId)
+    void Player::SetArenaDefendLayout(UInt8 index, UInt16 fighterId)
     { 
         //XXX
         if(index >= 7)
             return ;
         _ArenaDefendLayout[index] = fighterId;
         return ;
-        DB1().PushUpdateData("delete `arenaLayout` where `playerId` = %" I64_FMT "u and `fighterId` = %u"  , getId(), fighterId());   //LIBOUInt64
-        DB1().PushUpdateData(" `arenaLayout` where `playerId` = %" I64_FMT "u and `fighterId` = %u"  , getId(), fighterId());   //LIBOUInt64
+        DB1().PushUpdateData("delete `arenaLayout` where `playerId` = %" I64_FMT "u and `fighterId` = %u"  , getId(), fighterId);   //LIBOUInt64
+        DB1().PushUpdateData(" `arenaLayout` where `playerId` = %" I64_FMT "u and `fighterId` = %u"  , getId(), fighterId);   //LIBOUInt64
         
     } 
+
+    std::map<UInt8,UInt16> Player::GetArenaLayout()
+    { 
+        return _ArenaLayout;
+    } 
+    
+    void Player::SetArenaLayout(UInt8 index, UInt16 fighterId)
+    { 
+        //XXX
+        if(index >= 7)
+            return ;
+        _ArenaLayout[index] = fighterId;
+    } 
+
 }

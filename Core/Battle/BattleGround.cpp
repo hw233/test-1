@@ -2037,20 +2037,23 @@ namespace Battle
 
         }
     }
-    void BattleGround::AutoEnterFighters(UInt8 index, Player* pl)
+    void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl)
     { 
         static UInt8 map2Point[][7][2]= {
             {{1,0},{2,0},{0,1},{1,1},{2,1},{2,0},{2,1}},
             {{3,0},{4,0},{2,1},{3,1},{4,1},{3,2},{4,2}}
         };
-        if( index == 0 )
+        if( index == 0 ) // 1 2 
             return;
-        std::map<UInt8, UInt16> _map = pl->GetArenaLayout();
+        std::map<UInt8, UInt16> _map ;
+        if(index - 1)
+            _map= pl->GetArenaLayout();
+        else
+            _map= pl->GetArenaDefendLayout();
         for(auto it = _map.begin(); it != _map.end(); ++it)
         { 
-            map2fighter[index].push_back(new FighterInfo(pl,fighterId,AutoEnterFighters[index -1][it->first][0],AutoEnterFighters[index-1][it->first][1]));
+            map2fighter[index].push_back(new FighterInfo(pl,it->second,map2Point[index -1][it->first][0],map2Point[index-1][it->first][1]));
         } 
-
-        setPlayer.insert(player);
+        setPlayer.insert(pl);
     } 
 }

@@ -265,7 +265,7 @@ namespace GObject
             return 3;
 
         //XXX 扣除道具
-        UInt8 res = GameAction()->UpgradeSoldierCost(m_Owner, fgt->GetTypeId(), part+1, grade + 1);
+        UInt8 res = GameAction()->UpgradeSoldierCost(m_Owner, index , part+1, grade + 1);
         //if(!res)
         //    return 4;
 
