@@ -20,6 +20,7 @@
 #include "Battle/ClanOrder.h"
 #include "Battle/Report2Id.h"
 #include "Battle/ClanBattleRoom.h"
+#include "Battle/ClanBattleCityStatus.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -424,6 +425,7 @@ void OnClanBattleReportList(GameMsgHdr& hdr, const void * data)
     std::vector<Battle::Report2Id*> vecReport = Battle::report2IdTable.GetReport2Ids(roomId);
     Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
     std::vector<UInt8> vecforce = room->GetJoinForce();
+    Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
     Stream st(REP::CLAN_BATTLE_REPORTList);
     if( vecReport.empty())
     {
@@ -440,7 +442,7 @@ void OnClanBattleReportList(GameMsgHdr& hdr, const void * data)
             {
                 st<<static_cast<UInt8>(*iter);
             }
-            st<<static_cast<UInt8>(0);
+            st<<static_cast<UInt8>(status->GetCityOwnForce((*it)->GetCityId()));
             st<<static_cast<UInt32>((*it)->GetEarliestTime());
             std::vector<Battle::ReportOneRound*> vecRoundRepot = (*it)->GetReportOneRounds();
             st<<static_cast<UInt8>(vecRoundRepot.size());
