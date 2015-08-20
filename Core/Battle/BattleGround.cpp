@@ -10,6 +10,7 @@
 #include "Common/URandom.h"
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleCityStatus.h"
+#include "Battle/Report2Id.h"
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
@@ -52,6 +53,17 @@ namespace Battle
         //_mapFlag = new UInt8[_x*_y];
         memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
         //memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
+        //
+        Battle::Report2Id* report2id = Battle::report2IdTable.GetReport2Id(_id-_mapId,_mapId);
+        if( report2id == NULL )
+        {
+            _actId = 0;
+        }
+        else
+        {
+            Battle::ReportOneRound* roundReport =  report2id->GetEarliestReport();
+            _actId = roundReport->GetActId();
+        }
         
     }
 

@@ -75,7 +75,7 @@ namespace GObject
         GVAR.SetVar(GVAR_BATTLE_STATUS,3);
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        GMHandler::Battle(1,2);
+        //GMHandler::Battle(1,2);
         //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1004,1005,2);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
