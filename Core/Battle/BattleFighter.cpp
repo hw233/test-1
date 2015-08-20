@@ -172,7 +172,7 @@ namespace Battle
         UInt32 hit = bAction->GetHit();
         UInt32 evade = GetEvade(); 
         UInt32 rand = uRand(10000);
-        if(rand > (hit*10000/evade))
+        if(!evade || rand > (hit*10000/evade))
         {
             flag = 1;
         }
@@ -180,7 +180,7 @@ namespace Battle
         UInt32 critical = bAction->GetCritical();
         UInt32 criticalDef = GetCriticalDef(); 
         rand = uRand(10000);
-        if(rand > (critical * 10000/criticalDef))
+        if(!criticalDef || rand > (critical * 10000/criticalDef))
         {
             flag = 2;
         }
