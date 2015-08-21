@@ -62,7 +62,7 @@ namespace Battle
         else
         {
             Battle::ReportOneRound* roundReport =  report2id->GetEarliestReport();
-            _actId = roundReport->GetActId();
+            _actId = roundReport->GetActId()+1;
         }
         
     }
@@ -453,6 +453,7 @@ namespace Battle
             _pack << win << reportId;
 
             //cout
+            std::cout<<" after fight the fighter hp info ..............................................................................."<<std::endl;
             TestCoutBattleS(target.bo);
             std::cout << std::endl;
 
@@ -1180,7 +1181,31 @@ namespace Battle
         }
         return bf;
     }
+    
 
+
+    void BattleGround::SortByActId()
+    {
+        for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
+        {
+            std::cout<<" 给阵营  "<<static_cast<UInt32>(it->first)<<" 按行动id 进行排序 "<<std::endl;
+            std::vector<BattleFighter*> vecFighter = camp2fighters[it->first];
+            LessActId<BattleFighter*> lessActId;
+            std::sort(vecFighter.begin(),vecFighter.end(),lessActId);
+            camp2fighters[it->first] = vecFighter;
+        }
+
+        for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
+        {
+            std::cout<<" 排序完成后  " << static_cast<UInt32>(it->first)<<std::endl;
+            for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter )
+            {
+               std::cout<<" fighterInfo  " << " x : " <<(*iter)->GetGroundX()<<" y : "<<(*iter)->GetGroundY()<<" actId " <<(*iter)->GetBattleIndex()<<std::endl;
+            }
+            std::cout<<std::endl;
+        }
+
+    }
     //一回合的战术
     void BattleGround::FightOneRound()
     {
@@ -1201,6 +1226,8 @@ namespace Battle
             return;
         }
         TestCoutBattleS();
+        //按照行动力的顺序给相应的阵营中的战将排序
+        SortByActId();
         std::map<UInt8,std::vector<BattleFighter*>> camp2fighters_copy = camp2fighters;
         
         _pack.init(0x80);
@@ -1209,6 +1236,7 @@ namespace Battle
         UInt16 actCount = 0;
         size_t offset = _pack.size();
         _pack << actCount;
+
         while(  /*flag < camp2fighters_copy.size()*/ camp2fighters_copy.size() > 0 )
         {
             if( CheckIsStop() )
@@ -1221,7 +1249,6 @@ namespace Battle
                 }
                 if( (it->second).empty())
                 {
-                    //++flag;
                    camp2fighters_copy.erase(it->first);
                    break;
                 }
@@ -1362,6 +1389,7 @@ namespace Battle
             return;
         preStart();
         TestCoutBattleS();
+        SortByActId();
         std::map<UInt8,std::vector<BattleFighter*>> camp2fighters_copy = camp2fighters;
         _pack.init(0x80);
         _pack << static_cast<UInt8>(_mapId);
