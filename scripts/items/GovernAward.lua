@@ -55,3 +55,6 @@ end
 function GetGovernDropItem(res)
     return Govern_item[res][3]
 end
+
+
+--print(GetGovernDropMoney(1))
