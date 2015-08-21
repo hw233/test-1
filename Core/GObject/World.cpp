@@ -22,6 +22,7 @@
 
 namespace GObject
 {
+    MapIndexPlayer World::arenaSort;
     
     UInt8 time = 0;
     bool World::Init()
@@ -84,7 +85,8 @@ namespace GObject
         //BattleAnalyze::Analyze(Stream(*r));
         //BattleAnalyze::Analyze(Stream(*r));
         //ReportAnalyse::AnalyseReport(Stream(*r));
-
+        
+        InitRank();
         return true; 
     }
 
@@ -342,4 +344,23 @@ namespace GObject
             }
         }
     }
+static bool init = false;
+    inline bool player_enum_rc(GObject::Player *pl,int)
+    { 
+        UInt32 pos = pl->GetVar(VAR_ARENA_POS) ;
+        if(pos < 3000)
+        { 
+            Player * p = World::arenaSort[pos];
+            if(!p)
+                World::arenaSort[pos] = pl;
+        } 
+    } 
+    void World::InitRank()
+    { 
+        if(init)
+            return ;
+
+        GObject::globalPlayers.enumerate(player_enum_rc, 0);
+        init = true;
+    } 
 }

@@ -52,6 +52,7 @@ namespace GObject
         VAR_SIGN_MONTH_ADD = 21,  //按月签到
         VAR_DAY_CHANGE = 22,  //按月签到
         VAR_EXPLOIT_TIME   = 23,  //上一次采集的时间
+        VAR_ARENA_POS = 24, //竞技场排名
 
         //武装
         VAR_0_WALK_ENCHANT = 30,    //步兵强化值

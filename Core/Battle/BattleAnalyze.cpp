@@ -52,7 +52,10 @@ void BattleAnalyze::Analyze(Stream br)
                 { 
                     UInt8 fgtId = 0;
                     UInt16 param = 0;
-                    br >> fgtId >> param;
+                    br >> fgtId; 
+                    UInt8 type = 0;
+                    br >> type;
+                    br>> param;
                     std::cout << "普通AT战将：" << static_cast<UInt32>(fgtId) << "伤害:" << static_cast<UInt32>(param) << std::endl;
                 } 
                 break;
@@ -67,7 +70,10 @@ void BattleAnalyze::Analyze(Stream br)
                         UInt8 type = 0;
                         UInt8 fgtId = 0;
                         UInt16 param = 0;
-                        br >> type >> fgtId >> param;
+                        br >> type >> fgtId ;
+                        UInt8 paramType = 0;
+                        br >> paramType;
+                        br>> param;
                         std::cout << "类型：" << static_cast<UInt32>(type);
                         std::cout << "受影响战将编号：" << static_cast<UInt32>(fgtId);
                         std::cout << "数值：" << static_cast<UInt32>(param);
@@ -86,7 +92,10 @@ void BattleAnalyze::Analyze(Stream br)
                         UInt16 time = 0;
                         UInt8 fgtBSNumber = 0;
                         UInt16 param = 0;
-                        br >> time >> fgtBSNumber >> param;
+                        br >> time >> fgtBSNumber;
+                        UInt8 type = 0;
+                        br >> type;
+                        br>> param;
                         std::cout<< "伤害产生时间点" << static_cast<UInt32>(time) << "攻击战将：" << static_cast<UInt32>(fgtBSNumber) << "伤害:" << static_cast<UInt32>(param) << std::endl;
 
                     } 
@@ -104,7 +113,10 @@ void BattleAnalyze::Analyze(Stream br)
                 { 
                     UInt8 fgtBSNumber = 0;
                     UInt16 param = 0;
-                    br >> fgtBSNumber >> param;
+                    br >> fgtBSNumber;
+                    UInt8 type = 0;
+                    br >> type;
+                    br>> param;
                     std::cout << "弓箭手攻击战将：" << static_cast<UInt32>(fgtBSNumber) <<  "伤害:" << static_cast<UInt32>(param) << std::endl;
                 } 
                 break;
