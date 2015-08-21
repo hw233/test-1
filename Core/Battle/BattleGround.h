@@ -75,6 +75,19 @@ namespace Battle
         Ascoord target;
         AttackInfo(Ascoord a,Ascoord t) : attack(a) , target(t) {}
     };
+    
+    template<class T=BattleFighter*>
+    struct LessActId
+    {
+        bool operator() (T bf1,T bf2)
+        {
+            if( bf1->GetBattleIndex() < bf2->GetBattleIndex() )
+            {
+                return true;
+            }
+            return false;
+        }
+    };
 
     struct TargetInfo
     {
@@ -173,6 +186,7 @@ namespace Battle
             void MakePreStartInfo();
             UInt16 GetOneRoundTimeCost() const { return _oneRoundCostTime;}
             void SyncHp(BattleFighter* bft,UInt8 x, UInt8 y);
+            void SortByActId();
             //对象移动
             void Move();
             //产生战报信息

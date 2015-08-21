@@ -239,25 +239,28 @@ namespace GObject
                     }
                     /*策划所谓的野怪入场 从配置中读取该地图上的野怪信息*/
                     /* 如果该处有玩家布置的战将  则不放入野怪*/
-                    GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
-                    std::vector<GData::NpcInfo> vecNpcInfo = mapInfo->GetNpcInfo();
-                    for( auto iterator = vecNpcInfo.begin(); iterator != vecNpcInfo.end(); ++iterator)
+                    if( status->GetCityOwnForce(mapId) != 0 )
                     {
-                        UInt16 fighterId = (*iterator).fighterId;
-                        UInt8  x = (*iterator).x;
-                        UInt8  y = (*iterator).y;
-                        bool flag = true;
-                        for( auto p = vecInfo.begin(); p != vecInfo.end(); ++p )
+                        GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
+                        std::vector<GData::NpcInfo> vecNpcInfo = mapInfo->GetNpcInfo();
+                        for( auto iterator = vecNpcInfo.begin(); iterator != vecNpcInfo.end(); ++iterator)
                         {
-                            if( (*p)->GetPosX() == x && (*p)->GetPosY() == y )
+                            UInt16 fighterId = (*iterator).fighterId;
+                            UInt8  x = (*iterator).x;
+                            UInt8  y = (*iterator).y;
+                            bool flag = true;
+                            for( auto p = vecInfo.begin(); p != vecInfo.end(); ++p )
                             {
-                                flag = false;
-                                break;
+                                if( (*p)->GetPosX() == x && (*p)->GetPosY() == y )
+                                {
+                                    flag = false;
+                                    break;
+                                }
                             }
-                        }
-                        if( flag )
-                        {
-                            singleBattle->NpcEnterBattleGround(0,fighterId,x,y);
+                            if( flag )
+                            {
+                                singleBattle->NpcEnterBattleGround(0,fighterId,x,y);
+                            }
                         }
                     }
                     roomBattle->InsertSingleBattle(singleBattle);
