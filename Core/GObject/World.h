@@ -21,6 +21,21 @@ namespace Script
 }
 namespace GObject
 {
+    struct RCSort
+    {
+        GObject::Player* player;
+        UInt32 total;
+        UInt32 time;
+        RCSort():player(NULL),total(0),time(0){}
+    };
+    struct lt_rcsort
+    {
+        bool operator()(const RCSort& a, const RCSort& b) const { return a.total > b.total || (a.total==b.total && a.time < b.time); }
+    };
+    typedef std::multiset<RCSort, lt_rcsort> RCSortType;
+
+    typedef std::map<UInt16,GObject::Player*> MapIndexPlayer;
+
     //class ChatHold;
     class World
         :public WorkerRunner<WorldMsgHandler>
@@ -33,6 +48,8 @@ namespace GObject
             inline Script::BattleFormula* getBattleFormula() {return _battleFormula;}
             ChatHold* GetChatHold(){return chatHold;}
 
+            void InitRank();
+
         private:
             static void World_Midnight_Check( World * );
             static void World_Test( World * );
@@ -43,6 +60,8 @@ namespace GObject
             static void World_clanBattle_stageCheck(World*); //军团战阶段检测
 
         public:
+            //static RCSortType arenaSort;
+            static MapIndexPlayer arenaSort;
 
         private:
             Script::BattleFormula * _battleFormula;
