@@ -1,5 +1,4 @@
-﻿
-#ifndef _VAR_H_
+﻿#ifndef _VAR_H_
 #define _VAR_H_
 
 #include "Common/TimeUtil.h"

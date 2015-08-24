@@ -1167,6 +1167,7 @@ namespace Battle
         }
     }
 
+    /*
     BattleFighter* BattleGround::GetMinBattleIndexFighter(std::vector<BattleFighter*> vecFighter)
     {
         UInt8 actId = 0xFF;
@@ -1181,6 +1182,7 @@ namespace Battle
         }
         return bf;
     }
+    */
     
 
 
@@ -1189,10 +1191,10 @@ namespace Battle
         for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
         {
             std::cout<<" 给阵营  "<<static_cast<UInt32>(it->first)<<" 按行动id 进行排序 "<<std::endl;
-            std::vector<BattleFighter*> vecFighter = camp2fighters[it->first];
+            std::list<BattleFighter*> listFighter = camp2fighters[it->first];
             LessActId<BattleFighter*> lessActId;
-            std::sort(vecFighter.begin(),vecFighter.end(),lessActId);
-            camp2fighters[it->first] = vecFighter;
+            listFighter.sort(lessActId);
+            camp2fighters[it->first] = listFighter;
         }
 
         for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
@@ -1228,7 +1230,7 @@ namespace Battle
         TestCoutBattleS();
         //按照行动力的顺序给相应的阵营中的战将排序
         SortByActId();
-        std::map<UInt8,std::vector<BattleFighter*>> camp2fighters_copy = camp2fighters;
+        std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
         
         _pack.init(0x80);
         _pack << static_cast<UInt8>(_mapId);
@@ -1237,7 +1239,7 @@ namespace Battle
         size_t offset = _pack.size();
         _pack << actCount;
 
-        while(  /*flag < camp2fighters_copy.size()*/ camp2fighters_copy.size() > 0 )
+        while(  camp2fighters_copy.size() > 0 )
         {
             if( CheckIsStop() )
                 break;
@@ -1254,45 +1256,31 @@ namespace Battle
                 }
                 else
                 {
-                    std::vector<BattleFighter*> vecFighter = camp2fighters_copy[it->first];
-                    for( auto iter = vecFighter.begin() ; iter != vecFighter.end(); )
+                    std::list<BattleFighter*> listFighter = camp2fighters_copy[it->first];
+                    while( listFighter.front() == NULL || ( listFighter.front() != NULL && listFighter.front()->getHP() <= 0 ))
                     {
-                        if( (*iter) != NULL && (*iter)->getHP() <= 0 )
-                        {
-                            iter = vecFighter.erase(iter);
-                        }
-                        else
-                        {
-                            ++iter;
-                        }
+                        listFighter.pop_front();
                     }
-                    BattleFighter* bf =  GetMinBattleIndexFighter(vecFighter);
-                    if( bf == NULL )
+                    if( listFighter.empty() )
                     {
+                        camp2fighters_copy.erase(it->first);
                         break;
                     }
-                    if( vecFighter.empty() )
+                    BattleFighter* bf =  listFighter.front();
+                    if( bf == NULL )
                     {
                         break;
                     }
                     currentBf = bf;
                     Move();
-                    for( auto iterator = vecFighter.begin(); iterator != vecFighter.end();)
-                    {
-                        if( (*iterator) == bf )
-                        {
-                            iterator = vecFighter.erase(iterator);
-                        }
-                        else
-                        {
-                            ++iterator;
-                        }
-                    }
-                    camp2fighters_copy[it->first] = vecFighter;
+                    listFighter.pop_front();
+                    camp2fighters_copy[it->first] = listFighter;
                     ++actCount;
                 }
             }
         }
+
+        std::cout<<" ---------------------------------ERROR_------------------------------------------------------------"<<std::endl;
         ++_actId;
         camp2fighters_copy.clear();
         std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
@@ -1322,8 +1310,8 @@ namespace Battle
     //检测某一阵营是不是已经死光了
     bool BattleGround::SomeCampIsAllDie(UInt8 campId)
     {
-        std::vector<BattleFighter*> vecFighter = camp2fighters[campId];
-        for( auto it = vecFighter.begin(); it != vecFighter.end(); ++it )
+        std::list<BattleFighter*> listFighter = camp2fighters[campId];
+        for( auto it = listFighter.begin(); it != listFighter.end(); ++it )
         {
             if( (*it) != NULL && (*it)->getHP() > 0 )
             {
@@ -1390,7 +1378,7 @@ namespace Battle
         preStart();
         TestCoutBattleS();
         SortByActId();
-        std::map<UInt8,std::vector<BattleFighter*>> camp2fighters_copy = camp2fighters;
+        std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
         _pack.init(0x80);
         _pack << static_cast<UInt8>(_mapId);
         MakePreStartInfo();
@@ -1416,41 +1404,24 @@ namespace Battle
                     }
                     else
                     {
-                        std::vector<BattleFighter*> vecFighter = camp2fighters_copy[it->first];
-                        for( auto iter = vecFighter.begin() ; iter != vecFighter.end(); )
+                        std::list<BattleFighter*> listFighter = camp2fighters_copy[it->first];
+                        while( listFighter.front() != NULL && listFighter.front()->getHP() > 0 )
                         {
-                            if( (*iter) != NULL && (*iter)->getHP() <= 0 )
-                            {
-                                iter = vecFighter.erase(iter);
-                            }
-                            else
-                            {
-                                ++iter;
-                            }
+                            listFighter.pop_front();
                         }
-                        BattleFighter* bf =  GetMinBattleIndexFighter(vecFighter);
-                        if( bf == NULL )
+                        if( listFighter.empty() )
                         {
                             break;
                         }
-                        if( vecFighter.empty() )
+                        BattleFighter* bf =  listFighter.front();
+                        if( bf == NULL )
                         {
                             break;
                         }
                         currentBf = bf;
                         Move();
-                        for( auto iterator = vecFighter.begin(); iterator != vecFighter.end();)
-                        {
-                            if( (*iterator) == bf )
-                            {
-                                iterator = vecFighter.erase(iterator);
-                            }
-                            else
-                            {
-                                ++iterator;
-                            }
-                        }
-                        camp2fighters_copy[it->first] = vecFighter;
+                        listFighter.remove(bf);
+                        camp2fighters_copy[it->first] = listFighter;
                         ++actCount;
                     }
                 }
@@ -1499,24 +1470,24 @@ namespace Battle
                     continue;
                 if( camp2fighters[campId].empty() )
                 {
-                    std::vector<BattleFighter*> vecFighter;
+                    std::list<BattleFighter*> listFighter;
                     BattleFighter * bft = newFighter(x,y,fgt);
                     if( bft == NULL )
                         continue;
-                    vecFighter.push_back(bft);
-                    camp2fighters[campId] = vecFighter;
+                    listFighter.push_back(bft);
+                    camp2fighters[campId] = listFighter;
                 }
                 else
                 {
 
-                    std::vector<BattleFighter*> vecFighter = camp2fighters[campId];
+                    std::list<BattleFighter*> listFighter = camp2fighters[campId];
                     BattleFighter* bft = newFighter(x,y,fgt);
                     if( bft == NULL )
                     {
                         continue;
                     }
-                    vecFighter.push_back(bft);
-                    camp2fighters[campId] = vecFighter;
+                    listFighter.push_back(bft);
+                    camp2fighters[campId] = listFighter;
                 }
             }
         }

@@ -271,7 +271,7 @@ namespace Battle
             BattleObject ** _mapFighters;    //注意和fighters的坐标同步
             std::map<UInt8,Ascoord> num2pos; //地图位置对应编号
             //来一个记录战将分布的结构 满足
-            std::map<UInt8,std::vector<BattleFighter*>> camp2fighters;
+            std::map<UInt8,std::list<BattleFighter*>> camp2fighters;
             //std::list<BattleFighter *> fighters[PLAYERMAX];   //阵营中的战将
             std::vector<BattleInfo> battleIds;
 
