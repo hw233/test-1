@@ -111,6 +111,12 @@ namespace REQ
     const UInt8 CLAN_BATTLE_INFO          = 0xA7;
     /*战报回放*/
     const UInt8 CLAN_BATTLE_REPORTList    = 0xA8;
+    /*战绩排行*/
+    const UInt8 CLAN_BATTLE_RANK          = 0xA9;
+    /*战绩信息*/
+    const UInt8 CLAN_BATTLE_RESULTINFO    = 0xAA;
+    /*战场个人战况*/
+    const UInt8 CLAN_BATTLE_SELFINFO      = 0xAB;
 
 
     /*开采换将*/

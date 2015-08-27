@@ -125,6 +125,9 @@ namespace GObject
         VAR_5_ADVICE_ROAD    =  88,   //谋士强化之路
         VAR_5_LANCE_ROAD     =  89,   //枪兵强化之路
 
+        /*公会战战场放将的数量*/
+        VAR_CLANBATTLE_FIGHTERNUM = 90, 
+
         VAR_MAX
     };
 
@@ -178,6 +181,7 @@ namespace GObject
                 REGISTER_VAR(VAR_SIGN_MONTH_ADD,CYCLE_MONTH);
                 REGISTER_VAR(VAR_DAY_CHANGE,CYCLE_DAY);
                 REGISTER_VAR(VAR_EXPLOIT_TIME,CYCLE_NONE);
+                REGISTER_VAR(VAR_CLANBATTLE_FIGHTERNUM,CYCLE_WEEK);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

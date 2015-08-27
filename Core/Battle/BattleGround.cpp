@@ -61,9 +61,11 @@ namespace Battle
         }
         else
         {
-            Battle::ReportOneRound* roundReport =  report2id->GetEarliestReport();
-            _actId = roundReport->GetActId()+1;
+            Battle::ReportOneRound* roundReport =  report2id->GetNewestReport();
+            _actId = roundReport->GetActId();
         }
+
+        std::cout<<" 接上一个回合的 id 为  "<<static_cast<UInt32>(_actId)<<std::endl;
         
     }
 
@@ -464,11 +466,17 @@ namespace Battle
             {
                 currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
                 currentBf->GetOwner()->AddKillSoldiersNum(currentBf->GetKillCount2());
+                std::cout<<" 杀死小兵的数量 "<<static_cast<UInt32>(currentBf->GetKillCount2())<<std::endl;
+                currentBf->GetOwner()->AddKillFighter(currentBf->GetId(),_mapId,currentBf->GetKillCount1());
+                currentBf->GetOwner()->AddKillSoldier(currentBf->GetId(),_mapId,currentBf->GetKillCount2());
             }
             if( (target.bo)->GetOwner() != NULL )
             {
                 (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
                 (target.bo)->GetOwner()->AddKillSoldiersNum((target.bo)->GetKillCount2());
+                std::cout<<" 杀死小兵的数量 "<<static_cast<UInt32>((target.bo)->GetKillCount2())<<std::endl;
+                (target.bo)->GetOwner()->AddKillFighter((target.bo)->GetId(),_mapId,(target.bo)->GetKillCount1());
+                (target.bo)->GetOwner()->AddKillSoldier((target.bo)->GetId(),_mapId,(target.bo)->GetKillCount2());
             }
 
             //往排布那边同步战将数据
@@ -485,13 +493,15 @@ namespace Battle
                     {
                         if( (target.bo)->GetOwner() != NULL )
                         {
-                            ((target.bo)->GetOwner())->AddEndConstantlyKill(currentBf->GetOwner(),currentBf->GetId(),constantKill);
+                            ((target.bo)->GetOwner())->AddEndConstantlyKill((target.bo)->GetId(),currentBf->GetOwner(),currentBf->GetId(),constantKill,true);
                         }
                     }
                     if( (target.bo)->GetOwner() != NULL )
                     {
-                        ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1);
+                        ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1,true);
                     }
+                    currentBf->GetOwner()->AddBeKilledFighterNum();
+                    currentBf->GetOwner()->AddLoseInfo(currentBf->GetId(),(target.bo)->GetOwner(),(target.bo)->GetId());                  
                 }
                 else //npc
                 {
@@ -511,7 +521,7 @@ namespace Battle
             //对手
             UInt8 bx = (target.bo)->GetGroundX();
             UInt8 by = (target.bo)->GetGroundY();
-            if( target.bo->getHP() <= 0 )
+            if( (target.bo)->getHP() <= 0 )
             {
 
                 if( (target.bo)->GetOwner() != NULL )
@@ -522,13 +532,15 @@ namespace Battle
                     {
                         if( currentBf->GetOwner() != NULL )
                         {
-                            (currentBf->GetOwner())->AddEndConstantlyKill((target.bo)->GetOwner(),(target.bo)->GetId(),constantKill);
+                            (currentBf->GetOwner())->AddEndConstantlyKill(currentBf->GetId(),(target.bo)->GetOwner(),(target.bo)->GetId(),constantKill,true);
                         }
                     }
                     if( currentBf->GetOwner() != NULL )
                     {
-                        (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1);
+                        (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1,true);
                     }
+                    (target.bo)->GetOwner()->AddBeKilledFighterNum();
+                    (target.bo)->GetOwner()->AddLoseInfo((target.bo)->GetId(),currentBf->GetOwner(),currentBf->GetId());                  
                 }
                 else  //npc
                 {
@@ -1305,6 +1317,14 @@ namespace Battle
         {
             (*it)->send(st);
         }
+
+        for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
+        {
+            Stream st(REQ::CLAN_BATTLE_SELFINFO);
+            (*it)->GetSelfBattleInfo(st);
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
     }
 
     //检测某一阵营是不是已经死光了
@@ -2048,6 +2068,7 @@ namespace Battle
 
         }
     }
+
     void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl)
     { 
         static UInt8 map2Point[][7][2]= {

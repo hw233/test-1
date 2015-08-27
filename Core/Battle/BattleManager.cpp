@@ -142,6 +142,20 @@ namespace Battle
         }
          
     }
+    
+    /*
+    UInt8 RoomBattle::GetCaptureCitys()
+    {
+        std::map<UInt8,UInt8> force2city;
+        CollectCaptureInfo(force2city);
+        UInt8 totalNum = 0;
+        for( auto it = force2city.begin(); it != force2city.end(); ++it )
+        {
+            totalNum += (it->second);
+        }
+        return totalNum;
+    }
+    */
 
 
     void RoomBattle::GivePlayerKillRankAward()
@@ -154,15 +168,6 @@ namespace Battle
         //按照杀敌人数进行排序
         MoreKillSoldiers moreKillSoldiers;
         std::sort(vecPlayer.begin(), vecPlayer.end(),moreKillSoldiers);
-        /*
-        static UInt32 Award[][2][2] ={
-            {{ 20001,0},{20002,20}},
-            {{ 20001,0},{20002,15}},
-            {{ 20001,0},{20002,10}},
-            {{ 20001,0},{20002,5}},
-            {{ 20001,1000},{ 20002,0}},
-        };
-        */
         std::string items[5] = {
             "20002,20",
             "20002,15",
@@ -208,16 +213,6 @@ namespace Battle
         std::sort(vecPlayer.begin(),vecPlayer.end(),moreKillFighter);
         UInt32 pos=1;
         UInt32 index=0;
-        /*
-        static UInt32 Award[][2][2] ={
-            {{ 20001,0},{20002,20}},
-            {{ 20001,0},{20002,15}},
-            {{ 20001,0},{20002,10}},
-            {{ 20001,0},{20002,5}},
-            {{ 20001,1000},{ 20002,0}},
-        };
-        */
-
         std::string items[5] = {
             "20002,20",
             "20002,15",
@@ -380,6 +375,187 @@ namespace Battle
         GivePlayerKillFighterRankAward();
         GiveCaptureCityAward();
         //GiveClanBattleAward();
+    }
+
+    
+    void RoomBattle::GetClanBattleRankInfo(UInt8 type,Stream& st)
+    {
+        if( GetStage() != 2 )
+            return;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        switch(type)
+        {
+            case 0:
+                {
+                    MoreKillFighters moreKillFighter;
+                    std::sort(vecPlayer.begin(),vecPlayer.end(),moreKillFighter);
+                }
+                break;
+            case 1:
+                {
+                    MoreKillSoldiers moreKillSoldiers;
+                    std::sort(vecPlayer.begin(), vecPlayer.end(),moreKillSoldiers);
+                }
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                {
+                    MoreConstantlyKill moreConstantlyKill;
+                    std::sort(vecPlayer.begin(), vecPlayer.end(),moreConstantlyKill);
+                }
+                break;
+            case 5:
+                {
+                    MoreEndConstantlyKill moreEndConstantlyKill;
+                    std::sort(vecPlayer.begin(), vecPlayer.end(),moreEndConstantlyKill);
+                }
+                break;
+        }
+        UInt8 pos = 1; 
+        UInt8 num = 0;
+        size_t offset = st.size();
+        st<<static_cast<UInt8>(num);
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            if( pos <= 50 )
+            {
+                st<<(*it)->GetName();
+                ++num;
+            }
+            else
+            {
+                break;
+            }
+            ++pos;
+        }
+        st.data<UInt8>(offset)=num;
+    }
+
+
+    GObject::Player* RoomBattle::GetMaxTotalKillPlayer()
+    {
+        if( GetStage() != 2 )
+            return NULL;
+        GObject::Player* player = NULL;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return NULL;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        MoreKill moreKill;
+        std::sort(vecPlayer.begin(),vecPlayer.end(),moreKill);
+        player = vecPlayer.front();
+        return player;
+    }
+
+    GObject::Player* RoomBattle::GetMaxEndConstantlyKillPlayer()
+    {
+        if( GetStage() != 2 )
+            return NULL;
+        GObject::Player* player = NULL;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return NULL;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        MoreEndConstantlyKill moreEndConstantlyKill;
+        std::sort(vecPlayer.begin(),vecPlayer.end(),moreEndConstantlyKill);
+        player = vecPlayer.front();
+        return player;
+
+    }
+
+    GObject::Player* RoomBattle::GetMaxConstantlyKillPlayer()
+    {
+        if( GetStage() != 2 )
+            return NULL;
+        GObject::Player* player = NULL;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return NULL;
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        MoreConstantlyKill moreConstantlyKill;
+        std::sort(vecPlayer.begin(),vecPlayer.end(),moreConstantlyKill);
+        player = vecPlayer.front();
+        return player;
+    }
+
+    void RoomBattle::GetBattleResultInfo(UInt8 forceId,Stream& st)
+    {
+        if( GetStage() != 2 )
+            return ;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return ;
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        st<<static_cast<UInt8>(status->GetCaptureCityNum());
+        //st<<static_cast<UInt8>(GetCaptureCitys());
+        std::vector<GObject::Player*> vecPlayer = room->GetAllJoinPlayer();
+        st<<static_cast<UInt16>(vecPlayer.size());
+        st<<static_cast<UInt16>(GetTotalKillFighterNum(forceId));
+        st<<static_cast<UInt16>(GetTotalLostFighterNum(forceId));
+        if( GetMaxConstantlyKillPlayer() != NULL )
+        {
+            st<<GetMaxConstantlyKillPlayer()->GetName();
+        }
+        else
+        {
+            st<<" 阳顶天";
+        }
+        GObject::Player* player = GetMaxTotalKillPlayer();
+        if( player == NULL )
+        {
+            st<<"god is a girl";
+        }
+        else
+        {
+            st<<player->GetName();
+        }
+        st<<" 司马太郎";
+        if( GetMaxEndConstantlyKillPlayer() != NULL )
+        {
+            st<<GetMaxEndConstantlyKillPlayer()->GetName();
+        }
+        else
+        {
+            st<<" my godness ";
+        }
+    }
+
+    UInt32 RoomBattle::GetTotalLostFighterNum(UInt8 forceId)
+    {
+        if( GetStage() != 2 )
+            return 0;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return 0;
+        std::vector<GObject::Player*> vecPlayer = room->GetJoinAllies(forceId);
+        UInt32 totalLost = 0;
+        for(auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            totalLost += (*it)->GetBeKilledFighterNum();
+        }
+        return totalLost;
+    }
+
+    UInt32 RoomBattle::GetTotalKillFighterNum(UInt8 forceId)
+    {
+        if( GetStage() != 2 )
+            return 0;
+        ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return 0;
+        std::vector<GObject::Player*> vecPlayer = room->GetJoinAllies(forceId);
+        UInt32 totalKill = 0;
+        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+        {
+            totalKill += (*it)->GetKillFighterNum();
+        }
+        return totalKill;
     }
 
 

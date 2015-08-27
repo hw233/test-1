@@ -137,6 +137,16 @@ namespace GObject
             fprintf(stderr, "load city status error!\n");
             std::abort();
         }
+        if( !loadConstantlyKill() )
+        {
+            fprintf(stderr, "load city loadConstantlyKill error!\n");
+            std::abort();
+        }
+        if( !loadEndConstantlyKill() )
+        {
+            fprintf(stderr, "load EndConstantlyKill error!\n");
+            std::abort();
+        }
     } 
 
     bool GObjectManager::loadAllPlayers()
@@ -644,6 +654,50 @@ namespace GObject
         while(execu->Next() == DB::DB_OK)
         {
             Battle::roomAllCityStatusManager.loadCityStatus(cityStatus.roomId,cityStatus.battleId,cityStatus.cityId,cityStatus.ownforce);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+    bool GObjectManager::loadConstantlyKill()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading clanBattle constantlykill ");
+        lc.reset(1000);
+        DBConstantlyKill constantlyKill;
+        if(execu->Prepare("SELECT `playerId`,`fighterId`,`killNum` FROM `constantly_kill`",constantlyKill) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Player* player = globalPlayers[constantlyKill.playerId];
+            if(!player)
+                continue;
+            player->AddConstantlyKill(constantlyKill.fighterId,constantlyKill.killNum);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadEndConstantlyKill()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading clanBattle endConstantlykill ");
+        lc.reset(1000);
+        DBEndConstantlyKill endconstantlyKill;
+        if(execu->Prepare("SELECT `playerId`,`fighterId`,`peerId`,`peerFighterId`,`endkillNum` FROM `endconstantly_kill`",endconstantlyKill) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            Player* player = globalPlayers[endconstantlyKill.playerId];
+            if(!player)
+                continue;
+            Player* peer = globalPlayers[endconstantlyKill.peerId];
+            if( !peer )
+                continue;
+            player->AddEndConstantlyKill(endconstantlyKill.fighterId,peer,endconstantlyKill.peerFighterId,endconstantlyKill.endkillNum);
             lc.advance();
         }
         lc.finalize();

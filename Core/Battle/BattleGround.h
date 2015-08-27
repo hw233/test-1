@@ -7,6 +7,7 @@
 #include "Server/OidGenerator.h"
 #include "GObject/AStar.h"
 #define GROUND_LENGTH 20
+#include "MsgID.h"
 
 namespace GObject
 {

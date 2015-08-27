@@ -1,6 +1,7 @@
 #include"ClanBattleRoom.h"
 #include"GData/ClanBattleBase.h"
 #include"Battle/ClanBattleCityStatus.h"
+#include"GObject/Var.h"
 
 namespace Battle
 {
@@ -258,7 +259,10 @@ namespace Battle
                 std::vector<GObject::Player*> temp = clan->GetJoinClanBattlePlayer();
                 for( auto iterator = temp.begin(); iterator != temp.end(); ++iterator)
                 {
-                    vecPlayer.push_back(*iterator);
+                    if( (*iterator)->GetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM) > 0 )
+                    {
+                        vecPlayer.push_back(*iterator);
+                    }
                 }
             }
         }
@@ -282,6 +286,20 @@ namespace Battle
                 vecPlayer.push_back(*iter);
             }
 
+        }
+        return vecPlayer;
+    }
+
+    std::vector<GObject::Player*> ClanBattleRoom::GetJoinAllies(UInt8 forceId)
+    {
+        std::vector<GObject::Player*> vecPlayer;
+        std::vector<GObject::Player*> vecAllies = GetSameForceAllies(forceId);
+        for( auto it = vecAllies.begin(); it != vecAllies.end(); ++it )
+        {
+            if( (*it)->GetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM) > 0 )
+            {
+                vecPlayer.push_back(*it);
+            }
         }
         return vecPlayer;
     }

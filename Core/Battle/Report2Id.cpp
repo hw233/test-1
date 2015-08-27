@@ -24,6 +24,15 @@ namespace Battle
         return (vecReportOneRound.front());
     }
 
+    ReportOneRound* Report2Id::GetNewestReport()
+    {
+        if( vecReportOneRound.empty())
+            return NULL;
+        LessActTime<ReportOneRound*> lessActTime;
+        std::sort(vecReportOneRound.begin(), vecReportOneRound.end(), lessActTime);
+        return (vecReportOneRound.back());
+    }
+
     UInt32 Report2Id::GetEarliestTime()
     {
         UInt32 time = TimeUtil::Now();

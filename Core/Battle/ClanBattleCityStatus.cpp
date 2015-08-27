@@ -113,6 +113,8 @@ namespace Battle
 
    }
 
+
+
    void RoomAllCityStatus::Init()
    {
        //根据战役Id 设置每一座城的拥有者
@@ -174,6 +176,19 @@ namespace Battle
        return 0;
    }
    
+   CityStatus* RoomAllCityStatus::GetCityStatus(UInt8 cityId)
+   {
+       for( auto it = vecCityStatus.begin(); it != vecCityStatus.end(); ++it )
+       {
+           if( (*it)->GetCityId() == cityId )
+           {
+               return (*it);
+           }
+       }
+       return NULL;
+   }
+
+
    std::vector<UInt8> RoomAllCityStatus::GetCaptureCitys(UInt8 forceId)
    {
        std::vector<UInt8> vecCitys;
@@ -185,6 +200,19 @@ namespace Battle
            }
        }
        return vecCitys;
+   }
+
+   UInt8 RoomAllCityStatus::GetCaptureCityNum()
+   {
+       UInt8 totalNum = 0;
+       for( auto it = vecCityStatus.begin(); it != vecCityStatus.end(); ++it )
+       {
+           if( (*it)->GetOwnForce() != 0 )
+           {
+               ++totalNum;
+           }
+       }
+       return totalNum;
    }
 
    void RoomAllCityStatusManager::InsertRoomAllCityStatus(UInt32 roomId,UInt8 battleId)
@@ -225,7 +253,15 @@ namespace Battle
        }
        else
        {
-           status->InsertCityStatus(cityId,ownforce);
+           CityStatus* cityStatus = status->GetCityStatus(cityId);
+           if( cityStatus != NULL )
+           {
+               cityStatus->SetOwnForce(ownforce);
+           }
+           else
+           {
+               status->InsertCityStatus(cityId,ownforce);
+           }
        }
 
 
