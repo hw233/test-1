@@ -106,16 +106,19 @@ void OnEnchantSoldierReq(GameMsgHdr& hdr, const void * data)
     MSG_QUERY_PLAYER(player) ;
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt8 opt = 0;
-    br >> opt;
-    UInt16 fighterId;
-    br >> fighterId;
+    br >> opt;  // 0 强化 1 升级
+    UInt8 index; //士兵类型
+    br >> index;
     UInt8 part = 0;
-    br >> part;
-    UInt32 result = player->GetPackage()->EnchantSoldierFromClient(fighterId,part,opt);
+    br >> part; //部位
+    UInt32 result = player->GetPackage()->EnchantSoldierFromClient(index,part,opt);
     Stream st(REP::ENCHARTSOLDIER);
     st << static_cast<UInt8>(opt);
     if(opt)
+    {
+        st << index;
         st << static_cast<UInt8>(part);
+    }
     st << result; 
     st << Stream::eos;
     player->send(st);

@@ -2048,7 +2048,7 @@ namespace Battle
 
         }
     }
-    void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl)
+    void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl, UInt16 pos)
     { 
         static UInt8 map2Point[][7][2]= {
             {{1,0},{2,0},{0,1},{1,1},{2,1},{2,0},{2,1}},
@@ -2056,11 +2056,45 @@ namespace Battle
         };
         if( index == 0 ) // 1 2 
             return;
+        if( index == 1 && !pl)
+            return ;
+
         std::map<UInt8, UInt16> _map ;
-        if(index - 1)
-            _map= pl->GetArenaLayout();
+        if(pl)
+        {
+            if(index - 1)
+                _map= pl->GetArenaLayout();
+            else
+                _map= pl->GetArenaDefendLayout();
+        }
         else
-            _map= pl->GetArenaDefendLayout();
+        {
+            std::set<UInt16> _set;
+            UInt8 index = 0;
+            //选出5个武将
+            while(_set.size()< 5 && index++ < 10 )
+            { 
+                UInt16 offect = uRand(globalFighters.size());
+                auto it = globalFighters.begin();
+                std::advance(it,offect);
+                _set.insert(it->first);
+            } 
+            auto it = _set.begin();
+            for(UInt8 i = 0; i < 7;)
+            { 
+                if(_map.size() == 5)
+                    break;
+                if(uRand(100)< 10 && (5-_map.size()+i) < 7)
+                {
+                    ++i;
+                    continue;
+                }
+                
+                _map[i]= *it;
+                it++;
+            } 
+        }
+
         for(auto it = _map.begin(); it != _map.end(); ++it)
         { 
             map2fighter[index].push_back(new FighterInfo(pl,it->second,map2Point[index -1][it->first][0],map2Point[index-1][it->first][1]));

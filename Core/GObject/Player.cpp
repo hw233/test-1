@@ -11,6 +11,8 @@
 #include "GData/BattleAward.h"
 #include "Battle/ClanBattleRoom.h"
 #include "FVar.h"
+#include "Battle/BattleGround.h"
+#include "GObject/World.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -18,6 +20,7 @@ namespace GObject
     enum 
     {
         e_sign_mouth = 0,
+        e_arena_day =1,
     };
 
     //GlobalNamedPlayers globalPlayers;
@@ -992,4 +995,124 @@ namespace GObject
         _ArenaLayout[index] = fighterId;
     } 
 
+    void Player::GetArenaInfo()
+    { 
+        
+        UInt32 dayVal = GetVar(VAR_DAY_CHANGE);
+        if(!(dayVal & (1 << e_arena_day))) 
+        {
+            SetVar(VAR_ARENA_COUNT, (10 << 16));
+            dayVal |= (1 << e_arena_day);  //当天签到
+            SetVar(VAR_DAY_CHANGE,dayVal);
+        }
+
+        Stream st(REP::BATTLE_ARENA);
+        st << static_cast<UInt8>(1);
+
+        UInt16 pos = GetVar(VAR_ARENA_POS);
+        UInt32 rand = GetVar(VAR_ARENA_RAND);
+        UInt16 index = pos>500?pos - 500:0;
+        UInt16 advance = (pos - index) / 3;
+
+        UInt16 vec[3] = {1,2,3};
+        if(advance)
+        { 
+            for(UInt8 i = 0; i < 3; ++i)
+            { 
+                vec[i] = index + advance*i + (rand >> (8*i))%advance;
+            } 
+        } 
+
+        size_t offect = st.size();
+        UInt8 count = 0;
+        st << count ;
+
+        for(UInt8 i = 0; i < 3 ; ++i)
+        { 
+            UInt8 select = vec[i];
+            GObject::Player* pl = (WORLD().arenaSort[select]);
+            st << static_cast<UInt8>(select);
+            if(pl)
+                st << pl->GetName();
+            else
+                st << "";
+            count ++;
+            if(!advance)
+                break;
+        } 
+        st.data<UInt8>(offect) = count;
+        st << Stream::eos;
+        send(st);
+    } 
+    void Player::AttackArenaPos(UInt16 targetPos)
+    { 
+        if(!CanAttackArena())
+            return ;
+
+        Stream st(REP::BATTLE_ARENA);
+        st << static_cast<UInt8>(2);
+
+        GObject::Player* pl = WORLD().arenaSort[targetPos];
+        if(pl && static_cast<UInt16>(pl->GetVar(VAR_ARENA_POS)) != targetPos)
+        {
+            WORLD().arenaSort[targetPos] = NULL;
+            pl->SetVar(VAR_ARENA_POS,0);
+            return ;
+        }
+        Battle::BattleGround bg(0,1);
+
+        bg.AutoEnterFighters(1,this);
+        bg.AutoEnterFighters(2,pl,targetPos);
+        bg.start();
+        UInt8 res = bg.GetCaptureId();
+        if(res == 1)
+        {
+            UInt32 myPos = GetVar(VAR_ARENA_POS);
+            WORLD().arenaSort[targetPos] = this;
+            SetVar(VAR_ARENA_POS,targetPos);
+            SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
+            if(pl)
+            { 
+                if(myPos < 3000)
+                    WORLD().arenaSort[myPos] = pl;
+                pl->SetVar(VAR_ARENA_POS,myPos);
+                pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
+            } 
+
+        }
+        st << static_cast<UInt8>(res);
+        st << Stream::eos;
+        send(st);
+    } 
+    UInt8 Player::ClearArenaCD()
+    { 
+        UInt32 time = GetVar(VAR_ARENA_TIME);
+        if(!time)
+            return 1;
+        UInt32 gold = GetVar(VAR_GOLD);
+        if(gold < 20)
+            return 1;
+        SetVar(VAR_GOLD, gold - 20);
+        SetVar(VAR_ARENA_TIME,0);
+        return 0;
+    } 
+    UInt8 Player::AddArenaCount()
+    { 
+        UInt32 gold = GetVar(VAR_GOLD);
+        if(gold < 20)
+            return 1;
+        SetVar(VAR_GOLD, gold - 20);
+        AddVar(VAR_ARENA_COUNT,(1 << 16));
+        return 0;
+    } 
+    bool Player::CanAttackArena()
+    { 
+        UInt32 count = GetVar(VAR_ARENA_COUNT);
+        UInt32 time = GetVar(VAR_ARENA_TIME);
+        if(time && time > TimeUtil::Now())
+            return false;
+        if(static_cast<UInt16>(count) >= static_cast<UInt16>(count >>16))
+            return false;
+        return true;
+    } 
 }

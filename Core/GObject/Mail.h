@@ -21,6 +21,8 @@ namespace GObject
 
             void SetOption(UInt8 option){_option = option;}
             UInt32 GetOverTime(){return _overTime;}
+
+            //void Accept(UInt32 id);
         private:
             UInt32 _id;
             Player* _owner;
