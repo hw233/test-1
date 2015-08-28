@@ -372,6 +372,7 @@ static bool init = false;
     } 
     void World::World_Send_Arena_Award( World * world )
     { 
+        InitRank();
         static std::string Award[] = {
             "20001,200",
             "20001,180",

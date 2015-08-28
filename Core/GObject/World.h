@@ -48,9 +48,8 @@ namespace GObject
             inline Script::BattleFormula* getBattleFormula() {return _battleFormula;}
             ChatHold* GetChatHold(){return chatHold;}
 
-            void InitRank();
-
         private:
+            static void InitRank();
             static void World_Midnight_Check( World * );
             static void World_Test( World * );
             static void World_Govern_SendInfo(World *); //每一小时发一组怪物id以及胜负 给客户端 

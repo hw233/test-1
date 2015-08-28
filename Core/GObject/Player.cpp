@@ -32,6 +32,7 @@ namespace GObject
     GlobalOnlinePlayerSet globalOnlinePlayerSet;
     GlobalNamedClans globalNamedClans;
 
+
     //GlobalNamedPlayers globalAccountsPlayers;
     Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),killSoldiersNum(0) , killFighterNum(0)
     {
@@ -60,7 +61,7 @@ namespace GObject
     { 
 
     } 
-    
+
     UInt32 Player::GetVar(UInt32 id)
     {
         if(this == NULL)
@@ -118,10 +119,10 @@ namespace GObject
     {
         m_pVars->SetOffset(offset);
     }
-    
+
     void Player::GetSelfInfoStream(Stream &st)
     {
-        
+
         st<<static_cast<UInt8>(GetSex());
         st<<GetName();
         st<<static_cast<UInt8>(GetLevel());
@@ -135,7 +136,7 @@ namespace GObject
         }
         //st << GetVar(VAR_GOLD);
     } 
-    
+
     void Player::send(const void * buf ,int size)
     { 
         if(!_isOnline) return;

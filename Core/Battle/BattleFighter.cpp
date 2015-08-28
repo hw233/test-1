@@ -414,19 +414,22 @@ namespace Battle
             UInt16 advance1 = 0;
             UInt16 advance2 = 0;
             UInt16 adv = 0; 
-            if(GetTypeId() == e_ride)
-                advance1 = s->GetActionCd1()*GetSpeed()/100;
+            if(_target)
+            {
+                if(GetTypeId() == e_ride)
+                    advance1 = s->GetActionCd1()*GetSpeed()/100;
 
-            if(_target && _target->GetTypeId() == e_ride)
-                advance2 = s->GetActionCd1()*_target->GetSpeed()/100;
+                if(_target && _target->GetTypeId() == e_ride)
+                    advance2 = s->GetActionCd1()*_target->GetSpeed()/100;
 
-            //预判
+                //预判
 
-            if((getPosX() < _target->getPosX() && _target->GetBattleDirection()) || (getPosX() > _target->getPosX() && !_target->GetBattleDirection()))
-                adv = advance1 - advance2;
-            else
-                adv = advance1 + advance2;
+                if((getPosX() < _target->getPosX() && _target->GetBattleDirection()) || (getPosX() > _target->getPosX() && !_target->GetBattleDirection()))
+                    adv = advance1 - advance2;
+                else
+                    adv = advance1 + advance2;
 
+            }
             if(s->GetSkillCondition()->MeetCondition(advance - adv,priority)) //XXX
             {
                 flag = 1;

@@ -17,6 +17,29 @@
 #include<math.h>
 namespace Battle
 {
+
+    inline UInt8 GetFrontFromPos(UInt16 pos)
+    { 
+        UInt8 res = 0;
+        pos %= 21;
+        for(UInt8 i = 6; i >= 1; --i)
+        { 
+           if(pos < i) 
+           { 
+               res |= ( 1 << (6-i));
+               for(UInt8 j = i-1 ; j >= 0; --j)
+               {
+                   if(pos < i) 
+                   {    
+                       res |= ( 1 << (6-i));
+                       res |= (1 << (7-i+pos));
+                       return res; 
+                   }    
+               }
+           } 
+           pos -= i;
+        } 
+    } 
     void BattleGround::InitMapFight(UInt8 mapId)   
     { 
 
@@ -2080,18 +2103,16 @@ namespace Battle
                 _set.insert(it->first);
             } 
             auto it = _set.begin();
-            for(UInt8 i = 0; i < 7;)
+            UInt8 front = GetFrontFromPos(pos);
+            for(UInt8 i = 0; i < 7; ++i)
             { 
-                if(_map.size() == 5)
-                    break;
-                if(uRand(100)< 10 && (5-_map.size()+i) < 7)
-                {
-                    ++i;
+                if(it == _st.begin())
                     continue;
+                if(!(front & (1 << i)))
+                {
+                    _map[i]= *it;
+                    it++;
                 }
-                
-                _map[i]= *it;
-                it++;
             } 
         }
 
