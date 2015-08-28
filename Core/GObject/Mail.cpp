@@ -1,4 +1,5 @@
 #include "Mail.h"
+#include "Common/StringTokenizer.h"
 namespace GObject
 {
     GlobalMails globalMails;
@@ -11,4 +12,22 @@ namespace GObject
         _option = option;
         _overTime = overTime;
     } 
+    
+    /*
+    void Mail::Accept(UInt32 id)
+    { 
+        std::string items = GetItems();
+        StringTokenizer item(items,",");
+        if(item.count() % 2)
+            return ;
+        if(!GetOwner())
+            return ;
+        for(UInt8 i = 0; i < item.count()/2; ++i)
+        { 
+            _owner->GetPackage()->AddItem(item[2*i],item[2*i+1]);
+        } 
+        _option = 1;
+        _owner->DeleteMail(_id);
+    } 
+    */
 }

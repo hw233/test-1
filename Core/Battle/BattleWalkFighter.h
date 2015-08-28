@@ -31,6 +31,8 @@ namespace Battle
             virtual bool CanMove() {  return _canMove;}
             virtual void SetMove(bool v) { _canMove = v;}
 
+            virtual UInt8 GetBattleDirection(){return 2;}  //0左1右2全部
+
         private:
             //BattleObject* _target; 
             UInt8 _count;

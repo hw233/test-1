@@ -283,7 +283,7 @@ namespace Battle
             BattleObject * GetTarget(){ return _target;};
 
             void SetBattleDirection(UInt8 direct){ if(_direction == direct) return; _direction = direct;}
-            virtual UInt8 GetBattleDirection(){return _direction;}  //1左2右0全部
+            virtual UInt8 GetBattleDirection(){return _direction;}  //0左1右2全部
             virtual UInt8 BeForAction() { PreGetObject(); return 0;};
 
             void BattlePrintf();
@@ -334,7 +334,7 @@ namespace Battle
             void SetAvoidHurt(bool v){ _avoidhurt = v;}
             bool GetAvoidHurt(){ return _avoidhurt;}
 
-            bool IsMainFighter(){return _fighter!=NULL;}
+            bool IsMainFighter(){return !_isChild;}
             
             void ResetSkill();//{}
 

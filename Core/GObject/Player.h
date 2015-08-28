@@ -358,6 +358,12 @@ namespace GObject
             std::map<UInt8,UInt16> GetArenaDefendLayout();
             void SetArenaDefendLayout(UInt8 index, UInt16 fighterId);
             void GetSelfBattleInfo(Stream& st);
+
+            void GetArenaInfo();
+            void AttackArenaPos(UInt16 targetPos);
+            UInt8 ClearArenaCD();
+            UInt8 AddArenaCount();
+            bool CanAttackArena();
     private:
             //IDTYPE _id;
             std::string _accounts;

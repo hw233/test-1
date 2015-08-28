@@ -272,7 +272,7 @@ namespace GObject
         UInt32 load  = 0;
 
         {
-            updateSoldierLoad(part);
+            updateSoldierLoad(offect);
             load = GetSoldierUpgradeLoad(offect);
             ++val;
         }

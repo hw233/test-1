@@ -22,6 +22,7 @@
 #include "Battle/ClanBattleRoom.h"
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/BattleManager.h"
+#include "GObject/World.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -508,5 +509,54 @@ void OnClanBattleResultInfo(GameMsgHdr& hdr, const void * data)
     st<<Stream::eos;
     player->send(st);
 }
+
+void OnBattleArenaOption(GameMsgHdr& hdr, const void * data)
+{ 
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+    switch(type)
+    { 
+        case 1:
+            {
+                player->GetArenaInfo();
+            }
+            break;
+        case 2:
+            {
+                UInt16 targetPos = 0;
+                br >> targetPos;
+                for(UInt8 i = 0; i < 7; ++i)
+                { 
+                    UInt8 fighterId = 0;
+                    br >> fighterId;
+                    player->SetArenaLayout(i+1,fighterId);
+                } 
+                player->AttackArenaPos(targetPos);
+            }
+            break;
+        case 3:
+            {
+                UInt8 res = player->AddArenaCount();
+                Stream st(REP::BATTLE_ARENA);
+                st << static_cast<UInt8>(3);
+                st << res;
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 4:
+            {
+                UInt8 res = player->ClearArenaCD();
+                Stream st(REP::BATTLE_ARENA);
+                st << static_cast<UInt8>(4);
+                st << res;
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+    } 
+} 
 
 #endif // _WORLDOUTERMSGHANDLER_H_

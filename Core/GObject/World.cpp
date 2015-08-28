@@ -43,6 +43,10 @@ namespace GObject
         if(sday < now) sday += 86400;
         AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
         AddTimer(86400 * 1000, World_Test, this, 10* 1000);
+
+        UInt32 ArenaAwardTime = TimeUtil::SharpDay(0) + 21 * 3600;
+        if(ArenaAwardTime < now) ArenaAwardTime += 86400;
+        AddTimer(86400 * 1000, World_Send_Arena_Award, this, (ArenaAwardTime - now) * 1000);
         
         
         time_t n = now;
@@ -77,7 +81,7 @@ namespace GObject
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //GMHandler::Battle(1,2);
-        //GMHandler::Battle(1001,1014);
+        GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1004,1005,2);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //std::vector<UInt8> *r = Battle::battleReport0[142];
@@ -353,7 +357,7 @@ namespace GObject
     inline bool player_enum_rc(GObject::Player *pl,int)
     { 
         UInt32 pos = pl->GetVar(VAR_ARENA_POS) ;
-        if(pos < 3000)
+        if(pos && pos <= 3000)
         { 
             Player * p = World::arenaSort[pos];
             if(!p)
@@ -368,5 +372,60 @@ namespace GObject
 
         GObject::globalPlayers.enumerate(player_enum_rc, 0);
         init = true;
+    } 
+    void World::World_Send_Arena_Award( World * world )
+    { 
+        static std::string Award[] = {
+            "20001,200",
+            "20001,180",
+            "20001,160",
+            "20001,140",
+            "20001,120",
+            "20001,100",
+            "20001, 80",
+            "20001, 60",
+            "20001, 40",
+            "20001, 20",
+            "20001, 10"
+        };
+
+        for(auto it = arenaSort.begin(); it != arenaSort.end(); ++it)
+        { 
+            UInt16 pos = it->first;
+            GObject::Player* pl = it->second;
+            UInt8 index = 0;
+
+            if(!pos)
+                continue;
+            if(pos == 1)
+                index = 0;
+            else if(pos == 2)
+                index = 1;
+            else if(pos == 3)
+                index = 2;
+            else if(pos < 11)
+                index = 3;
+            else if(pos < 21)
+                index = 4;
+            else if(pos < 51)
+                index = 5;
+            else if(pos < 101)
+                index = 6;
+            else if(pos < 201)
+                index = 7;
+            else if(pos < 301)
+                index = 8;
+            else if(pos < 1001)
+                index = 9;
+            else 
+                index = 10;
+
+            Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),pl,1,Award[index],0,static_cast<UInt32>(-1));
+            if(mail)
+            {    
+                GObject::globalMails.add(mail->GetId(), mail);
+                pl->AddMail(mail->GetId());
+            }       
+        } 
     } 
 }

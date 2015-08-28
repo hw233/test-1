@@ -58,7 +58,7 @@ namespace GObject
             static void world_clanBattle_putFighters(World* );//军团战放入战将
             static void World_clanBattle_OneRound(World*);  //军团战战术一回合
             static void World_clanBattle_stageCheck(World*); //军团战阶段检测
-
+            static void World_Send_Arena_Award(World*); //发送竞技场奖励
         public:
             //static RCSortType arenaSort;
             static MapIndexPlayer arenaSort;

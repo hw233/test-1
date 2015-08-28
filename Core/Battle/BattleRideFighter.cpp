@@ -174,12 +174,13 @@ namespace Battle
         return 0;
     } 
 
+    // 1 <=> --->    0<==> <---
     UInt8 BattleRideFighter::GetBattleDirection()
     { 
         if(count == 1)
             return !GetSideInBS();
         if(count == 2)
-            return GetSideInBS();
+            return GetSideInBS(); 
         return 2;
     } 
 

@@ -108,7 +108,7 @@ CREATE TABLE `clan` (
     `leader` bigint(20) unsigned NOT NULL,
     `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
     `contribute` int(10) unsigned NOT NULL DEFAULT '0',
-    `personMax` tinyint(3) unsigned NOT NULL DEFAULT '0',
+    `personMax` tinyint(3) unsigned NOT NULL DEFAULT '50',
     `battleRoomId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '公会战房间id',
     `clanFame` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '公会声望',
     `conquests` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '公会战绩',

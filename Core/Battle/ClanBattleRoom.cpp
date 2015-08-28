@@ -33,6 +33,22 @@ namespace Battle
     }
 
 
+    std::vector<UInt32> ClanBattleRoom::GetEnemyClans(UInt8 forceId)
+    {
+        std::vector<UInt32> vecClan;
+        for( auto it = force2clans.begin(); it != force2clans.end(); ++it )
+        {
+            if( it->first == forceId )
+                continue;
+            for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter )
+            {
+                vecClan.push_back(*iter);
+            }
+        }
+        return vecClan;
+    }
+
+
     void ClanBattleRoom::InsertClan(UInt8 forceId,UInt32 clanId,UInt32 num )
     {
         //更新数据库

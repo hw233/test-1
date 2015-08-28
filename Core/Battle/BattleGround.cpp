@@ -11,6 +11,7 @@
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/Report2Id.h"
+#include "Battle/ClanBattleRoom.h"
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
@@ -1220,6 +1221,98 @@ namespace Battle
         }
 
     }
+
+    void BattleGround::SendBattleEachInfo()
+    {
+        UInt32 roomId = _id-_mapId;
+        Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return ;
+        std::map<UInt8,std::vector<UInt32>> force2clans = room->GetForce2Clans();
+
+        for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
+        {
+            GObject::Clan* clan = (*it)->GetClan();
+            if( clan == NULL )
+                continue;
+            UInt32 clanId = clan->GetId();
+            Stream st(REQ::CLAN_BATTLE_PROCESS);
+            st<<static_cast<UInt8>(0x00);
+            st<<static_cast<UInt8>(force2clans.size());
+            for( auto iter = force2clans.begin(); iter != force2clans.end(); ++iter )
+            {
+                size_t offset = st.size();
+                UInt8 num = 0;
+                st<<static_cast<UInt8>(num);
+                std::vector<UInt32> vecClan = iter->second;
+                for( auto iterator = vecClan.begin(); iterator != vecClan.end(); ++iterator )
+                {
+                    if( (*iterator) == clanId )
+                        continue;
+                    GObject::Clan* clan = GObject::globalClan[(*iterator)];
+                    if( clan == NULL )
+                        continue;
+                    st<<clan->GetName();
+                    ++num;
+                }
+                st.data<UInt8>(offset) = num;
+            }
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
+    }
+
+    std::vector<UInt8> BattleGround::GetPreStartForces()
+    {
+        std::vector<UInt8> vecForce;
+        for( auto it = map2fighter.begin(); it != map2fighter.end(); ++it )
+        {
+            if( it->first != 0 )
+            {
+                vecForce.push_back(it->first);
+            }
+        }
+        return vecForce;
+
+    }
+
+
+    void BattleGround::SendBattleResultInfo()
+    {
+        UInt8 roomId = _id-_mapId;
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        UInt8 ownforce = 0;
+        if( status != NULL )
+        { 
+            ownforce = status->GetCityOwnForce(_mapId);
+        }
+        for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
+        {
+            Stream st(REQ::CLAN_BATTLE_PROCESS);
+            st<<static_cast<UInt8>(0x01);
+            st<<static_cast<UInt8>(_mapId);
+            //参战之前有哪些势力
+            std::vector<UInt8> vecPreForce = GetPreStartForces();
+            st<<static_cast<UInt8>(vecPreForce.size());
+            for( auto iter = vecPreForce.begin(); iter != vecPreForce.end(); ++iter )
+            {
+                st<<static_cast<UInt8>(*iter);
+            }
+            //参战之后剩余那些势力
+            std::vector<UInt8> vecAfterForce;
+            GetAliveForce(vecAfterForce);
+            st<<static_cast<UInt8>(vecAfterForce.size());
+            for( auto iter = vecAfterForce.begin(); iter != vecAfterForce.end(); ++iter )
+            {
+                st<< static_cast<UInt8>(*iter);
+            }
+            st<<static_cast<UInt8>(ownforce);
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
+    }
+
+
     //一回合的战术
     void BattleGround::FightOneRound()
     {
@@ -1229,13 +1322,15 @@ namespace Battle
         {
             preStart();  //
             _isFirstRound = false;
+            SendBattleEachInfo();
         }
         if( CheckIsStop() )
         {
             if( ! _isSetCapture )
             {
                 SetCaptureForce();
-                _isSetCapture=true;
+                SendBattleResultInfo();
+                _isSetCapture = true;
             }
             return;
         }
@@ -1431,6 +1526,7 @@ namespace Battle
                         }
                         if( listFighter.empty() )
                         {
+                            camp2fighters_copy.erase(it->first);
                             break;
                         }
                         BattleFighter* bf =  listFighter.front();
@@ -2020,6 +2116,8 @@ namespace Battle
             return;
         for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
         {
+            if( it->first == 0 )
+                continue;
             bool res = SomeCampIsAllDie(it->first);
             if( !res )
             {
@@ -2069,7 +2167,7 @@ namespace Battle
         }
     }
 
-    void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl)
+    void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl, UInt16 pos)
     { 
         static UInt8 map2Point[][7][2]= {
             {{1,0},{2,0},{0,1},{1,1},{2,1},{2,0},{2,1}},
@@ -2077,11 +2175,45 @@ namespace Battle
         };
         if( index == 0 ) // 1 2 
             return;
+        if( index == 1 && !pl)
+            return ;
+
         std::map<UInt8, UInt16> _map ;
-        if(index - 1)
-            _map= pl->GetArenaLayout();
+        if(pl)
+        {
+            if(index - 1)
+                _map= pl->GetArenaLayout();
+            else
+                _map= pl->GetArenaDefendLayout();
+        }
         else
-            _map= pl->GetArenaDefendLayout();
+        {
+            std::set<UInt16> _set;
+            UInt8 index = 0;
+            //选出5个武将
+            while(_set.size()< 5 && index++ < 10 )
+            { 
+                UInt16 offect = uRand(globalFighters.size());
+                auto it = globalFighters.begin();
+                std::advance(it,offect);
+                _set.insert(it->first);
+            } 
+            auto it = _set.begin();
+            for(UInt8 i = 0; i < 7;)
+            { 
+                if(_map.size() == 5)
+                    break;
+                if(uRand(100)< 10 && (5-_map.size()+i) < 7)
+                {
+                    ++i;
+                    continue;
+                }
+                
+                _map[i]= *it;
+                it++;
+            } 
+        }
+
         for(auto it = _map.begin(); it != _map.end(); ++it)
         { 
             map2fighter[index].push_back(new FighterInfo(pl,it->second,map2Point[index -1][it->first][0],map2Point[index-1][it->first][1]));
