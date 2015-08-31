@@ -11,6 +11,7 @@
 #include "Battle/ClanBattleDistribute.h"
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/Report2Id.h"
+#include "Battle/ClanBattleRoom.h"
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
@@ -84,9 +85,11 @@ namespace Battle
         }
         else
         {
-            Battle::ReportOneRound* roundReport =  report2id->GetEarliestReport();
-            _actId = roundReport->GetActId()+1;
+            Battle::ReportOneRound* roundReport =  report2id->GetNewestReport();
+            _actId = roundReport->GetActId();
         }
+
+        std::cout<<" 接上一个回合的 id 为  "<<static_cast<UInt32>(_actId)<<std::endl;
         
     }
 
@@ -487,11 +490,17 @@ namespace Battle
             {
                 currentBf->GetOwner()->AddKillFighterNum(currentBf->GetKillCount1());
                 currentBf->GetOwner()->AddKillSoldiersNum(currentBf->GetKillCount2());
+                std::cout<<" 杀死小兵的数量 "<<static_cast<UInt32>(currentBf->GetKillCount2())<<std::endl;
+                currentBf->GetOwner()->AddKillFighter(currentBf->GetId(),_mapId,currentBf->GetKillCount1());
+                currentBf->GetOwner()->AddKillSoldier(currentBf->GetId(),_mapId,currentBf->GetKillCount2());
             }
             if( (target.bo)->GetOwner() != NULL )
             {
                 (target.bo)->GetOwner()->AddKillFighterNum((target.bo)->GetKillCount1());
                 (target.bo)->GetOwner()->AddKillSoldiersNum((target.bo)->GetKillCount2());
+                std::cout<<" 杀死小兵的数量 "<<static_cast<UInt32>((target.bo)->GetKillCount2())<<std::endl;
+                (target.bo)->GetOwner()->AddKillFighter((target.bo)->GetId(),_mapId,(target.bo)->GetKillCount1());
+                (target.bo)->GetOwner()->AddKillSoldier((target.bo)->GetId(),_mapId,(target.bo)->GetKillCount2());
             }
 
             //往排布那边同步战将数据
@@ -508,13 +517,15 @@ namespace Battle
                     {
                         if( (target.bo)->GetOwner() != NULL )
                         {
-                            ((target.bo)->GetOwner())->AddEndConstantlyKill(currentBf->GetOwner(),currentBf->GetId(),constantKill);
+                            ((target.bo)->GetOwner())->AddEndConstantlyKill((target.bo)->GetId(),currentBf->GetOwner(),currentBf->GetId(),constantKill,true);
                         }
                     }
                     if( (target.bo)->GetOwner() != NULL )
                     {
-                        ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1);
+                        ((target.bo)->GetOwner())->AddConstantlyKill((target.bo)->GetId(),1,true);
                     }
+                    currentBf->GetOwner()->AddBeKilledFighterNum();
+                    currentBf->GetOwner()->AddLoseInfo(currentBf->GetId(),(target.bo)->GetOwner(),(target.bo)->GetId());                  
                 }
                 else //npc
                 {
@@ -534,7 +545,7 @@ namespace Battle
             //对手
             UInt8 bx = (target.bo)->GetGroundX();
             UInt8 by = (target.bo)->GetGroundY();
-            if( target.bo->getHP() <= 0 )
+            if( (target.bo)->getHP() <= 0 )
             {
 
                 if( (target.bo)->GetOwner() != NULL )
@@ -545,13 +556,15 @@ namespace Battle
                     {
                         if( currentBf->GetOwner() != NULL )
                         {
-                            (currentBf->GetOwner())->AddEndConstantlyKill((target.bo)->GetOwner(),(target.bo)->GetId(),constantKill);
+                            (currentBf->GetOwner())->AddEndConstantlyKill(currentBf->GetId(),(target.bo)->GetOwner(),(target.bo)->GetId(),constantKill,true);
                         }
                     }
                     if( currentBf->GetOwner() != NULL )
                     {
-                        (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1);
+                        (currentBf->GetOwner())->AddConstantlyKill(currentBf->GetId(),1,true);
                     }
+                    (target.bo)->GetOwner()->AddBeKilledFighterNum();
+                    (target.bo)->GetOwner()->AddLoseInfo((target.bo)->GetId(),currentBf->GetOwner(),currentBf->GetId());                  
                 }
                 else  //npc
                 {
@@ -1231,6 +1244,98 @@ namespace Battle
         }
 
     }
+
+    void BattleGround::SendBattleEachInfo()
+    {
+        UInt32 roomId = _id-_mapId;
+        Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+        if( room == NULL )
+            return ;
+        std::map<UInt8,std::vector<UInt32>> force2clans = room->GetForce2Clans();
+
+        for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
+        {
+            GObject::Clan* clan = (*it)->GetClan();
+            if( clan == NULL )
+                continue;
+            UInt32 clanId = clan->GetId();
+            Stream st(REQ::CLAN_BATTLE_PROCESS);
+            st<<static_cast<UInt8>(0x00);
+            st<<static_cast<UInt8>(force2clans.size());
+            for( auto iter = force2clans.begin(); iter != force2clans.end(); ++iter )
+            {
+                size_t offset = st.size();
+                UInt8 num = 0;
+                st<<static_cast<UInt8>(num);
+                std::vector<UInt32> vecClan = iter->second;
+                for( auto iterator = vecClan.begin(); iterator != vecClan.end(); ++iterator )
+                {
+                    if( (*iterator) == clanId )
+                        continue;
+                    GObject::Clan* clan = GObject::globalClan[(*iterator)];
+                    if( clan == NULL )
+                        continue;
+                    st<<clan->GetName();
+                    ++num;
+                }
+                st.data<UInt8>(offset) = num;
+            }
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
+    }
+
+    std::vector<UInt8> BattleGround::GetPreStartForces()
+    {
+        std::vector<UInt8> vecForce;
+        for( auto it = map2fighter.begin(); it != map2fighter.end(); ++it )
+        {
+            if( it->first != 0 )
+            {
+                vecForce.push_back(it->first);
+            }
+        }
+        return vecForce;
+
+    }
+
+
+    void BattleGround::SendBattleResultInfo()
+    {
+        UInt32 roomId = _id-_mapId;
+        Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        UInt8 ownforce = 0;
+        if( status != NULL )
+        { 
+            ownforce = status->GetCityOwnForce(_mapId);
+        }
+        for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
+        {
+            Stream st(REQ::CLAN_BATTLE_PROCESS);
+            st<<static_cast<UInt8>(0x01);
+            st<<static_cast<UInt8>(_mapId);
+            //参战之前有哪些势力
+            std::vector<UInt8> vecPreForce = GetPreStartForces();
+            st<<static_cast<UInt8>(vecPreForce.size());
+            for( auto iter = vecPreForce.begin(); iter != vecPreForce.end(); ++iter )
+            {
+                st<<static_cast<UInt8>(*iter);
+            }
+            //参战之后剩余那些势力
+            std::vector<UInt8> vecAfterForce;
+            GetAliveForce(vecAfterForce);
+            st<<static_cast<UInt8>(vecAfterForce.size());
+            for( auto iter = vecAfterForce.begin(); iter != vecAfterForce.end(); ++iter )
+            {
+                st<< static_cast<UInt8>(*iter);
+            }
+            st<<static_cast<UInt8>(ownforce);
+            st<<Stream::eos;
+            (*it)->send(st);
+        }
+    }
+
+
     //一回合的战术
     void BattleGround::FightOneRound()
     {
@@ -1240,13 +1345,15 @@ namespace Battle
         {
             preStart();  //
             _isFirstRound = false;
+            SendBattleEachInfo();
         }
         if( CheckIsStop() )
         {
             if( ! _isSetCapture )
             {
                 SetCaptureForce();
-                _isSetCapture=true;
+                SendBattleResultInfo();
+                _isSetCapture = true;
             }
             return;
         }
@@ -1326,6 +1433,14 @@ namespace Battle
 
         for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
         {
+            (*it)->send(st);
+        }
+
+        for( auto it = setPlayer.begin(); it != setPlayer.end(); ++it )
+        {
+            Stream st(REQ::CLAN_BATTLE_SELFINFO);
+            (*it)->GetSelfBattleInfo(st);
+            st<<Stream::eos;
             (*it)->send(st);
         }
     }
@@ -1434,6 +1549,7 @@ namespace Battle
                         }
                         if( listFighter.empty() )
                         {
+                            camp2fighters_copy.erase(it->first);
                             break;
                         }
                         BattleFighter* bf =  listFighter.front();
@@ -2023,6 +2139,8 @@ namespace Battle
             return;
         for( auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
         {
+            if( it->first == 0 )
+                continue;
             bool res = SomeCampIsAllDie(it->first);
             if( !res )
             {
@@ -2071,6 +2189,7 @@ namespace Battle
 
         }
     }
+
     void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl, UInt16 pos)
     { 
         static UInt8 map2Point[][7][2]= {

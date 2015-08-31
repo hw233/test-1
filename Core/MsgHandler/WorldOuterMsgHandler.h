@@ -21,6 +21,7 @@
 #include "Battle/Report2Id.h"
 #include "Battle/ClanBattleRoom.h"
 #include "Battle/ClanBattleCityStatus.h"
+#include "Battle/BattleManager.h"
 #include "GObject/World.h"
 
 #include <mysql.h>
@@ -422,9 +423,15 @@ void OnClanBattleReportList(GameMsgHdr& hdr, const void * data)
     if( !player )
         return;
     GObject::Clan* clan = player->GetClan();
+    if( clan == NULL )
+        return;
     UInt32 roomId = clan->GetClanBattleRoomId();
     std::vector<Battle::Report2Id*> vecReport = Battle::report2IdTable.GetReport2Ids(roomId);
+    if( vecReport.empty() )
+        return;
     Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
+    if( room == NULL )
+        return;
     std::vector<UInt8> vecforce = room->GetJoinForce();
     Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
     Stream st(REP::CLAN_BATTLE_REPORTList);
@@ -453,6 +460,52 @@ void OnClanBattleReportList(GameMsgHdr& hdr, const void * data)
             }
         }
     }
+    st<<Stream::eos;
+    player->send(st);
+}
+
+void OnClanBattleRank(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player)
+        return;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >>type;
+    GObject::Clan* clan = player->GetClan();
+    if( clan == NULL )
+        return;
+    UInt32 roomId = clan->GetClanBattleRoomId();
+    if( roomId == 0 )
+        return;
+    Stream st(REQ::CLAN_BATTLE_RANK);
+    Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
+    if( roomBattle == NULL )
+        return;
+    roomBattle->GetClanBattleRankInfo(type,st);
+    st<<Stream::eos;
+    player->send(st);
+
+}
+
+void OnClanBattleResultInfo(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player)
+        return;
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    GObject::Clan* clan = player->GetClan();
+    if( clan == NULL )
+        return;
+    UInt32 roomId = clan->GetClanBattleRoomId();
+    UInt8 forceId = clan->GetBattleForceId();
+    if( roomId == 0 )
+        return;
+    Stream st(REQ::CLAN_BATTLE_RESULTINFO);
+    Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
+    if( roomBattle == NULL )
+        return;
+    roomBattle->GetBattleResultInfo(forceId,st);
     st<<Stream::eos;
     player->send(st);
 }

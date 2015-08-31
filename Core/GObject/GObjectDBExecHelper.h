@@ -200,6 +200,22 @@ namespace GObject
         UInt8  cityId;
         UInt8  ownforce;
     };
+
+    struct DBConstantlyKill
+    {
+        UInt64 playerId;
+        UInt16 fighterId;
+        UInt16 killNum;
+    };
+
+    struct DBEndConstantlyKill
+    {
+        UInt64 playerId;
+        UInt16 fighterId;
+        UInt64 peerId;
+        UInt16 peerFighterId;
+        UInt16 endkillNum;
+    };
 }
 namespace DB
 {
@@ -431,6 +447,26 @@ namespace DB
         UInt8, battleId,
         UInt8, cityId,
         UInt8, ownforce
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBConstantlyKill)
+    SPECIALDEF(3)
+    (
+        UInt64, playerId,
+        UInt16, fighterId,
+        UInt16, killNum
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBEndConstantlyKill)
+    SPECIALDEF(5)
+    (
+        UInt64, playerId,
+        UInt16, fighterId,
+        UInt64, peerId,
+        UInt16, peerFighterId,
+        UInt16, endkillNum
     )
     SPECIALEND()
 }

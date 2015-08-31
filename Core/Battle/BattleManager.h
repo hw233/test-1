@@ -64,6 +64,43 @@ namespace Battle
         }
     };
 
+    struct MoreKill
+    {
+        bool operator () ( GObject::Player* player1,GObject::Player* player2)
+        {
+            if( player1->GetTotalKill() > player2->GetTotalKill() )
+            {
+                return true;
+            }
+            return false;
+        }
+
+    };
+
+    struct MoreConstantlyKill
+    {
+        bool operator () ( GObject::Player* player1,GObject::Player* player2)
+        {
+            if( player1->GetMaxConstantlyKill() > player2->GetMaxConstantlyKill() )
+            {
+                return true;
+            }
+            return false;
+        }
+    };
+
+    struct MoreEndConstantlyKill
+    {
+        bool operator () ( GObject::Player* player1,GObject::Player* player2)
+        {
+            if( player1->GetMaxEndConstantlyKill() > player2->GetMaxEndConstantlyKill() )
+            {
+                return true;
+            }
+            return false;
+        }
+    };
+
 
     class RoomBattle  //一个房间 管理一个战役的许多个城市
     {
@@ -83,7 +120,15 @@ namespace Battle
             void GivePlayerConstantlyKillAward();   //连杀奖励
             void GiveCaptureCityAward();            //占领城市多少的奖励
             void GiveClanBattleAward();            //公会战奖励
+            void GetClanBattleRankInfo(UInt8 type,Stream& st);
             void Settlement();
+            GObject::Player* GetMaxTotalKillPlayer();
+            void GetBattleResultInfo(UInt8 forceId,Stream& st);
+            UInt8 GetCaptureCitys();
+            UInt32 GetTotalLostFighterNum(UInt8 forceId);
+            UInt32 GetTotalKillFighterNum(UInt8 forceId);
+            GObject::Player* GetMaxEndConstantlyKillPlayer();
+            GObject::Player* GetMaxConstantlyKillPlayer();
         private:
             UInt32 roomId;
             std::vector<SingleBattle*> singleBattles;

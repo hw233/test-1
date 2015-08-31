@@ -4,6 +4,7 @@
 #include"ClanBattleComment.h"
 #include"Battle/Report2Id.h"
 #include"Battle/ClanBattleCityStatus.h"
+#include"GObject/Var.h"
 
 #include"MsgID.h"
 
@@ -196,6 +197,7 @@ namespace Battle
                 if( fgt == NULL )
                     return false;
                 UpdateMainFighterHP(roomId,mapId,x,y,fgt->GetHP());
+                player->SetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM,player->GetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM)+1);
             }
         }
         player->InsertClanBattleFighter(mapId,fighterId,x,y);
@@ -238,6 +240,17 @@ namespace Battle
             //删掉这个数据
             RemoveDistributeInfo(roomId,mapId,info);
             player->DelClanBattleFighter(mapId,fighterId,x,y);
+        }
+        Battle::RoomAllCityStatus* roomStatus = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
+        if( roomStatus != NULL )
+        {
+            if( roomStatus->GetStage() == 0 )
+            {
+                if( player->GetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM) > 1 )
+                {
+                    player->SetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM,player->GetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM)-1);
+                }
+            }
         }
         return true;
     }

@@ -38,6 +38,7 @@ namespace Battle
                 //force2clans.insert(pair<UInt8,std::vector<UInt32>>(forceId,clans));
             }
             std::vector<UInt32> GetAllyClans(UInt8 forceId) { return force2clans[forceId];}
+            std::vector<UInt32> GetEnemyClans(UInt8 forceId);
             void SetBuildTime(UInt32 time) { buildTime = time;}
             UInt32 GetBuildTime() const
             { 
@@ -48,6 +49,8 @@ namespace Battle
             bool IsFirstDay();
             std::vector<UInt32> GetJoinClan();
             std::vector<UInt8> GetJoinForce();
+            std::vector<GObject::Player*> GetJoinAllies(UInt8 forceId);
+            std::map<UInt8,std::vector<UInt32>> GetForce2Clans() { return force2clans;}
         private:
             UInt32 roomId;    //以创建者的军团id作为roomId
             UInt8  battleId;  //战役Id

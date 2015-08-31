@@ -50,6 +50,7 @@ namespace Battle
             void InsertReportOneRound(ReportOneRound* reportRound) { vecReportOneRound.push_back(reportRound);}
             ReportOneRound* GetEarliestReport();
             UInt32 GetEarliestTime();
+            ReportOneRound* GetNewestReport();
         private:
             UInt32 roomId;
             UInt8  cityId;

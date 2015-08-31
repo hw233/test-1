@@ -30,9 +30,7 @@ namespace Battle
     class RoomAllCityStatus
     {
         public:
-            RoomAllCityStatus(UInt32 rId,UInt8 bId) : roomId(rId) ,battleId(bId),stage(0) 
-            {
-            }
+            RoomAllCityStatus(UInt32 rId,UInt8 bId) : roomId(rId) ,battleId(bId),stage(0) {}
             void   Init();
             UInt32 GetRoomId() const { return roomId;}
             UInt8  GetBattleId() const { return battleId;}
@@ -46,6 +44,8 @@ namespace Battle
             bool  IsStop();
             std::set<UInt8> GetCanConfigure(UInt8 forceId);
             std::vector<UInt8> GetCaptureCitys(UInt8 forceId);
+            CityStatus* GetCityStatus(UInt8 cityId);
+            UInt8 GetCaptureCityNum();
         private:
             UInt32 roomId;
             UInt8 battleId;   //战役Id

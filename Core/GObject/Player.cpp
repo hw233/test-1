@@ -34,7 +34,7 @@ namespace GObject
 
 
     //GlobalNamedPlayers globalAccountsPlayers;
-    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),killSoldiersNum(0) , killFighterNum(0)
+    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),killSoldiersNum(0) , killFighterNum(0),beKilledFighterNum(0)
     {
         m_pVars = new VarSystem(id);
         m_Package = new Package(this); 
@@ -798,25 +798,49 @@ namespace GObject
         return NULL;
     }
 
-    void Player::AddConstantlyKill(UInt16 fighterId,UInt32 killCount)
+    void Player::AddConstantlyKill(UInt16 fighterId,UInt32 killCount,bool flag)
     {
         for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it)
         {
             if( (*it).fighterId == fighterId )
             {
                 (*it).killNum += killCount;
+                if( flag )
+                {
+                    DB7().PushUpdateData("update `constantly_kill` set `killNum` = %u where `playerId`= %" I64_FMT "u and `fighterId`=%u",(*it).killNum,GetId(),fighterId);
+                }
                 return ;
             }
         }
         //没找到的话
         vecConstantlyKill.push_back(ConstantlyKill(fighterId,killCount));
+        if( flag )
+        {
+            DB7().PushUpdateData("INSERT INTO `constantly_kill` (`playerId`,`fighterId`,`killNum`) VALUES(%" I64_FMT "u,%u,%u)",GetId(),fighterId,killCount);
+        }
     }
 
-    void Player::AddEndConstantlyKill(Player* pl,UInt16 fighterId,UInt32 killCount)
+    void Player::AddEndConstantlyKill(UInt16 id,Player* pl,UInt16 fighterId,UInt32 killCount,bool flag)
     {
          if( pl == NULL  || killCount <= 0 )
              return;
-         vecEndConstantlyKill.push_back(EndConstantlyKill(pl,fighterId,killCount));
+         for( auto it = vecEndConstantlyKill.begin(); it != vecEndConstantlyKill.end(); ++it )
+         {
+             if( (*it).selfFighterId == id && pl == (*it).player && (*it).fighterId == fighterId )
+             {
+                 (*it).endkillNum += killCount;
+                 if( flag )
+                 {
+                     DB7().PushUpdateData("update endconstantly_kill set `endkillNum` = %u where `playerId` =%" I64_FMT "u and  fighterId=%u and peerId=%" I64_FMT "u and `peerFighterId`=%u",(*it).endkillNum,GetId(),id,pl->GetId(),fighterId);
+                 }
+                 return;
+             }
+         }
+         vecEndConstantlyKill.push_back(EndConstantlyKill(id, pl,fighterId,killCount));
+         if( flag )
+         {
+             DB7().PushUpdateData("INSERT INTO `endconstantly_kill` (`fighterId`,`playerId`,`peerId`,`peerFighterId`,`endkillNum`) VALUES(%u,%" I64_FMT "u,%" I64_FMT "u,%u,%u)",id,GetId(),pl->GetId(),fighterId,killCount);
+         }
     }
 
 
@@ -833,12 +857,25 @@ namespace GObject
         return 0;
     }
 
+    UInt16 Player::GetMaxEndConstantlyKill()
+    {
+        UInt16 maxEndKill = 0;
+        for( auto it = vecEndConstantlyKill.begin(); it != vecEndConstantlyKill.end(); ++it)
+        {
+            if( (*it).endkillNum > maxEndKill )
+            {
+                maxEndKill = (*it).endkillNum;
+            }
+        }
+        return maxEndKill;
+    }
+
     void Player::GiveEndConstantlyKillAward()
     {
         UInt32 totalEndKillNum = 0;
         for( auto it = vecEndConstantlyKill.begin(); it != vecEndConstantlyKill.end(); ++it)
         {
-            UInt32 endKillNum = (*it).endKillNum;
+            UInt32 endKillNum = (*it).endkillNum;
             if( endKillNum == 0 )
                 continue;
             totalEndKillNum += endKillNum;
@@ -857,6 +894,21 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
+    }
+
+    
+    //获得最大连杀
+    UInt16 Player::GetMaxConstantlyKill()
+    {
+        UInt16 maxConstantlyKill = 0;
+        for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it)
+        {
+           if( (*it).killNum > maxConstantlyKill )
+           {
+               maxConstantlyKill = (*it).killNum;
+           }
+        }
+        return maxConstantlyKill;
     }
 
     void Player::GiveConstantlyKillAward()
@@ -890,6 +942,12 @@ namespace GObject
             globalMails.add(mail->GetId(), mail);
             AddMail(mail->GetId());
         }
+    }
+
+
+    UInt16 Player::GetTotalKill()
+    {
+        return (killSoldiersNum+killFighterNum);
     }
 
 
@@ -995,7 +1053,113 @@ namespace GObject
             return ;
         _ArenaLayout[index] = fighterId;
     } 
+    //某一战将杀敌将
+    void Player::AddKillFighter(UInt16 fighterId,UInt8 cityId,UInt16 killCount)
+    {
+        for( auto it = vecKillInfo.begin(); it != vecKillInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId && cityId == (*it).cityId )
+            {
+                (*it).killFighterNum += killCount;
+                return ;
+            }
+        }
+        vecKillInfo.push_back(KillInfo(fighterId,cityId,killCount,0));
+    }
+    //某一战将杀敌方士兵
+    void Player::AddKillSoldier(UInt16 fighterId,UInt8 cityId,UInt16 killCount)
+    {
+        for( auto it = vecKillInfo.begin(); it != vecKillInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId && cityId == (*it).cityId )
+            {
+                (*it).killSoldierNum += killCount;
+                return ;
+            }
+        }
+        vecKillInfo.push_back(KillInfo(fighterId,cityId,0,killCount));
+    }
 
+    UInt16 Player::GetKillFighter(UInt16 fighterId)
+    {
+        for( auto it = vecKillInfo.begin(); it != vecKillInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                return (*it).killFighterNum;
+            }
+        }
+        return 0;
+    }
+
+    UInt16 Player::GetKillSoldier(UInt16 fighterId)
+    {
+        for( auto it = vecKillInfo.begin(); it != vecKillInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                return (*it).killSoldierNum;
+            }
+        }
+        return 0;
+    }
+    
+    /*
+    KillInfo* Player::GetKillInfo(UInt8 fighterId)
+    {
+        for( auto it = vecKillInfo.begin(); it != vecKillInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                return (*it);
+            }
+        }
+        return NULL;
+    }
+    */
+
+    void Player::AddLoseInfo(UInt16 fighterId,Player* peer,UInt16 peerId)
+    {
+        for( auto it = vecLoseInfo.begin(); it != vecLoseInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                return ;
+            }
+        }
+        vecLoseInfo.push_back(LoseInfo(fighterId,peer,peerId));
+    }
+
+    LoseInfo* Player::GetLoseInfo(UInt16 fighterId)
+    {
+        for( auto it = vecLoseInfo.begin(); it != vecLoseInfo.end(); ++it )
+        {
+            if( (*it).fighterId == fighterId )
+            {
+                return (&(*it));
+            }
+        }
+        return NULL;
+    }
+
+    void Player::GetSelfBattleInfo(Stream& st)
+    {
+        st<<static_cast<UInt8>(vecKillInfo.size());
+        for( auto it = vecKillInfo.begin(); it != vecKillInfo.end(); ++it )
+        {
+            st<<static_cast<UInt16>((*it).fighterId);
+            st<<static_cast<UInt8>((*it).cityId);
+            st<<static_cast<UInt16>((*it).killFighterNum);
+            st<<static_cast<UInt16>((*it).killSoldierNum);
+        }
+        st<<static_cast<UInt8>(vecLoseInfo.size());
+        for( auto it = vecLoseInfo.begin(); it != vecLoseInfo.end(); ++it )
+        {
+            st<<static_cast<UInt16>((*it).fighterId);
+            st<<((*it).peer)->GetName();
+            st<<static_cast<UInt16>((*it).peerId);
+        }
+    }
     void Player::GetArenaInfo()
     { 
         

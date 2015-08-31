@@ -11,6 +11,7 @@ namespace GObject
 {
     class Player;
     class Clan;
+    class Var;
 }
 
 namespace GData

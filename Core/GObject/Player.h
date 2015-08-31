@@ -1,4 +1,3 @@
-
 #ifndef PLAYER_H_
 #define PLAYER_H_
 #include "GObjectManager.h"
@@ -96,10 +95,29 @@ namespace GObject
 
     struct EndConstantlyKill //终结连杀结构体
     {
-        EndConstantlyKill(GObject::Player* pl,UInt16 id,UInt32 num) :player(pl),fighterId(id),endKillNum(num) {}
+        EndConstantlyKill(UInt16 sId, GObject::Player* pl,UInt16 id,UInt32 num) :selfFighterId(sId), player(pl),fighterId(id),endkillNum(num) {}
+        UInt16 selfFighterId; //己方的战将
         Player* player;      //终结的那个玩家
         UInt16 fighterId;    //哪个将
-        UInt32 endKillNum;   //终结了对方的几连杀
+        UInt32 endkillNum;   //终结了对方的几连杀
+    };
+
+
+    struct KillInfo
+    {
+        KillInfo(UInt16 id,UInt8 cId,UInt16 fnum,UInt16 snum) : fighterId(id),cityId(cId),killFighterNum(fnum),killSoldierNum(snum){}
+        UInt16 fighterId;
+        UInt8 cityId;
+        UInt16 killFighterNum;
+        UInt16 killSoldierNum;
+    };
+
+    struct LoseInfo
+    {
+        LoseInfo(UInt16 id,Player* pl,UInt16 pId) : fighterId(id),peer(pl),peerId(pId){}
+        UInt16 fighterId;
+        Player* peer;
+        UInt16 peerId;
     };
 
     class VarSystem;
@@ -302,11 +320,27 @@ namespace GObject
             UInt32 GetKillSoldiersNum() const { return killSoldiersNum;}
             void AddKillSoldiersNum(UInt32 killCount) { killSoldiersNum+=killCount;}
 
-            void AddConstantlyKill(UInt16 fighterId,UInt32 killCount);   //增加连续击杀的数量
+            void AddConstantlyKill(UInt16 fighterId,UInt32 killCount,bool flag = false);   //增加连续击杀的数量
             UInt32 GetConstantlyKill(UInt16 fighterId);
 
-            void AddEndConstantlyKill(Player* pl,UInt16 fighterId,UInt32 killCount);
+            void AddEndConstantlyKill(UInt16 id, Player* pl,UInt16 fighterId,UInt32 killCount,bool flag = false);
             void GiveEndConstantlyKillAward();
+            UInt16 GetMaxEndConstantlyKill();
+            UInt16 GetMaxConstantlyKill();
+            UInt16 GetTotalKill(); // 杀士兵和战将总数  
+            void AddBeKilledFighterNum() { beKilledFighterNum += 1;}
+            UInt32 GetBeKilledFighterNum() const { return beKilledFighterNum;}
+           
+            //某一战将杀敌将
+            void AddKillFighter(UInt16 fighterId,UInt8 cityId,UInt16 killCount);
+            //某一战将杀敌方士兵
+            void AddKillSoldier(UInt16 fighterId,UInt8 cityId,UInt16 killCount);
+            UInt16 GetKillFighter(UInt16 fighterId);
+            UInt16 GetKillSoldier(UInt16 fighterId);
+
+            //被敌方的哪个玩家的哪个将击败 
+            void AddLoseInfo(UInt16 fighterId,Player* peer,UInt16 peerId);
+            LoseInfo * GetLoseInfo(UInt16 fighterId);
 
             void GiveConstantlyKillAward();
 
@@ -323,6 +357,7 @@ namespace GObject
 
             std::map<UInt8,UInt16> GetArenaDefendLayout();
             void SetArenaDefendLayout(UInt8 index, UInt16 fighterId);
+            void GetSelfBattleInfo(Stream& st);
 
             void GetArenaInfo();
             void AttackArenaPos(UInt16 targetPos);
@@ -375,6 +410,8 @@ namespace GObject
             UInt32 killSoldiersNum;     //军团战击杀敌军人数(小兵)
             UInt32 killFighterNum; //军团战击杀敌将数量(主将)
 
+            UInt32 beKilledFighterNum; //被杀的战将数量
+
             std::vector<ConstantlyKill> vecConstantlyKill;
             std::vector<EndConstantlyKill> vecEndConstantlyKill;
 
@@ -382,6 +419,9 @@ namespace GObject
 
             std::map<UInt8 , UInt16> _ArenaLayout;
             std::map<UInt8 , UInt16> _ArenaDefendLayout;
+
+            std::vector<KillInfo> vecKillInfo;
+            std::vector<LoseInfo> vecLoseInfo;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

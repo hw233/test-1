@@ -81,7 +81,7 @@ namespace GObject
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //GMHandler::Battle(1,2);
-        GMHandler::Battle(1001,1014);
+        //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1004,1005,2);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //std::vector<UInt8> *r = Battle::battleReport0[142];
@@ -245,8 +245,10 @@ namespace GObject
                     }
                     /*策划所谓的野怪入场 从配置中读取该地图上的野怪信息*/
                     /* 如果该处有玩家布置的战将  则不放入野怪*/
-                    if( status->GetCityOwnForce(mapId) != 0 )
+                    if( status->GetCityOwnForce(mapId) == 0 )
                     {
+                        std::cout<<" roomId "<<static_cast<UInt32>(roomId)<<std::endl;
+                        std::cout<<"cityId is   "<<static_cast<UInt32>(mapId)<<" 这个城还没有被占领,  放野怪进行干扰  "<<std::endl;
                         GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
                         std::vector<GData::NpcInfo> vecNpcInfo = mapInfo->GetNpcInfo();
                         for( auto iterator = vecNpcInfo.begin(); iterator != vecNpcInfo.end(); ++iterator)
@@ -347,11 +349,12 @@ namespace GObject
             {
                 std::cout<<"处于结算阶段  开始发奖励啦"<<std::endl;
                 roomBattle->Settlement();
-                Battle::battleManager.removeRoomBattle(roomId);
+                //Battle::battleManager.removeRoomBattle(roomId);
             }
         }
     }
-static bool init = false;
+
+    static bool init = false;
     inline bool player_enum_rc(GObject::Player *pl,int)
     { 
         UInt32 pos = pl->GetVar(VAR_ARENA_POS) ;
@@ -361,6 +364,7 @@ static bool init = false;
             if(!p)
                 World::arenaSort[pos] = pl;
         } 
+        return true;
     } 
     void World::InitRank()
     { 
@@ -370,6 +374,9 @@ static bool init = false;
         GObject::globalPlayers.enumerate(player_enum_rc, 0);
         init = true;
     } 
+
+
+
     void World::World_Send_Arena_Award( World * world )
     { 
         InitRank();

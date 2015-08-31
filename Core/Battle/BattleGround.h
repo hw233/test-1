@@ -7,6 +7,7 @@
 #include "Server/OidGenerator.h"
 #include "GObject/AStar.h"
 #define GROUND_LENGTH 20
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -253,6 +254,9 @@ namespace Battle
             void  SetCaptureForce();
             UInt8 GetCaptureId();
             void  GetAliveForce(std::vector<UInt8> &vecForce);
+            void  SendBattleEachInfo();
+            std::vector<UInt8> GetPreStartForces();
+            void  SendBattleResultInfo();
 
             void AutoEnterFighters(UInt8 index, GObject::Player *pl, UInt16 pos = 0);
         private:
