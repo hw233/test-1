@@ -1389,7 +1389,7 @@ namespace Battle
                 }
                 else
                 {
-                    std::list<BattleFighter*> listFighter = camp2fighters_copy[it->first];
+                    std::list<BattleFighter*> listFighter = it->second;
                     while( listFighter.front() == NULL || ( listFighter.front() != NULL && listFighter.front()->getHP() <= 0 ))
                     {
                         listFighter.pop_front();
