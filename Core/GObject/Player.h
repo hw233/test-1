@@ -111,13 +111,15 @@ namespace GObject
         UInt16 killFighterNum;
         UInt16 killSoldierNum;
     };
+    
 
+    //自己的哪个战将被敌方战将击败
     struct LoseInfo
     {
         LoseInfo(UInt16 id,Player* pl,UInt16 pId) : fighterId(id),peer(pl),peerId(pId){}
-        UInt16 fighterId;
-        Player* peer;
-        UInt16 peerId;
+        UInt16 fighterId;//自己的战将
+        Player* peer;   //敌方玩家
+        UInt16 peerId;  //敌方战将
     };
 
     class VarSystem;

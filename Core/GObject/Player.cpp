@@ -1120,6 +1120,8 @@ namespace GObject
 
     void Player::AddLoseInfo(UInt16 fighterId,Player* peer,UInt16 peerId)
     {
+        if( peer == NULL )
+            return ;
         for( auto it = vecLoseInfo.begin(); it != vecLoseInfo.end(); ++it )
         {
             if( (*it).fighterId == fighterId )
