@@ -240,8 +240,14 @@ namespace GObject
                         UInt8  posy = (*iterator)->GetPosY();
                         GObject::Player* player = GObject::globalPlayers[playerId];
                         if( player == NULL )
-                            continue;
-                        singleBattle->EnterBattleGround(player,fighterId,posx,posy);
+                        {
+
+                            singleBattle->NpcEnterBattleGround(0,fighterId,posx,posy);
+                        }
+                        else
+                        {
+                            singleBattle->EnterBattleGround(player,fighterId,posx,posy);
+                        }
                     }
                     /*策划所谓的野怪入场 从配置中读取该地图上的野怪信息*/
                     /* 如果该处有玩家布置的战将  则不放入野怪*/
