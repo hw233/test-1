@@ -1302,7 +1302,7 @@ namespace Battle
 
     void BattleGround::SendBattleResultInfo()
     {
-        UInt8 roomId = _id-_mapId;
+        UInt32 roomId = _id-_mapId;
         Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
         UInt8 ownforce = 0;
         if( status != NULL )
@@ -2225,7 +2225,7 @@ namespace Battle
             UInt8 front = GetFrontFromPos(pos);
             for(UInt8 i = 0; i < 7; ++i)
             { 
-                if(it == _st.begin())
+                if(it == _set.begin())
                     continue;
                 if(!(front & (1 << i)))
                 {

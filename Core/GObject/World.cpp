@@ -81,7 +81,7 @@ namespace GObject
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //GMHandler::Battle(1,2);
-        GMHandler::Battle(1001,1014);
+        //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1004,1005,2);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //std::vector<UInt8> *r = Battle::battleReport0[142];
@@ -353,6 +353,7 @@ namespace GObject
             }
         }
     }
+
     static bool init = false;
     inline bool player_enum_rc(GObject::Player *pl,int)
     { 
@@ -373,6 +374,9 @@ namespace GObject
         GObject::globalPlayers.enumerate(player_enum_rc, 0);
         init = true;
     } 
+
+
+
     void World::World_Send_Arena_Award( World * world )
     { 
         InitRank();
