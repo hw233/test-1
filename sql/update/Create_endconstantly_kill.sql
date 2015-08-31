@@ -1,4 +1,4 @@
-OP TABLE IF EXISTS `endconstantly_kill`; 
+DROP TABLE IF EXISTS `endconstantly_kill`; 
 CREATE TABLE `endconstantly_kill` (
     `playerId` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '玩家Id',
     `fighterId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '自己的战将id',
