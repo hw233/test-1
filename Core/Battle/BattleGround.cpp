@@ -293,8 +293,8 @@ namespace Battle
 
     void BattleGround::SyncHp(Battle::BattleFighter* bft,UInt8 x,UInt8 y)
     {
-        if( bft == NULL || bft->GetOwner() == NULL )
-            return;
+        //if( bft == NULL || bft->GetOwner() == NULL )
+        //    return;
         Battle::battleDistribute.UpdateMainFighterHP(_roomId,_mapId,x,y,bft->getHP());
         std::vector<UInt32> vecHP;
         for( UInt8 i = 0 ; i < 10 ; ++i )
@@ -1168,18 +1168,21 @@ namespace Battle
         std::cout << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
 
         //设置主将及小兵的血量( 非npc )
-        if( fgt->GetOwner() != NULL )
+        //if( fgt->GetOwner() != NULL )
         {
             UInt32 roomId = _roomId;
             Battle::DistributeInfo* info =Battle::battleDistribute.GetDistributeInfo(roomId,_mapId,x,y);
-            UInt32 mainFighterHP = info->GetMainFighterHP();
-            bf->setHP(mainFighterHP);
-            std::vector<UInt32> vecHP = info->GetSoldiersHP();
-            UInt8 index = 0;
-            for( auto it = vecHP.begin(); it != vecHP.end(); ++it )
+            if( info != NULL )
             {
-                bf->SetSoldierHp(index,(*it));
-                ++index;
+                UInt32 mainFighterHP = info->GetMainFighterHP();
+                bf->setHP(mainFighterHP);
+                std::vector<UInt32> vecHP = info->GetSoldiersHP();
+                UInt8 index = 0;
+                for( auto it = vecHP.begin(); it != vecHP.end(); ++it )
+                {
+                    bf->SetSoldierHp(index,(*it));
+                    ++index;
+                }
             }
         }
         return bf;
