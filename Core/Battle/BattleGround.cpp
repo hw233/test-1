@@ -78,7 +78,7 @@ namespace Battle
         memset(_mapFighters,0,sizeof(BattleObject*)*_x*_y);
         //memset(_mapFlag,0,sizeof(UInt8)*_x*_y);
         //
-        Battle::Report2Id* report2id = Battle::report2IdTable.GetReport2Id(_id-_mapId,_mapId);
+        Battle::Report2Id* report2id = Battle::report2IdTable.GetReport2Id(_roomId,_mapId);
         if( report2id == NULL )
         {
             _actId = 0;
@@ -295,14 +295,14 @@ namespace Battle
     {
         if( bft == NULL || bft->GetOwner() == NULL )
             return;
-        Battle::battleDistribute.UpdateMainFighterHP(_id-_mapId,_mapId,x,y,bft->getHP());
+        Battle::battleDistribute.UpdateMainFighterHP(_roomId,_mapId,x,y,bft->getHP());
         std::vector<UInt32> vecHP;
         for( UInt8 i = 0 ; i < 10 ; ++i )
         {
             UInt32 hp = bft->GetSoldierHp(i);
             vecHP.push_back(hp);
         }
-        Battle::battleDistribute.UpdateSoldiersHP(_id-_mapId,_mapId,x,y,vecHP);
+        Battle::battleDistribute.UpdateSoldiersHP(_roomId,_mapId,x,y,vecHP);
     }
 
 
@@ -346,7 +346,7 @@ namespace Battle
                 {
                     if( _mapCamp[mx+my*_x] != 5 )
                     {
-                        Battle::battleDistribute.MoveNpc(_id-_mapId,_mapId,currentBf->GetId(),x,y,mx,my);
+                        Battle::battleDistribute.MoveNpc(_roomId,_mapId,currentBf->GetId(),x,y,mx,my);
                         SyncHp(currentBf,mx,my);
                     }
                 }
@@ -427,7 +427,7 @@ namespace Battle
                 {
                     if( _mapCamp[ax+ay*_x] != 5 )
                     {
-                        Battle::battleDistribute.MoveNpc(_id-_mapId,_mapId,currentBf->GetId(),x,y,ax,ay);
+                        Battle::battleDistribute.MoveNpc(_roomId,_mapId,currentBf->GetId(),x,y,ax,ay);
                         SyncHp(currentBf,ax,ay);
                     }
                 }
@@ -531,7 +531,7 @@ namespace Battle
                 {
                     if( _mapCamp[cx+cy*_x] != 5 )
                     {
-                        Battle::battleDistribute.RemoveNpc(_id-_mapId,_mapId,x,y);
+                        Battle::battleDistribute.RemoveNpc(_roomId,_mapId,x,y);
                     }
                 }
             }
@@ -570,7 +570,7 @@ namespace Battle
                 {
                     if( _mapCamp[bx+by*_x] != 5 )
                     {
-                        Battle::battleDistribute.RemoveNpc(_id-_mapId,_mapId,bx,by);
+                        Battle::battleDistribute.RemoveNpc(_roomId,_mapId,bx,by);
                     }
                 }
 
@@ -1170,7 +1170,7 @@ namespace Battle
         //设置主将及小兵的血量( 非npc )
         if( fgt->GetOwner() != NULL )
         {
-            UInt32 roomId = _id-_mapId;
+            UInt32 roomId = _roomId;
             Battle::DistributeInfo* info =Battle::battleDistribute.GetDistributeInfo(roomId,_mapId,x,y);
             UInt32 mainFighterHP = info->GetMainFighterHP();
             bf->setHP(mainFighterHP);
@@ -1247,7 +1247,7 @@ namespace Battle
 
     void BattleGround::SendBattleEachInfo()
     {
-        UInt32 roomId = _id-_mapId;
+        UInt32 roomId = _roomId;
         Battle::ClanBattleRoom* room = Battle::clanBattleRoomManager.GetBattleRoom(roomId);
         if( room == NULL )
             return ;
@@ -1302,7 +1302,7 @@ namespace Battle
 
     void BattleGround::SendBattleResultInfo()
     {
-        UInt32 roomId = _id-_mapId;
+        UInt32 roomId = _roomId;
         Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
         UInt8 ownforce = 0;
         if( status != NULL )
@@ -1421,8 +1421,8 @@ namespace Battle
         UInt32 battleId = IDGenerator::gBattleOidGenerator0.ID();
         std::cout<<" ****************************************************************该战术战报Id为  "<<static_cast<UInt32>(battleId)<<endl;
         battleReport0.addReport(/*_battleNum*/ battleId,_pack);
-        report2IdTable.Insert(_id-_mapId,_mapId,_actId,/*_battleNum*/ battleId,now);
-        DB7().PushUpdateData("REPLACE INTO `report2id` value(%u,%u,%u,%u,%u)",_id-_mapId,_mapId,_actId, /*_battleNum*/battleId,now);
+        report2IdTable.Insert(_roomId,_mapId,_actId,/*_battleNum*/ battleId,now);
+        DB7().PushUpdateData("REPLACE INTO `report2id` value(%u,%u,%u,%u,%u)",_roomId,_mapId,_actId, /*_battleNum*/battleId,now);
 
 
         Stream st(0xA6);
@@ -1900,7 +1900,7 @@ namespace Battle
             return;
         map2fighter[forceId].push_back(new FighterInfo(player,fighterId,x,y));
 
-        player->SetBattleId(_id);
+        player->SetBattleId(_roomId+_mapId);
         player->SetBattleSide(forceId);
 
         setPlayer.insert(player);
@@ -2174,7 +2174,7 @@ namespace Battle
         if( camp2fighters.empty() )
             return;
         //先获得城市的原来拥有者
-        UInt32 roomId = _id-_mapId;
+        UInt32 roomId = _roomId;
         Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
         if( status == NULL )
             return;

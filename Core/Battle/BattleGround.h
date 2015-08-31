@@ -113,7 +113,7 @@ namespace Battle
     class BattleGround
     {
         public:
-            BattleGround(UInt32 id , UInt8 mapId):_id(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID()),_actId(0),_isFirstRound(true),_oneRoundCostTime(0),_isSetCapture(false)
+            BattleGround(UInt32 id , UInt8 mapId):_roomId(id),_maxID(0),_battleNum(IDGenerator::gBattleOidGenerator0.ID()),_actId(0),_isFirstRound(true),_oneRoundCostTime(0),_isSetCapture(false)
             {
                 //map_player.clear();
                 currentBf = NULL;
@@ -260,7 +260,7 @@ namespace Battle
 
             void AutoEnterFighters(UInt8 index, GObject::Player *pl, UInt16 pos = 0);
         private:
-            UInt32 _id;
+            UInt32 _roomId;   //房间id  没有的话 就默认就是0
             UInt8 _x;
             UInt8 _y;
             UInt8 _mapId;

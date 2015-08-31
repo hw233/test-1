@@ -21,7 +21,7 @@ namespace Battle
     SingleBattle::SingleBattle(UInt32 battleId,UInt8 mapId,UInt8 limit = 4): nextStartTime(0)
     {
         //FastMutex::ScopedLock lk(_mutex);
-        battleId = battleId + mapId;
+        //battleId = battleId + mapId;
         ground = new BattleGround(battleId,mapId);
     }
 
