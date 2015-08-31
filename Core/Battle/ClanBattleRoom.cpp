@@ -206,7 +206,7 @@ namespace Battle
                 //获得房间中人数最少的势力
                 UInt8 i = 1;
                 UInt8 theMinNum = 0xFF;  //人数最少的势力
-                UInt8 minForce = 1 ;    
+                UInt8 minForce = 0xFF;    
                 for( auto it = vecForce.begin(); it != vecForce.end(); ++it)
                 {
                     UInt8 forceId = (*it);
@@ -215,6 +215,7 @@ namespace Battle
                         theMinNum = room->GetNum(forceId);
                         minForce = i;
                     }
+                    ++i;
                 }
                 if( theMinNum >= playermax )
                 {

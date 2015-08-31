@@ -200,7 +200,7 @@ namespace GObject
     void Player::Login()
     { 
         //TODO
-        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,"20001,20",0,static_cast<UInt32>(-1));
+        Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,"1,1",0,static_cast<UInt32>(-1));
         if(mail)
         { 
             globalMails.add(mail->GetId(), mail);

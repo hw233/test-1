@@ -31,7 +31,14 @@ namespace Battle
             { 
                 force2num.insert(pair<UInt8,UInt32>(forceId,num));
             }
-            UInt32 GetNum(UInt8 forceId) { return force2num[forceId];}
+            UInt32 GetNum(UInt8 forceId) 
+            {
+                if( !force2num[forceId] )
+                {
+                    return 0;
+                }
+                return force2num[forceId];
+            }
             void InsertClans(UInt8 forceId,std::vector<UInt32>clans) 
             { 
                 force2clans[forceId] = clans;
