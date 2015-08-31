@@ -2106,7 +2106,7 @@ namespace Battle
             UInt8 front = GetFrontFromPos(pos);
             for(UInt8 i = 0; i < 7; ++i)
             { 
-                if(it == _st.begin())
+                if(it == _set.begin())
                     continue;
                 if(!(front & (1 << i)))
                 {
