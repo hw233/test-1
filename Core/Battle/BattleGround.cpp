@@ -1390,7 +1390,7 @@ namespace Battle
                 else
                 {
                     std::list<BattleFighter*> listFighter = it->second;
-                    while( listFighter.front() == NULL || ( listFighter.front() != NULL && listFighter.front()->getHP() <= 0 ))
+                    while(    listFighter.front() == NULL || ( listFighter.front() != NULL && listFighter.front()->getHP() <= 0 ))
                     {
                         listFighter.pop_front();
                     }

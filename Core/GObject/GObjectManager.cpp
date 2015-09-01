@@ -137,6 +137,7 @@ namespace GObject
             fprintf(stderr, "load city status error!\n");
             std::abort();
         }
+        /*
         if( !loadConstantlyKill() )
         {
             fprintf(stderr, "load city loadConstantlyKill error!\n");
@@ -147,6 +148,7 @@ namespace GObject
             fprintf(stderr, "load EndConstantlyKill error!\n");
             std::abort();
         }
+        */
     } 
 
     bool GObjectManager::loadAllPlayers()
@@ -659,6 +661,8 @@ namespace GObject
         lc.finalize();
         return true;
     }
+
+    /*
     bool GObjectManager::loadConstantlyKill()
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -703,6 +707,7 @@ namespace GObject
         lc.finalize();
         return true;
     }
+    */
     //关于equipment的提取，
     /*
        ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )

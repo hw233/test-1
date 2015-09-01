@@ -67,7 +67,7 @@ namespace Battle
         }
         else
         {
-            newStage = 3;
+            newStage = 0;
         }
 
         if( newStage != stage )

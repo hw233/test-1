@@ -805,6 +805,10 @@ namespace GObject
             if( (*it).fighterId == fighterId )
             {
                 (*it).killNum += killCount;
+                 if( (*it).killNum > GetVar(VAR_MAX_ENDCONSTANTLYKILL) )
+                 {
+                     SetVar(VAR_MAX_CONSTANTLYKILL,(*it).killNum);
+                 }
                 /*
                 if( flag )
                 {
@@ -816,6 +820,10 @@ namespace GObject
         }
         //没找到的话
         vecConstantlyKill.push_back(ConstantlyKill(fighterId,killCount));
+        if( killCount > GetVar(VAR_MAX_ENDCONSTANTLYKILL) )
+        {
+            SetVar(VAR_MAX_CONSTANTLYKILL,killCount);
+        }
         /*
         if( flag )
         {
@@ -876,7 +884,8 @@ namespace GObject
 
     UInt16 Player::GetMaxEndConstantlyKill()
     {
-        UInt16 maxEndKill = 0;
+        UInt16 maxEndKill = GetVar(VAR_MAX_ENDCONSTANTLYKILL);
+        /*
         for( auto it = vecEndConstantlyKill.begin(); it != vecEndConstantlyKill.end(); ++it)
         {
             if( (*it).endkillNum > maxEndKill )
@@ -884,6 +893,7 @@ namespace GObject
                 maxEndKill = (*it).endkillNum;
             }
         }
+        */
         return maxEndKill;
     }
 
@@ -917,7 +927,8 @@ namespace GObject
     //获得最大连杀
     UInt16 Player::GetMaxConstantlyKill()
     {
-        UInt16 maxConstantlyKill = 0;
+        UInt16 maxConstantlyKill = GetVar(VAR_MAX_CONSTANTLYKILL);
+        /*
         for( auto it = vecConstantlyKill.begin(); it != vecConstantlyKill.end(); ++it)
         {
            if( (*it).killNum > maxConstantlyKill )
@@ -925,6 +936,7 @@ namespace GObject
                maxConstantlyKill = (*it).killNum;
            }
         }
+        */
         return maxConstantlyKill;
     }
 
