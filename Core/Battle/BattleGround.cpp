@@ -1393,6 +1393,8 @@ namespace Battle
                     while(    listFighter.front() == NULL || ( listFighter.front() != NULL && listFighter.front()->getHP() <= 0 ))
                     {
                         listFighter.pop_front();
+                        if(listFighter.empty())
+                            break;
                     }
                     if( listFighter.empty() )
                     {

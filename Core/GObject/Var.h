@@ -55,6 +55,7 @@ namespace GObject
         VAR_ARENA_RAND = 25, //竞技场随机选择
         VAR_ARENA_TIME = 26, //竞技场时间
         VAR_ARENA_COUNT = 27, //竞技场次数
+        VAR_ARENA_MONEY = 27, //竞技场货币
 
         //武装
         VAR_0_WALK_ENCHANT = 30,    //步兵强化值
@@ -189,6 +190,7 @@ namespace GObject
                 REGISTER_VAR(VAR_CLANBATTLE_FIGHTERNUM,CYCLE_WEEK);
                 REGISTER_VAR(VAR_ARENA_POS,CYCLE_NONE);
                 REGISTER_VAR(VAR_ARENA_RAND,CYCLE_NONE);
+                REGISTER_VAR(VAR_ARENA_MONEY,CYCLE_NONE);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);
