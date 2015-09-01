@@ -131,6 +131,8 @@ namespace GObject
 
         /*公会战战场放将的数量*/
         VAR_CLANBATTLE_FIGHTERNUM = 90, 
+        VAR_MAX_CONSTANTLYKILL  = 91,   //公会战最大连杀数
+        VAR_MAX_ENDCONSTANTLYKILL = 92, //公会战最大终结连杀数量
 
         VAR_MAX
     };
