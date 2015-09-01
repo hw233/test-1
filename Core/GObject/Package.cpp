@@ -112,9 +112,18 @@ namespace GObject
     { 
         if( num == 0 )
             return NULL;
-        if( typeId >= 20001 &&  typeId <= 20002 )
+        if( typeId >= 20001 &&  typeId <= 20003 )
         {
-            m_Owner->AddMoney(typeId-20000,num);
+            switch(typeId)
+            { 
+                case 20001:
+                case 20002:
+                    m_Owner->AddMoney(typeId-20000,num);
+                    break;
+                case 20003:
+                    m_Owner->AddVar(VAR_ARENA_MONEY,num);
+                    break;
+            } 
             return NULL;
         }
         ItemBase* item = m_Items[ItemKey(typeId, bind)];
