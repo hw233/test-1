@@ -1407,6 +1407,11 @@ namespace Battle
                     currentBf = bf;
                     Move();
                     listFighter.pop_front();
+                    if( listFighter.empty() )
+                    {
+                        camp2fighters_copy.erase(it->first);
+                        break;
+                    }
                     camp2fighters_copy[it->first] = listFighter;
                     ++actCount;
                 }

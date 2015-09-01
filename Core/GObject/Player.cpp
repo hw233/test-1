@@ -805,19 +805,23 @@ namespace GObject
             if( (*it).fighterId == fighterId )
             {
                 (*it).killNum += killCount;
+                /*
                 if( flag )
                 {
                     DB7().PushUpdateData("update `constantly_kill` set `killNum` = %u where `playerId`= %" I64_FMT "u and `fighterId`=%u",(*it).killNum,GetId(),fighterId);
                 }
+                */
                 return ;
             }
         }
         //没找到的话
         vecConstantlyKill.push_back(ConstantlyKill(fighterId,killCount));
+        /*
         if( flag )
         {
             DB7().PushUpdateData("INSERT INTO `constantly_kill` (`playerId`,`fighterId`,`killNum`) VALUES(%" I64_FMT "u,%u,%u)",GetId(),fighterId,killCount);
         }
+        */
     }
 
     void Player::AddEndConstantlyKill(UInt16 id,Player* pl,UInt16 fighterId,UInt32 killCount,bool flag)
@@ -829,18 +833,31 @@ namespace GObject
              if( (*it).selfFighterId == id && pl == (*it).player && (*it).fighterId == fighterId )
              {
                  (*it).endkillNum += killCount;
+                 if( (*it).endkillNum > GetVar(VAR_MAX_ENDCONSTANTLYKILL) )
+                 {
+                     SetVar(VAR_MAX_ENDCONSTANTLYKILL,(*it).endkillNum);
+                 }
+                 /*
                  if( flag )
                  {
                      DB7().PushUpdateData("update endconstantly_kill set `endkillNum` = %u where `playerId` =%" I64_FMT "u and  fighterId=%u and peerId=%" I64_FMT "u and `peerFighterId`=%u",(*it).endkillNum,GetId(),id,pl->GetId(),fighterId);
                  }
+                 */
                  return;
              }
          }
+
          vecEndConstantlyKill.push_back(EndConstantlyKill(id, pl,fighterId,killCount));
+         if( killCount > GetVar(VAR_MAX_ENDCONSTANTLYKILL) )
+         {
+             SetVar(VAR_MAX_ENDCONSTANTLYKILL,killCount);
+         }
+         /*
          if( flag )
          {
              DB7().PushUpdateData("INSERT INTO `endconstantly_kill` (`fighterId`,`playerId`,`peerId`,`peerFighterId`,`endkillNum`) VALUES(%u,%" I64_FMT "u,%" I64_FMT "u,%u,%u)",id,GetId(),pl->GetId(),fighterId,killCount);
          }
+         */
     }
 
 
@@ -1052,7 +1069,9 @@ namespace GObject
         if(index >= 7)
             return ;
         _ArenaLayout[index] = fighterId;
-    } 
+    }
+
+
     //某一战将杀敌将
     void Player::AddKillFighter(UInt16 fighterId,UInt8 cityId,UInt16 killCount)
     {
@@ -1066,6 +1085,8 @@ namespace GObject
         }
         vecKillInfo.push_back(KillInfo(fighterId,cityId,killCount,0));
     }
+
+
     //某一战将杀敌方士兵
     void Player::AddKillSoldier(UInt16 fighterId,UInt8 cityId,UInt16 killCount)
     {
@@ -1251,6 +1272,7 @@ namespace GObject
         st << Stream::eos;
         send(st);
     } 
+
     UInt8 Player::ClearArenaCD()
     { 
         UInt32 time = GetVar(VAR_ARENA_TIME);
