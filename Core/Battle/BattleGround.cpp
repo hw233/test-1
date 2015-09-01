@@ -1400,12 +1400,12 @@ namespace Battle
                         break;
                     }
                     BattleFighter* bf =  listFighter.front();
-                    if( bf == NULL )
+                    if( bf != NULL )
                     {
-                        break;
+                        currentBf = bf;
+                        Move();
+                        ++actCount;
                     }
-                    currentBf = bf;
-                    Move();
                     listFighter.pop_front();
                     if( listFighter.empty() )
                     {
@@ -1413,7 +1413,6 @@ namespace Battle
                         break;
                     }
                     camp2fighters_copy[it->first] = listFighter;
-                    ++actCount;
                 }
             }
         }
