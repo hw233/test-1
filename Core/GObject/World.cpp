@@ -404,6 +404,8 @@ namespace GObject
         { 
             UInt16 pos = it->first;
             GObject::Player* pl = it->second;
+            if(!pl)
+                continue;
             UInt8 index = 0;
 
             if(!pos)

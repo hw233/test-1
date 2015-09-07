@@ -16,30 +16,16 @@
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
 #include<math.h>
+#define MAXPOS 6
 namespace Battle
 {
 
     inline UInt8 GetFrontFromPos(UInt16 pos)
     { 
         UInt8 res = 0;
-        pos %= 21;
-        for(UInt8 i = 6; i >= 1; --i)
-        { 
-           if(pos < i) 
-           { 
-               res |= ( 1 << (6-i));
-               for(UInt8 j = i-1 ; j >= 0; --j)
-               {
-                   if(pos < i) 
-                   {    
-                       res |= ( 1 << (6-i));
-                       res |= (1 << (7-i+pos));
-                       return res; 
-                   }    
-               }
-           } 
-           pos -= i;
-        } 
+        pos %= MAXPOS;
+        
+        res |= (1 << pos);
     } 
     void BattleGround::InitMapFight(UInt8 mapId)   
     { 
@@ -2164,6 +2150,12 @@ namespace Battle
     {
         std::vector<UInt8> vecAliveForce;
         GetAliveForce(vecAliveForce);
+        if(GetIsNPC())
+        {
+            ClearArenaPos(); 
+            SetIsNPC(false);
+        }
+
         if( vecAliveForce.empty() )  //都死光了
         {
             return 0;
@@ -2238,6 +2230,10 @@ namespace Battle
                     continue;
                 if(!(front & (1 << i)))
                 {
+                    GObject::Fighter* ft = GObject::globalFighters[*it];
+                    if(!ft)
+                        continue;
+                    ft->SetArenaPos(pos);
                     _map[i]= *it;
                     it++;
                 }
@@ -2246,8 +2242,24 @@ namespace Battle
 
         for(auto it = _map.begin(); it != _map.end(); ++it)
         { 
+            if(!it->second)
+                continue;
             map2fighter[index].push_back(new FighterInfo(pl,it->second,map2Point[index -1][it->first][0],map2Point[index-1][it->first][1]));
         } 
         setPlayer.insert(pl);
+    } 
+
+    void BattleGround::ClearArenaPos()
+    { 
+        for(auto it = map2fighter[2].begin(); it != map2fighter[2].end(); ++it)
+        { 
+            FighterInfo fi = (**it);
+            if(fi.owner)
+                return ;
+            GObject::Fighter* ft = GObject::globalFighters[fi.fighterId];
+            if(!ft)
+                continue;
+            ft->SetArenaPos(0);
+        } 
     } 
 }

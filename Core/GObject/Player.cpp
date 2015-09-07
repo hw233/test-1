@@ -1210,6 +1210,8 @@ namespace GObject
         st << static_cast<UInt8>(1);
 
         UInt16 pos = GetVar(VAR_ARENA_POS);
+        if(pos == 0)
+            pos = 3001;
         UInt32 rand = GetVar(VAR_ARENA_RAND);
         UInt16 index = pos>500?pos - 500:0;
         UInt16 advance = (pos - index) / 3;
@@ -1223,6 +1225,7 @@ namespace GObject
             } 
         } 
 
+        st << pos;
         size_t offect = st.size();
         UInt8 count = 0;
         st << count ;
@@ -1231,7 +1234,7 @@ namespace GObject
         { 
             UInt8 select = vec[i];
             GObject::Player* pl = (WORLD().arenaSort[select]);
-            st << static_cast<UInt8>(select);
+            st << static_cast<UInt16>(select);
             if(pl)
                 st << pl->GetName();
             else
@@ -1263,6 +1266,8 @@ namespace GObject
 
         bg.AutoEnterFighters(1,this);
         bg.AutoEnterFighters(2,pl,targetPos);
+        if(!pl)
+            bg.SetIsNPC(true);
         bg.start();
         UInt8 res = bg.GetCaptureId();
         if(res == 1)
@@ -1278,7 +1283,6 @@ namespace GObject
                 pl->SetVar(VAR_ARENA_POS,myPos);
                 pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
             } 
-
         }
         st << static_cast<UInt8>(res);
         st << Stream::eos;
