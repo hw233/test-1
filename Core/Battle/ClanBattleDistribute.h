@@ -107,6 +107,7 @@ namespace Battle
             void MoveNpc(UInt32 roomId,UInt8 mapId,UInt16 fighterId,UInt8 curx,UInt8 cury,UInt8 destx,UInt8 desty);
             void PutNpc(UInt32 roomId,UInt8 mapId,UInt16 fighterId,UInt8 x,UInt8 y,bool flag = true);
             void RemoveNpc(UInt32 roomId,UInt8 mapId,UInt8 curx,UInt8 cury);
+            void RemoveRoomDistribute(UInt32 roomId);  //删除某一房间的所有排布情况
         private:
             map<UInt32,std::vector<MapDistributeInfo*>> _room2Distribute;
     };

@@ -182,4 +182,18 @@ namespace Battle
         }
     }
 
+    void RoomOrderManager::RemoveRoomOrder(UInt32 roomId)
+    {
+        for( auto it = room2order.begin(); it != room2order.end(); ++it )
+        {
+            if( it->first == roomId )
+            {
+                delete it->second;
+                it->second = NULL;
+                room2order.erase(it->first);
+                break;
+            }
+        }
+    }
+
 }

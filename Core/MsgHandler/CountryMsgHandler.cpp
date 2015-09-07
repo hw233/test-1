@@ -81,4 +81,10 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr,REQ::EXPLOIT_SPEEDUP,OnExploitSpeedUp);
 
+    //商城系统
+    MSG_REG_2(GameMsgHdr,REQ::STOREA_INFO,OnStoreInfo);
+    MSG_REG_2(GameMsgHdr,REQ::STOREA_FRESH,OnFreshStore);
+    MSG_REG_2(GameMsgHdr,REQ::STOREA_BUY,OnStoreBuy);
+
+
 MSG_HANDLER_END()

@@ -275,4 +275,22 @@ namespace Battle
        status->SetCityOwnForce(cityId,ownForce);
    }
 
+
+   void RoomAllCityStatusManager::RemoveRoomAllCityStatus(UInt32 roomId)
+   {
+       for( auto it =  _vecRoomAllCityStatus.begin(); it != _vecRoomAllCityStatus.end();)
+       {
+           if( (*it)->GetRoomId() == roomId )
+           {
+               RoomAllCityStatus* p = (*it);
+               it = _vecRoomAllCityStatus.erase(it);
+               delete p;
+           }
+           else
+           {
+               ++it;
+           }
+       }
+   }
+
 }

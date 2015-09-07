@@ -662,52 +662,29 @@ namespace GObject
         return true;
     }
 
+    
     /*
-    bool GObjectManager::loadConstantlyKill()
+    bool GObjectManager::loadStoreA()
     {
         std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
-        LoadingCounter lc("Loading clanBattle constantlykill ");
+        LoadingCounter lc("Loading clanBattle all city status");
         lc.reset(1000);
-        DBConstantlyKill constantlyKill;
-        if(execu->Prepare("SELECT `playerId`,`fighterId`,`killNum` FROM `constantly_kill`",constantlyKill) != DB::DB_OK)
+        DBStoreA store;
+        if(execu->Prepare("SELECT `playerId`,`pageId`,`index`,`limitCount` FROM `storeA`",store) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            Player* player = globalPlayers[constantlyKill.playerId];
-            if(!player)
+            GObject::Player* player = GObject::globalPlayers[store.playerId];
+            if( !player )
                 continue;
-            player->AddConstantlyKill(constantlyKill.fighterId,constantlyKill.killNum);
-            lc.advance();
-        }
-        lc.finalize();
-        return true;
-    }
-
-    bool GObjectManager::loadEndConstantlyKill()
-    {
-        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-        if (execu.get() == NULL || !execu->isConnected()) return false;
-        LoadingCounter lc("Loading clanBattle endConstantlykill ");
-        lc.reset(1000);
-        DBEndConstantlyKill endconstantlyKill;
-        if(execu->Prepare("SELECT `playerId`,`fighterId`,`peerId`,`peerFighterId`,`endkillNum` FROM `endconstantly_kill`",endconstantlyKill) != DB::DB_OK)
-            return false;
-        while(execu->Next() == DB::DB_OK)
-        {
-            Player* player = globalPlayers[endconstantlyKill.playerId];
-            if(!player)
-                continue;
-            Player* peer = globalPlayers[endconstantlyKill.peerId];
-            if( !peer )
-                continue;
-            player->AddEndConstantlyKill(endconstantlyKill.fighterId,peer,endconstantlyKill.peerFighterId,endconstantlyKill.endkillNum);
-            lc.advance();
+            //player->GetStoreA()->LoadStoreItems(pageId,);
         }
         lc.finalize();
         return true;
     }
     */
+
     //关于equipment的提取，
     /*
        ItemEquip * GObjectManager::fetchEquipment( UInt32 id, bool record )

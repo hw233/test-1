@@ -201,21 +201,14 @@ namespace GObject
         UInt8  ownforce;
     };
 
-    struct DBConstantlyKill
+    struct DBStoreA
     {
         UInt64 playerId;
-        UInt16 fighterId;
-        UInt16 killNum;
+        UInt8  pageId;
+        UInt8  index;
+        UInt16 limitCount;
     };
 
-    struct DBEndConstantlyKill
-    {
-        UInt64 playerId;
-        UInt16 fighterId;
-        UInt64 peerId;
-        UInt16 peerFighterId;
-        UInt16 endkillNum;
-    };
 }
 namespace DB
 {
@@ -450,23 +443,13 @@ namespace DB
     )
     SPECIALEND()
 
-    SPECIALBEGIN(GObject::DBConstantlyKill)
-    SPECIALDEF(3)
+    SPECIALBEGIN(GObject::DBStoreA)
+    SPECIALDEF(4)
     (
         UInt64, playerId,
-        UInt16, fighterId,
-        UInt16, killNum
-    )
-    SPECIALEND()
-
-    SPECIALBEGIN(GObject::DBEndConstantlyKill)
-    SPECIALDEF(5)
-    (
-        UInt64, playerId,
-        UInt16, fighterId,
-        UInt64, peerId,
-        UInt16, peerFighterId,
-        UInt16, endkillNum
+        UInt8,  pageId,
+        UInt8,  index,
+        UInt16, limitCount
     )
     SPECIALEND()
 }

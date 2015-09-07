@@ -58,6 +58,7 @@ namespace Battle
             std::vector<UInt8> GetJoinForce();
             std::vector<GObject::Player*> GetJoinAllies(UInt8 forceId);
             std::map<UInt8,std::vector<UInt32>> GetForce2Clans() { return force2clans;}
+            void ResetJoinStatus();
         private:
             UInt32 roomId;    //以创建者的军团id作为roomId
             UInt8  battleId;  //战役Id
@@ -76,6 +77,7 @@ namespace Battle
             bool EnterRoom(GObject::Player* player);   //进入军团战房间 (军团长)
             ClanBattleRoom* GetBattleRoom(UInt32 roomId);
             std::vector<ClanBattleRoom*> GetRoomList() const { return _roomList;}
+            void RemoveClanBattleRoom(UInt32 roomId);
         private:
             std::vector<ClanBattleRoom*> _roomList;  
     };

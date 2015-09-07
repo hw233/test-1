@@ -871,4 +871,17 @@ namespace Battle
             PutNpc(roomId,mapId,fighterId,destx,desty);
         }
     }
+
+    void BattleDistribute::RemoveRoomDistribute(UInt32 roomId) //删除某一房间的所有排布情况
+    {
+        for( auto it = _room2Distribute.begin(); it != _room2Distribute.end(); ++it )
+        {
+            if( it->first == roomId )
+            {
+                (it->second).clear();
+                _room2Distribute.erase(it->first);
+                break;
+            }
+        }
+    }
 }

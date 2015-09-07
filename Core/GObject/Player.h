@@ -17,6 +17,7 @@
 #include "Clan.h"
 #include "Govern.h"
 #include "Exploit.h"
+#include "StoreA.h"
 
 //VAR
 //Package
@@ -129,6 +130,7 @@ namespace GObject
     class Clan;
     class GovernManager; //治理
     class ExploitManager; //开采
+    class StoreA;  //个人商城
 
     class Player :
         public GObjectBaseT<Player,IDTYPE>
@@ -366,6 +368,11 @@ namespace GObject
             UInt8 ClearArenaCD();
             UInt8 AddArenaCount();
             bool CanAttackArena();
+            void ClearAllBattleFighter() { _vecClanBattleFighter.clear();}
+            StoreA* GetStoreA() const { return m_storeA;}
+            void FreshStoreItems(UInt8 pageId);
+            void BuyItem(UInt8 pageId,UInt8 index,UInt8 num);
+            bool UseItem(UInt32 itemId,UInt16 num);
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -424,6 +431,8 @@ namespace GObject
 
             std::vector<KillInfo> vecKillInfo;
             std::vector<LoseInfo> vecLoseInfo;
+
+            StoreA* m_storeA;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

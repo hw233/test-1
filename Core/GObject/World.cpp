@@ -48,7 +48,11 @@ namespace GObject
         if(ArenaAwardTime < now) ArenaAwardTime += 86400;
         AddTimer(86400 * 1000, World_Send_Arena_Award, this, (ArenaAwardTime - now) * 1000);
         
-        
+        UInt32 storeAFreshTime = TimeUtil::SharpDay(0) + 21 * 3600;
+        World_Store_Fresh(this);
+        if( storeAFreshTime < now ) storeAFreshTime += 86400;
+        AddTimer(86400 * 1000, World_Store_Fresh, this, (storeAFreshTime - now) * 1000);
+
         time_t n = now;
         tm* tt=localtime(&n);
         UInt8 min = tt->tm_min;
@@ -441,4 +445,14 @@ namespace GObject
             }       
         } 
     } 
+    
+    //定时刷新( 应该是所有玩家 )
+    void World::World_Store_Fresh(World* world)
+    {
+
+        for( auto it = GObject::globalPlayerVec.begin(); it != GObject::globalPlayerVec.end(); ++it )
+        {
+            (*it)->GetStoreA()->FreshItems();
+        }
+    }
 }

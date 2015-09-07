@@ -62,6 +62,7 @@ namespace Battle
             RoomComment* GetRoomComment(UInt32 roomId) { return room2comments[roomId];}
             void GetAllisComment(GObject::Player* player,Stream& st);
             void NoticeOtherAllies(GObject::Player* player,UInt8 mapId,std::string message);
+            void RemoveRoomComment(UInt32 roomId);
         private:
             std::map<UInt32,RoomComment*>  room2comments;
     };
