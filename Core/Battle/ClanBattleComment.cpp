@@ -184,4 +184,18 @@ namespace Battle
         }
     }
 
+    void RoomCommentManager::RemoveRoomComment(UInt32 roomId)
+    {
+        for( auto it = room2comments.begin(); it != room2comments.end(); ++it )
+        {
+            if( it->first == roomId )
+            {
+                delete (it->second);
+                it->second = NULL;
+                room2comments.erase(it->first);
+                break;
+            }
+        }
+    }
+
 }

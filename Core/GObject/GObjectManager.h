@@ -45,8 +45,7 @@ namespace GObject
             static bool loadClanBattleOrder(); //军团令
             static bool loadReport2Id();  //某一城市对应的战报Id
             static bool loadClanBattleAllCityStatus();
-            static bool loadConstantlyKill();
-            static bool loadEndConstantlyKill();
+            //static bool loadStoreA();
         private:
             static std::map<UInt32, ItemEquip *> equips;
     };

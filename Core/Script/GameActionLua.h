@@ -10,6 +10,7 @@ namespace GObject
 {
     class Player;
     class Fighter;
+    class StoreA;
 }
 using namespace GObject;
 
@@ -35,15 +36,13 @@ namespace Script
         public:
             const char* GetItemName(UInt32 itemId);
             const char* GetGreatFighterName(UInt32 fgtId);
-            UInt8  GetInfo(UInt8 mapId,UInt8 x , UInt8 y );
             UInt16 GetRandFighter();
-            UInt8  GetRideSub(UInt8 stype, UInt8 landform);
-            UInt8  GetAttackRange(UInt8 stype);
-            UInt8  GetMovePower(UInt8 stype);
             UInt8  GetSignForMouth(Player* player, UInt8 index, UInt8 vip, UInt8 flag);
             UInt8  UpgradeCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
             UInt8 UpgradeSoldierCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
             UInt8 EnchantSoldierCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
+            void loadItems(Player* player);
+            void loadPageItems(Player* player,UInt8 pageId);
 
 
         public:

@@ -8,6 +8,7 @@
 #include "Network/TcpServerWrapper.h"
 #include "Server/OidGenerator.h"
 #include "GObject/Player.h"
+#include "GObject/StoreA.h"
 
 using namespace GObject;
 
@@ -102,11 +103,18 @@ namespace Script
         CLASS_DEF(Player, AddVar);
         CLASS_DEF(Player, AddVarS);
         CLASS_DEF(Player, GetPackage);
+        CLASS_DEF(Player, GetStoreA);
+        CLASS_DEF(Player, GetLevel);
 
         CLASS_ADD(Package);
         CLASS_DEF(Package, AddItem);
         CLASS_DEF(Package, DelItem);
         CLASS_DEF(Package, GetItemCount);
+
+        CLASS_ADD(StoreA);
+        CLASS_DEF(StoreA,Add);
+        CLASS_DEF(StoreA,Clear);
+
 
     }
     /*
@@ -291,30 +299,20 @@ namespace Script
         return Call<bool>("UpgradeSoldierCost",player,cls,index,lev);
     }
 
-    UInt8 GameActionLua::GetInfo(UInt8 mapId,UInt8 x , UInt8 y )  //获得地图上的地形信息
-    {
-        return Run<UInt8>(NULL,"GetInfo",mapId,x,y);
-    }
-
     UInt32 GameActionLua::RandMonster(UInt8 group)
     {
         return Run<UInt32>(NULL,"RandMonster",group);
     }
 
 
-    UInt8 GameActionLua::GetRideSub(UInt8 stype, UInt8 landform)
+    void GameActionLua::loadItems(Player* pl)
     {
-        return Run<UInt8>(NULL, "GetRideSub",stype,landform);
+        return Call<void>("loadItems",pl);
     }
 
-    UInt8 GameActionLua::GetAttackRange(UInt8 stype)
+    void GameActionLua::loadPageItems(Player* pl, UInt8 pageId)
     {
-        return Run<UInt8>(NULL,"GetAttackRange",stype);
-    }
-
-    UInt8 GameActionLua::GetMovePower(UInt8 stype)
-    {
-        return Run<UInt8>(NULL,"GetMovePower",stype);
+        return Call<void>("loadPageItems",pl,pageId);
     }
 
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)

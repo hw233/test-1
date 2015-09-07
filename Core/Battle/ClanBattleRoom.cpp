@@ -320,4 +320,41 @@ namespace Battle
         }
         return vecPlayer;
     }
+
+    void ClanBattleRoom::ResetJoinStatus()
+    {
+       std::vector<GObject::Player*> vecPlayer = GetAllJoinPlayer();
+       for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
+       {
+           (*it)->SetJoinClanBattle(0);
+           (*it)->SetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM,0);
+           (*it)->SetVar(GObject::VAR_MAX_CONSTANTLYKILL,0);
+           (*it)->SetVar(GObject::VAR_MAX_ENDCONSTANTLYKILL,0);
+           (*it)->ClearAllBattleFighter();
+       }
+       std::vector<UInt32> vecJoinClans = GetJoinClan();
+       for( auto it = vecJoinClans.begin(); it != vecJoinClans.end(); ++it )
+       {
+           UInt32 clanId = (*it);
+           DB7().PushUpdateData( "update clan_player set `isClanBattle` = %u where clanId = %u",static_cast<UInt8>(0),clanId);
+       }
+    }
+
+    void ClanBattleRoomManager::RemoveClanBattleRoom(UInt32 roomId)
+    {
+        for(auto it = _roomList.begin(); it != _roomList.end();)
+        {
+           if( (*it)->GetRoomId() == roomId )
+           {
+               it = _roomList.erase(it);
+               //删除数据库
+               DB7().PushUpdateData("delete from `clan_battle_room`  where roomId=%u ",roomId);
+               break;
+           }
+           else
+           {
+               ++it;
+           }
+        }
+    }
 }

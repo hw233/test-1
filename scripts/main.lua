@@ -37,6 +37,7 @@ require("items/Awards")
 require("items/GovernAward")
 require("items/map")
 require("ParseMapInfo")
+require("Store")
 --require("AirBook")
 --require("forceCommitArena")
 

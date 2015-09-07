@@ -189,7 +189,7 @@ namespace Battle
             void SyncHp(BattleFighter* bft,UInt8 x, UInt8 y);
             void SortByActId();
             //对象移动
-            void Move();
+            void Move(bool flag = 0 );
             //产生战报信息
             void Fight(BattleFighter *bf , BattleFighter * bo,UInt8& result,UInt32& BattleReport,UInt16& fightTimeCost);
             void FighterMove(BattleFighter *, UInt8 x ,UInt8 y);

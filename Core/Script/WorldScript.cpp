@@ -35,10 +35,12 @@ UInt32 WorldScript::onAthleticsNewBox( UInt8 type, UInt32 count )
 	return call<UInt32>("onAthleticsNewBox", type, count);
 }
 
+/*
 GData::Store * WorldScript::GetStore()
 {
 	return &GData::store;
 }
+*/
 
 GData::TitleList * WorldScript::GetTitleList()
 {

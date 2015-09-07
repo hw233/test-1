@@ -131,6 +131,15 @@ namespace REQ
     const UInt8 EXPLOIT_SPEEDUP           = 0xB2;
 
 
+    /*商城系统*/
+    /*商城信息*/
+    const UInt8 STOREA_INFO               = 0xC0;
+    /*商城购买刷新*/
+    const UInt8 STOREA_FRESH              = 0xC1;
+    /*商城物品购买*/
+    const UInt8 STOREA_BUY                = 0xC2;
+
+
 
 
 
@@ -689,6 +698,13 @@ namespace REP
     const UInt8 EXPLOIT_COLLECT           = 0xB1;
     /*开采加速*/
     const UInt8 EXPLOIT_SPEEDUP           = 0xB2;
+
+    /*商城物品信息请求*/
+    const UInt8 STOREA_INFO               = 0xC0;
+    /*商城购买刷新*/
+    const UInt8 STOREA_FRESH              = 0xC1;
+    /*商城物品购买*/
+    const UInt8 STOREA_BUY                = 0xC2;
 
 
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00

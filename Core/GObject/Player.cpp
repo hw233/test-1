@@ -43,6 +43,7 @@ namespace GObject
         clan = NULL;
         m_governManager = new GovernManager(this);
         m_exploitManager = new ExploitManager(this);
+        m_storeA = new StoreA(this);
         _ArenaLayout.clear();
         _ArenaDefendLayout.clear();
     }
@@ -1316,4 +1317,67 @@ namespace GObject
             return false;
         return true;
     } 
+
+
+    void Player::FreshStoreItems(UInt8 pageId)
+    {
+        m_storeA->BuyFreshItems(pageId);
+    }
+
+
+    bool Player::UseItem(UInt32 itemId,UInt16 num)
+    {
+        if( itemId >= 20001 &&  itemId <= 20003 )
+        {
+            switch(itemId)
+            { 
+                case 20001:
+                case 20002:
+                    if(GetVar(itemId-20000) >= num )
+                    {
+                        SetVar(itemId-20000,GetVar(itemId-20000)-num);
+                        return true;
+                    }
+                    break;
+                case 20003:
+                    if( GetVar(VAR_ARENA_MONEY) >= num )
+                    {
+                        AddVar(VAR_ARENA_MONEY,GetVar(VAR_ARENA_MONEY)-num);
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return false;
+    }
+
+
+    void Player::BuyItem(UInt8 pageId,UInt8 index,UInt8 num)
+    {
+        //先获得该位置的物品的具体信息
+        StoreItemInfo* info = m_storeA->GetStoreItemInfo(pageId,index);
+        if( info == NULL )
+        {
+            return ;
+        }
+        UInt32 itemId = info->GetItemId();
+        UInt16 limitCount = info->GetLimitCount();
+        UInt16 price = info->GetPrice();
+        UInt32 coinType = info->GetCoinType();
+
+        //然后判断商品是不是已经达到限购上限
+        if( limitCount < num )
+        {
+            return;
+        }
+        else
+        {
+            if( UseItem(coinType,num*price) )
+            {
+                //背包里添加物品
+                m_storeA->UpdateItemNum(pageId,index,limitCount-num);
+                //数据库更新
+            }
+        }
+    }
 }

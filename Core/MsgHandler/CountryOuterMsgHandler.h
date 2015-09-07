@@ -709,5 +709,44 @@ void OnExploitSpeedUp(GameMsgHdr& hdr,const void * data)
     player->GetExploitManager()->SpeedUp();
 }
 
+void OnStoreInfo(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( player == NULL )
+        return ;
+    Stream st(REP::STOREA_INFO);
+    player->GetStoreA()->GetStoreInfo(st);
+    player->send(st);
+}
+
+void OnFreshStore(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( player == NULL )
+        return ;
+    UInt8 pageId = 0;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    br>>pageId;
+    
+    Stream st(REP::STOREA_FRESH);
+    player->GetStoreA()->GetStoreInfo(pageId,st);
+    player->send(st);
+}
+
+void OnStoreBuy(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( player == NULL )
+        return ;
+    UInt8 pageId = 0;
+    UInt8 index = 0;
+    UInt8 num =0;
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+
+    br>>pageId;
+    br>>index;
+    br>>num;
+    player->BuyItem(pageId,index,num);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

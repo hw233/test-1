@@ -56,6 +56,7 @@ namespace Battle
             bool InsertClanOrder(GObject::Player* player,UInt8 mapId,UInt8 order);
             void GetClanOrder(GObject::Player* player,Stream &st);
             void NoticeOtherAllies(GObject::Player* player,UInt8 mapId,UInt8 order);
+            void RemoveRoomOrder(UInt32 roomId);
         private:
             std::map<UInt32,RoomOrder*> room2order;
     };
