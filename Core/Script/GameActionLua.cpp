@@ -265,7 +265,9 @@ namespace Script
     {
         return TimeUtil::SharpDay(0, now);
     }
+    
 
+    /*
     UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
     {
         return Run<UInt16>(NULL,"GetGovernDropMoney", res);
@@ -276,6 +278,8 @@ namespace Script
     {
         return Run<UInt16>(NULL,"GetGovernDropItem", res);
     }
+
+    */
     
     UInt16 GameActionLua::GetRandFighter()
     {

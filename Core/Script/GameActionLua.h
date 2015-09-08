@@ -29,8 +29,8 @@ namespace Script
             void init();
             void postInit();
             void RegisterActionInterface();
-            UInt16 GetGovernDropMoney(UInt8 res);
-            UInt16 GetGovernDropItem(UInt8 res);
+            //UInt16 GetGovernDropMoney(UInt8 res);
+            //UInt16 GetGovernDropItem(UInt8 res);
             UInt32 RandMonster(UInt8 group);
 
         public:

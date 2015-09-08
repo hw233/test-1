@@ -49,7 +49,6 @@ namespace GObject  //治理
             void SendBaseInfo();
             UInt8 FightWithMonster(Monster* mon);
             Monster* RandomOneMonster(UInt8 groupId);
-            void SendGovernAward(UInt8 number);
             void GetGovernInfo(Stream &st, UInt8 begin);
             void SendGovernResult(UInt8 type);
             void loadGovernOfflineGain(UInt32 itemId, UInt32 itemNum);

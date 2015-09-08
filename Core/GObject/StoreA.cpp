@@ -17,12 +17,14 @@ namespace GObject
     {
         for(UInt8 i = 0 ; i < PAGE_MAX ; ++i )
         {
+            _storeItems[i].erase(_storeItems[i].begin(), _storeItems[i].end());
             _storeItems[i].clear();
         }
     }
 
     void StoreA::TestPrint()
     {
+        std::cout<<"   我是    "<<_owner->GetName()<<std::endl;
         for(UInt8 i = 0 ; i < 2 ; ++i )
         {
             std::cout<<"pageId " << static_cast<UInt32>(i+1)<<std::endl;
@@ -59,6 +61,7 @@ namespace GObject
         if( _owner->GetVar( coinType ) < needNum )
             return;
         _owner->SetVar(coinType,_owner->GetVar( coinType )-needNum);
+        _storeItems[pageId-1].erase(_storeItems[pageId-1].begin(), _storeItems[pageId-1].end());
         _storeItems[pageId-1].clear();
         if( !GameAction()->loadPageItems(_owner,pageId) )
             return;
@@ -85,6 +88,8 @@ namespace GObject
         for(UInt8 i = 0 ; i < PAGE_MAX ; ++i )
         {
             st<<static_cast<UInt8>(i+1);
+            GetStoreInfo(i+1,st);
+            /*
             st<<static_cast<UInt8>(_storeItems[i].size());
             for( auto it = _storeItems[i].begin(); it != _storeItems[i].end(); ++it )
             {
@@ -93,6 +98,7 @@ namespace GObject
                 st<<static_cast<UInt16>((*it)->GetPrice());
                 st<<static_cast<UInt16>((*it)->GetCoinType());
             }
+            */
         }
     }
 
