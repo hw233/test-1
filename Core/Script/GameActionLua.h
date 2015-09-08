@@ -41,8 +41,8 @@ namespace Script
             UInt8  UpgradeCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
             UInt8 UpgradeSoldierCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
             UInt8 EnchantSoldierCost(Player* player ,UInt8 cls, UInt8 index, UInt8 lev);
-            void loadItems(Player* player);
-            void loadPageItems(Player* player,UInt8 pageId);
+            bool loadItems(Player* player);
+            bool loadPageItems(Player* player,UInt8 pageId);
 
 
         public:
