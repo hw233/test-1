@@ -1234,12 +1234,23 @@ namespace GObject
         for(UInt8 i = 0; i < 3 ; ++i)
         { 
             UInt8 select = vec[i];
-            GObject::Player* pl = (WORLD().arenaSort[select]);
+            ArenaMember am = WORLD().arenaSort[select];
+            //GObject::Player* pl = (WORLD().arenaSort[select].pl);
             st << static_cast<UInt16>(select);
-            if(pl)
-                st << pl->GetName();
+            if(am.pl)
+            {
+                st << static_cast<UInt8>(0);
+                st << am.pl->GetName();
+                st << am.pl->GetVar(VAR_BATTLE_POINT);
+                am.pl->GetArenaDefendStream(st);
+            }
             else
-                st << "";
+            {
+                st << static_cast<UInt8>(1);
+                st << static_cast<UInt32>(am.firstPos*10 + uRand(100));
+                st << static_cast<UInt16>(am.robotId);
+                st << static_cast<UInt16>(am.firstPos + (cfg.serverNum)%30);
+            }
             count ++;
             if(!advance)
                 break;
@@ -1256,7 +1267,8 @@ namespace GObject
         Stream st(REP::BATTLE_ARENA);
         st << static_cast<UInt8>(2);
 
-        GObject::Player* pl = WORLD().arenaSort[targetPos];
+        ArenaMember am = WORLD().arenaSort[targetPos];
+        GObject::Player* pl = am.pl;
         if(pl && static_cast<UInt16>(pl->GetVar(VAR_ARENA_POS)) != targetPos)
         {
             WORLD().arenaSort[targetPos] = NULL;
@@ -1274,16 +1286,22 @@ namespace GObject
         if(res == 1)
         {
             UInt32 myPos = GetVar(VAR_ARENA_POS);
-            WORLD().arenaSort[targetPos] = this;
+            WORLD().arenaSort[targetPos] = ArenaMember(this);
             SetVar(VAR_ARENA_POS,targetPos);
             SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
-            if(pl)
+            if(pl)   //进攻玩家
             { 
-                if(myPos < 3000)
+                if(myPos < 3001)
                     WORLD().arenaSort[myPos] = pl;
                 pl->SetVar(VAR_ARENA_POS,myPos);
                 pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
             } 
+            else    //进攻电脑
+            {
+                if(myPos < 3001)
+                    WORLD().arenaSort[myPos] = ArenaMember(am.firstPos, am.robotId);
+                WORLD().UpdateArena(targetPos, myPos);
+            }
         }
         st << static_cast<UInt8>(res);
         st << Stream::eos;
@@ -1384,4 +1402,11 @@ namespace GObject
             }
         }
     }
+    void Player::GetArenaDefendStream(Stream& st)
+    { 
+        for(UInt8 i = 0; i < 6; ++i)
+        {
+            st << static_cast<UInt16>(_ArenaDefendLayout[index]); // = fighterId;
+        }
+    } 
 }

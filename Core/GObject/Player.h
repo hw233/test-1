@@ -358,6 +358,7 @@ namespace GObject
             void LoadArenaDefendLayout(UInt8 index , UInt16 fighterId);
             std::map<UInt8,UInt16> GetArenaLayout();
             void SetArenaLayout(UInt8 index, UInt16 fighterId);
+            void GetArenaDefendStream(Stream& st);
 
             std::map<UInt8,UInt16> GetArenaDefendLayout();
             void SetArenaDefendLayout(UInt8 index, UInt16 fighterId);

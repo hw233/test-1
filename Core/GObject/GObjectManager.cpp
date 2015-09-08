@@ -26,6 +26,7 @@
 #include "Battle/ClanOrder.h"
 #include "Battle/Report2Id.h"
 #include "Battle/ClanBattleCityStatus.h"
+#include "GObject/World.h"
 
 namespace GObject
 {
@@ -137,6 +138,12 @@ namespace GObject
             fprintf(stderr, "load city status error!\n");
             std::abort();
         }
+        if( !loadArenaRobot() )
+        {
+            fprintf(stderr, "load Arena Robot error!\n");
+            std::abort();
+        }
+
         /*
         if( !loadConstantlyKill() )
         {
@@ -662,6 +669,23 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::loadArenaRobot()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading arenaRobot");
+        lc.reset(1000);
+        DBArenaRobot robot;
+        if(execu->Prepare("SELECT `index`,`firstIndex`,`robotId` FROM `arenaRobot`",robot) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            WORLD().arenaSort[robot.index] = World::ArenaMember(robot.firstIndex, robot.robotId);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
     
     /*
     bool GObjectManager::loadStoreA()

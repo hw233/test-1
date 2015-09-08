@@ -370,9 +370,9 @@ namespace GObject
         UInt32 pos = pl->GetVar(VAR_ARENA_POS) ;
         if(pos && pos <= 3000)
         { 
-            Player * p = World::arenaSort[pos];
+            Player * p = World::arenaSort[pos].pl;
             if(!p)
-                World::arenaSort[pos] = pl;
+                World::arenaSort[pos] = World::ArenaMember(pl);
         } 
         return true;
     } 
@@ -407,7 +407,7 @@ namespace GObject
         for(auto it = arenaSort.begin(); it != arenaSort.end(); ++it)
         { 
             UInt16 pos = it->first;
-            GObject::Player* pl = it->second;
+            GObject::Player* pl = it->second.pl;
             if(!pl)
                 continue;
             UInt8 index = 0;
@@ -455,4 +455,16 @@ namespace GObject
             (*it)->GetStoreA()->FreshItems();
         }
     }
+    void World::UpdateArena(UInt16 oldIndex ,UInt16 index)
+    { 
+        ArenaMember am = arenaSort[index];
+        if(am.pl)
+            return ;
+
+        if(oldIndex)
+            DB1().PushUpdateData("DELETE `arenaRobot` where index = %u",oldIndex); 
+
+        if(!index && index < 3001)
+            DB1().PushUpdateData("REPLACE INTO `arenaRobot` values(%u, %u, %u)",index,am.firstIndex, am.robotId); 
+    } 
 }
