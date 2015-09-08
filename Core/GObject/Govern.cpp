@@ -7,6 +7,17 @@
 
 namespace GObject
 {
+    static UInt32 govern_base[5][2] = {
+
+        //金币获得几率(/10000)  道具获得个数
+        { 10000 , 10 },
+        { 8000,   50 },
+        { 6000,   0  },
+        { 4000,   0  },
+        { 0   ,   0  },
+    };
+
+
     GovernManager::GovernManager(Player *pl):m_owner(pl),curMonster(NULL)
     {
          if( pl != NULL )
@@ -77,7 +88,6 @@ namespace GObject
 
         m_owner->AddVar(VAR_GOVERN_SPEEDUP_CNT,1);
         //发背包 更新背包数据库
-        //
         for( auto it = speedupId2Num.begin() ; it != speedupId2Num.end(); ++it)
         {
             if( it->first == 20001 )
@@ -107,10 +117,8 @@ namespace GObject
 
     Monster* GovernManager::RandomOneMonster(UInt8 groupId)
     {
-        UInt32 monsterId = GameAction()->RandMonster(groupId);
-        if( monsterId == 0 )
-            monsterId = 1;
-        std::cout<<"the monster id is"<<monsterId<<std::endl;
+        UInt32 monsterId = 1;
+        monsterId = GameAction()->RandMonster(groupId);
         Monster* mon = monsterTable.GetMonster(groupId,monsterId);
         return mon;
     }
@@ -167,13 +175,16 @@ namespace GObject
         {
              Monster* mon = RandomOneMonster(lv);
              UInt8 res = FightWithMonster(mon);
-             UInt16 base = GameAction()->GetGovernDropItem(res);
-             UInt16 random = uRand(10000);
-
+             UInt16 base = govern_base[res-1][1];   //GameAction()->GetGovernDropItem(res);
              bool isGet = false;
-             if( random < base )
+             if( base != 0 )
              {
-                 isGet = true;
+                 UInt16 random = uRand(10000);
+
+                 if( random < base )
+                 {
+                     isGet = true;
+                 }
              }
              GovernInfo info(mon->GetGroupId(),mon->GetMonsterId(),res,isGet);
              _vecGovernInfo.push_back(info);
@@ -259,7 +270,6 @@ namespace GObject
     }
 
 
-
     void GovernManager::GetItemsByResult(UInt8 res,UInt8 groupId,UInt8 monsterId,bool isGet, std::vector<ItemInfo>& vecItem)
     {
         if(res <= 0  || res >= 5 )
@@ -268,8 +278,9 @@ namespace GObject
         }
         Monster* mon = monsterTable.GetMonster(groupId,monsterId);
         UInt16 moneyNum = mon->GetMoney();
-        UInt16 base =  GameAction()->GetGovernDropMoney(res);
-        if( isGet )
+        //UInt16 base =  GameAction()->GetGovernDropMoney(res);
+        UInt16 base = govern_base[res-1][0];
+        if( isGet )   //获得物品
         {
             UInt32  itemId = mon->GetItemId();
             UInt8 itemNum = mon->GetItemNum();
@@ -278,7 +289,7 @@ namespace GObject
                vecItem.push_back(ItemInfo(itemId,itemNum));
             }
         }
-        if( base != 0 )
+        if( base != 0 )  //获得钱
         {
             vecItem.push_back(ItemInfo(20001,moneyNum*(base/10000.0f)));
         }
@@ -290,8 +301,8 @@ namespace GObject
         if( res <= 0  || res >= 5 || mon == NULL )   //大败的话什么东西都没有的
             return;
         UInt16 moneyNum = mon->GetMoney();
-        UInt16 mbase =  GameAction()->GetGovernDropMoney(res);
-        UInt16 ibase =  GameAction()->GetGovernDropItem(res);
+        UInt16 mbase =   govern_base[res-1][0] /*GameAction()->GetGovernDropMoney(res)*/;
+        UInt16 ibase =   govern_base[res-1][1] /*GameAction()->GetGovernDropItem(res)*/;
         vecItem.push_back(ItemInfo(20001,moneyNum*(mbase/10000.0f)*(prob/10000.0f)*times));
         UInt32 itemId = mon->GetItemId();
         UInt32 itemNum = mon->GetItemNum();

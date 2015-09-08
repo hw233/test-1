@@ -17,15 +17,35 @@ namespace GObject
     {
         for(UInt8 i = 0 ; i < PAGE_MAX ; ++i )
         {
+            _storeItems[i].erase(_storeItems[i].begin(), _storeItems[i].end());
             _storeItems[i].clear();
         }
     }
-    
 
+    void StoreA::TestPrint()
+    {
+        std::cout<<"   我是    "<<_owner->GetName()<<std::endl;
+        for(UInt8 i = 0 ; i < 2 ; ++i )
+        {
+            std::cout<<"pageId " << static_cast<UInt32>(i+1)<<std::endl;
+            for( auto it = _storeItems[i].begin(); it != _storeItems[i].end(); ++it )
+            {
+                std::cout<<"   itemId   "<<static_cast<UInt32>((*it)->GetItemId());
+                std::cout<<"   limitCount  "<<static_cast<UInt32>((*it)->GetLimitCount());
+                std::cout<<"   price   "<<static_cast<UInt32>((*it)->GetPrice());
+                std::cout<<"   coinType  "<<static_cast<UInt32>((*it)->GetCoinType())<<std::endl;
+            }
+        }
+    }
+
+    
     //刷新物品   type 0 : 整点刷新( 每天9点 )  1 : 使用元宝进行刷新
     void StoreA::FreshItems()
     {
-        GameAction()->loadItems(_owner);
+        Clear();
+        if( !GameAction()->loadItems(_owner))
+            return;
+        TestPrint();
     }
 
     UInt32 static needCoin[2][2] = {
@@ -41,8 +61,10 @@ namespace GObject
         if( _owner->GetVar( coinType ) < needNum )
             return;
         _owner->SetVar(coinType,_owner->GetVar( coinType )-needNum);
+        _storeItems[pageId-1].erase(_storeItems[pageId-1].begin(), _storeItems[pageId-1].end());
         _storeItems[pageId-1].clear();
-        GameAction()->loadPageItems(_owner,pageId);
+        if( !GameAction()->loadPageItems(_owner,pageId) )
+            return;
     }
 
     StoreItemInfo* StoreA::GetStoreItemInfo(UInt8 pageId,UInt8 index)
@@ -66,6 +88,8 @@ namespace GObject
         for(UInt8 i = 0 ; i < PAGE_MAX ; ++i )
         {
             st<<static_cast<UInt8>(i+1);
+            GetStoreInfo(i+1,st);
+            /*
             st<<static_cast<UInt8>(_storeItems[i].size());
             for( auto it = _storeItems[i].begin(); it != _storeItems[i].end(); ++it )
             {
@@ -74,6 +98,7 @@ namespace GObject
                 st<<static_cast<UInt16>((*it)->GetPrice());
                 st<<static_cast<UInt16>((*it)->GetCoinType());
             }
+            */
         }
     }
 

@@ -265,7 +265,9 @@ namespace Script
     {
         return TimeUtil::SharpDay(0, now);
     }
+    
 
+    /*
     UInt16 GameActionLua::GetGovernDropMoney(UInt8 res)
     {
         return Run<UInt16>(NULL,"GetGovernDropMoney", res);
@@ -276,6 +278,8 @@ namespace Script
     {
         return Run<UInt16>(NULL,"GetGovernDropItem", res);
     }
+
+    */
     
     UInt16 GameActionLua::GetRandFighter()
     {
@@ -305,14 +309,14 @@ namespace Script
     }
 
 
-    void GameActionLua::loadItems(Player* pl)
+    bool GameActionLua::loadItems(Player* player)
     {
-        return Call<void>("loadItems",pl);
+        return Call<bool>("loadItems",player);
     }
 
-    void GameActionLua::loadPageItems(Player* pl, UInt8 pageId)
+    bool GameActionLua::loadPageItems(Player* player, UInt8 pageId)
     {
-        return Call<void>("loadPageItems",pl,pageId);
+        return Call<bool>("loadPageItems",player,pageId);
     }
 
     //Player * GameActionLua::GetPlayerPtr(IDTYPE playerId)

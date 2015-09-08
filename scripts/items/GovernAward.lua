@@ -1,21 +1,10 @@
 local Govern_item =
 {
-	{ 1, 10000,2000},    --¿¿  ¿¿100%¿¿¿   ¿20%¿¿¿¿¿¿¿
-	{ 2, 8000, 1000},    --¿¿  ¿¿80%¿¿¿    ¿10%¿¿¿¿¿¿¿
-    { 3, 6000,  0},      --¿¿  ¿¿60%¿¿¿    ¿¿¿¿¿
-	{ 4, 4000,  0},      --¿¿  ¿¿40%¿¿¿    ¿¿¿¿¿
-	{ 5, 0, 0}           --¿¿  ¿¿¿¿¿       ¿¿¿¿¿
-}
-
-
-
-local Govern_item =
-{
-	[1] = { 1, 10000,10},    
-	[2] = { 2, 8000, 50},
-    [3] = { 3, 6000,  0},
-	[4] = { 4, 4000,  0},
-	[5] = { 5, 0,     0}
+	[1] = { 10000,10},    
+	[2] = { 8000, 50},
+    [3] = { 6000,  0},
+	[4] = { 4000,  0},
+	[5] = { 0,     0}
 }
 
 
@@ -49,11 +38,11 @@ end
 
 
 function GetGovernDropMoney(res)
-	return Govern_item[res][2]
+	return Govern_item[res][1]
 end
 
 function GetGovernDropItem(res)
-    return Govern_item[res][3]
+    return Govern_item[res][2]
 end
 
 

@@ -749,4 +749,13 @@ void OnStoreBuy(GameMsgHdr& hdr, const void * data)
     player->BuyItem(pageId,index,num);
 }
 
+void OnFreshStoreItems(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    if( player == NULL )
+        return ;
+    player->GetStoreA()->FreshItems();
+
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_

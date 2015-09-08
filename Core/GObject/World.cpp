@@ -452,7 +452,9 @@ namespace GObject
 
         for( auto it = GObject::globalPlayerVec.begin(); it != GObject::globalPlayerVec.end(); ++it )
         {
-            (*it)->GetStoreA()->FreshItems();
+            //(*it)->GetStoreA()->FreshItems();
+            GameMsgHdr hdr(0x157 ,WORKER_THREAD_COUNTRY_1,(*it),0);
+            GLOBAL().PushMsg(hdr,NULL);
         }
     }
     void World::UpdateArena(UInt16 oldIndex ,UInt16 index)

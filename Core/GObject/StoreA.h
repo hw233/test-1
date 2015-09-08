@@ -47,6 +47,7 @@ namespace GObject
             void UpdateItemNum(UInt8 pageId,UInt8 index, UInt8 num);
             void GetStoreInfo(Stream& st);
             void GetStoreInfo(UInt8 pageId,Stream& st);
+            void TestPrint();
         private:
             Player* _owner;
             std::vector<StoreItemInfo*> _storeItems[PAGE_MAX];
