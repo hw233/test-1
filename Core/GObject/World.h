@@ -43,6 +43,8 @@ namespace GObject
         UInt16 robotId;
         ArenaMember(Player* p){ pl = p; firstIndex = 0; robotId = 0;}
         ArenaMember(UInt16 fp, UInt16 rId) {pl = NULL; firstIndex = fp; robotId = rId;}
+        ArenaMember(){pl=NULL; firstIndex = 0; robotId = 0;}
+        bool NotEmpty(){ return pl!=NULL || (firstIndex !=0 && robotId != 0);}
     };
 
     typedef std::map<UInt16,ArenaMember> MapIndexPlayer;
@@ -59,7 +61,8 @@ namespace GObject
             inline Script::BattleFormula* getBattleFormula() {return _battleFormula;}
             ChatHold* GetChatHold(){return chatHold;}
 
-            void UpdateArena(UInt16, UInt16);
+            void UpdateArena(UInt16 oldIndex, UInt16 index);
+            ArenaMember GetArenaMember(UInt16 index);
         private:
             static void InitRank();
             static void World_Midnight_Check( World * );

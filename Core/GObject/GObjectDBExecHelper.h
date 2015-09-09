@@ -215,6 +215,15 @@ namespace GObject
         UInt16 firstIndex; 
         UInt16 robotId;
     };
+
+    struct DBArenaReport
+    {
+        UInt64 playerId;
+        UInt32 battleId;
+        std::string name;
+        UInt16 index;
+        UInt32 power;
+    };
 }
 namespace DB
 {
@@ -465,6 +474,17 @@ namespace DB
      UInt16, index,
      UInt16, firstIndex,
      UInt16, robotId
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBArenaReport)
+    SPECIALDEF(5)
+    (
+     UInt64, playerId,
+     UInt32, battleId,
+     std::string, name,
+     UInt16, index,
+     UInt32, power
     )
     SPECIALEND()
 }

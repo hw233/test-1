@@ -18,6 +18,7 @@
 #include "Battle/BattleReportAnalyse.h"
 #include "GObject/Exploit.h"
 #include "GData/Map.h"
+#include "GData/Robot.h"
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -372,7 +373,7 @@ namespace GObject
         { 
             Player * p = World::arenaSort[pos].pl;
             if(!p)
-                World::arenaSort[pos] = World::ArenaMember(pl);
+                World::arenaSort[pos] = ArenaMember(pl);
         } 
         return true;
     } 
@@ -468,5 +469,16 @@ namespace GObject
 
         if(!index && index < 3001)
             DB1().PushUpdateData("REPLACE INTO `arenaRobot` values(%u, %u, %u)",index,am.firstIndex, am.robotId); 
+    } 
+    ArenaMember World::GetArenaMember(UInt16 index)
+    { 
+        if(!arenaSort[index].NotEmpty())
+        { 
+           UInt32 robotId = uRand(GData::robotInfo.GetRobotSize())+1;
+           if(robotId && robotId < GData::robotInfo.GetRobotSize())
+               arenaSort[index] = ArenaMember(index,robotId);
+           UpdateArena(0,index);
+        } 
+        return arenaSort[index];
     } 
 }

@@ -12,6 +12,8 @@
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/Report2Id.h"
 #include "Battle/ClanBattleRoom.h"
+#include "GData/Robot.h"
+#include "GObject/World.h"
 
 #define MAX(x,y) x>y?x:y
 #define ABS(x,y) x>y?x-y:y-x
@@ -292,7 +294,7 @@ namespace Battle
     }
 
 
-    void BattleGround::Move()
+    void BattleGround::Move(bool )
     {
         //选择对象
         if(!currentBf)
@@ -2194,8 +2196,10 @@ namespace Battle
     void BattleGround::AutoEnterFighters(UInt8 index, GObject::Player* pl, UInt16 pos)
     { 
         static UInt8 map2Point[][7][2]= {
-            {{1,0},{2,0},{0,1},{1,1},{2,1},{2,0},{2,1}},
-            {{3,0},{4,0},{2,1},{3,1},{4,1},{3,2},{4,2}}
+            {{2,0},{1,1},{2,2},{1,0},{0,1},{1,2}},
+            {{3,0},{3,1},{3,2},{4,0},{4,1},{4,2}}
+            //{{1,0},{2,0},{0,1},{1,1},{2,1},{2,0},{2,1}},
+            //{{3,0},{4,0},{2,1},{3,1},{4,1},{3,2},{4,2}}
         };
         if( index == 0 ) // 1 2 
             return;
@@ -2212,33 +2216,37 @@ namespace Battle
         }
         else
         {
-            std::set<UInt16> _set;
-            UInt8 index = 0;
+            /*
+               std::set<UInt16> _set;
+               UInt8 index = 0;
             //选出5个武将
             while(_set.size()< 5 && index++ < 10 )
             { 
-                UInt16 offect = uRand(globalFighters.size());
-                auto it = globalFighters.begin();
-                std::advance(it,offect);
-                _set.insert(it->first);
-            } 
-            auto it = _set.begin();
-            UInt8 front = GetFrontFromPos(pos);
-            for(UInt8 i = 0; i < MAXPOS ; ++i)
+            UInt16 offect = uRand(globalFighters.size());
+            auto it = globalFighters.begin();
+            std::advance(it,offect);
+            _set.insert(it->first);
+            } */
+
+            GObject::ArenaMember am = WORLD().GetArenaMember(pos);
+            if(!am.pl)
+                return ;
+
+            GData::RobotInfo ri = GData::robotInfo.GetRobot(am.robotId);
+
+            UInt8 front = ri.ground; //GetFrontFromPos(am.firstIndex);
+            for(UInt8 i = 0, j =0; i < MAXPOS ; ++i)
             { 
-                if(it == _set.begin())
+                if(i == front)
                     continue;
-                if(!(front & (1 << i)))
-                {
-                    GObject::Fighter* ft = GObject::globalFighters[*it];
-                    if(!ft)
-                        continue;
-                    ft->SetArenaPos(pos);
-                    _map[i]= *it;
-                    it++;
-                }
-            } 
-        }
+                UInt16 fighterId = ri.fighters[j++];
+                GObject::Fighter* ft = GObject::globalFighters[fighterId];
+                if(!ft)
+                    continue;
+                ft->SetArenaPos(am.firstIndex);
+                _map[i]= fighterId;
+            }
+        } 
 
         for(auto it = _map.begin(); it != _map.end(); ++it)
         { 

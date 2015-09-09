@@ -680,7 +680,7 @@ namespace GObject
             return false;
         while(execu->Next() == DB::DB_OK)
         {
-            WORLD().arenaSort[robot.index] = World::ArenaMember(robot.firstIndex, robot.robotId);
+            WORLD().arenaSort[robot.index] = GObject::ArenaMember(robot.firstIndex, robot.robotId);
             lc.advance();
         }
         lc.finalize();
@@ -749,4 +749,25 @@ namespace GObject
        return static_cast<ItemArmor *>(equip);
        }
        */
+
+    bool GObjectManager::loadArenaReport()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading arenaRobot");
+        lc.reset(1000);
+        DBArenaReport report;
+        if(execu->Prepare("SELECT `playerId`,`battleId`,`name`,`index`,`power` FROM `arenaRobot`",report) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GObject::Player* player = GObject::globalPlayers[report.playerId];
+            if( !player )
+                continue;
+            player->InsertArenaBattleReport(ArenaBattleInfo(report.battleId, report.name, report.index, report.power), false);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
 }

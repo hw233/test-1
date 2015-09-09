@@ -191,6 +191,23 @@ namespace GData
         UInt8 perMin;
         UInt8 perMax;
     };
+
+    struct DBGlobalRobot
+    {
+        UInt16 index;
+        UInt8  front;
+        UInt16 fgt1;
+        UInt16 fgt2;
+        UInt16 fgt3;
+        UInt16 fgt4;
+        UInt16 fgt5;
+    };
+
+    struct DBGlobalPVPName
+    {
+        UInt16 index;
+        std::string name;
+    };
 }
 namespace DB
 {
@@ -410,6 +427,27 @@ namespace DB
           float, transform,
           UInt8, perMin,
           UInt8, perMax
+       )
+       SPECIALEND()
+
+       SPECIALBEGIN(GData::DBGlobalRobot)
+       SPECIALDEF(7)
+       (
+        UInt16, index,
+        UInt8 , front,
+        UInt16, fgt1,
+        UInt16, fgt2,
+        UInt16, fgt3,
+        UInt16, fgt4,
+        UInt16, fgt5
+       )
+       SPECIALEND()
+
+       SPECIALBEGIN(GData::DBGlobalPVPName)
+       SPECIALDEF(2)
+       (
+        UInt16, index,
+        std::string, name
        )
        SPECIALEND()
 }

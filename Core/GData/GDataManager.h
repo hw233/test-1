@@ -29,6 +29,9 @@ namespace GData
             static bool LoadClanBattleBase();
             static bool LoadBattleMap();
             static bool LoadExploitPointInfo();
+            static bool LoadGlobalRobot();
+            static bool LoadGlobalPVPName();
+            static bool LoadArenaReport();
 
         private:
 

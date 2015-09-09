@@ -265,6 +265,7 @@ namespace Battle
             
             void SetIsNPC(bool v){ _isNpc = v;}
             bool GetIsNPC(){ return _isNpc;}
+            UInt32 GetBattleNUmber(){ return _battleNum;} 
 
         private:
             UInt32 _roomId;   //房间id  没有的话 就默认就是0

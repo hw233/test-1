@@ -13,6 +13,7 @@
 #include "FVar.h"
 #include "Battle/BattleGround.h"
 #include "GObject/World.h"
+#include "GData/GlobalPVPName.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -1234,7 +1235,7 @@ namespace GObject
         for(UInt8 i = 0; i < 3 ; ++i)
         { 
             UInt8 select = vec[i];
-            ArenaMember am = WORLD().arenaSort[select];
+            ArenaMember am = WORLD().GetArenaMember(select);
             //GObject::Player* pl = (WORLD().arenaSort[select].pl);
             st << static_cast<UInt16>(select);
             if(am.pl)
@@ -1247,9 +1248,9 @@ namespace GObject
             else
             {
                 st << static_cast<UInt8>(1);
-                st << static_cast<UInt32>(am.firstPos*10 + uRand(100));
+                st << static_cast<UInt32>(am.firstIndex*10 + uRand(100)); //战斗力
                 st << static_cast<UInt16>(am.robotId);
-                st << static_cast<UInt16>(am.firstPos + (cfg.serverNum)%30);
+                st << static_cast<UInt16>(am.firstIndex + (cfg.serverNum)%30);
             }
             count ++;
             if(!advance)
@@ -1264,10 +1265,13 @@ namespace GObject
         if(!CanAttackArena())
             return ;
 
+        //差战报信息
+        std::string name ;
+
         Stream st(REP::BATTLE_ARENA);
         st << static_cast<UInt8>(2);
 
-        ArenaMember am = WORLD().arenaSort[targetPos];
+        ArenaMember am = WORLD().GetArenaMember(targetPos);
         GObject::Player* pl = am.pl;
         if(pl && static_cast<UInt16>(pl->GetVar(VAR_ARENA_POS)) != targetPos)
         {
@@ -1275,6 +1279,19 @@ namespace GObject
             pl->SetVar(VAR_ARENA_POS,0);
             return ;
         }
+
+        if(pl)
+        { 
+            name = pl->GetName();
+        } 
+        else
+        {
+            if(am.robotId)
+                name = GData::globalPVPName.GetName(am.robotId);
+            else
+                return ;
+        }
+
         Battle::BattleGround bg(0,1);
 
         bg.AutoEnterFighters(1,this);
@@ -1299,13 +1316,16 @@ namespace GObject
             else    //进攻电脑
             {
                 if(myPos < 3001)
-                    WORLD().arenaSort[myPos] = ArenaMember(am.firstPos, am.robotId);
+                    WORLD().arenaSort[myPos] = ArenaMember(am.firstIndex, am.robotId);
                 WORLD().UpdateArena(targetPos, myPos);
             }
         }
         st << static_cast<UInt8>(res);
+        st << bg.GetBattleNUmber();
         st << Stream::eos;
         send(st);
+
+        InsertArenaBattleReport(ArenaBattleInfo(bg.GetBattleNUmber(), name, targetPos, am.firstIndex*10 + uRand(100)));
     } 
 
     UInt8 Player::ClearArenaCD()
@@ -1406,7 +1426,32 @@ namespace GObject
     { 
         for(UInt8 i = 0; i < 6; ++i)
         {
-            st << static_cast<UInt16>(_ArenaDefendLayout[index]); // = fighterId;
+            st << static_cast<UInt16>(_ArenaDefendLayout[i]); // = fighterId;
         }
+    } 
+
+    void Player::InsertArenaBattleReport(ArenaBattleInfo abi, bool update)
+    { 
+        if(_arenaBattleReport.size() >= ARENA_BATTLE_MAX)
+        {
+            ArenaBattleInfo bak = _arenaBattleReport.back();
+            DB1().PushUpdateData("delete from `arenaBrp` where `index` = %u ",bak.battleId);   //LIBOUInt64
+            _arenaBattleReport.pop_back();
+        }
+        _arenaBattleReport.push_front(abi);
+        if(update)
+            DB1().PushUpdateData("replace into `arenaBrp` values(%" I64_FMT "u,%u,%s,%u,%u)",getId(),abi.battleId, abi.name.c_str(), abi.index, abi.power);   //LIBOUInt64
+
+    } 
+    void Player::GetArenaBattleReport(Stream& st)
+    { 
+        st << static_cast<UInt8>(_arenaBattleReport.size());
+        for(auto it = _arenaBattleReport.begin(); it != _arenaBattleReport.end(); ++it)
+        { 
+            st << it->battleId;
+            st << it->name;
+            st << it->index;
+            st << it->power;
+        } 
     } 
 }
