@@ -1539,10 +1539,12 @@ namespace Battle
                     }
                     else
                     {
-                        std::list<BattleFighter*> listFighter = camp2fighters_copy[it->first];
-                        while( listFighter.front() != NULL && listFighter.front()->getHP() > 0 )
+                        std::list<BattleFighter*> listFighter =it->second;    //camp2fighters_copy[it->first];
+                        while(  listFighter.front() == NULL || ( listFighter.front() != NULL && listFighter.front()->getHP() <= 0 ))
                         {
                             listFighter.pop_front();
+                            if(listFighter.empty())
+                                break;
                         }
                         if( listFighter.empty() )
                         {
@@ -1550,13 +1552,18 @@ namespace Battle
                             break;
                         }
                         BattleFighter* bf =  listFighter.front();
-                        if( bf == NULL )
+                        if( bf != NULL )
                         {
+                            currentBf = bf;
+                            Move();
+                            ++actCount;
+                        }
+                        listFighter.pop_front();
+                        if( listFighter.empty() )
+                        {
+                            camp2fighters_copy.erase(it->first);
                             break;
                         }
-                        currentBf = bf;
-                        Move();
-                        listFighter.remove(bf);
                         camp2fighters_copy[it->first] = listFighter;
                         ++actCount;
                     }
@@ -2255,6 +2262,10 @@ namespace Battle
             if(!it->second)
                 continue;
             map2fighter[index].push_back(new FighterInfo(pl,it->second,map2Point[index -1][it->first][0],map2Point[index-1][it->first][1]));
+            if( pl != NULL )
+            {
+                pl->SetBattleSide(index);
+            }
         } 
         setPlayer.insert(pl);
     } 
