@@ -1440,7 +1440,7 @@ namespace GObject
         }
         _arenaBattleReport.push_front(abi);
         if(update)
-            DB1().PushUpdateData("replace into `arenaBrp` values(%" I64_FMT "u,%u,%s,%u,%u)",getId(),abi.battleId, abi.name.c_str(), abi.index, abi.power);   //LIBOUInt64
+            DB1().PushUpdateData("replace into `arenaBrp` values(%" I64_FMT "u,%u,'%s',%u,%u)",getId(),abi.battleId, abi.name.c_str(), abi.index, abi.power);   //LIBOUInt64
 
     } 
     void Player::GetArenaBattleReport(Stream& st)

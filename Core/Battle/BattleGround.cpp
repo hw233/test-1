@@ -2211,7 +2211,7 @@ namespace Battle
         std::map<UInt8, UInt16> _map ;
         if(pl)
         {
-            if(index - 1)
+            if(!(index - 1))
                 _map= pl->GetArenaLayout();
             else
                 _map= pl->GetArenaDefendLayout();
@@ -2231,7 +2231,7 @@ namespace Battle
             } */
 
             GObject::ArenaMember am = WORLD().GetArenaMember(pos);
-            if(!am.pl)
+            if(am.pl)
                 return ;
 
             GData::RobotInfo ri = GData::robotInfo.GetRobot(am.robotId);
