@@ -87,7 +87,7 @@ namespace Battle
             Report2Id* GetReport2Id(UInt32 roomId,UInt8 cityId);
             UInt32 GetRecentReportId(UInt32 roomId, UInt8 mapId);
             std::vector<Battle::Report2Id*> GetReport2Ids(UInt32 roomId);
-
+            void RemoveReports(UInt32 roomId);
         private:
             std::vector<Report2Id*> _vecReportId;
 

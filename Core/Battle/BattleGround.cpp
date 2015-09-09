@@ -1590,6 +1590,7 @@ namespace Battle
                 }
             }
         }while( CheckIsStop() );
+
         camp2fighters_copy.clear();
         std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
         _pack.data<UInt16>(offset) = actCount;
@@ -1598,6 +1599,7 @@ namespace Battle
         _pack<<Stream::eos;
         std::cout<<" ****************************************************************该战术战报Id为  "<<static_cast<UInt32>(_battleNum)<<endl;
         battleReport0.addReport(_battleNum,_pack);
+        SetCaptureForce();
     }
 
     //战将进入战场

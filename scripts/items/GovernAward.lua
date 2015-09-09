@@ -1,3 +1,4 @@
+--[[
 local Govern_item =
 {
 	[1] = { 10000,10},    
@@ -6,7 +7,7 @@ local Govern_item =
 	[4] = { 4000,  0},
 	[5] = { 0,     0}
 }
-
+--]]
 
 local Govern_monster =
 {
@@ -36,7 +37,7 @@ function RandMonster(group)
     return Govern_monster[group][index];
 end
 
-
+--[[
 function GetGovernDropMoney(res)
 	return Govern_item[res][1]
 end
@@ -44,6 +45,6 @@ end
 function GetGovernDropItem(res)
     return Govern_item[res][2]
 end
-
+-]]
 
 --print(GetGovernDropMoney(1))

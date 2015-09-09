@@ -100,4 +100,23 @@ namespace Battle
         return vecReport;
     }
 
+
+    void Report2IdTable::RemoveReports(UInt32 roomId)
+    {
+        for( auto it = _vecReportId.begin() ; it != _vecReportId.end();)
+        {
+            if( (*it)->GetRoomId() == roomId )
+            {
+                delete (*it);
+                (*it) = NULL;
+                it = _vecReportId.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+        //DB7().PushUpdateData("delete from `report2id`  where roomId=%u ",roomId);
+    }
+
 };
