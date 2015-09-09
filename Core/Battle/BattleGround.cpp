@@ -1589,7 +1589,7 @@ namespace Battle
                     }
                 }
             }
-        }while( CheckIsStop() );
+        }while( !CheckIsStop() );
 
         camp2fighters_copy.clear();
         std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
