@@ -117,6 +117,7 @@ namespace Battle
             {
                 //map_player.clear();
                 currentBf = NULL;
+                _isNpc = false;
                 map2fighter.clear();
                 _camp2pos.clear();
                 camp2fighters.clear();
@@ -259,6 +260,13 @@ namespace Battle
             void  SendBattleResultInfo();
 
             void AutoEnterFighters(UInt8 index, GObject::Player *pl, UInt16 pos = 0);
+
+            void ClearArenaPos();
+            
+            void SetIsNPC(bool v){ _isNpc = v;}
+            bool GetIsNPC(){ return _isNpc;}
+            UInt32 GetBattleNUmber(){ return _battleNum;} 
+
         private:
             UInt32 _roomId;   //房间id  没有的话 就默认就是0
             UInt8 _x;
@@ -297,6 +305,8 @@ namespace Battle
             std::list<Node>  _closeList;
             std::list<Node>  _openList;
             std::vector<Ascoord> _aroundAscoord;
+
+            bool _isNpc;
     };
 }
 #endif // BATTLEGROUND_H_

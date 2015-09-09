@@ -209,6 +209,21 @@ namespace GObject
         UInt16 limitCount;
     };
 
+    struct DBArenaRobot
+    {
+        UInt16 index;
+        UInt16 firstIndex; 
+        UInt16 robotId;
+    };
+
+    struct DBArenaReport
+    {
+        UInt64 playerId;
+        UInt32 battleId;
+        std::string name;
+        UInt16 index;
+        UInt32 power;
+    };
 }
 namespace DB
 {
@@ -450,6 +465,26 @@ namespace DB
         UInt8,  pageId,
         UInt8,  index,
         UInt16, limitCount
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBArenaRobot)
+    SPECIALDEF(3)
+    (
+     UInt16, index,
+     UInt16, firstIndex,
+     UInt16, robotId
+    )
+    SPECIALEND()
+
+    SPECIALBEGIN(GObject::DBArenaReport)
+    SPECIALDEF(5)
+    (
+     UInt64, playerId,
+     UInt32, battleId,
+     std::string, name,
+     UInt16, index,
+     UInt32, power
     )
     SPECIALEND()
 }

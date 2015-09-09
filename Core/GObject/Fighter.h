@@ -103,6 +103,9 @@ namespace GObject
 
             void SetSkill(std::string skill);
 
+            void SetArenaPos(UInt16 pos){ _Arena = pos;}
+            UInt16 GetArenaPos() { return _Arena;}
+
             UInt32 GetFighterAttr(UInt8 index)
             { 
                 static UInt32 baseUp[]= {20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
@@ -154,6 +157,11 @@ namespace GObject
             UInt32 GetFighterEquipUpAttr(UInt8 index)
             { 
                UInt8 cls = GetTypeId();
+               UInt16 arena = 0;
+               UInt16 arenaLevel = 0;
+               if(!_owner)
+                   arenaLevel = ((3001 - GetArenaPos())*15/3000 + 15);
+
                switch(index)
                { 
                    //攻击
@@ -162,6 +170,8 @@ namespace GObject
                            //步兵，骑兵，弓手，枪兵，谋士
                            UInt32 AttackForWeapon[e_fighter_max] = {40,50,30,0,40};
                            UInt32 value = GetVar(FVAR_WEAPON_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForWeapon[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        //魔法攻击
@@ -169,6 +179,8 @@ namespace GObject
                        {
                            UInt32 AttackForWeapon[e_fighter_max] = {0,0,0,30,0};
                            UInt32 value = GetVar(FVAR_WEAPON_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForWeapon[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -177,6 +189,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor1[e_fighter_max] = {50,40,25,25,40};
                            UInt32 value = GetVar(FVAR_ARMOR1_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor1[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -185,6 +199,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor2[e_fighter_max] = {30,30,35,40,30};
                            UInt32 value = GetVar(FVAR_ARMOR2_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor2[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -193,6 +209,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor4[e_fighter_max] = {9,12,10,10,10};
                            UInt32 value = GetVar(FVAR_ARMOR4_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor4[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -201,6 +219,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor4[e_fighter_max] = {6,3,5,5,5};
                            UInt32 value = GetVar(FVAR_ARMOR4_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor4[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -209,6 +229,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor5[e_fighter_max] = {10,10,10,10,10};
                            UInt32 value = GetVar(FVAR_ARMOR5_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor5[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -217,6 +239,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor5[e_fighter_max] = {2,2,2,2,2};
                            UInt32 value = GetVar(FVAR_ARMOR5_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor5[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -225,6 +249,8 @@ namespace GObject
                        {
                            UInt32 AttackForArmor3[e_fighter_max] = {40,40,20,20,50};
                            UInt32 value = GetVar(FVAR_ARMOR3_ENCHANT);
+                           if(arenaLevel)
+                               value = arenaLevel;
                            return AttackForArmor3[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
@@ -272,6 +298,7 @@ namespace GObject
             UInt16 _childTypeId;
             UInt8 _color; 
             std::map<UInt8,UInt16> m_skills;  //仅global使用
+            UInt16 _Arena;
 };
 typedef GGlobalObjectManagerT<Fighter, UInt32> GlobalFighters;
 extern GlobalFighters globalFighters;

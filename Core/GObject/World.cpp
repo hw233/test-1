@@ -18,6 +18,7 @@
 #include "Battle/BattleReportAnalyse.h"
 #include "GObject/Exploit.h"
 #include "GData/Map.h"
+#include "GData/Robot.h"
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -370,9 +371,9 @@ namespace GObject
         UInt32 pos = pl->GetVar(VAR_ARENA_POS) ;
         if(pos && pos <= 3000)
         { 
-            Player * p = World::arenaSort[pos];
+            Player * p = World::arenaSort[pos].pl;
             if(!p)
-                World::arenaSort[pos] = pl;
+                World::arenaSort[pos] = ArenaMember(pl);
         } 
         return true;
     } 
@@ -407,7 +408,9 @@ namespace GObject
         for(auto it = arenaSort.begin(); it != arenaSort.end(); ++it)
         { 
             UInt16 pos = it->first;
-            GObject::Player* pl = it->second;
+            GObject::Player* pl = it->second.pl;
+            if(!pl)
+                continue;
             UInt8 index = 0;
 
             if(!pos)
@@ -455,4 +458,27 @@ namespace GObject
             GLOBAL().PushMsg(hdr,NULL);
         }
     }
+    void World::UpdateArena(UInt16 oldIndex ,UInt16 index)
+    { 
+        ArenaMember am = arenaSort[index];
+        if(am.pl)
+            return ;
+
+        if(oldIndex)
+            DB1().PushUpdateData("DELETE `arenaRobot` where index = %u",oldIndex); 
+
+        if(!index && index < 3001)
+            DB1().PushUpdateData("REPLACE INTO `arenaRobot` values(%u, %u, %u)",index,am.firstIndex, am.robotId); 
+    } 
+    ArenaMember World::GetArenaMember(UInt16 index)
+    { 
+        if(!arenaSort[index].NotEmpty())
+        { 
+           UInt32 robotId = uRand(GData::robotInfo.GetRobotSize())+1;
+           if(robotId && robotId < GData::robotInfo.GetRobotSize())
+               arenaSort[index] = ArenaMember(index,robotId);
+           UpdateArena(0,index);
+        } 
+        return arenaSort[index];
+    } 
 }

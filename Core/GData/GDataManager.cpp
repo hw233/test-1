@@ -22,6 +22,8 @@
 #include "GData/ClanBattleBase.h"
 #include "GData/BattleMap.h"
 #include "GData/ExploitTable.h"
+#include "GData/Robot.h"
+#include "GData/GlobalPVPName.h"
 namespace GData
 {
     //静态成员申明区
@@ -116,6 +118,17 @@ namespace GData
             std::abort();
         }
 
+        if( !LoadGlobalRobot())
+        {
+            fprintf(stderr, "Load Global Robot Error !\n");
+            std::abort();
+        }
+
+        if( !LoadGlobalPVPName())
+        {
+            fprintf(stderr, "Load Global PVP Name Error !\n");
+            std::abort();
+        }
         return true;
     }
     bool GDataManager::LoadExpData()
@@ -607,6 +620,42 @@ namespace GData
             if( exploitInfo == NULL )
                 return false;
             GData::exploitTable.LoadExpoit(exploitInfo);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GDataManager::LoadGlobalRobot()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Global Robot");
+        lc.reset(1000);
+        DBGlobalRobot robot;
+        if(execu->Prepare("SELECT `index`,`front`,`fgt1`,`fgt2`,`fgt3`,`fgt4`,`fgt5` FROM `robot`", robot) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::robotInfo.LoadRobot(robot.index, robot.front, robot.fgt1, robot.fgt2, robot.fgt3, robot.fgt4, robot.fgt5);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GDataManager::LoadGlobalPVPName()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading Global Robot");
+        lc.reset(1000);
+        DBGlobalPVPName pvpName;
+        if(execu->Prepare("SELECT `index`,`name` from `globalPVPName`", pvpName) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::globalPVPName.LoadNames(pvpName.index, pvpName.name);
             lc.advance();
         }
         lc.finalize();

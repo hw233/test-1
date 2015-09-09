@@ -37,6 +37,7 @@
 
 #define IDTYPE UInt64   //LIBO
 #define MAIL_LIST_MAX 10
+#define ARENA_BATTLE_MAX 5
 namespace Battle
 {
     class BattleSimulator;
@@ -73,6 +74,26 @@ namespace GObject
         lineup line[6];
     };
 
+    struct ArenaBattleInfo
+    {
+        UInt32 battleId;
+        std::string name;
+        UInt16 index;
+        UInt32 power;
+        ArenaBattleInfo()
+        { 
+            battleId = 0;
+            index = 0;
+            power = 0;
+        } 
+        ArenaBattleInfo(UInt32 bId, std::string n, UInt16 idx, UInt32 p)
+        { 
+            battleId = bId;
+            name = n;
+            index = idx;
+            power = p;
+        } 
+    };
 
     struct ClanBattleFighter
     {
@@ -358,6 +379,7 @@ namespace GObject
             void LoadArenaDefendLayout(UInt8 index , UInt16 fighterId);
             std::map<UInt8,UInt16> GetArenaLayout();
             void SetArenaLayout(UInt8 index, UInt16 fighterId);
+            void GetArenaDefendStream(Stream& st);
 
             std::map<UInt8,UInt16> GetArenaDefendLayout();
             void SetArenaDefendLayout(UInt8 index, UInt16 fighterId);
@@ -374,6 +396,10 @@ namespace GObject
             void BuyItem(UInt8 pageId,UInt8 index,UInt8 num);
             bool UseItem(UInt32 itemId,UInt16 num);
             void ResetClanBattleData();
+
+            //ARENA Battle
+            void InsertArenaBattleReport(ArenaBattleInfo abi, bool update = true);
+            void GetArenaBattleReport(Stream& st);
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -434,6 +460,9 @@ namespace GObject
             std::vector<LoseInfo> vecLoseInfo;
 
             StoreA* m_storeA;
+
+            //ARENABATTLE
+            std::list<ArenaBattleInfo > _arenaBattleReport;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

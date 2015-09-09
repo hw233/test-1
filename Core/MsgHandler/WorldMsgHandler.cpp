@@ -26,4 +26,6 @@ MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_REPORTList,OnClanBattleReportList);
 MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_RANK,OnClanBattleRank);
 MSG_REG_2(GameMsgHdr,REQ::CLAN_BATTLE_RESULTINFO,OnClanBattleResultInfo);
 
+MSG_REG_2(GameMsgHdr,REQ::BATTLE_ARENA,OnBattleArenaOption);
+
 MSG_HANDLER_END()

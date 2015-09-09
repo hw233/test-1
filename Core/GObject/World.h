@@ -21,6 +21,7 @@ namespace Script
 }
 namespace GObject
 {
+    class Player;
     struct RCSort
     {
         GObject::Player* player;
@@ -34,7 +35,19 @@ namespace GObject
     };
     typedef std::multiset<RCSort, lt_rcsort> RCSortType;
 
-    typedef std::map<UInt16,GObject::Player*> MapIndexPlayer;
+
+    struct  ArenaMember
+    {
+        Player* pl; 
+        UInt16 firstIndex;
+        UInt16 robotId;
+        ArenaMember(Player* p){ pl = p; firstIndex = 0; robotId = 0;}
+        ArenaMember(UInt16 fp, UInt16 rId) {pl = NULL; firstIndex = fp; robotId = rId;}
+        ArenaMember(){pl=NULL; firstIndex = 0; robotId = 0;}
+        bool NotEmpty(){ return pl!=NULL || (firstIndex !=0 && robotId != 0);}
+    };
+
+    typedef std::map<UInt16,ArenaMember> MapIndexPlayer;
 
     //class ChatHold;
     class World
@@ -48,6 +61,8 @@ namespace GObject
             inline Script::BattleFormula* getBattleFormula() {return _battleFormula;}
             ChatHold* GetChatHold(){return chatHold;}
 
+            void UpdateArena(UInt16 oldIndex, UInt16 index);
+            ArenaMember GetArenaMember(UInt16 index);
         private:
             static void InitRank();
             static void World_Midnight_Check( World * );
@@ -61,6 +76,7 @@ namespace GObject
             static void World_Store_Fresh(World*);
         public:
             //static RCSortType arenaSort;
+
             static MapIndexPlayer arenaSort;
 
         private:

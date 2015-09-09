@@ -527,11 +527,11 @@ void OnBattleArenaOption(GameMsgHdr& hdr, const void * data)
             {
                 UInt16 targetPos = 0;
                 br >> targetPos;
-                for(UInt8 i = 0; i < 7; ++i)
+                for(UInt8 i = 0; i < 6; ++i)
                 { 
-                    UInt8 fighterId = 0;
+                    UInt16 fighterId = 0;
                     br >> fighterId;
-                    player->SetArenaLayout(i+1,fighterId);
+                    player->SetArenaLayout(i,fighterId);
                 } 
                 player->AttackArenaPos(targetPos);
             }

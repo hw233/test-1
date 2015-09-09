@@ -46,6 +46,8 @@ namespace GObject
             static bool loadReport2Id();  //某一城市对应的战报Id
             static bool loadClanBattleAllCityStatus();
             //static bool loadStoreA();
+            static bool loadArenaRobot();
+            static bool loadArenaReport();
         private:
             static std::map<UInt32, ItemEquip *> equips;
     };
