@@ -3,7 +3,7 @@
 #define __REPORT2ID_H__
 #include"Config.h"
 #include"Common/TimeUtil.h"
-
+#include "Server/WorldServer.h"
 namespace Battle
 {
 

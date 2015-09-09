@@ -373,6 +373,7 @@ namespace GObject
             void FreshStoreItems(UInt8 pageId);
             void BuyItem(UInt8 pageId,UInt8 index,UInt8 num);
             bool UseItem(UInt32 itemId,UInt16 num);
+            void ResetClanBattleData();
     private:
             //IDTYPE _id;
             std::string _accounts;
