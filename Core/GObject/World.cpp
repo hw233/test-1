@@ -220,6 +220,8 @@ namespace GObject
         for( auto it = room2Distribute.begin(); it != room2Distribute.end(); ++it )
         {
             UInt32 roomId = it->first;
+            if( roomId == 0 )
+                continue;
             Battle::RoomAllCityStatus* status = Battle::roomAllCityStatusManager.GetRoomAllCityStatus(roomId);
             if( status->GetStage() != 1 )
                 continue;
