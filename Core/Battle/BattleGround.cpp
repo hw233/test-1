@@ -1579,7 +1579,6 @@ namespace Battle
                             break;
                         }
                         camp2fighters_copy[it->first] = listFighter;
-                        ++actCount;
                     }
                 }
             }
