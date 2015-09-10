@@ -556,6 +556,12 @@ void OnBattleArenaOption(GameMsgHdr& hdr, const void * data)
                 player->send(st);
             }
             break;
+        case 5:
+        case 6:
+            Stream st(REP::BATTLE_ARENA);
+            st << static_cast<UInt8>(5);
+            
+            st << Stream::eos;
     } 
 } 
 
