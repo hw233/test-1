@@ -116,7 +116,7 @@ namespace Battle
                 ++it;
             }
         }
-        //DB7().PushUpdateData("delete from `report2id`  where roomId=%u ",roomId);
+        DB7().PushUpdateData("delete from `report2id`  where roomId=%u ",roomId);
     }
 
 };

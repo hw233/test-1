@@ -326,11 +326,7 @@ namespace Battle
        std::vector<GObject::Player*> vecPlayer = GetAllJoinPlayer();
        for( auto it = vecPlayer.begin(); it != vecPlayer.end(); ++it )
        {
-           (*it)->SetJoinClanBattle(0);
-           (*it)->SetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM,0);
-           (*it)->SetVar(GObject::VAR_MAX_CONSTANTLYKILL,0);
-           (*it)->SetVar(GObject::VAR_MAX_ENDCONSTANTLYKILL,0);
-           (*it)->ClearAllBattleFighter();
+           (*it)->ResetClanBattleData();
        }
        std::vector<UInt32> vecJoinClans = GetJoinClan();
        for( auto it = vecJoinClans.begin(); it != vecJoinClans.end(); ++it )
