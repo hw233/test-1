@@ -560,8 +560,24 @@ void OnBattleArenaOption(GameMsgHdr& hdr, const void * data)
         case 6:
             Stream st(REP::BATTLE_ARENA);
             st << static_cast<UInt8>(5);
-            
+            for(UInt8 i = 0; i < 50; ++i) 
+            { 
+                GObject::ArenaMember am = WORLD().GetArenaMember(i);
+                if(am.pl)
+                { 
+                    st << pl->GetName();
+                } 
+                else
+                {
+                    if(am.robotId)
+                    {
+                        name = GData::globalPVPName.GetName(am.robotId);
+                        st << name;
+                    }
+                }
+            } 
             st << Stream::eos;
+            player->send(st);
     } 
 } 
 
