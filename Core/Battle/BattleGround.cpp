@@ -2236,7 +2236,7 @@ namespace Battle
 
             GData::RobotInfo ri = GData::robotInfo.GetRobot(am.robotId);
 
-            UInt8 front = ri.ground; //GetFrontFromPos(am.firstIndex);
+            UInt8 front = ri.ground % 6; //GetFrontFromPos(am.firstIndex);
             for(UInt8 i = 0, j =0; i < MAXPOS ; ++i)
             { 
                 if(i == front)
