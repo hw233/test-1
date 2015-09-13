@@ -19,9 +19,9 @@ namespace GData
     UInt8 VipBaseTable::GetVipLevel(UInt32 coinCount)
     {
         UInt8 level = 0;
-        for( UInt8 i = 1 ; i <= VIP_MAX ; ++i )
+        for( UInt8 i = 1 ; i < VIP_MAX ; ++i )
         {
-            if( vipBaseTable[i]->GetNeedCoin() >= coinCount )
+            if( vipBaseTable[i]->GetNeedCoin() <= coinCount )
             {
                 ++level;
             }

@@ -669,6 +669,8 @@ namespace GObject
                 if( base == NULL )
                     return;
                 std::vector<GData::Gift> vecGift = base->GetGifts();
+
+                //发vip奖励
                 for( auto it = vecGift.begin(); it != vecGift.end(); ++it )
                 {
                     GetPackage()->AddItem((*it).itemId,(*it).count);
