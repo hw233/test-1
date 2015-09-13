@@ -28,7 +28,8 @@ namespace Battle
         pos %= MAXPOS;
         
         res |= (1 << pos);
-    } 
+    }
+
     void BattleGround::InitMapFight(UInt8 mapId)   
     { 
 
@@ -1593,6 +1594,7 @@ namespace Battle
         std::cout<<" ****************************************************************该战术战报Id为  "<<static_cast<UInt32>(_battleNum)<<endl;
         battleReport0.addReport(_battleNum,_pack);
         SetCaptureForce();
+        std::cout<<" 竞技场  的胜利的势力Id 为 " <<static_cast<UInt32>(GetCaptureId())<<std::endl;
     }
 
     //战将进入战场

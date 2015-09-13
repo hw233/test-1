@@ -2,6 +2,8 @@
 
 void ReportAnalyse::AnalyseReport(Stream st)
 {
+    if( st.size() == 0 )
+        return;
     UInt32 protoId = 0;
     st>> protoId; 
     std::cout<< " the protoId is " << static_cast<UInt32>(protoId)<<std::endl;

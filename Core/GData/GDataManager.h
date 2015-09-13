@@ -32,6 +32,7 @@ namespace GData
             static bool LoadGlobalRobot();
             static bool LoadGlobalPVPName();
             static bool LoadArenaReport();
+            static bool LoadPlayerVip();
 
         private:
 
