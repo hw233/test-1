@@ -516,7 +516,7 @@ namespace GData
 
             StringTokenizer st1(AwardInfo.itemNums,",");
             for(UInt8 i = 0; i < st1.count(); ++i)
-                vecNum.push_back(::atoi(st[i].c_str()));
+                vecNum.push_back(::atoi(st1[i].c_str()));
 
             if( vecId.size() != vecNum.size() )
                 return false;
@@ -688,11 +688,15 @@ namespace GData
             std::vector<UInt32> vecNum;
             StringTokenizer st(playerVip.itemIds,",");
             for(UInt8 i = 0; i < st.count(); ++i)
+            {
                 vecId.push_back(::atoi(st[i].c_str()));
+            }
 
             StringTokenizer st1(playerVip.itemNums,",");
             for(UInt8 i = 0; i < st1.count(); ++i)
-                vecNum.push_back(::atoi(st[i].c_str()));
+            {
+                vecNum.push_back(::atoi(st1[i].c_str()));
+            }
 
             if( vecId.size() != vecNum.size() )
                 return false;

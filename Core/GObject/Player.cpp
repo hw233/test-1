@@ -661,20 +661,34 @@ namespace GObject
                 return;
             UInt8 oldLevel = GetVipLevel();
             UInt8 level = GData::vipTable.GetVipLevel(totalRecharge);
+            if( level >= 15 )
+            {
+                std::cout<<" 真乃神人耶  "<<std::endl;
+                level = 15;
+            }
             if( level > oldLevel )
             {
                 SetVipLevel(level);
                 //发奖励
-                GData::VipBase* base = GData::vipTable.GetVipBase(level);
-                if( base == NULL )
-                    return;
-                std::vector<GData::Gift> vecGift = base->GetGifts();
-
-                //发vip奖励
-                for( auto it = vecGift.begin(); it != vecGift.end(); ++it )
+                std::cout<<" 发vip奖励啦 "<<std::endl;
+                for( UInt8 i = oldLevel+1 ; i <= level ; ++i )
                 {
-                    GetPackage()->AddItem((*it).itemId,(*it).count);
+                    std::cout<<" vip 等级  "<<static_cast<UInt32>(i);
+                    GData::VipBase* base = GData::vipTable.GetVipBase(level);
+                    if( base == NULL )
+                        return;
+                    std::vector<GData::Gift> vecGift = base->GetGifts();
+
+                    //发vip奖励
+                    for( auto it = vecGift.begin(); it != vecGift.end(); ++it )
+                    {
+                        std::cout<<" 奖励id   奖励数量 "<<static_cast<UInt32>((*it).itemId)<<"  " <<static_cast<UInt32>((*it).count);
+                        GetPackage()->AddItem((*it).itemId,(*it).count);
+                    }
+
+                    std::cout<<endl;
                 }
+
             }
         }
 

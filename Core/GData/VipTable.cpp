@@ -13,6 +13,8 @@ namespace GData
 
     VipBase* VipBaseTable::GetVipBase(UInt8 level)
     {
+        if( level == 0 )
+            return NULL;
         return vipBaseTable[level];
     }
 
