@@ -23,6 +23,8 @@
 #include "Battle/ClanBattleCityStatus.h"
 #include "Battle/BattleManager.h"
 #include "GObject/World.h"
+#include "GData/GlobalPVPName.h"
+#include "GData/Robot.h"
 
 #include <mysql.h>
 #include "Memcached.h"
@@ -558,26 +560,72 @@ void OnBattleArenaOption(GameMsgHdr& hdr, const void * data)
             break;
         case 5:
         case 6:
-            Stream st(REP::BATTLE_ARENA);
-            st << static_cast<UInt8>(5);
-            for(UInt8 i = 0; i < 50; ++i) 
-            { 
-                GObject::ArenaMember am = WORLD().GetArenaMember(i);
-                if(am.pl)
+            {
+                Stream st(REP::BATTLE_ARENA);
+                st << static_cast<UInt8>(5);
+                for(UInt8 i = 0; i < 50; ++i) 
                 { 
-                    st << pl->GetName();
-                } 
-                else
-                {
-                    if(am.robotId)
+                    GObject::ArenaMember am = WORLD().GetArenaMember(i);
+                    if(am.pl)
+                    { 
+                        st << am.pl->GetVar(VAR_BATTLE_POINT);
+                        st << am.pl->GetName();
+                    } 
+                    else
                     {
-                        name = GData::globalPVPName.GetName(am.robotId);
-                        st << name;
+                        if(am.robotId)
+                        {
+                            GData::RobotInfo ri = GData::robotInfo.GetRobot(am.robotId);
+                            st << ri.GetPower()*5*am.firstIndex/100;
+                            std::string name = GData::globalPVPName.GetName(am.robotId);
+                            st << name;
+                        }
                     }
-                }
-            } 
-            st << Stream::eos;
-            player->send(st);
+                } 
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 7:
+            {
+                Stream st(REP::BATTLE_ARENA);
+                st << static_cast<UInt8>(7);
+                player->GetArenaBattleReport(st);
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 8:
+            {
+               for(UInt8 i =0; i < 6; ++i)  
+               { 
+                   UInt16 fighterId = 0;
+                   br >> fighterId;
+                   player->SetArenaDefendLayout(i,fighterId);
+               } 
+               Stream st(REP::BATTLE_ARENA);
+               st << static_cast<UInt8>(8);
+               st << static_cast<UInt8>(0);
+               st << Stream::eos;
+               player->send(st);
+            }
+            break;
+        case 9:
+            {
+                Stream st(REP::BATTLE_ARENA);
+                st << static_cast<UInt8>(9);
+                std::map<UInt8, UInt16> m = player->GetArenaDefendLayout();
+                for(UInt8 i = 0; i < 6; ++i)
+                { 
+                    st << static_cast<UInt16>(m[i]);
+                } 
+                st << Stream::eos;
+                player->send(st);
+            }
+            break;
+        case 10:
+                player->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
+            break;
     } 
 } 
 

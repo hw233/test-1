@@ -55,7 +55,7 @@ namespace GObject
         VAR_ARENA_RAND = 25, //竞技场随机选择
         VAR_ARENA_TIME = 26, //竞技场时间
         VAR_ARENA_COUNT = 27, //竞技场次数
-        VAR_ARENA_MONEY = 27, //竞技场货币
+        VAR_ARENA_MONEY = 28, //竞技场货币
 
         //武装
         VAR_0_WALK_ENCHANT = 30,    //步兵强化值

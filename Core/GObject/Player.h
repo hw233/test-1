@@ -77,16 +77,18 @@ namespace GObject
     struct ArenaBattleInfo
     {
         UInt32 battleId;
+        UInt8  res;
         std::string name;
         UInt16 index;
         UInt32 power;
         ArenaBattleInfo()
         { 
             battleId = 0;
+            res = 0;
             index = 0;
             power = 0;
         } 
-        ArenaBattleInfo(UInt32 bId, std::string n, UInt16 idx, UInt32 p)
+        ArenaBattleInfo(UInt32 bId, UInt8 res, std::string n, UInt16 idx, UInt32 p)
         { 
             battleId = bId;
             name = n;
