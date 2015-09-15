@@ -7,6 +7,8 @@ function update_data()
    #mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20141023_cHorcruxHoldAttr.sql
    mysql -h$H -u$U -p$P -P$PT $DBD < update/Create_Robot.sql
    mysql -h$H -u$U -p$P -P$PT $DBD < update/Create_Global_PVP_Name.sql
+   mysql -h$H -u$U -p$P -P$PT $DBD < update/Create_Vip.sql
+
 
    # mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from horcruxHoldAttr1; source horcruxHoldAttr1;";
    # mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from horcruxHoldAttr2; source horcruxHoldAttr2;";
