@@ -402,6 +402,8 @@ namespace GObject
             //ARENA Battle
             void InsertArenaBattleReport(ArenaBattleInfo abi, bool update = true);
             void GetArenaBattleReport(Stream& st);
+            UInt8 GetVipLevel() const { return vipLevel;}
+            void SetVipLevel(UInt8 level) { vipLevel = level;}
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -465,6 +467,8 @@ namespace GObject
 
             //ARENABATTLE
             std::list<ArenaBattleInfo > _arenaBattleReport;
+
+            UInt8 vipLevel;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

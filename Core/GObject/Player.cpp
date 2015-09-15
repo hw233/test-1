@@ -15,6 +15,7 @@
 #include "GObject/World.h"
 #include "GData/GlobalPVPName.h"
 #include "GData/Robot.h"
+#include "GData/VipTable.h"
 
 #define P_CHAT_MAX 10
 namespace GObject
@@ -36,7 +37,7 @@ namespace GObject
 
 
     //GlobalNamedPlayers globalAccountsPlayers;
-    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),killSoldiersNum(0) , killFighterNum(0),beKilledFighterNum(0)
+    Player::Player( IDTYPE id ): GObjectBaseT<Player, IDTYPE>(id),_isOnline(false),_session(-1),_friendMax(10),killSoldiersNum(0) , killFighterNum(0),beKilledFighterNum(0), vipLevel(0) 
     {
         m_pVars = new VarSystem(id);
         m_Package = new Package(this); 
@@ -202,6 +203,16 @@ namespace GObject
 
     void Player::Login()
     { 
+
+        UInt32 totalRecharge = GetVar(VAR_TOTAL_RECHARGE);
+        if( totalRecharge > 0 )
+        {
+            UInt8 level = GData::vipTable.GetVipLevel(totalRecharge);
+            if( level > 0 )
+            {
+                SetVipLevel(level);
+            }
+        }
         //TODO
         Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,"1,1",0,static_cast<UInt32>(-1));
         if(mail)
@@ -642,6 +653,46 @@ namespace GObject
         if( type <= 0 || type > 3)
             return;
         AddVar(type ,num);
+        if( type == 3 )
+        {
+            AddVar(VAR_TOTAL_RECHARGE,num);
+            UInt32 totalRecharge = GetVar(VAR_TOTAL_RECHARGE);
+            std::cout<<" 总的充值元宝数量 "<< static_cast<UInt32>(GetVar(VAR_TOTAL_RECHARGE)) <<std::endl;
+            if( totalRecharge == 0 )
+                return;
+            UInt8 oldLevel = GetVipLevel();
+            UInt8 level = GData::vipTable.GetVipLevel(totalRecharge);
+            if( level >= 15 )
+            {
+                std::cout<<" 真乃神人耶  "<<std::endl;
+                level = 15;
+            }
+            if( level > oldLevel )
+            {
+                SetVipLevel(level);
+                //发奖励
+                std::cout<<" 发vip奖励啦 "<<std::endl;
+                for( UInt8 i = oldLevel+1 ; i <= level ; ++i )
+                {
+                    std::cout<<" vip 等级  "<<static_cast<UInt32>(i);
+                    GData::VipBase* base = GData::vipTable.GetVipBase(level);
+                    if( base == NULL )
+                        return;
+                    std::vector<GData::Gift> vecGift = base->GetGifts();
+
+                    //发vip奖励
+                    for( auto it = vecGift.begin(); it != vecGift.end(); ++it )
+                    {
+                        std::cout<<" 奖励id   奖励数量 "<<static_cast<UInt32>((*it).itemId)<<"  " <<static_cast<UInt32>((*it).count);
+                        GetPackage()->AddItem((*it).itemId,(*it).count);
+                    }
+
+                    std::cout<<endl;
+                }
+
+            }
+        }
+
     }
     
     UInt8 Player::GetFreeSearch()
@@ -1364,7 +1415,7 @@ namespace GObject
 
         AddVar(VAR_ARENA_COUNT ,1);
         UInt32 now = TimeUtil::Now();
-        SetVar(VAR_ARENA_TIME,now + 300);
+        SetVar(VAR_ARENA_TIME,now + 600);
     } 
 
     UInt8 Player::ClearArenaCD()
@@ -1441,7 +1492,7 @@ namespace GObject
         {
             return ;
         }
-        UInt32 itemId = info->GetItemId();
+        //UInt32 itemId = info->GetItemId();
         UInt16 limitCount = info->GetLimitCount();
         UInt16 price = info->GetPrice();
         UInt32 coinType = info->GetCoinType();

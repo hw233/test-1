@@ -133,6 +133,7 @@ namespace GObject
         VAR_CLANBATTLE_FIGHTERNUM = 90, 
         VAR_MAX_CONSTANTLYKILL  = 91,   //公会战最大连杀数
         VAR_MAX_ENDCONSTANTLYKILL = 92, //公会战最大终结连杀数量
+        VAR_TOTAL_RECHARGE        = 93, //总充值数量
 
         VAR_MAX
     };
@@ -191,6 +192,7 @@ namespace GObject
                 REGISTER_VAR(VAR_ARENA_POS,CYCLE_NONE);
                 REGISTER_VAR(VAR_ARENA_RAND,CYCLE_NONE);
                 REGISTER_VAR(VAR_ARENA_MONEY,CYCLE_NONE);
+                REGISTER_VAR(VAR_TOTAL_RECHARGE,CYCLE_NONE);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);

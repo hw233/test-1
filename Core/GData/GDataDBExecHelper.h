@@ -172,6 +172,15 @@ namespace GData
     };
 
 
+    struct DBPlayerVip
+    {
+        UInt8 level;
+        UInt32 needCoin;
+        std::string itemIds;
+        std::string itemNums;
+    };
+
+
     struct DBClanBattleBase
     {
         UInt8 battleId;
@@ -401,6 +410,17 @@ namespace DB
           UInt8, mapId,
           UInt32, exp,
           UInt32, moneyNum,
+          std::string, itemIds,
+          std::string, itemNums
+       )
+       SPECIALEND()
+
+
+       SPECIALBEGIN(GData::DBPlayerVip)
+       SPECIALDEF(4)
+       (
+          UInt8, level,
+          UInt32, needCoin,
           std::string, itemIds,
           std::string, itemNums
        )

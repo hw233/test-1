@@ -24,6 +24,8 @@
 #include "GData/ExploitTable.h"
 #include "GData/Robot.h"
 #include "GData/GlobalPVPName.h"
+#include "GData/VipTable.h"
+
 namespace GData
 {
     //静态成员申明区
@@ -127,6 +129,12 @@ namespace GData
         if( !LoadGlobalPVPName())
         {
             fprintf(stderr, "Load Global PVP Name Error !\n");
+            std::abort();
+        }
+
+        if( !LoadPlayerVip() )
+        {
+            fprintf(stderr, "Load player vip Error !\n");
             std::abort();
         }
         return true;
@@ -508,7 +516,7 @@ namespace GData
 
             StringTokenizer st1(AwardInfo.itemNums,",");
             for(UInt8 i = 0; i < st1.count(); ++i)
-                vecNum.push_back(::atoi(st[i].c_str()));
+                vecNum.push_back(::atoi(st1[i].c_str()));
 
             if( vecId.size() != vecNum.size() )
                 return false;
@@ -661,6 +669,50 @@ namespace GData
         lc.finalize();
         return true;
     }
+
+    bool GDataManager::LoadPlayerVip()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+        LoadingCounter lc("Loading player_vip");
+        lc.reset(1000);
+        DBPlayerVip playerVip;
+        if(execu->Prepare("SELECT `level`,`needCoin`,`itemIds`,`itemNums` FROM `player_vip`", playerVip) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            GData::VipBase* base = new(std::nothrow) GData::VipBase(playerVip.level,playerVip.needCoin);
+            if( base == NULL )
+                return false;
+            std::vector<UInt32> vecId;
+            std::vector<UInt32> vecNum;
+            StringTokenizer st(playerVip.itemIds,",");
+            for(UInt8 i = 0; i < st.count(); ++i)
+            {
+                vecId.push_back(::atoi(st[i].c_str()));
+            }
+
+            StringTokenizer st1(playerVip.itemNums,",");
+            for(UInt8 i = 0; i < st1.count(); ++i)
+            {
+                vecNum.push_back(::atoi(st1[i].c_str()));
+            }
+
+            if( vecId.size() != vecNum.size() )
+                return false;
+            std::vector<Gift> vecGifts;
+            for(UInt8 i = 0 ; i < vecId.size() ; ++i )
+            {
+              vecGifts.push_back(Gift(vecId[i],vecNum[i]));
+            }
+            base->SetGifts(vecGifts);
+            GData::vipTable.InsertVipBase(base);
+            lc.advance();
+        }
+        lc.finalize();
+        return true;
+    }
+
 }
 
 
