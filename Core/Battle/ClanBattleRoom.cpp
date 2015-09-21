@@ -342,6 +342,8 @@ namespace Battle
         {
            if( (*it)->GetRoomId() == roomId )
            {
+               delete (*it);
+               (*it) = NULL;
                it = _roomList.erase(it);
                //删除数据库
                DB7().PushUpdateData("delete from `clan_battle_room`  where roomId=%u ",roomId);

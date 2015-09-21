@@ -47,6 +47,7 @@ namespace GObject
         m_governManager = new GovernManager(this);
         m_exploitManager = new ExploitManager(this);
         m_storeA = new StoreA(this);
+        m_taskManager = new TaskManager(this);
         _ArenaLayout.clear();
         _ArenaDefendLayout.clear();
     }
