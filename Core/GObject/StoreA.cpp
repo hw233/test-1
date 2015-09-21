@@ -45,7 +45,7 @@ namespace GObject
         Clear();
         if( !GameAction()->loadItems(_owner))
             return;
-        TestPrint();
+        //TestPrint();
     }
 
     UInt32 static needCoin[2][2] = {
