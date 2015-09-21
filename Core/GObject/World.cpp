@@ -467,7 +467,7 @@ namespace GObject
             return ;
 
         if(oldIndex)
-            DB1().PushUpdateData("DELETE `arenaRobot` where index = %u",oldIndex); 
+            DB1().PushUpdateData("DELETE from `arenaRobot` where index = %u",oldIndex); 
 
         if(!index && index < 3001)
             DB1().PushUpdateData("REPLACE INTO `arenaRobot` values(%u, %u, %u)",index,am.firstIndex, am.robotId); 

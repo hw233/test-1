@@ -49,7 +49,7 @@ namespace GObject
         VAR_EXPLOIT_IRON = 19,    //铁
         VAR_EXPLOIT_COPPER = 20,  //铜
         VAR_SIGN_MONTH_ADD = 21,  //按月签到
-        VAR_DAY_CHANGE = 22,  //按月签到
+        VAR_DAY_CHANGE = 22,  
         VAR_EXPLOIT_TIME   = 23,  //上一次采集的时间
         VAR_ARENA_POS = 24, //竞技场排名
         VAR_ARENA_RAND = 25, //竞技场随机选择
