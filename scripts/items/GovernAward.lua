@@ -33,18 +33,17 @@ function RandMonster(group)
            break
        end
     end
-    print(group..index)
-    return Govern_monster[group][index];
+    return Govern_monster[group][index]
 end
+
 
 --[[
-function GetGovernDropMoney(res)
-	return Govern_item[res][1]
-end
+for i = 1, 10 do
+    rand = math.random(1,3)
 
-function GetGovernDropItem(res)
-    return Govern_item[res][2]
-end
--]]
+    print( " rand " .. rand)
+    id = RandMonster(rand)
 
---print(GetGovernDropMoney(1))
+    print(" monster id is " ..id)
+end
+--]]

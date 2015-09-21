@@ -18,6 +18,7 @@
 #include "Govern.h"
 #include "Exploit.h"
 #include "StoreA.h"
+#include "Task.h"
 
 //VAR
 //Package
@@ -152,6 +153,7 @@ namespace GObject
     class GovernManager; //治理
     class ExploitManager; //开采
     class StoreA;  //个人商城
+    class TaskManager;  //任务系统
 
     class Player :
         public GObjectBaseT<Player,IDTYPE>
@@ -402,6 +404,8 @@ namespace GObject
             void GetArenaBattleReport(Stream& st);
             UInt8 GetVipLevel() const { return vipLevel;}
             void SetVipLevel(UInt8 level) { vipLevel = level;}
+
+            TaskManager* GetTaskManager() const { return m_taskManager;}
     private:
             //IDTYPE _id;
             std::string _accounts;
@@ -467,6 +471,8 @@ namespace GObject
             std::list<ArenaBattleInfo > _arenaBattleReport;
 
             UInt8 vipLevel;
+
+            TaskManager* m_taskManager;
 };
 
 typedef GGlobalObjectManagerT<Player, UInt64> GlobalPlayers;

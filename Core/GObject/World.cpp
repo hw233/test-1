@@ -71,7 +71,7 @@ namespace GObject
             second = ((min%TIME_ONCE)*60+sec)%TIME_TAB;
             s = TIME_ONCE*60-((min%TIME_ONCE)*60+sec);
         }
-
+        //sharpMinute
         AddTimer(10*60*1000, World_Govern_SendInfo,this,(s+1)*1000);
         AddTimer(15*1000, World_Govern_SendAward, this,(TIME_TAB-second+3)*1000);
 
