@@ -19,6 +19,8 @@
 #include "GObject/Exploit.h"
 #include "GData/Map.h"
 #include "GData/Robot.h"
+#include "Common/LoadingCounter.h"
+
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -85,12 +87,14 @@ namespace GObject
         GVAR.SetVar(GVAR_BATTLE_STATUS,3);
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        //GMHandler::Battle(1,2);
+        LoadingCounter lc("GM attack");
+        GMHandler::Battle(1,2);
+        lc.finalize();
         //GMHandler::Battle(1001,1014);
-        //GMHandler::Battle(1004,1005,2);
+        //GMHandler::Battle(1011,1017);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //std::vector<UInt8> *r = Battle::battleReport0[520];
-        //std::vector<UInt8>* r = Battle::battleReport1[903];
+        //std::vector<UInt8>* r = Battle::battleReport1[991];
         //BattleAnalyze::Analyze(Stream(*r));
         //BattleAnalyze::Analyze(Stream(*r));
         //ReportAnalyse::AnalyseReport(Stream(*r));

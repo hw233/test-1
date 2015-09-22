@@ -112,10 +112,10 @@ void BattleAnalyze::Analyze(Stream br)
             case 5:
                 { 
                     UInt8 fgtBSNumber = 0;
-                    UInt16 param = 0;
                     br >> fgtBSNumber;
                     UInt8 type = 0;
                     br >> type;
+                    UInt16 param = 0;
                     br>> param;
                     std::cout << "弓箭手攻击战将：" << static_cast<UInt32>(fgtBSNumber) <<  "伤害:" << static_cast<UInt32>(param) << std::endl;
                 } 

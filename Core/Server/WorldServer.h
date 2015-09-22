@@ -91,6 +91,7 @@ public:
     bool do_http_request(const char* url, int timeout);
 
     void updateState(const char* action);
+    bool do_http_request_for_login(UInt32 accid, std::string token, int timeout = 3);
 
 private:
     CURL* curl;

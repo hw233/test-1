@@ -104,6 +104,8 @@ public:
 
     std::string stateUrl;
     std::string chargeUrl;
+    std::string remoteUrl;
+    UInt32 appid;
     UInt16 warZone;
 
     std::string mergeList;
@@ -155,6 +157,10 @@ public:
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
     inline void setStateUrl(const char* url) { stateUrl = url; }
     inline void setChargeUrl(const char* url) { chargeUrl = url; }
+
+    inline void setRemoteUrl(const char* url) { remoteUrl = url; }  //平台
+    inline void setAppid(UInt32 app) { appid = app; }  // 游戏id
+
     inline void setWarZone(UInt16 zone) { warZone = zone; }
     inline void setServerNum(UInt32 no) { serverNum = no; }
     inline void setServerNo(UInt32 no) { serverNo = no; }

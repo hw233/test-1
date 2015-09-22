@@ -1413,7 +1413,10 @@ namespace Battle
                         camp2fighters_copy.erase(it->first);
                         break;
                     }
-                    camp2fighters_copy[it->first] = listFighter;
+                    else
+                    {
+                        camp2fighters_copy[it->first] = listFighter;
+                    }
                 }
             }
         }
@@ -1579,7 +1582,10 @@ namespace Battle
                             camp2fighters_copy.erase(it->first);
                             break;
                         }
-                        camp2fighters_copy[it->first] = listFighter;
+                        else
+                        {
+                            camp2fighters_copy[it->first] = listFighter;
+                        }
                     }
                 }
             }

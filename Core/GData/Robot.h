@@ -29,7 +29,7 @@ namespace GData
         public:
             void LoadRobot(UInt16 index,UInt8 ground, UInt16 fgt1, UInt16 fgt2, UInt16 fgt3, UInt16 fgt4, UInt16 fgt5)
             { 
-                _robots[index] = RobotInfo(index);
+                _robots[index] = RobotInfo(ground);
                 _robots[index].fighters.push_back(fgt1);
                 _robots[index].fighters.push_back(fgt2);
                 _robots[index].fighters.push_back(fgt3);
