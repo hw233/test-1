@@ -1249,12 +1249,15 @@ namespace GObject
             st<<static_cast<UInt16>((*it).peerId);
         }
     }
+
+
     void Player::ResetClanBattleData()
     {
         SetJoinClanBattle(0);
         SetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM,0);
         SetVar(GObject::VAR_MAX_CONSTANTLYKILL,0);
         SetVar(GObject::VAR_MAX_ENDCONSTANTLYKILL,0);
+        SetVar(GObject::VAR_CLANBATTLE_COMMENT_TIME,0);
         ClearAllBattleFighter();
         vecKillInfo.clear();
         vecLoseInfo.clear();
@@ -1264,6 +1267,8 @@ namespace GObject
         _battleId = 0;
         _battleSide = 0;
     }
+
+
     void Player::GetArenaInfo()
     { 
         

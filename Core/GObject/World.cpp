@@ -19,6 +19,7 @@
 #include "GObject/Exploit.h"
 #include "GData/Map.h"
 #include "GData/Robot.h"
+#include "Battle/Report2Id.h"
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -362,7 +363,10 @@ namespace GObject
             {
                 std::cout<<"处于结算阶段  开始发奖励啦"<<std::endl;
                 roomBattle->Settlement();
-                //Battle::battleManager.removeRoomBattle(roomId);
+                Battle::battleManager.removeRoomBattle(roomId);
+                Battle::clanBattleRoomManager.RemoveClanBattleRoom(roomId);
+                Battle::battleDistribute.RemoveRoomDistribute(roomId);
+                Battle::report2IdTable.RemoveReports(roomId);
             }
         }
     }
