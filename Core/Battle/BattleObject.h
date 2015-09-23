@@ -43,7 +43,7 @@ namespace Battle
 
             virtual void makeDamage(UInt32 u)
             {
-                std::cout << "XXXXX战将: " << static_cast<UInt32>(GetBSNumber()) << "伤害" << std::endl;
+                //COUT << "XXXXX战将: " << static_cast<UInt32>(GetBSNumber()) << "伤害" << std::endl;
                 if(_hp < u)
                     _hp = 0;
                 else

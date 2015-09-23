@@ -24,16 +24,16 @@ namespace GObject
 
     void StoreA::TestPrint()
     {
-        std::cout<<"   我是    "<<_owner->GetName()<<std::endl;
+        //COUT<<"   我是    "<<_owner->GetName()<<std::endl;
         for(UInt8 i = 0 ; i < 2 ; ++i )
         {
-            std::cout<<"pageId " << static_cast<UInt32>(i+1)<<std::endl;
+            //COUT<<"pageId " << static_cast<UInt32>(i+1)<<std::endl;
             for( auto it = _storeItems[i].begin(); it != _storeItems[i].end(); ++it )
             {
-                std::cout<<"   itemId   "<<static_cast<UInt32>((*it)->GetItemId());
-                std::cout<<"   limitCount  "<<static_cast<UInt32>((*it)->GetLimitCount());
-                std::cout<<"   price   "<<static_cast<UInt32>((*it)->GetPrice());
-                std::cout<<"   coinType  "<<static_cast<UInt32>((*it)->GetCoinType())<<std::endl;
+                //COUT<<"   itemId   "<<static_cast<UInt32>((*it)->GetItemId());
+                //COUT<<"   limitCount  "<<static_cast<UInt32>((*it)->GetLimitCount());
+                //COUT<<"   price   "<<static_cast<UInt32>((*it)->GetPrice());
+                //COUT<<"   coinType  "<<static_cast<UInt32>((*it)->GetCoinType())<<std::endl;
             }
         }
     }

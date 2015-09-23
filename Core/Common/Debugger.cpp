@@ -11,7 +11,7 @@
 
 
 // NOTE: In this module, we use the C library functions (fputs) for,
-// output since, at the time we're called, the C++ iostream objects std::cout, etc.
+// output since, at the time we're called, the C++ iostream objects //COUT, etc.
 // might not have been initialized yet.
 
 

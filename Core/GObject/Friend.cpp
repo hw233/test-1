@@ -123,7 +123,7 @@ namespace GObject
             return;
         if( GetFriendNum(friend_normal) >= m_owner->GetFriendMax() || pl->GetFriendManager()->GetFriendNum(friend_normal) >= pl->GetFriendMax() )
         {
-            std::cout<<"其中之一列表已满 不可添加"<<endl;
+            //COUT<<"其中之一列表已满 不可添加"<<endl;
             return;
         }
         //从申请列表中删掉
@@ -157,18 +157,18 @@ namespace GObject
             return;
         if( pl == m_owner)
         {
-            std::cout<<"不能添加自己"<<std::endl;
+            //COUT<<"不能添加自己"<<std::endl;
             return;
         }
         if( type == friend_normal && _friends[type].size() > m_owner->GetFriendMax() )
         {
-            std::cout<<"好友列表已满"<<std::endl;
+            //COUT<<"好友列表已满"<<std::endl;
             return;
         }
         bool isIn = IsInList(type,pl);
         if(isIn)
         {
-            std::cout<<"已在列表中拉"<<std::endl;
+            //COUT<<"已在列表中拉"<<std::endl;
             return ;
         }
         _friends[type].insert(pl);
@@ -183,7 +183,7 @@ namespace GObject
         bool isIn = IsInList(type,pl);
         if( !isIn )
         {
-            std::cout<<"未找到不能删除"<<std::endl;
+            //COUT<<"未找到不能删除"<<std::endl;
         }
         _friends[type].erase(pl);
         //更新数据库
@@ -197,7 +197,7 @@ namespace GObject
             return;
         if( pl->GetFriendManager()->IsInList(friend_apply,m_owner))
         {
-            std::cout<<"被申请者表里已经有这个申请者了"<<std::endl;
+            //COUT<<"被申请者表里已经有这个申请者了"<<std::endl;
             return;
         }
 
@@ -205,7 +205,7 @@ namespace GObject
         bool isInlist  = pl->GetFriendManager()->IsInList(friend_normal,m_owner);
         if( isIn & isInlist )
         {
-            std::cout<<"已经是你的好友了"<<std::endl;
+            //COUT<<"已经是你的好友了"<<std::endl;
             return;
         }
         pl->GetFriendManager()->PushInSet(friend_apply,m_owner);

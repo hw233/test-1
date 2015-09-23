@@ -15,7 +15,7 @@ namespace Battle
         if(!_target->getHP())
         {
             _target = GetField()->GetTarget(!GetSideInBS(),getPosX(),getPosY());
-            std::cout << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
+            //COUT << "战将编号"  << static_cast<UInt32>(GetBSNumber()) << "锁定目标" << static_cast<UInt32>(_target->GetBSNumber()) << std::endl;
         }
         if(_target)
         {

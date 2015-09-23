@@ -77,11 +77,11 @@ namespace Battle
     { 
         if(side > 1)
             return NULL;
-        //std::cout << "选择的Side:" << static_cast<UInt32>(side) << std::endl;
+        ////COUT << "选择的Side:" << static_cast<UInt32>(side) << std::endl;
         //FieldPrint();
         if(cur!= NULL && cur->GetSideInBS() == side)
         {
-            std::cout << "The Same Side "  << std::endl;
+            //COUT << "The Same Side "  << std::endl;
         }
         UInt16 max = -1;
         UInt8 res = -1;
@@ -165,7 +165,7 @@ namespace Battle
             return -1;
         if(adx <= bf->GetRad()+ rad)
         {
-            std::cout << "adx:" << static_cast<UInt32>(adx) << " Rad1:" << static_cast<UInt32>(bf->GetRad()) << " Rad2" << static_cast<UInt32>(rad) <<std::endl;
+            //COUT << "adx:" << static_cast<UInt32>(adx) << " Rad1:" << static_cast<UInt32>(bf->GetRad()) << " Rad2" << static_cast<UInt32>(rad) <<std::endl;
             return 0;
         }
         return adx - bf->GetRad()- rad;
@@ -186,7 +186,7 @@ namespace Battle
                     continue ;
                 if(getDistance(_fighters[j][i],x,y,bo->GetRad()) == 0)
                 {
-                    std::cout << "位置冲突: " << static_cast<UInt32>(x) << " , " << static_cast<UInt32>(y) << " 和 " << static_cast<UInt32>(_fighters[j][i]->getPosX()) << " , " << static_cast<UInt32>(_fighters[j][i]->getPosY()) <<  std::endl;
+                    //COUT << "位置冲突: " << static_cast<UInt32>(x) << " , " << static_cast<UInt32>(y) << " 和 " << static_cast<UInt32>(_fighters[j][i]->getPosX()) << " , " << static_cast<UInt32>(_fighters[j][i]->getPosY()) <<  std::endl;
                     return false;  
                 }
             } 
@@ -222,10 +222,10 @@ namespace Battle
                 st << static_cast<UInt16>(_fighters[i][j]->getPosX());
                 st << static_cast<UInt16>(_fighters[i][j]->getPosY());
                 st << static_cast<UInt16>(_fighters[i][j]->getHP());
-                //std::cout << " 入场战将分部" << std::endl;
-                //std::cout << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
-                //std::cout << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
-                //std::cout << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
+                ////COUT << " 入场战将分部" << std::endl;
+                ////COUT << " 战将编号"<<  static_cast<UInt32>(_fighters[i][j]->GetBSNumber());
+                ////COUT << " X坐标："<< static_cast<UInt32>(_fighters[i][j]->getPosX());
+                ////COUT << " Y坐标：" <<static_cast<UInt32>(_fighters[i][j]->getPosY()) << std::endl;
             } 
         } 
     } 
@@ -470,7 +470,7 @@ namespace Battle
         //if(BattlePre.begin() != BattlePre.end() && time < BattlePre.begin()->first)
         //    return ;
 
-        std::cout << "-----战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << " 准备于时间点 " <<  static_cast<UInt32>(time+4) << std::endl;
+        //COUT << "-----战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << " 准备于时间点 " <<  static_cast<UInt32>(time+4) << std::endl;
         BattlePre[time + 4].push_back(fgt);
     } 
 
@@ -478,9 +478,11 @@ namespace Battle
     { 
         for(UInt8 i = 0; i < 2; ++i)
         { 
-            std::cout << "Side" << static_cast<UInt32>(i) << std::endl;
+            //COUT << "Side" << static_cast<UInt32>(i) << std::endl;
             for(UInt8 j = 0; j < _fighters[i].size(); ++j)
-                std::cout << "战将编号:" << static_cast<UInt32>(_fighters[i][j]->GetBSNumber()) << "血量：" << static_cast<UInt32>(_fighters[i][j]->getHP()) << std::endl;
+            {
+                //COUT << "战将编号:" << static_cast<UInt32>(_fighters[i][j]->GetBSNumber()) << "血量：" << static_cast<UInt32>(_fighters[i][j]->getHP()) << std::endl;
+            }
         } 
     } 
 
@@ -490,27 +492,27 @@ namespace Battle
         { 
             case 0:
                 { 
-                    std::cout << "准备攻击者 ";
+                    //COUT << "准备攻击者 ";
                     if(FieldAttack.begin() == FieldAttack.end())
                         return ;
                     std::vector<ActionPackage> vec = FieldAttack.begin()->second;
-                    std::cout << "time：" << FieldAttack.begin()->first << std::endl;
+                    //COUT << "time：" << FieldAttack.begin()->first << std::endl;
                     for(UInt8 i = 0; i < vec.size(); ++i)
                     { 
-                        std::cout << "战将编号" << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
+                        //COUT << "战将编号" << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
                     } 
                 } 
                 break;
             case 1:
                 { 
-                    std::cout << "魔法行动列表:";
+                    //COUT << "魔法行动列表:";
                     if(FieldImage.begin() == FieldImage.end())
                         return ;
                     std::vector<ImagePackage> vec = FieldImage.begin()->second;
-                    std::cout << "time：" << FieldImage.begin()->first << std::endl;
+                    //COUT << "time：" << FieldImage.begin()->first << std::endl;
                     for(UInt8 i = 0; i < vec.size(); ++i)
                     { 
-                        std::cout << " 战将编号: " << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
+                        //COUT << " 战将编号: " << static_cast<UInt32>(vec[i].GetBattleFighter()->GetBSNumber()) << std::endl;
                     } 
                 } 
                 break;

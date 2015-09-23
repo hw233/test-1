@@ -6,24 +6,24 @@ void ReportAnalyse::AnalyseReport(Stream st)
         return;
     UInt32 protoId = 0;
     st>> protoId; 
-    std::cout<< " the protoId is " << static_cast<UInt32>(protoId)<<std::endl;
+    //COUT<< " the protoId is " << static_cast<UInt32>(protoId)<<std::endl;
 
     UInt8 mapId = 0;
     st>> mapId;
-    std::cout<<" the map is "<<static_cast<UInt32>(mapId) <<std::endl;
+    //COUT<<" the map is "<<static_cast<UInt32>(mapId) <<std::endl;
 
     UInt8 forceNum = 0;
     st>> forceNum;
-    std::cout<<" the total force count is "<< static_cast<UInt32>(forceNum)<<std::endl;
+    //COUT<<" the total force count is "<< static_cast<UInt32>(forceNum)<<std::endl;
 
     for( UInt8 index = 0; index < forceNum ; ++index )
     {
         UInt8 forceId = 0;
         st>>forceId;
-        std::cout<<" the forceId is "<<static_cast<UInt32>(forceId)<<std::endl;
+        //COUT<<" the forceId is "<<static_cast<UInt32>(forceId)<<std::endl;
         UInt8 heroNum = 0;
         st>>heroNum;
-        std::cout<<" the hero num is "<<static_cast<UInt32>(heroNum)<<std::endl;
+        //COUT<<" the hero num is "<<static_cast<UInt32>(heroNum)<<std::endl;
         for( UInt8 i=0 ; i < heroNum ; ++i )
         {
             UInt8 id = 0;
@@ -36,14 +36,14 @@ void ReportAnalyse::AnalyseReport(Stream st)
             st>>x;
             st>>y;
             st>>soldierNum;
-            std::cout<<" id " <<  static_cast<UInt32>(id)<<"  fighterId  " <<  static_cast<UInt32>(fighterId)<<"  x : " << static_cast<UInt32>(x)<<"y : " << static_cast<UInt32>(y)<<" the solider num  " << static_cast<UInt32>(soldierNum)<<std::endl;
+            //COUT<<" id " <<  static_cast<UInt32>(id)<<"  fighterId  " <<  static_cast<UInt32>(fighterId)<<"  x : " << static_cast<UInt32>(x)<<"y : " << static_cast<UInt32>(y)<<" the solider num  " << static_cast<UInt32>(soldierNum)<<std::endl;
         }
     }
 
     //行动
     UInt16 actionNum  = 0;
     st>>actionNum;
-    std::cout<<" the total act Num " << static_cast<UInt32>(actionNum)<<std::endl;
+    //COUT<<" the total act Num " << static_cast<UInt32>(actionNum)<<std::endl;
     for( UInt16 j = 0 ; j < actionNum ; ++j )
     {
         UInt8 actId = 0;
@@ -54,21 +54,21 @@ void ReportAnalyse::AnalyseReport(Stream st)
 
         st>>actId>>moveI>>moveJ>>time>>battle;
 
-        std::cout<< " the actId  is "<<static_cast<UInt32>(actId) <<" moveI " << static_cast<UInt32>(moveI) << " moveJ " << static_cast<UInt32>(moveJ) << " cost time " << static_cast<UInt32>(time) << " battle " << static_cast<UInt32>(battle)<<std::endl;
+        //COUT<< " the actId  is "<<static_cast<UInt32>(actId) <<" moveI " << static_cast<UInt32>(moveI) << " moveJ " << static_cast<UInt32>(moveJ) << " cost time " << static_cast<UInt32>(time) << " battle " << static_cast<UInt32>(battle)<<std::endl;
 
         if( battle == 1 )
         {
-            std::cout<<" 发生战斗" <<std::endl;
+            //COUT<<" 发生战斗" <<std::endl;
             UInt8 effectId = 0;
             UInt8 res = 0;
             UInt32 battleId = 0;
             st>>effectId >> res >> battleId;
-            std::cout<<" 受击战将id " << static_cast<UInt32>(effectId) <<" 战斗结果 " << static_cast<UInt32>(res)<< " 战报Id " << static_cast<UInt32>(battleId)<<std::endl;
+            //COUT<<" 受击战将id " << static_cast<UInt32>(effectId) <<" 战斗结果 " << static_cast<UInt32>(res)<< " 战报Id " << static_cast<UInt32>(battleId)<<std::endl;
         }
     }
 
     UInt32 actTime = 0;
     st>>actTime;
-    std::cout<<" 战报开始时间 " <<static_cast<UInt32>(actTime)<<std::endl;
+    //COUT<<" 战报开始时间 " <<static_cast<UInt32>(actTime)<<std::endl;
 
 }

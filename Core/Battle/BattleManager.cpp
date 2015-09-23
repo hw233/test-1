@@ -284,17 +284,17 @@ namespace Battle
             UInt8 forceId = it->first;
             UInt8 captureCityNum = it->second;
             std::vector<GObject::Player*> vecPlayer = room->GetSameForceAllies(forceId);
-            std::cout<<" 势力  "<<static_cast<UInt32>(forceId)<<"占领了   "<<static_cast<UInt32>(captureCityNum)<<"座城市 "<<std::endl;
+            //COUT<<" 势力  "<<static_cast<UInt32>(forceId)<<"占领了   "<<static_cast<UInt32>(captureCityNum)<<"座城市 "<<std::endl;
             for( auto iter = vecPlayer.begin(); iter != vecPlayer.end(); ++iter )
             {
-                std::cout<<"给 "<<(*iter)->GetName()<<"发奖励"<<std::endl;
+                //COUT<<"给 "<<(*iter)->GetName()<<"发奖励"<<std::endl;
                 GObject::Mail* mail = new GObject::Mail(IDGenerator::gMailOidGenerator.ID(),(*iter),1,"10002,100",0,static_cast<UInt32>(-1));
                 if(mail)
                 { 
                     GObject::globalMails.add(mail->GetId(), mail);
                     (*iter)->AddMail(mail->GetId());
                 }
-                std::cout<<"奖励是  : 10002 2 个呵呵呵呵" <<std::endl;
+                //COUT<<"奖励是  : 10002 2 个呵呵呵呵" <<std::endl;
             }
 
         }
@@ -309,7 +309,7 @@ namespace Battle
         //先找到最大的占城个数
         for( auto it = force2captureCityNum.begin(); it != force2captureCityNum.end(); ++it )
         {
-            std::cout<<static_cast<UInt32>(it->first)<<endl;
+            //COUT<<static_cast<UInt32>(it->first)<<endl;
             if( it->second > max )
             {
                 max = it->second;

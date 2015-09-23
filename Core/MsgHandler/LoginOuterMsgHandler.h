@@ -98,6 +98,7 @@ struct UserReconnectStruct
 struct UserLoginStruct
 {
     std::string phoneId;
+    //std::string token;
     std::string accounts;
     std::string password;
     //typedef Array<UInt8, 36> HashValType;
@@ -108,6 +109,7 @@ struct UserLoginStruct
     //std::string _openkey;
     //std::string _via;
     //std::string _para;
+    //MESSAGE_DEF4(REQ::LOGIN, std::string, phoneId, std::string token, std::string, accounts, std::string, password /*, HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via , std::string, _para */);
     MESSAGE_DEF3(REQ::LOGIN, std::string, phoneId, std::string, accounts, std::string, password /*, HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via , std::string, _para */);
 };
 struct UserLogonRepStruct 
@@ -151,7 +153,13 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         } 
         UInt8 ret = 0 ;
         if(!accounts.empty())
+        {
             ret = player2Id.CheckAccount(accounts ,ul.password);
+        }
+        else
+        {
+            //ret = WORLD().do_http_request_for_login(static_cast<UInt32>(atoi(ul.phoneId)), url.token);
+        }
 
         if(ret == 0)
             res = doLogin(cl, ul.phoneId, accounts,ul.password, hdr.sessionID, player);

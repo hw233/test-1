@@ -55,7 +55,7 @@ namespace Battle
                 //_fgt[index]->SetMinX(x[0]);
                 _fighters[index].push_back(_fgt[index]);
                 _fgt[index]->resetBattleStatue();
-                std::cout << "主将编号：" << static_cast<UInt32>(_fgt[index]->GetBSNumber()) << "位置:" << static_cast<UInt32>(_fgt[index]->getPosX()) << " , " << static_cast<UInt32>(_fgt[index]->getPosY()) << std::endl;
+                //COUT << "主将编号：" << static_cast<UInt32>(_fgt[index]->GetBSNumber()) << "位置:" << static_cast<UInt32>(_fgt[index]->getPosX()) << " , " << static_cast<UInt32>(_fgt[index]->getPosY()) << std::endl;
                 continue ;
             }
 
@@ -67,14 +67,14 @@ namespace Battle
             fgt1->resetBattleStatue();
             _fighters[index].push_back(fgt1);
 
-            std::cout << "战将编号：" << static_cast<UInt32>(fgt1->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt1->getPosX()) << " , " << static_cast<UInt32>(fgt1->getPosY()) << std::endl;
+            //COUT << "战将编号：" << static_cast<UInt32>(fgt1->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt1->getPosX()) << " , " << static_cast<UInt32>(fgt1->getPosY()) << std::endl;
 
             //fgt2
             BattleFighter* fgt2 =  _fgt[index]->getMyFighters(i*2);
             if(!fgt2 || fgt2->getHP() == 0)
                 return ;
             setObjectXY( (!index)?x[2-i%2]:FIELD_WIDTH -x[2-i%2] ,static_cast<UInt16>((FIELD_HIGH/(2*STEP) - i)*STEP/*-STEP/2*/) , fgt2);
-            std::cout << "战将编号：" << static_cast<UInt32>(fgt2->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt2->getPosX()) << " , " << static_cast<UInt32>(fgt2->getPosY()) << std::endl;
+            //COUT << "战将编号：" << static_cast<UInt32>(fgt2->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt2->getPosX()) << " , " << static_cast<UInt32>(fgt2->getPosY()) << std::endl;
             //fgt2->SetMinX(x[2-i%2]);
             fgt2->resetBattleStatue();
             _fighters[index].push_back(fgt2);
@@ -111,7 +111,7 @@ namespace Battle
             fgt->resetBattleStatue();
             _fighters[index].push_back(fgt);
 
-            std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt->getPosX()) << " , " << static_cast<UInt32>(fgt->getPosY()) << std::endl;
+            //COUT << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << "位置:" << static_cast<UInt32>(fgt->getPosX()) << " , " << static_cast<UInt32>(fgt->getPosY()) << std::endl;
         } 
     } 
 
@@ -162,8 +162,8 @@ namespace Battle
             {
                 //count ++;
                 time = GetMinTime();
-                std::cout << "Now time:"  << time <<std::endl;
-                std::cout << "HP:" <<static_cast<UInt32>(_fgt[0]->getHP()) << std::endl;
+                //COUT << "Now time:"  << time <<std::endl;
+                //COUT << "HP:" <<static_cast<UInt32>(_fgt[0]->getHP()) << std::endl;
                 if(time > 2000 || GetWin() < 4)
                 {
                     break; 
@@ -176,16 +176,16 @@ namespace Battle
 
                 actCount += FighterMove(0,lastTime,time);
                 actCount += FighterMove(1,lastTime,time);
-                std::cout << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
+                //COUT << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
                 lastTime = time;
             }
             _time = time;
         }
 
         actCount += ClearObjectPackage();
-        std::cout << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
+        //COUT << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
         FieldPrint();
-        std::cout << "战斗结果" << static_cast<UInt32>(GetWin()) <<std::endl;
+        //COUT << "战斗结果" << static_cast<UInt32>(GetWin()) <<std::endl;
 
         _packet.data<UInt16>(offset) = actCount;
         _packet << Stream::eos;
@@ -284,11 +284,11 @@ namespace Battle
                 _packet << static_cast<UInt8>(param >> 16);
                 _packet << static_cast<UInt16>(param);
 
-                std::cout << "时间：" << bAction.GetHappenTime();
-                std::cout << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber());
-                std::cout << " 攻击 战将编号:" << static_cast<UInt32>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
-                std::cout << "伤害：" << static_cast<UInt32>(param) << std::endl; 
-                std::cout << "敌将血量剩余：" << static_cast<UInt32>(bo->getHP()) << std::endl; 
+                //COUT << "时间：" << bAction.GetHappenTime();
+                //COUT << "战将编号：" << static_cast<UInt32>(fgt->GetBSNumber());
+                //COUT << " 攻击 战将编号:" << static_cast<UInt32>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
+                //COUT << "伤害：" << static_cast<UInt32>(param) << std::endl; 
+                //COUT << "敌将血量剩余：" << static_cast<UInt32>(bo->getHP()) << std::endl; 
                 if(bo->getHP() == 0)
                 {
                     if(bo->IsMainFighter())
@@ -355,9 +355,9 @@ namespace Battle
             _packet << static_cast<UInt16>(skillId);
             cnt++;
 
-            std::cout << " 回合数" << static_cast<UInt32>(bAction.GetHappenTime());
-            std::cout << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
-            std::cout << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
+            //COUT << " 回合数" << static_cast<UInt32>(bAction.GetHappenTime());
+            //COUT << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
+            //COUT << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
 
             UInt16 buffId = se->buffId;
             const GData::SkillBuff * sb = GData::skillBuffManager[buffId];
@@ -403,7 +403,7 @@ namespace Battle
                 }
                 //++count;
 
-                std::cout << "#####战将编号：" << static_cast<UInt32>(bo->GetBSNumber()) << "被法术攻击" << std::endl;
+                //COUT << "#####战将编号：" << static_cast<UInt32>(bo->GetBSNumber()) << "被法术攻击" << std::endl;
                 ++infectCnt; 
             }
 
@@ -450,7 +450,7 @@ namespace Battle
             {
                 BattleFighter * target = it->GetTargetFighter();
 
-                //std::cout << "####### 粒子型技能 移动 : 技能释放者=="  << static_cast<UInt32>(fgt->GetBSNumber()) << " 位置 ：" << static_cast<UInt32>(it->GetPosX()) << " , " << static_cast<UInt32>(it->GetPosY()) << std::endl;
+                ////COUT << "####### 粒子型技能 移动 : 技能释放者=="  << static_cast<UInt32>(fgt->GetBSNumber()) << " 位置 ：" << static_cast<UInt32>(it->GetPosX()) << " , " << static_cast<UInt32>(it->GetPosY()) << std::endl;
 
                 for(UInt8 i = 0; i < _fighters[!fgt->GetSideInBS()].size(); ++i)
                 { 
@@ -473,11 +473,11 @@ namespace Battle
                                 fgt->AddKillCount2();
 
                         }
-                        std::cout << "时间点：" << static_cast<UInt32>(time) ;
-                        std::cout << " 粒子型技能造成伤害 " ;
-                        std::cout << " 技能释放者：" << static_cast<UInt32>(fgt->GetBSNumber());
-                        std::cout << " 技能受击者：" << static_cast<UInt32>(ft->GetBSNumber());
-                        std::cout << std::endl;
+                        //COUT << "时间点：" << static_cast<UInt32>(time) ;
+                        //COUT << " 粒子型技能造成伤害 " ;
+                        //COUT << " 技能释放者：" << static_cast<UInt32>(fgt->GetBSNumber());
+                        //COUT << " 技能受击者：" << static_cast<UInt32>(ft->GetBSNumber());
+                        //COUT << std::endl;
                     } 
                     if(target)
                         break;
