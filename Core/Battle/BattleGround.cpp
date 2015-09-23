@@ -1919,6 +1919,8 @@ namespace Battle
 
     void BattleGround::PushFighter(GObject::Player* player,UInt16 fighterId ,UInt8 x,UInt8 y)
     {
+        if( x >= _x || y >= _y )
+            return;
         GObject::Clan* clan = player->GetClan();
         if( clan == NULL )
             return;
@@ -1935,6 +1937,8 @@ namespace Battle
 
     void BattleGround::PushNpc(UInt8 forceId,UInt16 fighterId,UInt8 x,UInt8 y)
     {
+        if( x >= _x || y >= _y )
+            return;
         map2fighter[forceId].push_back(new FighterInfo(NULL,fighterId,x,y));
     }
 
@@ -2282,7 +2286,11 @@ namespace Battle
         { 
             if(!it->second)
                 continue;
-            map2fighter[index].push_back(new FighterInfo(pl,it->second,map2Point[index -1][it->first][0],map2Point[index-1][it->first][1]));
+            UInt8 x = map2Point[index -1][it->first][0];
+            UInt8 y = map2Point[index-1][it->first][1];
+            if( x >= _x || y >= _y )
+                continue;
+            map2fighter[index].push_back(new FighterInfo(pl,it->second,x,y));
             if( pl != NULL )
             {
                 pl->SetBattleSide(index);
