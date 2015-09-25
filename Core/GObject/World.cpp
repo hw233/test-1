@@ -92,6 +92,10 @@ namespace GObject
         //lc.reset(1000);
         //GMHandler::Battle(1001,1014);
         //lc.finalize();
+        //LoadingCounter lc("GM attack");
+        //lc.reset(1000);
+        //GMHandler::Battle(1,2);
+        //lc.finalize();
         //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1011,1017);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
