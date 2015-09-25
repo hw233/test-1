@@ -164,7 +164,7 @@ namespace Battle
                         _point[i]._x += _xAdd * _flagX - _xAdd * !_flagX;
                     if(_yAdd)
                         _point[i]._y += _yAdd * _flagY - _yAdd * !_flagY;
-                    std::cout << " 粒子技能 " << static_cast<UInt32>(i) << " 行动 ：" << static_cast<UInt32>(_point[i]._x) << " , " << static_cast<UInt32>(_point[i]._y) << std::endl;
+                    //COUT << " 粒子技能 " << static_cast<UInt32>(i) << " 行动 ：" << static_cast<UInt32>(_point[i]._x) << " , " << static_cast<UInt32>(_point[i]._y) << std::endl;
                 }
             } 
 

@@ -14,6 +14,7 @@
 #include "Battle/BattleGround.h"
 #include "GObject/World.h"
 #include "GData/GlobalPVPName.h"
+#include "GData/Robot.h"
 #include "GData/VipTable.h"
 
 #define P_CHAT_MAX 10
@@ -302,7 +303,7 @@ namespace GObject
         }
         st << static_cast<UInt8>(GetJoinClanBattle());
         st << static_cast<UInt32>(TimeUtil::Now());
-        std::cout << "获得玩家信息：" << GetName() << std::endl;
+        //COUT << "获得玩家信息：" << GetName() << std::endl;
     }
 
     ChatHold* Player::GetChatHold()
@@ -657,24 +658,24 @@ namespace GObject
         {
             AddVar(VAR_TOTAL_RECHARGE,num);
             UInt32 totalRecharge = GetVar(VAR_TOTAL_RECHARGE);
-            std::cout<<" 总的充值元宝数量 "<< static_cast<UInt32>(GetVar(VAR_TOTAL_RECHARGE)) <<std::endl;
+            //COUT<<" 总的充值元宝数量 "<< static_cast<UInt32>(GetVar(VAR_TOTAL_RECHARGE)) <<std::endl;
             if( totalRecharge == 0 )
                 return;
             UInt8 oldLevel = GetVipLevel();
             UInt8 level = GData::vipTable.GetVipLevel(totalRecharge);
             if( level >= 15 )
             {
-                std::cout<<" 真乃神人耶  "<<std::endl;
+                //COUT<<" 真乃神人耶  "<<std::endl;
                 level = 15;
             }
             if( level > oldLevel )
             {
                 SetVipLevel(level);
                 //发奖励
-                std::cout<<" 发vip奖励啦 "<<std::endl;
+                //COUT<<" 发vip奖励啦 "<<std::endl;
                 for( UInt8 i = oldLevel+1 ; i <= level ; ++i )
                 {
-                    std::cout<<" vip 等级  "<<static_cast<UInt32>(i);
+                    //COUT<<" vip 等级  "<<static_cast<UInt32>(i);
                     GData::VipBase* base = GData::vipTable.GetVipBase(level);
                     if( base == NULL )
                         return;
@@ -683,11 +684,11 @@ namespace GObject
                     //发vip奖励
                     for( auto it = vecGift.begin(); it != vecGift.end(); ++it )
                     {
-                        std::cout<<" 奖励id   奖励数量 "<<static_cast<UInt32>((*it).itemId)<<"  " <<static_cast<UInt32>((*it).count);
+                        //COUT<<" 奖励id   奖励数量 "<<static_cast<UInt32>((*it).itemId)<<"  " <<static_cast<UInt32>((*it).count);
                         GetPackage()->AddItem((*it).itemId,(*it).count);
                     }
 
-                    std::cout<<endl;
+                    //COUT<<endl;
                 }
 
             }
@@ -739,19 +740,19 @@ namespace GObject
         Clan* clan = GetClan();
         if( clan == NULL )
         {
-            std::cout<<"sorry you have no clan"<<std::endl;
+            //COUT<<"sorry you have no clan"<<std::endl;
             return 0;
         }
         UInt8 pos = GetClanPos();  //只有会长和副会长才能开启军团战
         if( pos < 2 )
         {
-            std::cout<<"sorry have no root"<<std::endl;
+            //COUT<<"sorry have no root"<<std::endl;
             return 1;
         }
         UInt8 status = clan->GetClanBattleStatus();
         if( status != 0 )
         {
-            std::cout<<"sorry have opened"<<std::endl;
+            //COUT<<"sorry have opened"<<std::endl;
             return 2;
         }
         clan->SetClanBattleStatus(1);
@@ -967,7 +968,7 @@ namespace GObject
         char buff[255];
         UInt16 offset = 0;
         offset = sprintf(buff,"%u,%u",20001,totalEndKillNum);
-        std::cout<<"发给"<<GetName()<<" 终结连杀奖励 20001 " <<static_cast<UInt32>(totalEndKillNum)<<"个 "<<std::endl;
+        //COUT<<"发给"<<GetName()<<" 终结连杀奖励 20001 " <<static_cast<UInt32>(totalEndKillNum)<<"个 "<<std::endl;
         buff[offset]='\0';
         Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
         if(mail)
@@ -1017,7 +1018,7 @@ namespace GObject
         char buff[255];
         UInt16 offset = 0;
         offset = sprintf(buff,"%u,%u",20001,totalKillNum);
-        std::cout<<"发给 "<<GetName()<<" 连杀奖励 20001 "<< static_cast<UInt32>(totalKillNum)<<"个  "<<std::endl;
+        //COUT<<"发给 "<<GetName()<<" 连杀奖励 20001 "<< static_cast<UInt32>(totalKillNum)<<"个  "<<std::endl;
         buff[offset]='\0';
         Mail* mail = new Mail(IDGenerator::gMailOidGenerator.ID(),this,1,buff,0,static_cast<UInt32>(-1));
         if(mail)
@@ -1275,10 +1276,11 @@ namespace GObject
         UInt32 dayVal = GetVar(VAR_DAY_CHANGE);
         if(!(dayVal & (1 << e_arena_day))) 
         {
-            SetVar(VAR_ARENA_COUNT, (10 << 16));
+            SetVar(VAR_ARENA_COUNT, (5 << 16));
             dayVal |= (1 << e_arena_day);  //当天签到
             SetVar(VAR_DAY_CHANGE,dayVal);
         }
+        UInt32 tCount = GetVar(VAR_ARENA_COUNT);
 
         Stream st(REP::BATTLE_ARENA);
         st << static_cast<UInt8>(1);
@@ -1299,6 +1301,8 @@ namespace GObject
             } 
         } 
 
+        st << static_cast<UInt8>(static_cast<UInt8>(tCount>>16) - static_cast<UInt16>(tCount));
+        st << GetVar(VAR_ARENA_TIME);
         st << pos;
         size_t offect = st.size();
         UInt8 count = 0;
@@ -1306,10 +1310,16 @@ namespace GObject
 
         for(UInt8 i = 0; i < 3 ; ++i)
         { 
-            UInt8 select = vec[i];
+            UInt16 select = vec[i];
             ArenaMember am = WORLD().GetArenaMember(select);
             //GObject::Player* pl = (WORLD().arenaSort[select].pl);
             st << static_cast<UInt16>(select);
+            if(!advance)
+            { 
+                if(am.pl == this)
+                    continue;
+            } 
+
             if(am.pl)
             {
                 st << static_cast<UInt8>(0);
@@ -1320,13 +1330,11 @@ namespace GObject
             else
             {
                 st << static_cast<UInt8>(1);
-                st << static_cast<UInt32>(am.firstIndex*10 + uRand(100)); //战斗力
+                st << static_cast<UInt16>(am.firstIndex);//*10 + uRand(100)); //战斗力
                 st << static_cast<UInt16>(am.robotId);
                 st << static_cast<UInt16>(am.firstIndex + (cfg.serverNum)%30);
             }
             count ++;
-            if(!advance)
-                break;
         } 
         st.data<UInt8>(offect) = count;
         st << Stream::eos;
@@ -1339,6 +1347,7 @@ namespace GObject
 
         //差战报信息
         std::string name ;
+        UInt32 battlePoint = 0;
 
         Stream st(REP::BATTLE_ARENA);
         st << static_cast<UInt8>(2);
@@ -1355,13 +1364,15 @@ namespace GObject
         if(pl)
         { 
             name = pl->GetName();
+            battlePoint = pl->GetVar(VAR_BATTLE_POINT);
         } 
         else
         {
-            if(am.robotId)
-                name = GData::globalPVPName.GetName(am.robotId);
-            else
+            if(!am.robotId)
                 return ;
+            name = GData::globalPVPName.GetName(am.robotId);
+            GData::RobotInfo ri = GData::robotInfo.GetRobot(am.robotId);
+            battlePoint = ri.GetPower() * (100 + (3001 - am.firstIndex) * 5) / 100;
         }
 
         Battle::BattleGround bg(0,1);
@@ -1383,7 +1394,7 @@ namespace GObject
                 if(myPos < 3001)
                     WORLD().arenaSort[myPos] = pl;
                 pl->SetVar(VAR_ARENA_POS,myPos);
-                pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
+                //pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
             } 
             else    //进攻电脑
             {
@@ -1397,7 +1408,20 @@ namespace GObject
         st << Stream::eos;
         send(st);
 
-        InsertArenaBattleReport(ArenaBattleInfo(bg.GetBattleNUmber(), name, targetPos, am.firstIndex*10 + uRand(100)));
+        InsertArenaBattleReport(ArenaBattleInfo(bg.GetBattleNUmber(), res, name, targetPos, battlePoint));
+        if(pl)
+        { 
+            if(res)
+            { 
+                res = 3-res;
+                battlePoint = GetVar(VAR_BATTLE_POINT);
+            } 
+            pl->InsertArenaBattleReport(ArenaBattleInfo(bg.GetBattleNUmber(), res, GetName(), targetPos,battlePoint));
+        } 
+
+        AddVar(VAR_ARENA_COUNT ,1);
+        UInt32 now = TimeUtil::Now();
+        SetVar(VAR_ARENA_TIME,now + 600);
     } 
 
     UInt8 Player::ClearArenaCD()
@@ -1415,10 +1439,10 @@ namespace GObject
     UInt8 Player::AddArenaCount()
     { 
         UInt32 gold = GetVar(VAR_GOLD);
-        if(gold < 20)
+        if(gold < 50)
             return 1;
-        SetVar(VAR_GOLD, gold - 20);
-        AddVar(VAR_ARENA_COUNT,(1 << 16));
+        SetVar(VAR_GOLD, gold - 50);
+        AddVar(VAR_ARENA_COUNT,(5 << 16));
         return 0;
     } 
     bool Player::CanAttackArena()
@@ -1512,7 +1536,7 @@ namespace GObject
         }
         _arenaBattleReport.push_front(abi);
         if(update)
-            DB1().PushUpdateData("replace into `arenaBrp` values(%" I64_FMT "u,%u,'%s',%u,%u)",getId(),abi.battleId, abi.name.c_str(), abi.index, abi.power);   //LIBOUInt64
+            DB1().PushUpdateData("replace into `arenaBrp` values(%" I64_FMT "u,%d,%u,'%s',%u,%u)",getId(),abi.battleId, abi.res, abi.name.c_str(), abi.index, abi.power);   //LIBOUInt64
 
     } 
     void Player::GetArenaBattleReport(Stream& st)
@@ -1521,6 +1545,7 @@ namespace GObject
         for(auto it = _arenaBattleReport.begin(); it != _arenaBattleReport.end(); ++it)
         { 
             st << it->battleId;
+            st << it->res;
             st << it->name;
             st << it->index;
             st << it->power;

@@ -257,7 +257,7 @@ namespace GObject
         GetItemsByResult(info.res,curMonster->GetGroupId(),curMonster->GetMonsterId(),info.isGet, vecItem);
         for( auto it = vecItem.begin(); it != vecItem.end() ; ++it )
         {
-            std::cout<<m_owner->GetName()<<"的战将 >>>>>>>"<<m_fighter->GetName()<<"     在线获得物品    "<<(*it).id<<"  " <<(*it).num<<endl;
+            //COUT<<m_owner->GetName()<<"的战将 >>>>>>>"<<m_fighter->GetName()<<"     在线获得物品    "<<(*it).id<<"  " <<(*it).num<<endl;
             if( (*it).id  == 20001 )
             {
                 m_owner->AddMoney(1,(*it).num);

@@ -57,21 +57,21 @@ namespace Battle
         st << static_cast<UInt16>(GetSkillId());
         st << static_cast<UInt8>(vec_struct.size());
 
-        std::cout << " 技能释放者编号: " << static_cast<UInt32>(GetBattleFighter()->GetBSNumber());
-        std::cout << std::endl;
+        //COUT << " 技能释放者编号: " << static_cast<UInt32>(GetBattleFighter()->GetBSNumber());
+        //COUT << std::endl;
         for(UInt8 i =0; i < _point.size(); ++i)
         {
-            std::cout << " 技能编号："  << static_cast<UInt32>(GetSkillId()) << " 前进 " << static_cast<UInt32>(_point[i]._x) << " , " << static_cast<UInt32>(_point[i]._y);
-            std::cout << std::endl;
+            //COUT << " 技能编号："  << static_cast<UInt32>(GetSkillId()) << " 前进 " << static_cast<UInt32>(_point[i]._x) << " , " << static_cast<UInt32>(_point[i]._y);
+            //COUT << std::endl;
         }
-        std::cout << std::endl;
+        //COUT << std::endl;
         for(UInt8 i = 0; i < vec_struct.size(); ++i)
         { 
             if(!vec_struct[i].GetBattleObject())
                 continue;
-            std::cout << "被击回合数: " << static_cast<UInt32>(vec_struct[i].GetCurTime());
-            std::cout << " 被击者：" << static_cast<UInt32>(vec_struct[i].GetBattleObject()->GetBSNumber()) << " 位置: " << static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosX()) <<" , "<< static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosY());
-            std::cout << std::endl;
+            //COUT << "被击回合数: " << static_cast<UInt32>(vec_struct[i].GetCurTime());
+            //COUT << " 被击者：" << static_cast<UInt32>(vec_struct[i].GetBattleObject()->GetBSNumber()) << " 位置: " << static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosX()) <<" , "<< static_cast<UInt32>(vec_struct[i].GetBattleObject()->getPosY());
+            //COUT << std::endl;
 
             st << static_cast<UInt16>(vec_struct[i].GetCurTime());
             st << static_cast<UInt8>(vec_struct[i].GetBattleObject()->GetBSNumber());

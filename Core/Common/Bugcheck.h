@@ -87,7 +87,7 @@ namespace Common {
 
 #if defined(_DEBUG)
 #	define common_stdout_dbg(outstr) \
-	std::cout << __FILE__ << '(' << std::dec << __LINE__ << "):" << outstr << std::endl;
+	//COUT << __FILE__ << '(' << std::dec << __LINE__ << "):" << outstr << std::endl;
 #else
 #	define common_stdout_dbg(outstr)
 #endif

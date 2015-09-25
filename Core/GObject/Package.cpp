@@ -155,7 +155,7 @@ namespace GObject
         item->DecItem(num);
         if(count == num)
         {
-            DB7().PushUpdateData( "delete item  where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",id,m_Owner->getId());
+            DB7().PushUpdateData( "delete from item  where (`itemId` = %u AND `playerId` = %"I64_FMT"u) ",id,m_Owner->getId());
         }
         else
         {

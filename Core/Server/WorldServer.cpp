@@ -428,6 +428,40 @@ bool WorldServer::do_http_request(const char* url, int timeout)
     return false;
 }
 
+bool WorldServer::do_http_request_for_login(UInt32 accid, std::string token, int timeout)
+{
+    char buffer[MAX_RET_LEN] = {0};
+    Stream st;
+    st << "uid=" << accid << "&appid=" << cfg.appid << "&token=" << token ;
+    std::string url = cfg.remoteUrl;
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+
+    fprintf(stderr, "URL: %s\n", url.c_str());
+
+    CURLcode res = curl_easy_perform(curl);
+    if (CURLE_OK == res)
+    {
+        fprintf(stderr, "URL: %s [OK]\n", url.c_str());
+        const char* msg = strcasestr(buffer, "msg");
+        if (!msg)
+            return false;
+        if (strcasestr(msg, "ok"))
+            return true;
+        return false;
+    }
+    else
+    {
+        fprintf(stderr, "URL: %s [ERROR]\n", url.c_str());
+        return false;
+    }
+
+    return false;
+}
+
 void WorldServer::State(const char* action, int serverNum)
 {
     if (!curl || !action || !serverNum)

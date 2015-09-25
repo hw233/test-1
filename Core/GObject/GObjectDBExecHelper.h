@@ -220,6 +220,7 @@ namespace GObject
     {
         UInt64 playerId;
         UInt32 battleId;
+        UInt8  res;
         std::string name;
         UInt16 index;
         UInt32 power;
@@ -478,10 +479,11 @@ namespace DB
     SPECIALEND()
 
     SPECIALBEGIN(GObject::DBArenaReport)
-    SPECIALDEF(5)
+    SPECIALDEF(6)
     (
      UInt64, playerId,
      UInt32, battleId,
+     UInt8,  res,
      std::string, name,
      UInt16, index,
      UInt32, power

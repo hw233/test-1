@@ -215,7 +215,7 @@ namespace Battle
             if(fgt)
             {
                 _target = fgt;
-                std::cout << "战将("<<static_cast<UInt32>(GetBSNumber()) <<  ") 被攻击  转换攻击目标" << static_cast<UInt32>(fgt->GetBSNumber()) << std::endl;
+                //COUT << "战将("<<static_cast<UInt32>(GetBSNumber()) <<  ") 被攻击  转换攻击目标" << static_cast<UInt32>(fgt->GetBSNumber()) << std::endl;
             }
         } 
 
@@ -240,13 +240,13 @@ namespace Battle
 
         if(_target && _target->GetAvoidHurt())
         {
-            std::cout << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
+            //COUT << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
             GetField()->InsertBattlePre(GetNowTime(), this);
             SetMove(true);
             return ;
         }
 
-        std::cout <<"BattleFighter("<< static_cast<UInt32>(GetBSNumber()) <<") 行动开始 时间：" << static_cast<UInt32>(GetNowTime()) ;
+        //COUT <<"BattleFighter("<< static_cast<UInt32>(GetBSNumber()) <<") 行动开始 时间：" << static_cast<UInt32>(GetNowTime()) ;
 
         if(BeForAction())
             return ;
@@ -259,7 +259,7 @@ namespace Battle
         bool flag = false;
 
         if(_ab._skillId)
-            std::cout << " 技能选择 " << static_cast<UInt32>(_ab._skillId);
+            //COUT << " 技能选择 " << static_cast<UInt32>(_ab._skillId);
 
         switch(_actionType)
         { 
@@ -272,7 +272,7 @@ namespace Battle
             case e_attack_middle:
             case e_attack_distant:
                 {
-                    std::cout << " 发起普通攻击 " ;
+                    //COUT << " 发起普通攻击 " ;
                     flag = NormolAttack();
                 }
                 break;
@@ -281,7 +281,7 @@ namespace Battle
             case e_image_attack_time_special:
                 { 
 
-                    std::cout << " 发起魔法攻击 " ;
+                    //COUT << " 发起魔法攻击 " ;
                     const GData::Skill * s = GData::skillManager[_ab._skillId];
                     if(s)
                     {
@@ -304,7 +304,7 @@ namespace Battle
             case e_object_image:
             case e_object_attack:
                 { 
-                    std::cout << " 发起粒子攻击 " ;
+                    //COUT << " 发起粒子攻击 " ;
                     const GData::Skill * s = GData::skillManager[_ab._skillId];
                     if(s)
                     {
@@ -329,7 +329,7 @@ namespace Battle
         } 
         if(!flag)
         {
-            std::cout << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
+            //COUT << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
             if(GetField()->GetSuperSkill() && this == GetField()->GetSuperSkill())
             {
                 GetField()->SetSuperSkill(NULL);
@@ -343,7 +343,7 @@ namespace Battle
         }
         if(GetAvoidHurt())
             SetAvoidHurt(false);
-        std::cout << std::endl;
+        //COUT << std::endl;
         return ;
     } 
 

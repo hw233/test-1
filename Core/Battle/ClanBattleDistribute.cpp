@@ -578,7 +578,7 @@ namespace Battle
             UInt32 reportId = Battle::report2IdTable.GetRecentReportId(roomId,mapId);
             if( reportId != 0 )
             {
-                std::cout<<"最近的一个战报是    "<<static_cast<UInt32>(reportId)<<std::endl;
+                //COUT<<"最近的一个战报是    "<<static_cast<UInt32>(reportId)<<std::endl;
             }
             if( status->GetStage() == 1 )
             {

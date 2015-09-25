@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     //float x = 900;
     //float v = sqrt(x);
 
-    //std::cout << v << std::endl;
+    ////COUT << v << std::endl;
 
 	if (!SERVER().ParseCommandInfor(argc, argv))
 	{

@@ -71,17 +71,17 @@ function GetSignForMouth(player, index , vip ,flag)  --flag == 0 表示补签
     end
     local count = 1; 
 
-    if flag == 0 and vip < AwardForMouth[index][0] then
+    if flag == 0 and vip < AwardForMouth[index][1] then
         return 0
     end
 
-    if flag == 1 and vip >= AwardForMouth[index][0] then
+    if flag == 1 and vip >= AwardForMouth[index][1] then
         count = 2
     end
 
     local package = player:GetPackage()
 
-    package:AddItem(AwardForMouth[index][1], AwardForMouth[index][2] * count)
+    package:AddItem(AwardForMouth[index][2], AwardForMouth[index][3] * count)
     return count
 end
 

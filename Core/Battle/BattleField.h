@@ -104,10 +104,12 @@ namespace Battle
             void SetSuperSkill(BattleFighter* super)
             {
                 _super = super;
+                /*
                 if(super)
-                    std::cout << "@@@@@@@@@场地大招开始" << std::endl;
+                    //COUT << "@@@@@@@@@场地大招开始" << std::endl;
                 else
-                    std::cout << "@@@@@@@@@场地大招结束" << std::endl;
+                    //COUT << "@@@@@@@@@场地大招结束" << std::endl;
+                */
 
             }
             BattleFighter* GetSuperSkill(){return _super;}

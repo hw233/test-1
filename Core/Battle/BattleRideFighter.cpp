@@ -33,7 +33,7 @@ namespace Battle
                     return false ;
             }
             count++;
-            std::cout << "战将编号：" << static_cast<UInt32>(GetBSNumber()) << "目的地：" << static_cast<UInt32>(_battleTargetX) << " , " << static_cast<UInt32>(_battleTargetY) << std::endl;
+            //COUT << "战将编号：" << static_cast<UInt32>(GetBSNumber()) << "目的地：" << static_cast<UInt32>(_battleTargetX) << " , " << static_cast<UInt32>(_battleTargetY) << std::endl;
         }
 
 
@@ -69,9 +69,9 @@ namespace Battle
             case e_run:
                 if(GetBSNumber() == 0 || GetBSNumber() == 11)
                 {
-                    std::cout<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    std::cout<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
-                    std::cout<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
+                    //COUT<< " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    //COUT<< " 目标 x 坐标：" << static_cast<UInt32>(_battleTargetX);
+                    //COUT<< " 自身 x 坐标：" << static_cast<UInt32>(getPosX()) << std::endl;
                 }
                 if(!isRunSend)
                 {
@@ -80,10 +80,10 @@ namespace Battle
                     _st << static_cast<UInt8>(0);
                     _st << static_cast<UInt16>(_battleTargetY);
                     isRunSend = true ;
-                    std::cout << " 回合数：" << static_cast<UInt32>(GetNowTime());
-                    std::cout << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
-                    std::cout << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
-                    std::cout << std::endl;
+                    //COUT << " 回合数：" << static_cast<UInt32>(GetNowTime());
+                    //COUT << " 战将ID: " << static_cast<UInt32>(GetBSNumber());
+                    //COUT << " 前进 y 坐标：" << static_cast<UInt32>(_battleTargetY);
+                    //COUT << std::endl;
                 } 
                 break;
             case e_attack_near:

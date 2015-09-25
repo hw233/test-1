@@ -2,21 +2,34 @@
 #ifndef ROBOT_H_
 #define ROBOT_H_
 #include "Config.h"
+#include "GObject/Fighter.h"
 namespace GData
 {
     struct RobotInfo 
     {
         UInt8 ground;    
         std::vector<UInt16> fighters;
-        RobotInfo(){ ground = 0; fighters.clear();}
-        RobotInfo(UInt16 g){ ground = g;}
+        UInt32 power;
+        RobotInfo(){ ground = 0; fighters.clear(); power = 0;}
+        RobotInfo(UInt16 g){ ground = g; power = 0;}
+        void calcBattlePoint() 
+        { 
+            UInt32 p = 0;
+            for(UInt8 i = 0; i < fighters.size(); ++i)
+            { 
+                GObject::Fighter* f = GObject::globalFighters[fighters[i]];
+                p+= f->GetTotalPower();
+            } 
+            power = p;
+        } 
+        UInt32 GetPower(){ if(!power) calcBattlePoint(); return power;}
     };
     class Robot
     {
         public:
             void LoadRobot(UInt16 index,UInt8 ground, UInt16 fgt1, UInt16 fgt2, UInt16 fgt3, UInt16 fgt4, UInt16 fgt5)
             { 
-                _robots[index] = RobotInfo(index);
+                _robots[index] = RobotInfo(ground);
                 _robots[index].fighters.push_back(fgt1);
                 _robots[index].fighters.push_back(fgt2);
                 _robots[index].fighters.push_back(fgt3);

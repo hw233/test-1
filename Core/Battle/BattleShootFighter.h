@@ -18,7 +18,7 @@ namespace Battle
             /*
             virtual ~BattleShootFighter() 
             {
-                std::cout<<" shootFighter destroy "<<std::endl;
+                //COUT<<" shootFighter destroy "<<std::endl;
             }
             */
 //            virtual void Action() {}

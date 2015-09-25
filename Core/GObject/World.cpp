@@ -20,6 +20,8 @@
 #include "GData/Map.h"
 #include "GData/Robot.h"
 #include "Battle/Report2Id.h"
+#include "Common/LoadingCounter.h"
+
 #define W_CHAT_MAX 20
 
 namespace GObject
@@ -86,15 +88,18 @@ namespace GObject
         GVAR.SetVar(GVAR_BATTLE_STATUS,3);
 
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        //GMHandler::Battle(1,2);
+        //LoadingCounter lc("GM attack");
+        //lc.reset(1000);
         //GMHandler::Battle(1001,1014);
-        //GMHandler::Battle(1004,1005,2);
+        //lc.finalize();
+        //GMHandler::Battle(1001,1014);
+        //GMHandler::Battle(1011,1017);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        //std::vector<UInt8> *r = Battle::battleReport0[520];
-        //std::vector<UInt8>* r = Battle::battleReport1[903];
+        std::vector<UInt8> *r = Battle::battleReport0[585];
+        //std::vector<UInt8>* r = Battle::battleReport1[991];
         //BattleAnalyze::Analyze(Stream(*r));
         //BattleAnalyze::Analyze(Stream(*r));
-        //ReportAnalyse::AnalyseReport(Stream(*r));
+        ReportAnalyse::AnalyseReport(Stream(*r));
         
         InitRank();
         return true; 
@@ -229,7 +234,7 @@ namespace GObject
             Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
             if( roomBattle == NULL )
             {
-                std::cout<<"put fighters"<<std::endl;
+                //COUT<<"put fighters"<<std::endl;
                 roomBattle = new Battle::RoomBattle(roomId);
                 for( auto iter = (it->second).begin(); iter != (it->second).end(); ++iter)
                 {
@@ -261,8 +266,8 @@ namespace GObject
                     /* 如果该处有玩家布置的战将  则不放入野怪*/
                     if( status->GetCityOwnForce(mapId) == 0 )
                     {
-                        std::cout<<" roomId "<<static_cast<UInt32>(roomId)<<std::endl;
-                        std::cout<<"cityId is   "<<static_cast<UInt32>(mapId)<<" 这个城还没有被占领,  放野怪进行干扰  "<<std::endl;
+                        //COUT<<" roomId "<<static_cast<UInt32>(roomId)<<std::endl;
+                        //COUT<<"cityId is   "<<static_cast<UInt32>(mapId)<<" 这个城还没有被占领,  放野怪进行干扰  "<<std::endl;
                         GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(mapId);
                         std::vector<GData::NpcInfo> vecNpcInfo = mapInfo->GetNpcInfo();
                         for( auto iterator = vecNpcInfo.begin(); iterator != vecNpcInfo.end(); ++iterator)
@@ -356,12 +361,12 @@ namespace GObject
             Battle::RoomBattle* roomBattle = Battle::battleManager.GetRoomBattle(roomId);
             if( (*it)->GetStage() == 0 && roomBattle != NULL )
             {
-                std::cout<<"处于准备阶段  删掉战场"<<std::endl;
+                //COUT<<"处于准备阶段  删掉战场"<<std::endl;
                 Battle::battleManager.removeRoomBattle(roomId);
             }
             if( (*it)->GetStage() == 2 && roomBattle != NULL)  //结算阶段
             {
-                std::cout<<"处于结算阶段  开始发奖励啦"<<std::endl;
+                //COUT<<"处于结算阶段  开始发奖励啦"<<std::endl;
                 roomBattle->Settlement();
                 Battle::battleManager.removeRoomBattle(roomId);
                 Battle::clanBattleRoomManager.RemoveClanBattleRoom(roomId);
@@ -471,7 +476,7 @@ namespace GObject
             return ;
 
         if(oldIndex)
-            DB1().PushUpdateData("DELETE `arenaRobot` where index = %u",oldIndex); 
+            DB1().PushUpdateData("DELETE from `arenaRobot` where `index` = %u",oldIndex); 
 
         if(!index && index < 3001)
             DB1().PushUpdateData("REPLACE INTO `arenaRobot` values(%u, %u, %u)",index,am.firstIndex, am.robotId); 

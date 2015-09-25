@@ -25,7 +25,7 @@ namespace Battle
             //virtual UInt8 NormolAttack();
             //virtual UInt8 NormolImage();
             //virtual UInt8 NormolObject();
-            void SetHighSpeed(bool v){ _isHighSpeed = v; }// if(v) std::cout << "战将编号" << static_cast<UInt32>(GetBSNumber()) << " 速度:" << static_cast<UInt32>(GetSpeed()) << std::endl;}
+            void SetHighSpeed(bool v){ _isHighSpeed = v; }// if(v) //COUT << "战将编号" << static_cast<UInt32>(GetBSNumber()) << " 速度:" << static_cast<UInt32>(GetSpeed()) << std::endl;}
             bool GetHighSpeed(){return _isHighSpeed;}
 
             virtual bool CanMove() {  return _canMove;}

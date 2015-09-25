@@ -4,6 +4,7 @@
 #include "Config.h"
 #include "GGlobalObjectManager.h"
 #include "FVar.h"
+#include "Common/Stream.h"
 
 namespace GObject
 {

@@ -42,6 +42,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
     class_def<Cfg>("setIDQueryMemcachedServer", &Cfg::setIDQueryMemcachedServer);
 	class_def<Cfg>("setOnlineLimit", &Cfg::setOnlineLimit);
 	class_def<Cfg>("setStateUrl", &Cfg::setStateUrl);
+	class_def<Cfg>("setRemoteUrl", &Cfg::setRemoteUrl);
 	class_def<Cfg>("setChargeUrl", &Cfg::setChargeUrl);
 	class_def<Cfg>("setWarZone", &Cfg::setWarZone);
 	class_def<Cfg>("setServerNum", &Cfg::setServerNum);

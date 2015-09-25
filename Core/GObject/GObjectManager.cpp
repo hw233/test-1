@@ -144,6 +144,12 @@ namespace GObject
             std::abort();
         }
 
+        if( !loadArenaReport() )
+        {
+            fprintf(stderr, "load Arena Robot report error!\n");
+            std::abort();
+        }
+
         /*
         if( !loadConstantlyKill() )
         {
@@ -757,14 +763,14 @@ namespace GObject
         LoadingCounter lc("Loading arenaRobot");
         lc.reset(1000);
         DBArenaReport report;
-        if(execu->Prepare("SELECT `playerId`,`battleId`,`name`,`index`,`power` FROM `arenaRobot`",report) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`,`battleId`,`res`,`name`,`index`,`power` FROM `arenaBrp`",report) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {
             GObject::Player* player = GObject::globalPlayers[report.playerId];
             if( !player )
                 continue;
-            player->InsertArenaBattleReport(ArenaBattleInfo(report.battleId, report.name, report.index, report.power), false);
+            player->InsertArenaBattleReport(ArenaBattleInfo(report.battleId, report.res, report.name, report.index, report.power), false);
             lc.advance();
         }
         lc.finalize();
