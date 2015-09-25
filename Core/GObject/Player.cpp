@@ -1380,21 +1380,25 @@ namespace GObject
         if(res == 1)
         {
             UInt32 myPos = GetVar(VAR_ARENA_POS);
-            WORLD().arenaSort[targetPos] = ArenaMember(this);
-            SetVar(VAR_ARENA_POS,targetPos);
-            SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
-            if(pl)   //进攻玩家
-            { 
-                if(myPos < 3001)
-                    WORLD().arenaSort[myPos] = pl;
-                pl->SetVar(VAR_ARENA_POS,myPos);
-                //pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
-            } 
-            else    //进攻电脑
+            if(myPos > targetPos)
             {
-                if(myPos < 3001)
-                    WORLD().arenaSort[myPos] = ArenaMember(am.firstIndex, am.robotId);
-                WORLD().UpdateArena(targetPos, myPos);
+                WORLD().arenaSort[targetPos] = ArenaMember(this);
+                SetVar(VAR_ARENA_POS,targetPos);
+                SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
+                if(pl)   //进攻玩家
+                { 
+                    if(myPos < 3001)
+                        WORLD().arenaSort[myPos] = pl;
+                    pl->SetVar(VAR_ARENA_POS,myPos);
+                    //是否要重新筛选
+                    pl->SetVar(VAR_ARENA_RAND,uRand(static_cast<UInt32>(-1)));
+                } 
+                else    //进攻电脑
+                {
+                    if(myPos < 3001)
+                        WORLD().arenaSort[myPos] = ArenaMember(am.firstIndex, am.robotId);
+                    WORLD().UpdateArena(targetPos, myPos);
+                }
             }
         }
         st << static_cast<UInt8>(res);
