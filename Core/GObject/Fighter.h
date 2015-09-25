@@ -109,7 +109,7 @@ namespace GObject
 
             UInt32 GetFighterAttr(UInt8 index)
             { 
-                static UInt32 baseUp[]= {20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20};
+                static UInt32 baseUp[]= {0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900};
                 UInt32 up = GetVar(27); // 星级（品质）编号
                 if(up >= 20)
                     return 0;
@@ -161,7 +161,7 @@ namespace GObject
                UInt16 arena = 0;
                UInt16 arenaLevel = 0;
                if(!_owner)
-                   arenaLevel = ((3001 - GetArenaPos())*15/3000 + 15);
+                   arenaLevel = ((3001 > GetArenaPos()?(3001 - GetArenaPos()):0)*15/3000 + 15);
 
                switch(index)
                { 
@@ -173,7 +173,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_WEAPON_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForWeapon[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForWeapon[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForWeapon[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForWeapon[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        //魔法攻击
                    case e_attr_magatk:
@@ -182,7 +183,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_WEAPON_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForWeapon[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForWeapon[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForWeapon[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForWeapon[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //防御
@@ -192,7 +194,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR1_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor1[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor1[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor1[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor1[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //魔法防御
@@ -202,7 +205,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR2_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor2[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor2[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor2[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor2[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //暴击
@@ -212,7 +216,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR4_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor4[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor4[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor4[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor4[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //抗爆
@@ -222,7 +227,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR4_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor4[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor4[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor4[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor4[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //命中
@@ -232,7 +238,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR5_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor5[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor5[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor5[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor5[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //闪避
@@ -242,7 +249,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR5_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor5[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor5[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor5[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor5[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                        //血量
@@ -252,7 +260,8 @@ namespace GObject
                            UInt32 value = GetVar(FVAR_ARMOR3_ENCHANT);
                            if(arenaLevel)
                                value = arenaLevel;
-                           return AttackForArmor3[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
+                           return AttackForArmor3[cls] * (value/(ENCHANT_MAX+1)+1) +AttackForArmor3[cls] * (20 + value%(ENCHANT_MAX+1))/20;
+                           //return AttackForArmor3[cls] * (2 << (value/(ENCHANT_MAX+1))) * (100 + value%(ENCHANT_MAX+1))/20;
                        }
                        break;
                } 

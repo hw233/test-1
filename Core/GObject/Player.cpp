@@ -1267,7 +1267,6 @@ namespace GObject
     }
     void Player::GetArenaInfo()
     { 
-        
         UInt32 dayVal = GetVar(VAR_DAY_CHANGE);
         if(!(dayVal & (1 << e_arena_day))) 
         {
@@ -1284,7 +1283,7 @@ namespace GObject
         if(pos == 0)
             pos = 3001;
         UInt32 rand = GetVar(VAR_ARENA_RAND);
-        UInt16 index = pos>500?pos - 500:0;
+        UInt16 index = pos>500?pos - 500:1;
         UInt16 advance = (pos - index) / 3;
 
         UInt16 vec[3] = {1,2,3};
