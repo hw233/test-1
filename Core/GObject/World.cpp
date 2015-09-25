@@ -95,7 +95,7 @@ namespace GObject
         //GMHandler::Battle(1001,1014);
         //GMHandler::Battle(1011,1017);
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        std::vector<UInt8> *r = Battle::battleReport0[585];
+        std::vector<UInt8> *r = Battle::battleReport0[621];
         //std::vector<UInt8>* r = Battle::battleReport1[991];
         //BattleAnalyze::Analyze(Stream(*r));
         //BattleAnalyze::Analyze(Stream(*r));
