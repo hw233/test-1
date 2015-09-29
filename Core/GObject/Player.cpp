@@ -1375,7 +1375,7 @@ namespace GObject
             battlePoint = ri.GetPower() * (100 + (3001 - am.firstIndex) * 5) / 100;
         }
 
-        Battle::BattleGround bg(0,10001);
+        Battle::BattleGround bg(0,1);
 
         bg.AutoEnterFighters(1,this);
         bg.AutoEnterFighters(2,pl,targetPos);
