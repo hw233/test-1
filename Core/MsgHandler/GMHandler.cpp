@@ -35,6 +35,7 @@ GMHandler::GMHandler()
     Reg(3, "addmoney",&GMHandler::OnAddMoney);
     Reg(3, "battle",&GMHandler::OnBattle);
     Reg(3, "setgvar",&GMHandler::OnSetGVar);
+    Reg(3, "attackstyle",&GMHandler::OnAttackStyle);
     _printMsgPlayer = NULL;
 }
 
@@ -162,6 +163,17 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
        return;
     UInt32 num = atoi(args[1].c_str());
     player->AddMoney(id , num);
+}
+
+
+void GMHandler::OnAttackStyle( GObject::Player * player, std::vector<std::string>& args)
+{
+    if( args.size() != 1 )
+        return;
+    UInt8 style = atoi(args[0].c_str());
+    if( style == player->GetVar(GObject::VAR_ATTACK_STYLE) )
+        return;
+    player->SetVar(GObject::VAR_ATTACK_STYLE,style);
 }
 
 void GMHandler::OnBattle( GObject::Player * player, std::vector<std::string>& args)

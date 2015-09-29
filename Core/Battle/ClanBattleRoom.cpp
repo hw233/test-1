@@ -342,6 +342,7 @@ namespace Battle
         {
            if( (*it)->GetRoomId() == roomId )
            {
+               (*it)->ResetJoinStatus();
                delete (*it);
                (*it) = NULL;
                it = _roomList.erase(it);

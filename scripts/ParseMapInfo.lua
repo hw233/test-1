@@ -2,6 +2,7 @@ forest = require("MapInfo/forest")
 campaign_1 = require("MapInfo/campaign_1")
 template9  = require("MapInfo/template_9x9")
 template_10x9_2p_lr = require("MapInfo/template_10x9_2p_lr")
+pvp = require("MapInfo/pvp")
 
 name2table= {
     [1] = forest,
@@ -22,7 +23,8 @@ name2table= {
     [16] = template_10x9_2p_lr,
     [17] = template_10x9_2p_lr,
     [18] = template_10x9_2p_lr,
-    [19] = template_10x9_2p_lr 
+    [19] = template_10x9_2p_lr,
+    [10001] = pvp
 }
 
 function GetMapWidth(mapId)
@@ -199,11 +201,11 @@ function GetTiles(mapId)
 end
 
 direction2num={
+    ["auto"] = 0,
     ["left"]  = 1,
     ["right"] = 2,
     ["up"]  = 3,
-    ["down"] = 4,
-    ["auto"] = 5
+    ["down"] = 4
 }
 
 
@@ -304,7 +306,7 @@ function GetForceDirection(mapId)
     for i=1,#tiles do 
         local properties = tiles[i].properties
         if properties["force"] == "auto" then
-            table.insert(direction,5)
+            table.insert(direction,0)
         else
             table.insert(direction,properties["force"])
         end

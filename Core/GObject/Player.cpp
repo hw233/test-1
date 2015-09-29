@@ -1250,12 +1250,15 @@ namespace GObject
             st<<static_cast<UInt16>((*it).peerId);
         }
     }
+
+
     void Player::ResetClanBattleData()
     {
         SetJoinClanBattle(0);
         SetVar(GObject::VAR_CLANBATTLE_FIGHTERNUM,0);
         SetVar(GObject::VAR_MAX_CONSTANTLYKILL,0);
         SetVar(GObject::VAR_MAX_ENDCONSTANTLYKILL,0);
+        SetVar(GObject::VAR_CLANBATTLE_COMMENT_TIME,0);
         ClearAllBattleFighter();
         vecKillInfo.clear();
         vecLoseInfo.clear();
@@ -1265,6 +1268,8 @@ namespace GObject
         _battleId = 0;
         _battleSide = 0;
     }
+
+
     void Player::GetArenaInfo()
     { 
         UInt32 dayVal = GetVar(VAR_DAY_CHANGE);
@@ -1334,6 +1339,7 @@ namespace GObject
         st << Stream::eos;
         send(st);
     } 
+
     void Player::AttackArenaPos(UInt16 targetPos)
     { 
         if(!CanAttackArena())
@@ -1369,7 +1375,7 @@ namespace GObject
             battlePoint = ri.GetPower() * (100 + (3001 - am.firstIndex) * 5) / 100;
         }
 
-        Battle::BattleGround bg(0,1);
+        Battle::BattleGround bg(0,10001);
 
         bg.AutoEnterFighters(1,this);
         bg.AutoEnterFighters(2,pl,targetPos);

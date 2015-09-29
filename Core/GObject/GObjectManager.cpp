@@ -146,7 +146,7 @@ namespace GObject
 
         if( !loadArenaReport() )
         {
-            fprintf(stderr, "load Arena Robot error!\n");
+            fprintf(stderr, "load Arena Robot report error!\n");
             std::abort();
         }
 

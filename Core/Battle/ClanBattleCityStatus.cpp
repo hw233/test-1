@@ -2,6 +2,7 @@
 #include"Battle/ClanBattleRoom.h"
 #include"Battle/ClanBattleDistribute.h"
 #include "GObject/GVar.h"
+#include "Common/TimeUtil.h"
 
 
 namespace Battle
@@ -28,12 +29,34 @@ namespace Battle
             return;
         }
         UInt32 buildTime = room->GetBuildTime();
-        time_t time = buildTime;
+
+
+        time_t time = t;
         tm* tt=localtime(&time);
         UInt8 hour = tt->tm_hour;
-        UInt8 min = tt->tm_min;
+        //UInt8 min = tt->tm_min;
 
 
+        UInt32 endTime = TimeUtil::SharpDay(7,buildTime);
+        UInt8 newStage = 0;
+        if( t >= endTime )
+        {
+            newStage = 2;
+        }
+        else
+        {
+            //处于5-8点是战役演算阶段
+            if( hour >= 5 && hour < 8 )
+            {
+                newStage = 1;
+            }
+            else
+            {
+                newStage = 0;
+            }
+        }
+
+        /*
         UInt32 sday =buildTime+((24-hour)*60-min)*60+36000;   //第二天十点的时间的戳
         //UInt32 sday =buildTime+((24-hour)*60-min)*60+3600*10+1200*2;   //第二天11点的时间的戳
         UInt8 newStage = 0;
@@ -69,7 +92,7 @@ namespace Battle
         {
             newStage = 0;
         }
-
+        */
         if( newStage != stage )
         {
             stage = newStage;

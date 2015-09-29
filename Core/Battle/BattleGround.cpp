@@ -165,18 +165,22 @@ namespace Battle
         }
         else
         {
-            auto begin = path.begin();
-            begin++;
-            for( auto it = begin; it != path.end() ;++it )
+
+            //按照路径重新走一遍
+            UInt8 cost = 0;
+            for( auto it = path.begin(); it != path.end() ;++it )
             {
-                if( InMyAttackHasEnemy(*it) || ride <= 0 )
+                if( cost >= ride /*|| InMyAttackHasEnemy(*it)*/ )
                     break;
                 flag = *it;
-                ride -=GetRideSub(flag.x,flag.y);
+                if( flag != *(path.begin()))
+                {
+                    cost+=GetRideSub(flag.x,flag.y);
+                }
                 //UInt8 dis = GetDistance(flag,target);
                 if( IsNearbyHaveEnemy(*it) )
                 {
-                    ride -= 1;
+                    cost += 1;
                 }
             }
         }
@@ -271,12 +275,12 @@ namespace Battle
         }
     }
 
-    static UInt8 priority [4][4] = {
+    static UInt8 priority [3][3] = {
 
-        {1,2,3,4},
-        {1,2,3,4},
-        {1,2,3,4},
-        {1,2,3,4}
+        //步兵  骑兵  弓箭兵
+        {1 , 1 , 2 },  //步兵
+        {1 , 2 , 1 },  //骑兵
+        {2 , 1 , 3 }   //弓箭兵
     };
 
 
@@ -356,11 +360,11 @@ namespace Battle
             }
             currentBf->SetGroundX(mx);
             currentBf->SetGroundY(my);
-            //COUT << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
-            //COUT << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
-            //COUT <<" 无方案" << " 从" << static_cast<UInt32>( x ) <<" , " << static_cast<UInt32>(y);
-            //COUT <<" 移动到 "<<  static_cast<UInt32>(mx)<< " , " << static_cast<UInt32>(my) <<std::endl;
-            //COUT << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
+            std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
+            std::cout << "战将编号:      "  << static_cast<UInt32>(currentBf->GetBattleIndex());
+            std::cout <<" 无方案" << " 从" << static_cast<UInt32>( x ) <<" , " << static_cast<UInt32>(y);
+            std::cout <<" 移动到 "<<  static_cast<UInt32>(mx)<< " , " << static_cast<UInt32>(my) <<std::endl;
+            std::cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
             currentBf->InsertFighterInfo(_pack);  //Stream
 
             //UInt8 rand = uRand(255);
@@ -389,11 +393,11 @@ namespace Battle
 
             //战斗
             
-            //COUT << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
-            //COUT <<"从     "<<static_cast<UInt32>(currentBf->GetGroundX())<<" , "<< static_cast<UInt32>(currentBf->GetGroundY())<<std::endl;
-            //COUT <<"移动到  "<<static_cast<UInt32>(target.attack.x)<< "," << static_cast<UInt32>(target.attack.y) <<std::endl;
-            //COUT << "攻击目标  " <<static_cast<UInt32>((target.bo)->GetGroundX())<<","<<static_cast<UInt32>((target.bo)->GetGroundY())<<std::endl;
-            //COUT << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
+            std::cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
+            std::cout <<"从     "<<static_cast<UInt32>(currentBf->GetGroundX())<<" , "<< static_cast<UInt32>(currentBf->GetGroundY())<<std::endl;
+            std::cout <<"移动到  "<<static_cast<UInt32>(target.attack.x)<< "," << static_cast<UInt32>(target.attack.y) <<std::endl;
+            std::cout << "攻击目标  " <<static_cast<UInt32>((target.bo)->GetGroundX())<<","<<static_cast<UInt32>((target.bo)->GetGroundY())<<std::endl;
+            std::cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 
             //Stream
             //
@@ -745,7 +749,7 @@ namespace Battle
         }
     }
 
-
+    /*
     void BattleGround::ShootCurrentPosAttack()
     {
         UInt8 x = currentBf->GetGroundX();
@@ -794,6 +798,7 @@ namespace Battle
         vecEnemy.clear();
         vecFinal.clear();
     }
+
 
 
     void BattleGround::ShootFrontAttack()
@@ -849,7 +854,7 @@ namespace Battle
         }
         if( target.x == 0xFF && target.y == 0xFF )
         {
-           return 3;
+           return 3;  //前进攻击
         }
         std::vector<Ascoord> vecNeighbourEnemy;
         GetNeighbourEnemy(x,y,vecNeighbourEnemy);
@@ -863,6 +868,192 @@ namespace Battle
         }
         return 0;
 
+    }
+
+    */
+
+    void BattleGround::AttackInStyle(UInt8 x,UInt8 y, Ascoord& target)
+    {
+        Ascoord myPos = Ascoord(x,y);
+        UInt8 attackStyle = 0 ; // 进攻方式
+        std::vector<Ascoord> vecNeighbourEnemy;
+        GetNeighbourEnemy(x,y,vecNeighbourEnemy);
+        if( IsInAround(myPos,target) && vecNeighbourEnemy.size() <= 6 )   //没有被包围
+        {
+            attackStyle = 2;   //敌人在周围   后退攻击
+        }
+        else if( vecNeighbourEnemy.size() == 6 || IsInAttackZone(myPos,target ))
+        {
+             attackStyle = 1;  //被敌人包围  或者不用动就能射到敌人
+        }
+        else
+        {
+            attackStyle = 3;   //敌人距离较远  得移动然后才能攻击到
+        }
+
+        //下面是做验证 主要把就算移动了依然打不到的目标给去掉
+        switch(attackStyle)
+        {
+            case 1:
+                {
+                    ShootCurrentAttack(target);
+                }
+                break;
+            case 2:
+                {
+                    ShootBackAttack(target);
+                }
+                break;
+            case 3:
+                {
+                    ShootFrontAttack(target);
+                }
+                break;
+        }
+
+    }
+
+    //按照另一种进攻方式 选择目标位置会有额外的优先级加成
+    UInt8 BattleGround::AddPriority(Ascoord& target)
+    {
+        UInt8 x = currentBf->GetGroundX();
+        UInt8 y = currentBf->GetGroundY();
+        UInt8 side = currentBf->GetSide();
+        UInt8 tx = target.x;
+        UInt8 ty = target.y;
+        //由地图信息上获得进攻的方向
+        GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(_mapId);
+        UInt8 dir = mapInfo->GetAttackDirect(side);
+        UInt8 extraPri = 0;
+        if( dir == 0 )
+        {
+            dir = 1;
+        }
+        if( currentBf->GetOwner() == NULL || ( currentBf->GetOwner() != NULL && currentBf->GetOwner()->GetVar(GObject::VAR_ATTACK_STYLE) ==0 ))
+        {
+            return extraPri;
+        }
+
+        switch(dir)
+        {
+            case 0:  //auto 
+                break;
+            case 1:  //left  向左进攻
+                if( ty == y && x > tx )
+                {
+                    UInt8 dis = x - tx;
+                    UInt8 add = _x-dis;
+                    extraPri += add;
+                }
+                break;
+            case 2:  //right
+                if( ty == y && x < tx )
+                {
+                    UInt8 dis = tx - x;
+                    UInt8 add = _x-dis;
+                    extraPri += add;
+                }
+                break;
+            case 3:  //up
+                if( x == tx && ty < y )
+                {
+                    UInt8 dis = y - ty ;
+                    UInt8 add = _y - dis;
+                    extraPri += add;
+                }
+                break;
+            case 4:  //down
+                if( x== tx && ty > y )
+                {
+                    UInt8 dis = ty -y ;
+                    UInt8 add = _y -dis;
+                    extraPri += add;
+                }
+                break;
+        }
+
+        return extraPri*2;
+
+    }
+
+    void BattleGround::ShootCurrentAttack(Ascoord& target)
+    {
+        UInt8 cost = 0;
+        UInt8 x = currentBf->GetGroundX();
+        UInt8 y = currentBf->GetGroundY();
+        Ascoord pos = Ascoord(x,y);
+        UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1] + AddPriority(target);
+        _vecTarget.push_back(TargetInfo(static_cast<BattleFighter*>(_mapFighters[target.x+target.y*_x]),pos,cost,pri));
+    }
+
+    void BattleGround::ShootFrontAttack(Ascoord& target)
+    {
+        UInt8 x = currentBf->GetGroundX();
+        UInt8 y = currentBf->GetGroundY();
+        Ascoord pos = Ascoord(x,y);
+        SetStart(pos);
+        SetEnd(target);
+        ComputeRoute();
+        std::list<Ascoord>path;
+        GetRoute(path);
+        Analyse(path,target);
+    }
+
+    void BattleGround::ShootBackAttack(Ascoord& target)
+    {
+        UInt8 x = currentBf->GetGroundX();
+        UInt8 y = currentBf->GetGroundY();
+        //Ascoord pos = Ascoord(x,y);
+        std::vector<Ascoord> vecEnemy;
+        GetNearEnemy(x,y,vecEnemy);
+        std::vector<AttackInfo> vecFinal;   //最终确立的那个要后退的一系列点
+        GetBackPosition(vecEnemy,vecFinal);
+        if( vecFinal.empty())   //后退没有位置 那就站原地攻击
+        {
+            ShootCurrentAttack(target);
+        }
+        else
+        {
+            SetStart(Ascoord(x,y));
+            for( auto it = vecFinal.begin() ; it != vecFinal.end(); ++it)
+            {
+                SetEnd((*it).attack);
+                ComputeRoute();
+                std::list<Ascoord>path;
+                GetRoute(path);
+                BowAnalyse(path,(*it).target);
+            }
+        }
+
+    }
+
+
+    void BattleGround::GetBackPosition(Ascoord& target,std::vector<AttackInfo>& vecFinal)
+    {
+        std::vector<Ascoord> vecAscoord;
+        GetRideZone(vecAscoord);
+        for( auto it = vecAscoord.begin(); it != vecAscoord.end() ; ++it )
+        {
+            std::vector<Ascoord> vecEnemy;
+            GetNearEnemy((*it).x,(*it).y,vecEnemy);
+            for( auto iter = vecEnemy.begin(); iter != vecEnemy.end(); ++iter)
+            {
+               if( IsInAttackZone(*it,target) && ! EnemyCanAttack(*iter,*it) )
+               {
+                   vecFinal.push_back(AttackInfo(*it,*iter));
+               }
+            }
+        }
+
+    }
+
+    void BattleGround::BowGetTarget(UInt8 x,UInt8 y, std::vector<Ascoord>& vecEnemy)
+    {
+        //对每一个敌人使用适合的方式进行攻击
+        for( auto it = vecEnemy.begin(); it != vecEnemy.end(); ++it )
+        {
+            AttackInStyle(x,y,*it);
+        }
     }
 
     void BattleGround::GetTarget(UInt8 x,UInt8 y ,UInt8 ride)
@@ -879,8 +1070,11 @@ namespace Battle
             if( currentBf->GetTypeId() == 3 )
             {
                 //获得弓箭兵行为类型  1原地攻击  2后退攻击  3前进攻击
-                UInt8 actionType = GetShootActionType(x,y, vecEnemy);
-                ShootGetTarget(actionType);
+                //UInt8 actionType = GetShootActionType(x,y, vecEnemy);
+                //ShootGetTarget(actionType);
+
+                //弓箭兵的行为进行优化
+                BowGetTarget(x,y,vecEnemy);
             }
             else
             {
@@ -943,7 +1137,7 @@ namespace Battle
         }
         else
         {
-            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1]+AddPriority(target);
             _vecTarget.push_back(TargetInfo(static_cast<BattleFighter*>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
         }
     }
@@ -1036,7 +1230,7 @@ namespace Battle
             {
                 if(IsInAround(attack,target))    //如果攻击点在目标点的附近
                 {
-                    UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+                    UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1]+AddPriority(target);
                     _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
                 }
                 else
@@ -1047,7 +1241,7 @@ namespace Battle
         }
         else
         {
-            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1]+AddPriority(target);
             _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
         }
 
@@ -1163,8 +1357,9 @@ namespace Battle
         bf->SetEnterPos(x,y);
         UInt8 actId = GetBattleIndex(x,y);
         bf->SetBattleIndex(actId);
+        std::cout<< "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
+        std::cout<<" before hp " <<static_cast<UInt32>(fgt->GetHP());
         //bf->InsertFighterInfo(_pack,1);
-        //COUT << "入场战将编号 : " << static_cast<UInt32>(bf->GetBattleIndex()) << std::endl;
 
         //设置主将及小兵的血量( 非npc )
         //if( fgt->GetOwner() != NULL )
@@ -1184,6 +1379,7 @@ namespace Battle
                 }
             }
         }
+        std::cout<< " after "<<static_cast<UInt32>(bf->getHP())<<std::endl;
         return bf;
     } 
 
@@ -1535,6 +1731,10 @@ namespace Battle
         _pack << actCount;
         do
         {
+            if(_actId > 100 )
+            {
+                break;
+            }
             std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
             while(  camp2fighters_copy.size() > 0 )
             {
@@ -1588,19 +1788,20 @@ namespace Battle
                         }
                     }
                 }
+                ++_actId;
             }
         }while( !CheckIsStop() );
 
         //camp2fighters_copy.clear();
-        //COUT<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
+        std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
         _pack.data<UInt16>(offset) = actCount;
         UInt32 now = TimeUtil::Now();
         _pack << static_cast<UInt32>(now);
         _pack<<Stream::eos;
-        //COUT<<" ****************************************************************该战术战报Id为  "<<static_cast<UInt32>(_battleNum)<<endl;
+        std::cout<<" ****************************************************************该战术战报Id为  "<<static_cast<UInt32>(_battleNum)<<endl;
         battleReport0.addReport(_battleNum,_pack);
         SetCaptureForce();
-        //COUT<<" 竞技场  的胜利的势力Id 为 " <<static_cast<UInt32>(GetCaptureId())<<std::endl;
+        std::cout<<" 竞技场  的胜利的势力Id 为 " <<static_cast<UInt32>(GetCaptureId())<<std::endl;
     }
 
     //战将进入战场
@@ -1669,12 +1870,12 @@ namespace Battle
                     continue;
                 if(_mapFighters[i+j*_x] != NULL )
                 {
-                    //COUT << "战将编号" << static_cast<UInt32>(_mapFighters[i+j*_x]->GetBattleIndex());
-                    //COUT << "玩家Side:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetSide());
-                    //COUT << "  x:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundX());
-                    //COUT << "  y:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundY());
-                    //COUT << " 血量：" << static_cast<UInt32>(_mapFighters[i+j*_x]->getHP()) ;
-                    //COUT << std::endl;
+                    std::cout << "战将编号" << static_cast<UInt32>(_mapFighters[i+j*_x]->GetBattleIndex());
+                    std::cout << "玩家Side:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetSide());
+                    std::cout << "  x:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundX());
+                    std::cout << "  y:"<< static_cast<UInt32>(_mapFighters[i+j*_x]->GetGroundY());
+                    std::cout << " 血量：" << static_cast<UInt32>(_mapFighters[i+j*_x]->getHP()) ;
+                    std::cout << std::endl;
                 }
             } 
         } 
@@ -1984,11 +2185,14 @@ namespace Battle
             GetCampAttackOrder(5,dir);
         }
         //
-        for(UInt8 i = 1 ; i <= forceNum ; ++i )
+        else
         {
-            UInt8 dir = mapInfo->GetAttackDirect(i);
-            //按照攻击方向获得实际的出手顺序
-            GetCampAttackOrder(i,dir);
+            for(UInt8 i = 1 ; i <= forceNum ; ++i )
+            {
+                UInt8 dir = mapInfo->GetAttackDirect(i);
+                //按照攻击方向获得实际的出手顺序
+                GetCampAttackOrder(i,dir);
+            }
         }
     }
     //  我们这么约定 1 left 2 right 3 up 4 down(进攻方向)
@@ -1996,8 +2200,12 @@ namespace Battle
 
     void BattleGround::GetCampAttackOrder(UInt8 campId,UInt8 dir)
     {
+        //编号
         switch(dir)
         {
+            case 0: //auto 
+                SearchFromLeftToRight(campId);
+                break;
             case 1: //left  向左进攻
                 SearchFromLeftToRight(campId);
                 break;
@@ -2052,17 +2260,26 @@ namespace Battle
                 {
                     break;
                 }
-                if( _mapCamp[i+j*_x] == campId )
+                UInt8 x = 0 ;
+                if( j % 2 == 1 && _mapCamp[i + j*_x] == 0  )
+                {
+                    x = i - 1;
+                }
+                else
+                {
+                    x = i;
+                }
+                if( _mapCamp[x + j*_x] == campId )
                 {
                     if( _camp2pos[campId].empty())
                     {
                         std::list<Ascoord> listAscoord;
-                        listAscoord.push_back(Ascoord(i,j));
+                        listAscoord.push_back(Ascoord(x,j));
                         _camp2pos[campId] = listAscoord;
                     }
                     else
                     {
-                        _camp2pos[campId].push_back(Ascoord(i,j));
+                        _camp2pos[campId].push_back(Ascoord(x,j));
 
                     }
                 }
@@ -2288,7 +2505,9 @@ namespace Battle
                 continue;
             UInt8 x = map2Point[index -1][it->first][0];
             UInt8 y = map2Point[index-1][it->first][1];
-            if( x >= _x || y >= _y )
+            if( x >= _x )
+                continue;
+            if( y >= _y )
                 continue;
             map2fighter[index].push_back(new FighterInfo(pl,it->second,x,y));
             if( pl != NULL )

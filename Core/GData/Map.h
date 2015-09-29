@@ -27,6 +27,8 @@ namespace GData
 
     typedef std::vector<UInt8> vecInfo;
 
+
+    //进攻方向 0 auto 1 left 2 right 3 up 4 down 
     class MapInfo
     {
         public:

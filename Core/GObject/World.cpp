@@ -19,6 +19,7 @@
 #include "GObject/Exploit.h"
 #include "GData/Map.h"
 #include "GData/Robot.h"
+#include "Battle/Report2Id.h"
 #include "Common/LoadingCounter.h"
 
 #define W_CHAT_MAX 20
@@ -89,16 +90,11 @@ namespace GObject
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //LoadingCounter lc("GM attack");
         //lc.reset(1000);
-        GMHandler::Battle(1007,1);
-        //lc.finalize();
         //GMHandler::Battle(1001,1014);
-        //GMHandler::Battle(1011,1017);
-        //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
-        //std::vector<UInt8> *r = Battle::battleReport0[520];
-        //std::vector<UInt8>* r = Battle::battleReport1[991];
-        //BattleAnalyze::Analyze(Stream(*r));
-        //BattleAnalyze::Analyze(Stream(*r));
-        //ReportAnalyse::AnalyseReport(Stream(*r));
+        //lc.finalize();
+        //LoadingCounter lc("GM attack");
+        //lc.reset(1000);
+        //GMHandler::Battle(1,2);
         
         InitRank();
         return true; 
@@ -367,7 +363,10 @@ namespace GObject
             {
                 //COUT<<"处于结算阶段  开始发奖励啦"<<std::endl;
                 roomBattle->Settlement();
-                //Battle::battleManager.removeRoomBattle(roomId);
+                Battle::battleManager.removeRoomBattle(roomId);
+                Battle::clanBattleRoomManager.RemoveClanBattleRoom(roomId);
+                Battle::battleDistribute.RemoveRoomDistribute(roomId);
+                Battle::report2IdTable.RemoveReports(roomId);
             }
         }
     }

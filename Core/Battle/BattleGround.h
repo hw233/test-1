@@ -5,7 +5,7 @@
 #include <vector>
 #include "Common/Stream.h"
 #include "Server/OidGenerator.h"
-#include "GObject/AStar.h"
+//#include "GObject/AStar.h"
 #define GROUND_LENGTH 20
 #include "MsgID.h"
 
@@ -131,6 +131,7 @@ namespace Battle
             ~BattleGround()
             {
                 //delete [] _mapFighters;
+                /*
                 for(UInt8 j = 0; j < _y ; ++j)
                 {
                     for(UInt8 i = 0 ; i < _x ; ++i )
@@ -142,6 +143,7 @@ namespace Battle
                     }
 
                 }
+                */
                 _mapFighters = NULL;
 
                 delete [] _mapGround;
@@ -233,6 +235,16 @@ namespace Battle
             void  GetMovePosition(Ascoord& move);
             UInt8 GetDistance(Ascoord & lp , Ascoord& rp );
             bool  IsNearbyHaveEnemy(Ascoord& p);
+
+
+            void AttackInStyle(UInt8 x,UInt8 y, Ascoord& target);
+            void ShootCurrentAttack(Ascoord& target);
+            void ShootFrontAttack(Ascoord& target);
+            void GetBackPosition(Ascoord& target,std::vector<AttackInfo>& vecFinal);
+            void BowGetTarget(UInt8 x,UInt8 y, std::vector<Ascoord>& vecEnemy);
+            void ShootBackAttack(Ascoord& target);
+
+            UInt8 AddPriority(Ascoord& target);
             ////////一下这些家伙全是A*相关东西
 
             UInt8 GetGValue(const Ascoord& p);
