@@ -1339,6 +1339,7 @@ namespace GObject
         st << Stream::eos;
         send(st);
     } 
+
     void Player::AttackArenaPos(UInt16 targetPos)
     { 
         if(!CanAttackArena())

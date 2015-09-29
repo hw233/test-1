@@ -913,13 +913,76 @@ namespace Battle
 
     }
 
+    //按照另一种进攻方式 选择目标位置会有额外的优先级加成
+    UInt8 BattleGround::AddPriority(Ascoord& target)
+    {
+        UInt8 x = currentBf->GetGroundX();
+        UInt8 y = currentBf->GetGroundY();
+        UInt8 side = currentBf->GetSide();
+        UInt8 tx = target.x;
+        UInt8 ty = target.y;
+        //由地图信息上获得进攻的方向
+        GData::MapInfo* mapInfo = GData::mapTable.GetMapInfo(_mapId);
+        UInt8 dir = mapInfo->GetAttackDirect(side);
+        UInt8 extraPri = 0;
+        if( dir == 0 )
+        {
+            dir = 1;
+        }
+        if( currentBf->GetOwner() == NULL || ( currentBf->GetOwner() != NULL && currentBf->GetOwner()->GetVar(GObject::VAR_ATTACK_STYLE) ==0 ))
+        {
+            return extraPri;
+        }
+
+        switch(dir)
+        {
+            case 0:  //auto 
+                break;
+            case 1:  //left  向左进攻
+                if( ty == y && x > tx )
+                {
+                    UInt8 dis = x - tx;
+                    UInt8 add = _x-dis;
+                    extraPri += add;
+                }
+                break;
+            case 2:  //right
+                if( ty == y && x < tx )
+                {
+                    UInt8 dis = tx - x;
+                    UInt8 add = _x-dis;
+                    extraPri += add;
+                }
+                break;
+            case 3:  //up
+                if( x == tx && ty < y )
+                {
+                    UInt8 dis = y - ty ;
+                    UInt8 add = _y - dis;
+                    extraPri += add;
+                }
+                break;
+            case 4:  //down
+                if( x== tx && ty > y )
+                {
+                    UInt8 dis = ty -y ;
+                    UInt8 add = _y -dis;
+                    extraPri += add;
+                }
+                break;
+        }
+
+        return extraPri*2;
+
+    }
+
     void BattleGround::ShootCurrentAttack(Ascoord& target)
     {
         UInt8 cost = 0;
         UInt8 x = currentBf->GetGroundX();
         UInt8 y = currentBf->GetGroundY();
         Ascoord pos = Ascoord(x,y);
-        UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+        UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1] + AddPriority(target);
         _vecTarget.push_back(TargetInfo(static_cast<BattleFighter*>(_mapFighters[target.x+target.y*_x]),pos,cost,pri));
     }
 
@@ -1074,7 +1137,7 @@ namespace Battle
         }
         else
         {
-            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1]+AddPriority(target);
             _vecTarget.push_back(TargetInfo(static_cast<BattleFighter*>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
         }
     }
@@ -1167,7 +1230,7 @@ namespace Battle
             {
                 if(IsInAround(attack,target))    //如果攻击点在目标点的附近
                 {
-                    UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+                    UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1]+AddPriority(target);
                     _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
                 }
                 else
@@ -1178,7 +1241,7 @@ namespace Battle
         }
         else
         {
-            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1];
+            UInt8 pri = priority[currentBf->getClass()-1][_mapFighters[target.x+target.y*_x]->getClass()-1]+AddPriority(target);
             _vecTarget.push_back(TargetInfo(static_cast<BattleFighter *>(_mapFighters[target.x+target.y*_x]),attack,cost,pri));
         }
 
@@ -1668,6 +1731,10 @@ namespace Battle
         _pack << actCount;
         do
         {
+            if(_actId > 100 )
+            {
+                break;
+            }
             std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
             while(  camp2fighters_copy.size() > 0 )
             {
@@ -1721,6 +1788,7 @@ namespace Battle
                         }
                     }
                 }
+                ++_actId;
             }
         }while( !CheckIsStop() );
 
@@ -2117,11 +2185,14 @@ namespace Battle
             GetCampAttackOrder(5,dir);
         }
         //
-        for(UInt8 i = 1 ; i <= forceNum ; ++i )
+        else
         {
-            UInt8 dir = mapInfo->GetAttackDirect(i);
-            //按照攻击方向获得实际的出手顺序
-            GetCampAttackOrder(i,dir);
+            for(UInt8 i = 0 ; i < forceNum ; ++i )
+            {
+                UInt8 dir = mapInfo->GetAttackDirect(i);
+                //按照攻击方向获得实际的出手顺序
+                GetCampAttackOrder(i,dir);
+            }
         }
     }
     //  我们这么约定 1 left 2 right 3 up 4 down(进攻方向)
@@ -2131,6 +2202,9 @@ namespace Battle
     {
         switch(dir)
         {
+            case 0: //auto 
+                SearchFromLeftToRight(campId);
+                break;
             case 1: //left  向左进攻
                 SearchFromLeftToRight(campId);
                 break;

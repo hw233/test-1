@@ -243,6 +243,8 @@ namespace Battle
             void GetBackPosition(Ascoord& target,std::vector<AttackInfo>& vecFinal);
             void BowGetTarget(UInt8 x,UInt8 y, std::vector<Ascoord>& vecEnemy);
             void ShootBackAttack(Ascoord& target);
+
+            UInt8 AddPriority(Ascoord& target);
             ////////一下这些家伙全是A*相关东西
 
             UInt8 GetGValue(const Ascoord& p);

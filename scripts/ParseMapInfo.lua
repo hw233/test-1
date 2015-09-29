@@ -199,11 +199,11 @@ function GetTiles(mapId)
 end
 
 direction2num={
+    ["auto"] = 0,
     ["left"]  = 1,
     ["right"] = 2,
     ["up"]  = 3,
-    ["down"] = 4,
-    ["auto"] = 5
+    ["down"] = 4
 }
 
 
@@ -304,7 +304,7 @@ function GetForceDirection(mapId)
     for i=1,#tiles do 
         local properties = tiles[i].properties
         if properties["force"] == "auto" then
-            table.insert(direction,5)
+            table.insert(direction,0)
         else
             table.insert(direction,properties["force"])
         end

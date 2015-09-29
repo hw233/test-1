@@ -37,6 +37,7 @@ private:
     void OnAddFighter( GObject::Player * player, std::vector<std::string>& args );
     void OnAddMoney(GObject::Player *player,std::vector<std::string>&);
     void OnBattle(GObject::Player *player,std::vector<std::string>&);
+    void OnAttackStyle(GObject::Player* player,std::vector<std::string>&);
 
 };
 

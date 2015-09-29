@@ -130,12 +130,13 @@ namespace GObject
         VAR_5_LANCE_ROAD     =  89,   //枪兵强化之路
 
         VAR_CLANBATTLE_FIGHTERNUM = 90, /*公会战战场放将的数量*/
-        VAR_MAX_CONSTANTLYKILL    = 91,   //公会战最大连杀数
+        VAR_MAX_CONSTANTLYKILL    = 91, //公会战最大连杀数
         VAR_MAX_ENDCONSTANTLYKILL = 92, //公会战最大终结连杀数量
         VAR_TOTAL_RECHARGE        = 93, //总充值数量
         VAR_TASK_DAY              = 94, //每日任务
         VAR_TASK_WEEK             = 95, //每周任务
         VAR_TASK_ONCE             = 96, //一次性任务
+        VAR_ATTACK_STYLE          = 97, //军团战及竞技场进攻方式
 
         VAR_MAX
     };
@@ -198,6 +199,7 @@ namespace GObject
                 REGISTER_VAR(VAR_TASK_DAY,CYCLE_DAY);
                 REGISTER_VAR(VAR_TASK_WEEK,CYCLE_WEEK);
                 REGISTER_VAR(VAR_TASK_ONCE,CYCLE_NONE);
+                REGISTER_VAR(VAR_ATTACK_STYLE,CYCLE_NONE);
             }
 
             UInt32 GetVar(UInt32 id, UInt32 now = 0);
