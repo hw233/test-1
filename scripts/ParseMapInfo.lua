@@ -2,6 +2,7 @@ forest = require("MapInfo/forest")
 campaign_1 = require("MapInfo/campaign_1")
 template9  = require("MapInfo/template_9x9")
 template_10x9_2p_lr = require("MapInfo/template_10x9_2p_lr")
+pvp = require("MapInfo/pvp")
 
 name2table= {
     [1] = forest,
@@ -22,7 +23,8 @@ name2table= {
     [16] = template_10x9_2p_lr,
     [17] = template_10x9_2p_lr,
     [18] = template_10x9_2p_lr,
-    [19] = template_10x9_2p_lr 
+    [19] = template_10x9_2p_lr,
+    [10001] = pvp
 }
 
 function GetMapWidth(mapId)

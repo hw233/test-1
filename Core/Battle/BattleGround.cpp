@@ -2187,7 +2187,7 @@ namespace Battle
         //
         else
         {
-            for(UInt8 i = 0 ; i < forceNum ; ++i )
+            for(UInt8 i = 1 ; i <= forceNum ; ++i )
             {
                 UInt8 dir = mapInfo->GetAttackDirect(i);
                 //按照攻击方向获得实际的出手顺序
@@ -2200,6 +2200,7 @@ namespace Battle
 
     void BattleGround::GetCampAttackOrder(UInt8 campId,UInt8 dir)
     {
+        //编号
         switch(dir)
         {
             case 0: //auto 
@@ -2259,17 +2260,26 @@ namespace Battle
                 {
                     break;
                 }
-                if( _mapCamp[i+j*_x] == campId )
+                UInt8 x = 0 ;
+                if( j % 2 == 1 && _mapCamp[i + j*_x] == 0  )
+                {
+                    x = i - 1;
+                }
+                else
+                {
+                    x = i;
+                }
+                if( _mapCamp[x + j*_x] == campId )
                 {
                     if( _camp2pos[campId].empty())
                     {
                         std::list<Ascoord> listAscoord;
-                        listAscoord.push_back(Ascoord(i,j));
+                        listAscoord.push_back(Ascoord(x,j));
                         _camp2pos[campId] = listAscoord;
                     }
                     else
                     {
-                        _camp2pos[campId].push_back(Ascoord(i,j));
+                        _camp2pos[campId].push_back(Ascoord(x,j));
 
                     }
                 }
