@@ -563,7 +563,7 @@ void OnBattleArenaOption(GameMsgHdr& hdr, const void * data)
             {
                 Stream st(REP::BATTLE_ARENA);
                 st << static_cast<UInt8>(5);
-                for(UInt8 i = 0; i < 50; ++i) 
+                for(UInt8 i = 1; i < 51; ++i) 
                 { 
                     GObject::ArenaMember am = WORLD().GetArenaMember(i);
                     if(am.pl)

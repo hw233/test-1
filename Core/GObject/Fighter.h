@@ -160,8 +160,8 @@ namespace GObject
                UInt8 cls = GetTypeId();
                UInt16 arena = 0;
                UInt16 arenaLevel = 0;
-               if(!_owner)
-                   arenaLevel = ((3001 > GetArenaPos()?(3001 - GetArenaPos()):0)*15/3000 + 15);
+               if(!_owner && GetArenaPos() < 3001)
+                   arenaLevel = (3001 - GetArenaPos())*15/3000 + 15;
 
                switch(index)
                { 
