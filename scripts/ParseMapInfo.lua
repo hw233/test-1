@@ -5,7 +5,7 @@ template_10x9_2p_lr = require("MapInfo/template_10x9_2p_lr")
 pvp = require("MapInfo/pvp")
 
 name2table= {
-    [1] = pvp,
+    [1] = forest,
     [2] = forest,
     [3] = forest,
     [4] = forest,
