@@ -206,7 +206,7 @@ namespace Battle
 
             void TestCoutBattleS(BattleFighter* bf = NULL);
             void InsertFighterInfo(UInt8 flag = 0);
-
+            void GetAllBattleFighter(std::list<BattleFighter*>& listFighters);
             UInt8 GetFactAttackDis();
             UInt8 GetCampInfo(UInt8 index) { return _mapCamp[index];}
 
@@ -319,6 +319,7 @@ namespace Battle
             std::vector<Ascoord> _aroundAscoord;
 
             bool _isNpc;
+
     };
 }
 #endif // BATTLEGROUND_H_

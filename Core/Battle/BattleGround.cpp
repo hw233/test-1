@@ -374,7 +374,6 @@ namespace Battle
             //COUT<<"移动用时  " <<static_cast<UInt32>(ceil((dis+1)*0.5))<<std::endl;
             _pack << static_cast<UInt8>(0); //无战斗发生
             _oneRoundCostTime += ceil(dis*0.5)/*currentBf->GetNowTime()/100*/;
-             
         }
         else
         {
@@ -1557,8 +1556,8 @@ namespace Battle
         }
         TestCoutBattleS();
         //按照行动力的顺序给相应的阵营中的战将排序
-        SortByActId();
-        std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
+        //SortByActId();
+        //std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
         
         _pack.init(0x80);
         _pack << static_cast<UInt8>(_mapId);
@@ -1566,7 +1565,10 @@ namespace Battle
         UInt16 actCount = 0;
         size_t offset = _pack.size();
         _pack << actCount;
+        std::list<BattleFighter*> listFighters;
+        GetAllBattleFighter(listFighters);
 
+        /*
         while(  camp2fighters_copy.size() > 0 )
         {
             if( CheckIsStop() )
@@ -1616,10 +1618,39 @@ namespace Battle
                 }
             }
         }
+        */
 
+        if( 1 )
+        {
+            if( CheckIsStop() )
+            {
+                return;
+            }
+            std::list<BattleFighter*> listFighters_copy = listFighters;
+            while( !listFighters_copy.empty() )
+            {
+                //取出非死战将
+                while(  listFighters_copy.front() == NULL || ( listFighters_copy.front() != NULL && listFighters_copy.front()->getHP() <= 0 ))
+                {
+                    listFighters_copy.pop_front();
+                    if( listFighters_copy.empty())
+                        break;
+                }
+                if( listFighters_copy.empty() )
+                    break;
+                BattleFighter* bf =  listFighters_copy.front();
+                if( bf != NULL )
+                {
+                    currentBf = bf;
+                    Move(1);
+                    ++actCount;
+                }
+                listFighters_copy.pop_front();
+            }
+        }
         //COUT<<" ---------------------------------print  useful info ------------------------------------------------------------"<<std::endl;
         ++_actId;
-        camp2fighters_copy.clear();
+        //camp2fighters_copy.clear();
         //COUT<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
         _pack.data<UInt16>(offset) = actCount;
         UInt32 now = TimeUtil::Now();
@@ -1714,7 +1745,23 @@ namespace Battle
         }
 
     }
-    
+
+
+    /* 按照策划的需求出手顺序有变 即严格按照出手顺序出手(轮到对面出手 但是他死了  出手顺序顺延) */
+   
+    void BattleGround::GetAllBattleFighter(std::list<BattleFighter*>& listFighters)
+    {
+        for(auto it = camp2fighters.begin(); it != camp2fighters.end(); ++it )
+        {
+            for( auto i = (it->second).begin(); i != (it->second).end(); ++i )
+            {
+                listFighters.push_back(*i);
+            }
+        }
+        //按照行动id排序
+        LessActId<BattleFighter*> lessActId;
+        listFighters.sort(lessActId);
+    }
 
     void BattleGround::start()
     {
@@ -1722,20 +1769,52 @@ namespace Battle
             return;
         preStart();
         TestCoutBattleS();
-        SortByActId();
+        //SortByActId();
         _pack.init(0x80);
         _pack << static_cast<UInt8>(_mapId);
         MakePreStartInfo();
         UInt16 actCount = 0;
         size_t offset = _pack.size();
         _pack << actCount;
-        do
+
+        std::list<BattleFighter*> listFighters;
+        GetAllBattleFighter(listFighters);
+        while( true )
         {
             if(_actId > 100 )
             {
                 break;
             }
+            if( CheckIsStop() )
+            {
+                break;
+            }
+            std::list<BattleFighter*> listFighters_copy = listFighters;
+            while( !listFighters_copy.empty() )
+            {
+                //取出非死战将
+                while(  listFighters_copy.front() == NULL || ( listFighters_copy.front() != NULL && listFighters_copy.front()->getHP() <= 0 ))
+                {
+                    listFighters_copy.pop_front();
+                    if( listFighters_copy.empty())
+                        break;
+                }
+                if( listFighters_copy.empty() )
+                    break;
+                BattleFighter* bf =  listFighters_copy.front();
+                if( bf != NULL )
+                {
+                    currentBf = bf;
+                    Move(1);
+                    ++actCount;
+                }
+                listFighters_copy.pop_front();
+            }
+            ++_actId;
+
+            /*
             std::map<UInt8,std::list<BattleFighter*>> camp2fighters_copy = camp2fighters;
+            _lastRes = 1 ;
             while(  camp2fighters_copy.size() > 0 )
             {
                 if( CheckIsStop() )
@@ -1758,7 +1837,7 @@ namespace Battle
                         {
                             listFighter.pop_front();
                             if( listFighter.empty())
-                                break;
+                            break;
                         }
                         if( listFighter.empty() )
                         {
@@ -1788,9 +1867,9 @@ namespace Battle
                         }
                     }
                 }
-                ++_actId;
             }
-        }while( !CheckIsStop() );
+            */
+        };
 
         //camp2fighters_copy.clear();
         std::cout<<"战术回合"<<static_cast<UInt32>(_actId)<<"用时  "<<static_cast<UInt32>(_oneRoundCostTime)<<" 秒"<<std::endl;
