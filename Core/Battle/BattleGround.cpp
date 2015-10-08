@@ -475,6 +475,14 @@ namespace Battle
             }
 #endif
             _pack << win << reportId;
+            if( win == 0 )
+            {
+                currentBf->SetMultiKill(currentBf->GetMultiKill()+1);
+            }
+            if( win == 1 )
+            {
+                (target.bo)->SetMultiKill((target.bo)->GetMultiKill()+1);
+            }
 
             //cout
             //COUT<<" after fight the fighter hp info ..............................................................................."<<std::endl;
@@ -484,7 +492,7 @@ namespace Battle
 
             _oneRoundCostTime += timeCost;
 
-            if( !flag )
+            if( !flag )   //竞技场的话  杀敌杀将信息不用增加  位置也不需要同步
             {
                 //增加击杀人数
                 if( currentBf->GetOwner() != NULL )
