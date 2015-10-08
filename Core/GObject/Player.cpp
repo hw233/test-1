@@ -1386,6 +1386,8 @@ namespace GObject
         if(res == 1)
         {
             UInt32 myPos = GetVar(VAR_ARENA_POS);
+            if(!myPos)
+                myPos = 3001;
             if(myPos > targetPos)
             {
                 WORLD().arenaSort[targetPos] = ArenaMember(this);

@@ -143,28 +143,32 @@ namespace Battle
         //TODO
         UInt32 attack = bAction->GetAttack();
         UInt32 defend = GetDefend();
+        UInt32 attackImage = bAction->GetAttackImage();
+        UInt32 defendImage = GetImageDefend();
         UInt32 hpSub = 0;
         UInt8 flag = 0;
 
-        if(attack <= defend)
-        { 
-            hpSub += attack * 25 / 100;
-        } 
-        else
+        if(bAction->GetBattleFighter()->GetTypeId() != e_advice)
         {
-            hpSub += attack - (defend  * 75 /100);
+            if(attack <= defend)
+            { 
+                hpSub += attack * 25 / 100;
+            } 
+            else
+            {
+                hpSub += attack - (defend  * 75 /100);
+            }
         }
-
-        UInt32 attackImage = bAction->GetAttackImage();
-        UInt32 defendImage = GetImageDefend();
-
-        if(attackImage <= defendImage)
-        { 
-            hpSub += attackImage * 25 / 100;
-        } 
         else
         {
-            hpSub += attackImage - (defendImage * 75 /100);
+            if(attackImage <= defendImage)
+            { 
+                hpSub += attackImage * 25 / 100;
+            } 
+            else
+            {
+                hpSub += attackImage - (defendImage * 75 /100);
+            }
         }
 
         //TEST
@@ -184,7 +188,7 @@ namespace Battle
         {
             flag = 2;
         }
-        
+
         GetAttackedSkill(flag);
 
         //伤害变化
@@ -206,7 +210,7 @@ namespace Battle
                 }
                 break;
         } 
-            
+
         makeDamage(hpSub);
 
         if(GetClass() == e_shoot || GetClass() == e_advice)
@@ -230,7 +234,7 @@ namespace Battle
         //_st.clear();
         UpdateActionList();
         //硬直
-        
+
         if(_crick)
         {
             GetField()->InsertBattlePre(GetNowTime()+_crick, this);
@@ -261,72 +265,72 @@ namespace Battle
         if(_ab._skillId)
             //COUT << " 技能选择 " << static_cast<UInt32>(_ab._skillId);
 
-        switch(_actionType)
-        { 
-            case e_none:
-                break;
-            case e_run:
-                //GoForward(1);
-                break;
-            case e_attack_near:
-            case e_attack_middle:
-            case e_attack_distant:
-                {
-                    //COUT << " 发起普通攻击 " ;
-                    flag = NormolAttack();
-                }
-                break;
-            case e_image_attack:
-            case e_image_therapy:
-            case e_image_attack_time_special:
-                { 
+            switch(_actionType)
+            { 
+                case e_none:
+                    break;
+                case e_run:
+                    //GoForward(1);
+                    break;
+                case e_attack_near:
+                case e_attack_middle:
+                case e_attack_distant:
+                    {
+                        //COUT << " 发起普通攻击 " ;
+                        flag = NormolAttack();
+                    }
+                    break;
+                case e_image_attack:
+                case e_image_therapy:
+                case e_image_attack_time_special:
+                    { 
 
-                    //COUT << " 发起魔法攻击 " ;
-                    const GData::Skill * s = GData::skillManager[_ab._skillId];
-                    if(s)
+                        //COUT << " 发起魔法攻击 " ;
+                        const GData::Skill * s = GData::skillManager[_ab._skillId];
+                        if(s)
+                        {
+                            const GData::SkillEffect * se = s->GetSkillEffect(); 
+                            if(se)
+                            { 
+                                if(se->avoidhurt)
+                                    SetAvoidHurt(true);
+                            } 
+                        }
+                        UInt8 super = s->GetSuperSkill();
+                        if(super)
+                            GetField()->SetSuperSkill(this);
+                        GetField()->AddTimeExtra(s->GetFrozrTime());
+                        flag = NormolImage();
+                    } 
+                    break;
+                case e_attack_counter:
+                    break;
+                case e_object_image:
+                case e_object_attack:
+                    { 
+                        //COUT << " 发起粒子攻击 " ;
+                        const GData::Skill * s = GData::skillManager[_ab._skillId];
+                        if(s)
+                        {
+                            const GData::SkillEffect * se = s->GetSkillEffect(); 
+                            if(se)
+                            { 
+                                if(se->avoidhurt)
+                                    SetAvoidHurt(true);
+                            } 
+                        }
+                        UInt8 super = s->GetSuperSkill();
+                        if(super)
+                            GetField()->SetSuperSkill(this);
+                        GetField()->AddTimeExtra(s->GetFrozrTime());
+                        flag = NormolObject();
+                    } 
+                    break;
+                default:
                     {
-                        const GData::SkillEffect * se = s->GetSkillEffect(); 
-                        if(se)
-                        { 
-                            if(se->avoidhurt)
-                                SetAvoidHurt(true);
-                        } 
                     }
-                    UInt8 super = s->GetSuperSkill();
-                    if(super)
-                        GetField()->SetSuperSkill(this);
-                    GetField()->AddTimeExtra(s->GetFrozrTime());
-                    flag = NormolImage();
-                } 
-                break;
-            case e_attack_counter:
-                break;
-            case e_object_image:
-            case e_object_attack:
-                { 
-                    //COUT << " 发起粒子攻击 " ;
-                    const GData::Skill * s = GData::skillManager[_ab._skillId];
-                    if(s)
-                    {
-                        const GData::SkillEffect * se = s->GetSkillEffect(); 
-                        if(se)
-                        { 
-                            if(se->avoidhurt)
-                                SetAvoidHurt(true);
-                        } 
-                    }
-                    UInt8 super = s->GetSuperSkill();
-                    if(super)
-                        GetField()->SetSuperSkill(this);
-                    GetField()->AddTimeExtra(s->GetFrozrTime());
-                    flag = NormolObject();
-                } 
-                break;
-            default:
-                {
-                }
-                break;
-        } 
+                    break;
+            } 
         if(!flag)
         {
             //COUT << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
@@ -445,7 +449,7 @@ namespace Battle
             preActionList.erase(result);
             preActionCD.push_back(res);
             if(flag == 2)
-               _energy = _energy > 100 ? _energy - 100:0; 
+                _energy = _energy > 100 ? _energy - 100:0; 
             AddEnergy(5);
         } 
         return res;
