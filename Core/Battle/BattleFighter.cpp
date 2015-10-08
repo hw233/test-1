@@ -9,7 +9,7 @@
 
 namespace Battle
 {
-    BattleFighter::BattleFighter( UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(Class/*XXX*/, pointX, pointY/*, field*/),_formula(bf),_target(NULL)
+    BattleFighter::BattleFighter( UInt8 Class ,Script::BattleFormula * bf ,GObject::Fighter * f , UInt8 pointX , UInt8 pointY):BattleObject(Class/*XXX*/, pointX, pointY/*, field*/),_formula(bf),_target(NULL),_multiKill(0)
     { 
         setFighter(f);
         memset(m_fighters,0,sizeof( BattleFighter *)*MYFIGHTERMAX);

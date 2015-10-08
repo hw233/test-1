@@ -90,7 +90,7 @@ namespace GObject
         //GVAR.SetVar(GVAR_CLAN_CREATE, TimeUtil::Now() + 60);
         //LoadingCounter lc("GM attack");
         //lc.reset(1000);
-        GMHandler::Battle(1006,1007);
+        //GMHandler::Battle(1006,1007);
         //lc.finalize();
         //LoadingCounter lc("GM attack");
         //lc.reset(1000);
