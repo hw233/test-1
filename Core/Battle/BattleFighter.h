@@ -268,7 +268,10 @@ namespace Battle
             { 
                 if(index >= e_attr_max)
                     return 0;
-                return A_SUB_B(attrBase[index]+attrAdd[index] , attrSub[index]);
+                UInt8 multiKill = GetMultiKill();
+                if(multiKill > 19)
+                    multiKill = 19;
+                return (A_SUB_B(attrBase[index]+attrAdd[index] , attrSub[index]))* (20 - multiKill )* 5 / 100;
             } 
 
             void AddBuff(UInt16 buffId);
@@ -346,7 +349,7 @@ namespace Battle
             bool GetAttackedSkill(UInt8& flag);
 
             void SetMultiKill(UInt8 kills){ _multiKill = kills;}
-            UInt8 GetMultiKill(){ return _multiKill;}
+            UInt8 GetMultiKill(){ if(!_isChild || !m_mainFighter) return _multiKill; return m_mainFighter->GetMultiKill();}
         protected:
 
             UInt8 _crick;  //硬直
