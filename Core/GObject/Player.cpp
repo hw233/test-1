@@ -1312,13 +1312,13 @@ namespace GObject
             UInt16 select = vec[i];
             ArenaMember am = WORLD().GetArenaMember(select);
             //GObject::Player* pl = (WORLD().arenaSort[select].pl);
-            st << static_cast<UInt16>(select);
             if(!advance)
             { 
                 if(am.pl == this)
                     continue;
             } 
 
+            st << static_cast<UInt16>(select);
             if(am.pl)
             {
                 st << static_cast<UInt8>(0);
@@ -1386,6 +1386,8 @@ namespace GObject
         if(res == 1)
         {
             UInt32 myPos = GetVar(VAR_ARENA_POS);
+            if(!myPos)
+                myPos = 3001;
             if(myPos > targetPos)
             {
                 WORLD().arenaSort[targetPos] = ArenaMember(this);
@@ -1541,7 +1543,6 @@ namespace GObject
         _arenaBattleReport.push_front(abi);
         if(update)
             DB1().PushUpdateData("replace into `arenaBrp` values(%" I64_FMT "u,%d,%u,'%s',%u,%u)",getId(),abi.battleId, abi.res, abi.name.c_str(), abi.index, abi.power);   //LIBOUInt64
-
     } 
     void Player::GetArenaBattleReport(Stream& st)
     { 

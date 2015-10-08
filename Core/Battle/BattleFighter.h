@@ -345,6 +345,8 @@ namespace Battle
 
             bool GetAttackedSkill(UInt8& flag);
 
+            void SetMultiKill(UInt8 kills){ _multiKill = kills;}
+            UInt8 GetMultiKill(){ return _multiKill;}
         protected:
 
             UInt8 _crick;  //硬直
@@ -416,6 +418,7 @@ namespace Battle
 
             UInt32 _energy;
 
+            UInt8 _multiKill;
         public:
             BattleFighter * _target;
     };
