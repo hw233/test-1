@@ -279,6 +279,7 @@ namespace Battle
                 _packet << static_cast<UInt16>(bAction.GetHappenTime());
                 _packet << static_cast<UInt8>(fgt->GetBSNumber());
                 _packet << static_cast<UInt8>(1);
+                _packet << static_cast<UInt16>(bAction.GetSkillId());
                 _packet << static_cast<UInt8>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
                 //param改
                 _packet << static_cast<UInt8>(param >> 16);

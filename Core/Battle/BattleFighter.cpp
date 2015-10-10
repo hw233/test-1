@@ -34,6 +34,8 @@ namespace Battle
 
         _energy = 0; //主将集气
 
+        _multiKill = 0;
+
         //if(f) //战将属性  小兵属性延后
         if(f)
         { 
@@ -459,7 +461,7 @@ namespace Battle
     } 
     ActionPackage BattleFighter::MakeActionEffect()   //实现动作效果  伤害 法术等
     { 
-        return  ActionPackage( this,_nowTime);  //未加入目标对象
+        return  ActionPackage( this,_ab._skillId,_nowTime);  //未加入目标对象
     } 
 
     ImagePackage BattleFighter::MakeImageEffect()
@@ -637,7 +639,7 @@ namespace Battle
                 return 0;
         }
         { 
-            ActionPackage ap(this,GetNowTime()/*,_target*/);
+            ActionPackage ap(this, _ab._skillId, GetNowTime()/*,_target*/);
             ap.PushObject(_target);
 
             GetField()->InsertTimeBattleAction( GetNowTime() + _actionLast ,ap );

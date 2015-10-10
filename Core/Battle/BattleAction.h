@@ -46,16 +46,17 @@ namespace Battle
             virtual float GetHappenTime2(){ return 0;}
             virtual UInt16 GetObjectSize(){return 0;}
             virtual BattleObject* GetObject(UInt16 index){return NULL;}
+            virtual UInt16 GetSkillId(){return 0;}
     };
 
     class ActionPackage  : public BattleAction
     {
         public:
-            ActionPackage(BattleFighter * bf,UInt16 time/*,BattleObject* bo*/):_bf(bf),_time(time)//,_bo(bo)
+            ActionPackage(BattleFighter * bf,UInt16 skillId,UInt16 time/*,BattleObject* bo*/):_bf(bf),_skillId(skillId),_time(time)//,_bo(bo)
         {
             vec_bo.clear();
         }
-            ActionPackage(BattleFighter * bf,float time/*,BattleObject* bo*/):_bf(bf),_time2(time)//,_bo(bo)
+            ActionPackage(BattleFighter * bf,UInt16 skillId,float time/*,BattleObject* bo*/):_bf(bf),_skillId(skillId),_time2(time)//,_bo(bo)
         {
             vec_bo.clear();
         }
@@ -72,6 +73,7 @@ namespace Battle
             UInt16 GetObjectSize(); //{return vec_bo.size();}
             UInt16 GetHappenTime(); //{return _time;}
             float GetHappenTime2(); //{return _time;}
+            UInt16 GetSkillId() { return _skillId;}
 
             BattleObject* GetObject(UInt16 index) ;//{if(index > vec_bo.size())return NULL; return vec_bo[index];}
         private: 
@@ -80,6 +82,7 @@ namespace Battle
             BattleFighter * _bf; //攻击发起者
             UInt16 _time;
             float _time2;
+            UInt16 _skillId;
             //UInt8 _type;   //0 表示根据本包内容组织 1 表示根据攻击发起者进行组织(bf为NULL 或死亡，本次攻击失效)
     };
 
