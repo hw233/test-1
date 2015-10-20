@@ -55,27 +55,27 @@ namespace Battle
 
             void PosPrintf(UInt8 index);
 
-            UInt8 FighterMove(UInt8 index, UInt16 lastTime, UInt16 cutTime);
+            UInt8 FighterMove(UInt8 index, UInt16 lastTime, UInt16 cutTime); //所有角色移动（步兵骑兵）
 
             UInt16 GetTime(){return _time + GetTimeExtra();}
 
-            bool GetStop();
+            bool GetStop();  //战斗是否结束（骑兵来回冲刺结束，则战斗结束）
 
-            void SetAttackUp();
+            void SetAttackUp();  //(设置属性提升)
 
             UInt8 GetAttackUp(UInt8 side){if(side >1) return 0; return _attackUp[side];} 
 
-            void EnergyUp(UInt32 time);
+            void EnergyUp(UInt32 time);  //能量累积，用于判断是否可以释放大招
         private:
             UInt32 _id;
             BattleFighter* _fgt[2];
             Script::BattleFormula * _formula; 
             Stream _packet;
-            UInt32 _limitTime;
-            UInt16 _time;
-            UInt8 _distance;
+            UInt32 _limitTime;   //时间限制
+            UInt16 _time;        //(当前的时间段)
+            UInt8 _distance;     //本场的攻击距离（攻击距离低于此的，无法攻击）
             //UInt16 _complate[2];
-            UInt8 _attackUp[2];
+            UInt8 _attackUp[2];  //战场导致的属性提升(场地和双方的克制关系)
     };
 }
 #endif // BATTLESIMULATOR_H_

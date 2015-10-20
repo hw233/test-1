@@ -84,7 +84,7 @@ namespace Battle
     void BattleSimulator::InitFightersSide(UInt8 index)
     { 
         //XXX
-        //输入会+100
+        //输入会+100 站位点
         static UInt16 XPos[][11] = {
             {420,280,160,280,160,280,160,280,160,280,160},
             {1100,1240,1360,1240,1360,1240,1360,1240,1360,1240,1360},
@@ -118,25 +118,27 @@ namespace Battle
     void BattleSimulator::start(UInt8 prevWin , bool checkEnh)
     { 
         _packet.init(0x81);
-        InitFightersSide(0);
-        InitFightersSide(1);
+        InitFightersSide(0);  //攻方入场
+        InitFightersSide(1);  //守方入场
         //if(_fgt[0]->GetClass() == e_walk && _fgt[1]->GetClass() == e_walk)
         {
-            RandPosBegin(0);
+            RandPosBegin(0); //角色偏移（步兵骑兵防止己方前后同Y轴）
             RandPosBegin(1);
         }
         //UInt32 time  = 0;
         //战力提升
-        SetAttackUp();
+        SetAttackUp();  
 
         _packet << static_cast<UInt8>(_distance);
-        GetBSEnterInfo(_packet);
+        GetBSEnterInfo(_packet);  //入场信息
 
         BattleFighter * bf = NULL;//[2] = {NULL,NULL};
         UInt8 index = 1;
         UInt16 actCount = 0;
         size_t offset = _packet.size();
         _packet << actCount; 
+
+        //设置各角色的起始时间轴
         for(UInt8 i = 0; i < 2 ; ++i)
         {
             for(UInt8 j = 0; j < _fighters[i].size(); ++j)
@@ -147,6 +149,7 @@ namespace Battle
                 if(!bf || !bf->GetField() || !bf->getHP())
                     continue;
 
+                //角色攻击距离不足战斗的攻击距离
                 if(_distance > bf->GetAttackRange())
                     continue ;
                 UInt16 rand = (uRand(25)+1)*4;
@@ -161,14 +164,18 @@ namespace Battle
             while(1)
             {
                 //count ++;
-                time = GetMinTime();
+
+                //获取时间轴的最小时间点
+                time = GetMinTime();  
                 //COUT << "Now time:"  << time <<std::endl;
                 //COUT << "HP:" <<static_cast<UInt32>(_fgt[0]->getHP()) << std::endl;
                 if(time > 2000 || GetWin() < 4)
                 {
                     break; 
                 }
+                //随着时间积累能量
                 EnergyUp(time-lastTime);
+
                 actCount += doAction(time);
                 actCount += doObjectMove(time, (time - lastTime)/4);  //每回合
                 actCount += doImage(time);   
@@ -256,6 +263,7 @@ namespace Battle
         vec_flag.clear();
         vec_flag.resize(vec.size());
 
+        //遍历之前先判断是否又零值 (防止因为遍历顺序导致无法同时死亡)
         for(UInt8 i = 0; i < vec.size(); ++i)
         { 
             BattleFighter * fgt = vec[i].GetBattleFighter();
@@ -270,18 +278,22 @@ namespace Battle
             BattleFighter * fgt = bAction.GetBattleFighter();
             if(!vec_flag[i])
                 continue; 
+
+            //可能会攻击多个人
             for(UInt8 j = 0; j < bAction.GetObjectSize(); ++j)
             {
                 BattleFighter * bo = static_cast<BattleFighter*>(bAction.GetObject(j));
                 if(bo->getHP() == 0 || bo->GetAvoidHurt())
                     continue;
                 UInt32 param = bo->BeActed(&bAction);
+
+                //普通攻击的协议格式
                 _packet << static_cast<UInt16>(bAction.GetHappenTime());
                 _packet << static_cast<UInt8>(fgt->GetBSNumber());
                 _packet << static_cast<UInt8>(1);
                 _packet << static_cast<UInt16>(bAction.GetSkillId());
                 _packet << static_cast<UInt8>(static_cast<BattleFighter*>(bAction.GetObject(j))->GetBSNumber());
-                //param改
+                //param = 伤害状态{躲避，格挡、、、} << 16 | 伤害值
                 _packet << static_cast<UInt8>(param >> 16);
                 _packet << static_cast<UInt16>(param);
 
@@ -335,6 +347,8 @@ namespace Battle
             const GData::Skill* s = GData::skillManager[skillId];
             if(!s)
                 continue;
+
+            //场地大招效果产生后，标识重置为false #BattleField::GetSuperSkill 与 Skill::GetSuperSkill 同名
             if(GetSuperSkill() && s->GetSuperSkill())
                 SetSuperSkill(false);
             const GData::SkillEffect* se = s->GetSkillEffect();
@@ -360,14 +374,15 @@ namespace Battle
             //COUT << " 战将编号:" << static_cast<UInt32>(fgt->GetBSNumber());
             //COUT << " 法术编号:" << static_cast<UInt32>(bAction.GetSkillId()) << std::endl;
 
+            //技能buf
             UInt16 buffId = se->buffId;
             const GData::SkillBuff * sb = GData::skillBuffManager[buffId];
             UInt8 side  = 0;
             UInt8 count = 0;
             if(sb)
             {
-                side = sb->side;
-                count = sb->count;
+                side = sb->side; //buf作用方
+                count = sb->count; //buf作用时间
                 //UInt8 type = sb->type;
             }
             if(buffId && count && !side)
@@ -386,8 +401,10 @@ namespace Battle
                     continue;
                 if(buffId && count && side)
                     bo->AddBuff(buffId);
+
+                //param = 伤害状态{躲避，格挡、、、} << 16 | 伤害值
                 UInt32 param = bo->BeActed(&bAction);
-                //XXX 差法术协议
+
                 if(skillType == e_image_therapy)
                     _packet << static_cast<UInt8>(1);
                 else
@@ -397,6 +414,7 @@ namespace Battle
                 _packet << static_cast<UInt16>(param);
                 if(!bo->getHP())
                 {
+                    //小兵，武将斩杀数
                     if(bo->IsMainFighter())
                         fgt->AddKillCount1();
                     else
@@ -410,6 +428,7 @@ namespace Battle
 
             _packet.data<UInt8>(offset) = infectCnt;
 
+            //僵直时间
             UInt16 backCd = s->GetActionBackCd();
 
             //把行动完成的将领放入准备队列
@@ -420,7 +439,7 @@ namespace Battle
         return cnt;
     } 
 
-    //物体型技能
+    //当前时间点物体型技能(释放飞行物)的行动以及效果
     UInt8 BattleSimulator::doObjectMove(UInt16 time, UInt8 cnt)
     { 
         std::list<ObjectPackage>& lst = FieldObject;//GetObjectpackage();
@@ -439,6 +458,7 @@ namespace Battle
 
             if(it->GetBeing() > time)
             {
+                //释放者死亡 （飞行体消失）
                 if(!fgt->getHP())
                     it = lst.erase(it);
                 else
@@ -458,13 +478,17 @@ namespace Battle
                     BattleFighter * ft = _fighters[!fgt->GetSideInBS()][i];
                     if(target)
                         ft = target;
+                    //检查是否能攻击到对方（对方是否无敌）
                     if(it->CheckFighterAttacked(ft))
                         continue;
+                    //检查对方是否在攻击的范围内
                     if(it->CheckFighterInSCope(ft)) 
                     { 
                         if(ft->getHP() == 0)
                             continue;
                         UInt32 param = ft->BeActed(&(*it));
+
+                        //伤害产生放入本技能的伤害列表 （统一写入协议）
                         it->InsertIntoPackage(time+index*4,ft, param);
                         if(ft->getHP() == 0)
                         {
@@ -492,6 +516,7 @@ namespace Battle
                     flag = true;
                     break;
                 } 
+                //粒子型技能前进
                 it->GoNext();
             }
             if(!flag)
@@ -533,6 +558,7 @@ namespace Battle
         return bf->AppendFighterStream(_packet);
     } 
 
+    //完成当前时间点攻击队列的攻击行为
     UInt8 BattleSimulator::doAction(UInt16 time)
     { 
         UInt16 time1 = 0;

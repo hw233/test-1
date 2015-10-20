@@ -5,6 +5,7 @@ if [ "$1" != "" ]
 then
     F=$1
 fi
+
 function skillCondition()
 {
 # 11,302,2,3|303,1,0,40,3,4
@@ -34,9 +35,9 @@ function skillCondition()
     if [ $? -eq 0 ]
     then
 #        iconv2utf8 $d
-        echo OK
+        echo "OK"
     else
-        echo ERROR
+        echo "ERROR"
     fi
 }
 function iconv2utf8()
@@ -49,5 +50,5 @@ if [ -f $F  ]
 then
     skillCondition $F
 else
-    echo File $F is not exists
+    echo "File $F is not exists"
 fi

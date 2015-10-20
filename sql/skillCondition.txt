@@ -24,7 +24,7 @@ skillID	name	triggerType	triggerProbability	castDistance	skillWeight
 402	贾诩投掷炸弹	0	100	100	2	
 403	贾诩劈砍	0	100	100	3	
 404	贾诩爆发	0	0	0	0	
-405	贾诩防御	1	0	0	9	
+405	贾诩防御	1	50	0	9	
 501	弓兵平射	0	100	-1	1	
 502	弓兵抛射	0	0	0	0	
 503	弓兵劈砍	0	100	100	2	
