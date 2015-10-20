@@ -186,7 +186,6 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 void GameClient::onRecv( int cmd, int len, void * buf )
 {
 	/* hack: ????xml??ȫ??????flash?ͻ??? */
-    printf("I Get The Message \n");
 	if(cmd > 0x1FF)
 	{
 		static char resp[1024] = {0};

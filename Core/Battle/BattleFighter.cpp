@@ -213,6 +213,34 @@ namespace Battle
                 break;
         } 
 
+        if(hpSub)
+        { 
+            UInt16 skillId = bAction->GetSkillId();
+            const GData::Skill* s = GData::skillManager[skillId];
+            const GData::SkillEffect* se = s->GetSkillEffect();
+            UInt16 stiffFixed = se->stiffFixed;
+            if(stiffFixed) 
+                _crick += stiffFixed;
+
+            if(se->beatBack)
+            { 
+                BattleFighter *fgt = bAction->GetBattleFighter();
+                if(fgt)
+                { 
+                    if(fgt->getPosX() > getPosX())
+                    {
+                        if(getPosX() > se->beatBack)
+                            setPos(getPosX() - se->beatBack, getPosY());
+                    }
+                    else
+                    {
+                        if(getPosX() + se->beatBack < FIELD_WIDTH ) 
+                            setPos(getPosX() + se->beatBack, getPosY());
+                    }
+                } 
+            } 
+        } 
+
         makeDamage(hpSub);
 
         if(GetClass() == e_shoot || GetClass() == e_advice)
@@ -277,6 +305,8 @@ namespace Battle
                 case e_attack_near:
                 case e_attack_middle:
                 case e_attack_distant:
+                case e_attack_back:
+                case e_attack_quick:
                     {
                         //COUT << " 发起普通攻击 " ;
                         flag = NormolAttack();
@@ -304,8 +334,6 @@ namespace Battle
                         GetField()->AddTimeExtra(s->GetFrozrTime());
                         flag = NormolImage();
                     } 
-                    break;
-                case e_attack_counter:
                     break;
                 case e_object_image:
                 case e_object_attack:
@@ -420,7 +448,7 @@ namespace Battle
             UInt16 advance1 = 0;
             UInt16 advance2 = 0;
             UInt16 adv = 0; 
-            if(_target)
+            if(!type && _target)
             {
                 if(GetTypeId() == e_ride)
                     advance1 = s->GetActionCd1()*GetSpeed()/100;

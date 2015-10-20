@@ -81,7 +81,11 @@ namespace GData
         UInt16 trerapy;
         float trerapyP;
 
+        float stiffFixed;
+
         UInt8 avoidhurt;
+
+        UInt8 beatBack;
     };
 
     struct DBFighterBase  
@@ -296,7 +300,7 @@ namespace DB
         SPECIALEND()
 
         SPECIALBEGIN(GData::DBSkillEffect)
-        SPECIALDEF(9)
+        SPECIALDEF(11)
         (
          UInt16, id,
          std::string, name,
@@ -310,7 +314,11 @@ namespace DB
          UInt16, trerapy,
          float, trerapyP,
 
-         UInt8, avoidhurt
+         float, stiffFixed,
+
+         UInt8, avoidhurt,
+
+         UInt8, beatBack
         )
         SPECIALEND()
 

@@ -275,7 +275,7 @@ namespace Battle
                 BattleFighter * bo = static_cast<BattleFighter*>(bAction.GetObject(j));
                 if(bo->getHP() == 0 || bo->GetAvoidHurt())
                     continue;
-                UInt16 param = bo->BeActed(&bAction);
+                UInt32 param = bo->BeActed(&bAction);
                 _packet << static_cast<UInt16>(bAction.GetHappenTime());
                 _packet << static_cast<UInt8>(fgt->GetBSNumber());
                 _packet << static_cast<UInt8>(1);

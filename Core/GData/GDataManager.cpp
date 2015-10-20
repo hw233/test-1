@@ -242,7 +242,7 @@ namespace GData
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
         if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillEffect dbskeffect;
-        if(execu->Prepare("SELECT `id`,`name`,`skillType`,buffId,`damage`,`damageP`,`trerapy`,`trerapyP`,`avoidhurt` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`,`name`,`skillType`,buffId,`damage`,`damageP`,`trerapy`,`trerapyP`,`stiffFixed`,`avoidhurt`,`beatBack` FROM `skillEffect`", dbskeffect) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {    
@@ -255,7 +255,10 @@ namespace GData
             se->damageP = dbskeffect.damageP;
             se->trerapy = dbskeffect.trerapy;
             se->trerapyP = dbskeffect.trerapyP;
+
+            se->stiffFixed = dbskeffect.stiffFixed * 100;
             se->avoidhurt = dbskeffect.avoidhurt;
+            se->beatBack = dbskeffect.beatBack;
 
             skillEffectManager.add(se);
         }    

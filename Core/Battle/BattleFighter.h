@@ -36,13 +36,15 @@ namespace Battle
         e_attack_distant = 4, //远距离攻击
         e_image_attack = 5,  //魔法攻击
         e_image_therapy = 6, //魔法治疗
-        e_attack_counter = 7, //反击
-        e_be_attacked = 8 , //被攻击
+        //e_attack_counter = 7, //反击
+        e_attack_back = 7, //击退（眩晕处理）
+        e_attack_quick = 8 , //快攻
         e_run_attack = 9 ,   //跑攻 (骑兵专用)
         e_object_image = 10,
         e_object_attack = 11, //弓箭（追击型）
         e_image_attack_time_special = 12, // 根据目标数量决定施法时间
-        e_parry // 格挡
+        e_parry = 13, // 格挡
+        e_be_attacked = 14
     };
 
     /*

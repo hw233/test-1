@@ -18,12 +18,12 @@ function skillEffect()
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
-    echo "Generating file $d, total lines $l"
+    echo Generating file $d, total lines $l
     awk '
         BEGIN {
             print "INSERT INTO `skillEffect` VALUES";
         } {
-            printf("(%u,\x27%s\x27,%d,%u,%u,%.2f,%u,%.2f,%u)",$1,$2,$3,$4,$5,$6,$7,$8,$11);
+            printf("(%u,\x27%s\x27,%d,%u,%u,%.2f,%u,%.2f,%.2f,%u,%u)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$11,$12);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

@@ -42,7 +42,7 @@ namespace GData
             ~SkillCondition(){}
             bool MeetCondition(UInt16 advance ,UInt8& pri) const 
             {
-                if(uRand(10000) > prob)                
+                if(uRand(100) > prob)                
                     return false;
                 if(distance >= advance && pri <= priority)  //XXX 等号添加
                 { 
@@ -98,8 +98,10 @@ namespace GData
             UInt16 trerapy;  //基础治疗
             float trerapyP;  //治疗百分比
 
+            UInt8 stiffFixed;
 
             UInt8 avoidhurt ;
+            UInt8 beatBack;
             // UInt16 defend;   //附加防御增加
             // float defendP;   //附加防御百分比增加
     };

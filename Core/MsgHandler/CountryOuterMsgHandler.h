@@ -758,4 +758,12 @@ void OnFreshStoreItems(GameMsgHdr& hdr, const void * data)
 
 }
 
+void OnRechargeForPlayer(GameMsgHdr& hdr, const void *data)
+{ 
+    MSG_QUERY_PLAYER(player);
+    BinaryReader br(data,hdr.msgHdr.bodyLen);
+    UInt32 val = 0;
+    br >>val;
+    player->Recharge(val);
+} 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

@@ -496,7 +496,21 @@ void IdentifyAccount( LoginMsgHdr& hdr, IdentifyAccountStruct& nu )
     cl->send(&st[0], st.size());
 }
 
+void OnRecharge(LoginMsgHdr& hdr,const void *data)
+{ 
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 playerId = 0;
+    UInt32 amount = 0;
+    br >> playerId ;
+    br >> amount;
 
+    GObject::Player * pl = GObject::globalPlayers[playerId];
+    if(!pl)
+        return ;
+
+    GameMsgHdr imh(0x158, pl->getThreadId(), pl, sizeof(amount));
+    GLOBAL().PushMsg(imh, &amount);
+} 
 
 #endif // _LOGINOUTERMSGHANDLER_H_
 

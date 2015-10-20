@@ -57,6 +57,7 @@ namespace Network
 
 	void TcpConduit::on_read( )
 	{
+        printf("I Get The Message \n");
 		struct evbuffer * buffer = bufferevent_get_input(_bev);
 		while(1)
 		{

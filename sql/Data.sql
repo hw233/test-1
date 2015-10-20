@@ -100,7 +100,10 @@ CREATE TABLE `skillEffect` (
       `damageP` float(10,2) NOT NULL COMMENT '伤害百分比',
       `trerapy` int(10) NOT NULL DEFAULT '0',
       `trerapyP` float(10,2) NOT NULL COMMENT '治疗增幅分比',
+      `stiffFixed` float(10,2) NOT NULL DEFAULT '0',
+      /*`stiffRate` float(10,2) NOT NULL COMMENT '百分比僵直(含义不明)',*/
       `avoidhurt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+      `beatBack` tinyint(3) unsigned NOT NULL DEFAULT '0',
       PRIMARY KEY (`id`,`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;

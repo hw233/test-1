@@ -74,6 +74,8 @@ MSG_HANDLER_DECLARE(CountryMsgHandler)
 
     MSG_REG_2(GameMsgHdr,0x157,OnFreshStoreItems);
 
+    MSG_REG_2(GameMsgHdr,0x158,OnRechargeForPlayer);
+
     //推图战役奖励
     MSG_REG_2(GameMsgHdr,REQ::BATTLE_AWARD,OnFarWardAward);
 

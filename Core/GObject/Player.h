@@ -408,6 +408,8 @@ namespace GObject
             void SetVipLevel(UInt8 level) { vipLevel = level;}
 
             TaskManager* GetTaskManager() const { return m_taskManager;}
+
+            void Recharge(UInt32 val);
     private:
             //IDTYPE _id;
             std::string _accounts;

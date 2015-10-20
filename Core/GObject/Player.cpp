@@ -1556,4 +1556,8 @@ namespace GObject
             st << it->power;
         } 
     } 
+    void Player::Recharge(UInt32 val)
+    { 
+        AddVar(VAR_GOLD, val);
+    } 
 }

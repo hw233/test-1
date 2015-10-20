@@ -12,5 +12,6 @@ MSG_REG(LoginMsgHdr, CreateAccount);
 MSG_REG(LoginMsgHdr, IdentifyAccount);
 //MSG_REG_2(LoginMsgHdr, 0x330, OnForbidSale);
 //MSG_REG(GameMsgHdr, UserDisconnect);
+MSG_REG_2(LoginMsgHdr, 0x123, OnRecharge);
 
 MSG_HANDLER_END()
