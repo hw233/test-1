@@ -64,7 +64,7 @@ namespace Battle
             case e_attack_middle:
             case e_attack_distant:
             case e_image_attack:
-            case e_image_therapy:
+            case e_image_therapy: //弃用
                 {
                     //_st << static_cast<UInt8>(wait);  //是否延迟
                     //_st << static_cast<UInt8>(_actionLast); //动作持续
@@ -74,7 +74,7 @@ namespace Battle
                         //_st << (_target)->getPosY();
                     } 
                 }
-            case e_be_attacked:
+            case e_be_attacked://弃用
                 _st << static_cast<UInt32>(param);
                 break;
             default :

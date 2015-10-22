@@ -249,6 +249,8 @@ namespace Battle
                 { 
                     //XXX
                     std::vector<UInt8> vec1 = getAliveCount(side);
+                    if(!ss->x)
+                        return ;
                     UInt8 div = vec1.size()/ss->x; 
                     UInt8 rand = uRand(div);
                     for(UInt8 i = 0; i < ss->x ; ++i)
@@ -471,6 +473,7 @@ namespace Battle
         //    return ;
 
         //COUT << "-----战将编号：" << static_cast<UInt32>(fgt->GetBSNumber()) << " 准备于时间点 " <<  static_cast<UInt32>(time+4) << std::endl;
+        //无论如何最多放在下一个时间片段
         BattlePre[time + 4].push_back(fgt);
     } 
 

@@ -587,6 +587,9 @@ namespace Battle
             return ;
         if(_fgt[index]->GetClass() != 2 && _fgt[index]->GetClass() != 1)
             return ;
+
+
+        //为防止所有人在中间相遇，有根据y值设置速度
         for(UInt8 i = 0; i < (_fighters[index].size()-1)/2 ; ++i)
         { 
             UInt32 rand = uRand(99);

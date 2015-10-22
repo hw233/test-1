@@ -36,7 +36,7 @@ namespace Battle
 
         _multiKill = 0;
 
-        //if(f) //战将属性  小兵属性延后
+        //if(f) //战将属性
         if(f)
         { 
             setHP(f->GetFighterAttr(e_attr_hp));
@@ -47,7 +47,7 @@ namespace Battle
             AddSkill();
         } 
 
-        //属性
+        //是否又小兵
         if( f->GetChildTypeId())
         {
             UInt16 fighterId = f->GetChildTypeId();
@@ -87,9 +87,6 @@ namespace Battle
         if(!f)
             return ;
         _fighter = f ;
-        //运动行为
-        //preActionList.push_back(ActionBase(0,0,0));
-        //普通攻击
     } 
 
     void BattleFighter::GoForward(UInt8 flag ,UInt16 advance) // flag ===0  表示Y优先  flag ==1 表示斜线
@@ -150,6 +147,7 @@ namespace Battle
         UInt32 hpSub = 0;
         UInt8 flag = 0;
 
+        //物理攻击
         if(bAction->GetBattleFighter()->GetTypeId() != e_advice)
         {
             if(attack <= defend)
@@ -161,7 +159,7 @@ namespace Battle
                 hpSub += attack - (defend  * 75 /100);
             }
         }
-        else
+        else //法术攻击
         {
             if(attackImage <= defendImage)
             { 
@@ -178,6 +176,8 @@ namespace Battle
         UInt32 hit = bAction->GetHit();
         UInt32 evade = GetEvade(); 
         UInt32 rand = uRand(10000);
+
+        //闪避
         if(!evade || rand > (hit*10000/evade))
         {
             flag = 1;
@@ -186,12 +186,14 @@ namespace Battle
         UInt32 critical = bAction->GetCritical();
         UInt32 criticalDef = GetCriticalDef(); 
         rand = uRand(10000);
+
+        //暴击
         if(!criticalDef || rand > (critical * 10000/criticalDef))
         {
             flag = 2;
         }
 
-        GetAttackedSkill(flag);
+        GetAttackedSkill(flag);  //被击的发动被动技能
 
         //伤害变化
         switch(flag)
@@ -218,10 +220,11 @@ namespace Battle
             UInt16 skillId = bAction->GetSkillId();
             const GData::Skill* s = GData::skillManager[skillId];
             const GData::SkillEffect* se = s->GetSkillEffect();
-            UInt16 stiffFixed = se->stiffFixed;
+            UInt16 stiffFixed = se->stiffFixed;  //僵直，眩晕
             if(stiffFixed) 
                 _crick += stiffFixed;
 
+            //击退
             if(se->beatBack)
             { 
                 BattleFighter *fgt = bAction->GetBattleFighter();
@@ -243,6 +246,7 @@ namespace Battle
 
         makeDamage(hpSub);
 
+        //弓箭手和谋士，谁打我我打谁
         if(GetClass() == e_shoot || GetClass() == e_advice)
         { 
             BattleFighter *fgt = bAction->GetBattleFighter();
@@ -254,6 +258,8 @@ namespace Battle
         } 
 
         AddEnergy(5);
+
+        //param = 伤害状态{躲避，格挡、、、} << 16 | 伤害值
         return hpSub | (flag << 16);
         //BuildLocalStream(e_be_attacked , hpSub);
     } 
@@ -261,10 +267,10 @@ namespace Battle
     { 
         if(!getHP())
             return ;
-        //_st.clear();
+        //更新行动列表(检查技能列表是否冷却结束)
         UpdateActionList();
-        //硬直
 
+        //硬直
         if(_crick)
         {
             GetField()->InsertBattlePre(GetNowTime()+_crick, this);
@@ -280,11 +286,10 @@ namespace Battle
             return ;
         }
 
-        //COUT <<"BattleFighter("<< static_cast<UInt32>(GetBSNumber()) <<") 行动开始 时间：" << static_cast<UInt32>(GetNowTime()) ;
-
         if(BeForAction())
             return ;
 
+        //获取当前的行为
         GetActionFromField();
 
         //Print
@@ -293,6 +298,7 @@ namespace Battle
         bool flag = false;
 
         if(_ab._skillId)
+        {
             //COUT << " 技能选择 " << static_cast<UInt32>(_ab._skillId);
 
             switch(_actionType)
@@ -361,6 +367,9 @@ namespace Battle
                     }
                     break;
             } 
+        }
+
+        //flag 指明此次是否有动作
         if(!flag)
         {
             //COUT << " 无动作 位置: " << static_cast<UInt32>(getPosX()) << " , " << static_cast<UInt32>(getPosY()) ;
@@ -426,6 +435,7 @@ namespace Battle
         } 
     } 
 
+    //从技能准备列表中选取当前可以释放的技能   参数：距离，主/被动
     ActionBase BattleFighter::GetActionCurrent(UInt16 advance, UInt8 type) //type == 0 主动  1 被动
     { 
         UInt8 priority = 0;
@@ -439,9 +449,10 @@ namespace Battle
             const GData::Skill * s = GData::skillManager[it->_skillId];
             if(!s)
                 continue;
-            if(s->GetSkillCondition()->cond != type)
+            if(s->GetSkillCondition()->cond != type)  
                 continue;
 
+            //超级技能（大招） 的释放，要确保此时没有其他角色释放超级技能，并且能量吵过100
             if(s->GetSuperSkill() && (GetField()->GetSuperSkill() || _energy < 100 ))
                 continue;
 
@@ -464,6 +475,8 @@ namespace Battle
                     adv = advance1 + advance2;
 
             }
+
+            //当前技能是否匹配
             if(s->GetSkillCondition()->MeetCondition(advance - adv,priority)) //XXX
             {
                 flag = 1;
@@ -487,6 +500,7 @@ namespace Battle
     void BattleFighter::BuildLocalStream(UInt8 wait , UInt8 param)
     { 
     } 
+
     ActionPackage BattleFighter::MakeActionEffect()   //实现动作效果  伤害 法术等
     { 
         return  ActionPackage( this,_ab._skillId,_nowTime);  //未加入目标对象
@@ -556,6 +570,8 @@ namespace Battle
         BattleBuff bb = BattleBuff(buffId, count);
         if(sb->attrIds.size() > sb->valueP.size() || sb->attrIds.size() > sb->value.size())
             return ;
+
+        //暂时支持属性加成buf
         for(UInt8 i = 0; i < sb->attrIds.size(); ++i )
         { 
             UInt8 attrId = sb->attrIds[i];
@@ -572,7 +588,7 @@ namespace Battle
     } 
     void BattleFighter::CheckBuff()
     { 
-        //BUFF 时间
+        //检查 BUFF 时间
         if(!bufflst.size())
             return ;
         std::list<BattleBuff>::iterator it = bufflst.begin();
@@ -606,6 +622,7 @@ namespace Battle
         } 
     } 
 
+    //从fighter导入技能
     void BattleFighter::AddSkill() 
     { 
         std::vector<UInt16> vec = GetBaseSkills();
@@ -615,7 +632,7 @@ namespace Battle
             const GData::Skill * s = GData::skillManager[skillId];
             if(!s)
                 continue;
-            if(!_fighter && skillId > 1000)
+            if(!_fighter/* && skillId > 1000*/)
                 continue;
             preActionList.push_back(ActionBase(skillId));
             //break;
@@ -667,12 +684,15 @@ namespace Battle
                 return 0;
         }
         { 
+            //战斗包
             ActionPackage ap(this, _ab._skillId, GetNowTime()/*,_target*/);
             ap.PushObject(_target);
-
+            
+            //战斗包队列
             GetField()->InsertTimeBattleAction( GetNowTime() + _actionLast ,ap );
             _actionType = e_none;
 
+            //加入准备队列
             GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast,this);
         } 
         return 1;
@@ -688,12 +708,15 @@ namespace Battle
         GetField()->GetTargetList(!GetSideInBS(), this , ip.vec_bo, _ab._skillId , GetBattleDirection()+1);
 
         UInt16 cd = _actionLast; // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
+
+        //特殊技能 冷却时间由对方受击角色数量决定
         if(s->GetSkillEffect()->skillType == e_image_attack_time_special)
             cd = s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
         GetField()->InsertTimeBattleAction(static_cast<UInt16>(GetNowTime()+cd),ip);
         return 1;
     } 
 
+    //粒子型技能
     UInt8 BattleFighter::NormolObject()
     { 
         const GData::Skill * s = GData::skillManager[_ab._skillId];
@@ -713,15 +736,22 @@ namespace Battle
 
         ObjectPackage op(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         op.setObjectDirection(/*getPosX(),minY + (ss->rady+1)*i*width,*/GetBattleDirection(),0,40, 0, 50);
+        
+        //设置最多可攻击数量
         op.setObjectCount(s->GetAttackCount());
+
+        //设置动作行为(粒子分类，追击型，行动型)
         op.SetEffectType(_actionType);
         for(UInt8 i = 0 ; i < ss->radx ; ++i)
         {
             op.pushObjectPoint(getPosX(), minY + (ss->rady+1)*i*width);
         }
+
+        //什么时间开始起作用
         op.SetBeing(GetNowTime() + _actionLast);
         GetField()->InsertObjectPackage(op);
 
+        //粒子型技能释放之后，武将进入行动队列
         GetField()->InsertBattlePre(GetNowTime() + _actionLast + _actionBackLast, this);
         return 1;
     } 
@@ -798,6 +828,7 @@ namespace Battle
             UInt8 type = s->GetSkillEffect()->skillType;
             switch(type)
             { 
+                //格挡(产生僵直)
                 case e_parry:
                     { 
                         if(_ab._skillId)

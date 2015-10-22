@@ -212,7 +212,7 @@ namespace Battle
 
             virtual UInt8 GetRideCount() {return 1;}
 
-            virtual UInt16 GetBaseActionNum() = 0 ;
+            virtual UInt16 GetBaseActionNum() = 0 ; //(基础攻击技能)弃用
             
             UInt32 GetAttack()
             { 
@@ -271,6 +271,7 @@ namespace Battle
                 if(index >= e_attr_max)
                     return 0;
                 UInt8 multiKill = GetMultiKill();
+                //连杀导致战斗属性下降
                 if(multiKill > 19)
                     multiKill = 19;
                 return (A_SUB_B(attrBase[index]+attrAdd[index] , attrSub[index]))* (20 - multiKill )* 5 / 100;
@@ -361,18 +362,19 @@ namespace Battle
             UInt8 _actionType;  // 动作类型
 
             Script::BattleFormula * _formula;
-            BattleFighter * m_fighters[MYFIGHTERMAX];
+            BattleFighter * m_fighters[MYFIGHTERMAX];  //小兵指针数组
             BattleFighter * m_mainFighter;   //主将指针
             UInt8 _number;   //所在阵营
 
-            ActionBase _ab;
+            ActionBase _ab;  //当前选择的行为
 
             ActionSort  preActionList;   //动作行为列表O
             ActionSort  preActionCD;     //待CD动作行为列表
 
-            GObject::Fighter * _fighter;
-            BattleField * _field;
+            GObject::Fighter * _fighter;  //本体fighter指针
+            BattleField * _field;        //场地指针
 
+            //战场属性
             UInt8 EnterX;
             UInt8 EnterY;
 
@@ -380,52 +382,53 @@ namespace Battle
             UInt8 _crickSum;  //硬直累计
             UInt8 _crickLev; //硬直等级
 
-            //霸体 
+            //霸体 (暂时未使用)
             UInt8 _stoic;
             UInt8 _stoicLev;
 
             UInt32 _wreck; //破击
             UInt32 _parry;  //格挡
 
-            UInt8 _groundX;
+            UInt8 _groundX; //战场位置
             UInt8 _groundY;
 
-            UInt16 _battleIndex;
+            UInt16 _battleIndex; 
 
             UInt16 _nowTime; //行动时间
-            float _nowTime2; //行动时间
-            UInt16 _beginTime;
+            float _nowTime2; //行动时间(备用)
 
-            UInt16 _minX;  //入场X坐标  //TODO
-            UInt16 _minY;  //入场Y坐标  //TODO
+            UInt16 _beginTime;  //起始动作时间
 
-            UInt16 _battleTargetX;
+            UInt16 _minX;  //入场X坐标  (用于计算骑兵的行径路线)
+            UInt16 _minY;  //入场Y坐标  
+
+            UInt16 _battleTargetX;        //战斗对象的坐标
             UInt16 _battleTargetY;
 
-            UInt8 _sideInBS;
+            UInt8 _sideInBS;              //进攻方0 防守方1
 
-            UInt32 attrBase[e_attr_max];
-            UInt32 attrAdd[e_attr_max];
-            UInt32 attrSub[e_attr_max];
+            UInt32 attrBase[e_attr_max];  //基础属性
+            UInt32 attrAdd[e_attr_max];   //buff增加属性
+            UInt32 attrSub[e_attr_max];  //buff减少属性值
 
-            std::list<BattleBuff> bufflst;
-            UInt8 _direction;
+            std::list<BattleBuff> bufflst;  //bufflist
+            UInt8 _direction;    //方向（步兵，骑兵有方向区别）
             UInt16 _killCount1;  // 击杀主将
             UInt16 _killCount2;  // 击杀小兵
 
-            UInt16 _cachePx;
+            UInt16 _cachePx;   //曾经使用于缓冲x累加值
 
             bool _acted;  //XXX
 
-            bool _avoidhurt;
+            bool _avoidhurt;  //是否无敌
 
-            bool _isChild;
+            bool _isChild;   //与IsMainFighter 效果相同
 
-            UInt32 _energy;
+            UInt32 _energy;    //能量
 
-            UInt8 _multiKill;
+            UInt8 _multiKill;  //连杀
         public:
-            BattleFighter * _target;
+            BattleFighter * _target;  //攻击对象（步兵固定）
     };
 
 }

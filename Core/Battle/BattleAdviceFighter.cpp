@@ -35,13 +35,21 @@ namespace Battle
         const GData::Skill * s = GData::skillManager[_ab._skillId];
         if(!s)
             return 0;
-        ImagePackage ip(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime2());
+        ImagePackage ip(_ab._skillId,GetAttack(),GetAttackImage(),GetCritical(),GetWreck(),GetHit(),this,GetNowTime());
         GetField()->GetTargetList( !GetSideInBS(), this , ip.vec_bo, _ab._skillId);
 
-        float cd = s->GetActionCd(); // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
-        GetField()->InsertTimeBattleAction(GetNowTime2()+cd,ip);
+        UInt16 cd = s->GetActionCd(); // s->GetActionCd1()*ip.vec_bo.size() + s->GetActionCd2();
+        GetField()->InsertTimeBattleAction(GetNowTime()+cd,ip);
         //GetField()->InsertTimeBattleAction(_nowTime2 + _actionLast, ip);
         return 1;
+    } 
+
+    UInt16 BattleAdviceFighter::GetTargetDistance()
+    { 
+        if(!_target || !GetField())
+            return 0;
+        UInt16 advance = GetField()->getDistance(this,_target);
+        return advance;
     } 
 } 
 

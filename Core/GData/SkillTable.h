@@ -73,7 +73,7 @@ namespace GData
             bool InTheScope(UInt16 loaclX ,UInt16 localY ,UInt16 targetX , UInt16 targetY);
         public:
             UInt8 area;  //范围类型  0-单体 1-全体  2-目标扩散型 3-地形半径扩散型  4-地形直线扩散型 4-无限范围
-            UInt16 x ;
+            UInt16 x ;   //具体含义见execl
             UInt16 y ;
             UInt16 radx;  //范围半径
             UInt16 rady;
@@ -88,9 +88,9 @@ namespace GData
                 : ObjectBaseT<UInt16>(id,name) { } 
 #endif
         public:
-            UInt8 skillType;
+            UInt8 skillType;  //效果类型
 
-            UInt16 buffId;
+            UInt16 buffId;   //技能附带buff
 
             UInt16 damage;   //基础伤害
             float damageP;   //伤害百分比
@@ -98,10 +98,10 @@ namespace GData
             UInt16 trerapy;  //基础治疗
             float trerapyP;  //治疗百分比
 
-            UInt8 stiffFixed;
+            UInt8 stiffFixed;  //眩晕时间
 
-            UInt8 avoidhurt ;
-            UInt8 beatBack;
+            UInt8 avoidhurt ;  //是否无敌
+            UInt8 beatBack;    //击退效果
             // UInt16 defend;   //附加防御增加
             // float defendP;   //附加防御百分比增加
     };
@@ -115,12 +115,12 @@ namespace GData
             void SetSide(UInt8 side1){ side = side1;}
             void SetType(UInt8 type1){ type = type1;}
         public:
-            std::vector<UInt8> attrIds;
-            std::vector<UInt8> valueP;
-            std::vector<UInt16> value;
+            std::vector<UInt8> attrIds; //属性id 列表
+            std::vector<UInt8> valueP;  //属性百分比增幅 列表
+            std::vector<UInt16> value;  //属性固定增幅 列表
             UInt16 count;   //BATTLE
-            UInt8 side;
-            UInt8 type;
+            UInt8 side;  //作用方（0 自己，1对方）
+            UInt8 type;  //0-减弱 1-增幅
     } ;
 
 
@@ -190,8 +190,8 @@ namespace GData
             UInt16 _actionBackCd;     //技能后置
             UInt16 _frozeTime;     //技能冻结
             UInt16 _mpCost;
-            UInt8 _superSkill;
-            UInt8 _attackCount;
+            UInt8 _superSkill;     //是否为场地大招
+            UInt8 _attackCount;    //攻击次数上线
             UInt16 _lstTime;   //持续时间
     };
 

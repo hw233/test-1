@@ -49,6 +49,7 @@ namespace Battle
             virtual UInt16 GetSkillId(){return 0;}
     };
 
+    //攻击包info
     class ActionPackage  : public BattleAction
     {
         public:
@@ -86,6 +87,7 @@ namespace Battle
             //UInt8 _type;   //0 表示根据本包内容组织 1 表示根据攻击发起者进行组织(bf为NULL 或死亡，本次攻击失效)
     };
 
+    //法术包info
     class ImagePackage : public BattleAction
     {
         public:
@@ -134,6 +136,8 @@ namespace Battle
         UInt16 _y;
         PointOb(UInt16 x, UInt16 y):_x(x),_y(y){}
     };
+
+    //粒子型info
     class ObjectPackage : public BattleAction
     { 
         public:
@@ -285,13 +289,13 @@ namespace Battle
             UInt16 _time;
             float _time2;
             
-            std::vector<struct PointOb> _point;
+            std::vector<struct PointOb> _point;  //粒子坐标
 
-            UInt16 _xAdd;
-            UInt16 _yAdd;
+            UInt16 _xAdd;   //x 步长
+            UInt16 _yAdd;   //y 步长
 
-            UInt8  _flagX;
-            UInt8  _flagY;
+            UInt8  _flagX;  //x方向  0--向左  1--向右
+            UInt8  _flagY;  //y方向  0--向下  1--向上
             UInt16 _rad;   //物体距离
 
             UInt8 _count;

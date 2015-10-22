@@ -4,6 +4,7 @@ namespace Battle
 { 
     bool BattleRideFighter::PreGetObject()
     { 
+        //获取战斗对象
         PreGetObject1() ;
         if(!_target)
             return false;
@@ -13,18 +14,18 @@ namespace Battle
         {
             switch(count)
             {
-                case 0:
+                case 0:  //第一次出发
                     {
                         _battleTargetX = (getPosX() > (FIELD_WIDTH)/2) ? 100:(FIELD_WIDTH-100);
                         break;
                     }
-                case 1:
+                case 1:  //回头
                     {
                         _battleTargetX = GetMinX();
                         _battleTargetY = GetMinY();
                         break;
                     }
-                case 2:
+                case 2:  //停
                     {
                         SetBattleTargetPos(getPosX(),getPosY());
                         break;
@@ -90,7 +91,7 @@ namespace Battle
             case e_attack_middle:
             case e_attack_distant:
             case e_image_attack:
-            case e_image_therapy:
+            case e_image_therapy: //弃用
                 {
                     break;
                     //for(;it!=targetList.end();++it)
@@ -118,7 +119,7 @@ namespace Battle
                     } 
                 }
                 break;
-            case e_be_attacked:
+            case e_be_attacked:  //弃用
                 {
                     break;
                     _st << static_cast<UInt8>(_nowTime);
@@ -174,7 +175,7 @@ namespace Battle
         return 0;
     } 
 
-    // 1 <=> --->    0<==> <---
+    //进攻方向 1 <=> --->    0<=> <---
     UInt8 BattleRideFighter::GetBattleDirection()
     { 
         if(count == 1)
@@ -187,6 +188,7 @@ namespace Battle
      UInt8 BattleRideFighter::BeForAction()
      { 
          return 0;
+         //40%启动
         if(!isRunSend)
         {
             if(uRand(100) < 40)  //XXX
