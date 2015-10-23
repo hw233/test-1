@@ -189,6 +189,7 @@ namespace Battle
             _time = time;
         }
 
+        //粒子型技能战报
         actCount += ClearObjectPackage();
         //COUT << "行动数量" << static_cast<UInt32>(actCount) <<std::endl;
         FieldPrint();
@@ -685,6 +686,7 @@ namespace Battle
         } 
         return false;
     } 
+
     void BattleSimulator::SetAttackUp()
     { 
         static UInt8 groundUp[][5] = {
